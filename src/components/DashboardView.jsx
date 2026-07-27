@@ -4,98 +4,140 @@ import { PidSlider } from './PidSlider';
 import { dict } from '../locales/dictionary';
 
 export const DashboardView = ({ 
-  lang, setLang, isDarkMode, setIsDarkMode, isConnected, connectBluetooth, disconnectBluetooth, toggleCamera, showAdvanced, setShowAdvanced
+  lang, setLang, 
+  isDarkMode, setIsDarkMode, 
+  isConnected, connectBluetooth, disconnectBluetooth, 
+  toggleCamera, showAdvanced, setShowAdvanced 
 }) => {
   const t = dict[lang];
 
-  // Bộ CSS động chuyển màu theo Theme
+  // Hệ màu chuẩn iOS / iPadOS
   const theme = {
-    card: isDarkMode ? 'bg-slate-800 border-slate-700 shadow-black/20' : 'bg-white border-blue-50 shadow-blue-100/50',
-    textMain: isDarkMode ? 'text-white' : 'text-blue-900',
-    textSub: isDarkMode ? 'text-blue-300' : 'text-blue-400',
-    panel: isDarkMode ? 'bg-slate-700/50 border-slate-600' : 'bg-blue-50/50 border-blue-100',
-    btnGhost: isDarkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+    wrapper: isDarkMode ? 'bg-[#000000]' : 'bg-[#F2F2F7]',
+    card: isDarkMode ? 'bg-[#1C1C1E]/90 backdrop-blur-2xl' : 'bg-white/90 backdrop-blur-2xl shadow-sm',
+    textMain: isDarkMode ? 'text-white' : 'text-black',
+    textSub: isDarkMode ? 'text-gray-400' : 'text-gray-500',
+    btnPrimary: 'bg-blue-500 hover:bg-blue-600 text-white active:scale-95 transition-transform',
+    btnSecondary: isDarkMode ? 'bg-[#2C2C2E] hover:bg-[#3A3A3C] text-white' : 'bg-[#E5E5EA] hover:bg-[#D1D1D6] text-black',
+    accent: 'text-blue-500'
   };
 
   return (
-    <div className="p-4 md:p-6 max-w-2xl mx-auto flex flex-col gap-6">
-      
-      {/* Header Bar có Toggles */}
-      <div className={`${theme.card} rounded-3xl shadow-sm border p-4 px-5 flex flex-wrap justify-between items-center gap-4 transition-colors`}>
-        <div className="flex items-center gap-3">
-          <div className="bg-blue-500 text-white p-2.5 rounded-2xl shadow-md shadow-blue-500/30">
-            <Camera className="w-7 h-7" />
-          </div>
-          <h1 className={`text-2xl font-black tracking-tight ${theme.textMain}`}>
-            {t.app.title}<span className="text-yellow-500">{t.app.subtitle}</span>
-          </h1>
-        </div>
+    <div className={`min-h-screen ${theme.wrapper} p-4 md:p-8 transition-colors duration-300 flex justify-center items-start`}>
+      <div className="w-full max-w-5xl flex flex-col gap-6">
         
-        <div className="flex items-center gap-3 w-full md:w-auto">
-          {/* Cụm Toggles Ngôn ngữ & Dark Mode */}
-          <div className="flex gap-1.5">
-            <button 
-              onClick={() => setIsDarkMode(!isDarkMode)} 
-              className={`p-2.5 rounded-xl font-bold transition-all ${isDarkMode ? 'bg-yellow-400/20 text-yellow-400' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
-            >
+        {/* HEADER BAR (Minimalist) */}
+        <div className="flex justify-between items-center px-2 pt-2">
+          <h1 className={`text-3xl font-bold tracking-tight ${theme.textMain}`}>
+            Gimbal <span className="text-blue-500">TN</span>
+          </h1>
+          
+          <div className="flex gap-2">
+            <button onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')} className={`w-10 h-10 rounded-full flex justify-center items-center font-bold text-xs ${theme.btnSecondary} active:scale-90 transition-transform`}>
+              {lang.toUpperCase()}
+            </button>
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`w-10 h-10 rounded-full flex justify-center items-center ${theme.btnSecondary} active:scale-90 transition-transform`}>
               {isDarkMode ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
             </button>
+          </div>
+        </div>
+
+        {/* CỘT GRID (Chia 2 khi xoay ngang) */}
+        <div className="grid grid-cols-1 landscape:grid-cols-2 gap-4 md:gap-6">
+          
+          {/* CỘT TRÁI */}
+          <div className="flex flex-col gap-4 md:gap-6">
+            
+            {/* Nút Kết nối BLE (Kiểu Widget iOS) */}
+            <div className={`${theme.card} rounded-[32px] p-6 flex justify-between items-center`}>
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center ${isConnected ? 'bg-blue-500/10' : 'bg-gray-500/10'}`}>
+                  <Bluetooth className={`w-6 h-6 ${isConnected ? 'text-blue-500' : theme.textSub}`} />
+                </div>
+                <div>
+                  <p className={`font-semibold ${theme.textMain}`}>{isConnected ? t.app.connected : t.app.disconnected}</p>
+                  <p className={`text-sm ${theme.textSub}`}>{isConnected ? t.app.ready : 'Web Bluetooth API'}</p>
+                </div>
+              </div>
+              <button 
+                onClick={isConnected ? disconnectBluetooth : connectBluetooth} 
+                className={`px-5 py-2.5 rounded-full font-semibold text-sm ${isConnected ? 'bg-gray-500/20 text-red-500 hover:bg-red-500/20' : theme.btnPrimary}`}
+              >
+                {isConnected ? 'Ngắt kết nối' : t.app.connect}
+              </button>
+            </div>
+
+            {/* Trạng thái phần cứng (2 ô vuông) */}
+            <div className="grid grid-cols-2 gap-4 md:gap-6">
+              <div className={`${theme.card} rounded-[32px] p-6 flex flex-col justify-between aspect-square`}>
+                 <Power className={`w-8 h-8 ${isConnected ? 'text-green-500' : theme.textSub}`} />
+                 <div>
+                   <p className={`text-xs font-semibold uppercase tracking-wider ${theme.textSub} mb-1`}>{t.dashboard.motorStatus}</p>
+                   <p className={`font-bold text-xl ${theme.textMain}`}>{isConnected ? 'Active' : 'Standby'}</p>
+                 </div>
+              </div>
+              <div className={`${theme.card} rounded-[32px] p-6 flex flex-col justify-between aspect-square`}>
+                 <Battery className={`w-8 h-8 ${isConnected ? 'text-green-500' : theme.textSub}`} />
+                 <div>
+                   <p className={`text-xs font-semibold uppercase tracking-wider ${theme.textSub} mb-1`}>{t.dashboard.battery}</p>
+                   <p className={`font-bold text-xl ${theme.textMain}`}>{isConnected ? '98%' : '--'}</p>
+                 </div>
+              </div>
+            </div>
+
+            {/* NÚT MỞ CAMERA KHỔNG LỒ */}
             <button 
-              onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')} 
-              className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl font-bold text-sm transition-all ${theme.btnGhost}`}
+              onClick={toggleCamera} 
+              className={`w-full ${theme.btnPrimary} rounded-[32px] p-8 flex flex-col items-center justify-center gap-3 relative overflow-hidden`}
             >
-              <Languages className="w-4 h-4" /> {lang.toUpperCase()}
+               <Camera className="w-12 h-12" />
+               <span className="font-bold text-xl tracking-tight">{t.dashboard.openCamera}</span>
             </button>
+
           </div>
 
-          <button onClick={isConnected ? disconnectBluetooth : connectBluetooth} className={`flex-1 md:flex-none flex justify-center items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all ${isConnected ? 'bg-yellow-400 text-yellow-900 shadow-md shadow-yellow-400/30' : 'bg-blue-500 text-white shadow-md shadow-blue-500/30 hover:bg-blue-600'}`}>
-            <Bluetooth className={isConnected ? "animate-pulse w-5 h-5" : "w-5 h-5"} />
-            {isConnected ? t.app.connected : t.app.connect}
-          </button>
-        </div>
-      </div>
+          {/* CỘT PHẢI: PID TUNING */}
+          <div className={`${theme.card} rounded-[32px] overflow-hidden flex flex-col h-full`}>
+            <button 
+              onClick={() => setShowAdvanced(!showAdvanced)} 
+              className="w-full p-6 flex justify-between items-center active:bg-black/5 dark:active:bg-white/5 transition-colors"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center">
+                  <Settings className="w-5 h-5 text-orange-500" />
+                </div>
+                <span className={`font-semibold text-lg ${theme.textMain}`}>{t.dashboard.advancedTuning}</span>
+              </div>
+              {showAdvanced ? <ChevronUp className={theme.textSub} /> : <ChevronDown className={theme.textSub} />}
+            </button>
+            
+            {/* Panel PID - Trên điện thoại dọc thì ẩn/hiện, xoay ngang thì luôn hiện */}
+            <div className={`${showAdvanced ? 'block' : 'hidden landscape:block'} px-6 pb-8 flex flex-col gap-8`}>
+              
+              {/* PAN AXIS */}
+              <div>
+                <p className={`text-xs font-bold uppercase tracking-widest ${theme.textSub} mb-4`}>{t.dashboard.axisPan}</p>
+                <div className={`bg-black/5 dark:bg-white/5 rounded-2xl p-4 space-y-5`}>
+                  <PidSlider label="P" isDarkMode={isDarkMode} />
+                  <PidSlider label="I" isDarkMode={isDarkMode} />
+                  <PidSlider label="D" isDarkMode={isDarkMode} />
+                </div>
+              </div>
 
-      {/* Nút Mở Camera Khổng lồ */}
-      <button onClick={toggleCamera} className="w-full bg-yellow-400 hover:bg-yellow-500 text-yellow-900 font-black text-2xl py-10 rounded-3xl shadow-xl shadow-yellow-400/20 flex flex-col items-center justify-center gap-3 transition-transform active:scale-95 border-2 border-yellow-300 relative overflow-hidden">
-         <Camera className="w-14 h-14" />
-         {t.dashboard.openCamera}
-         <div className="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl shadow-sm">{t.dashboard.support4k}</div>
-      </button>
+              {/* TILT AXIS */}
+              <div>
+                <p className={`text-xs font-bold uppercase tracking-widest ${theme.textSub} mb-4`}>{t.dashboard.axisTilt}</p>
+                <div className={`bg-black/5 dark:bg-white/5 rounded-2xl p-4 space-y-5`}>
+                  <PidSlider label="P" isDarkMode={isDarkMode} />
+                  <PidSlider label="I" isDarkMode={isDarkMode} />
+                  <PidSlider label="D" isDarkMode={isDarkMode} />
+                </div>
+              </div>
 
-      {/* Trạng thái */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className={`${theme.card} p-6 rounded-3xl shadow-sm border flex flex-col gap-2 justify-center items-center text-center transition-colors`}>
-           <Power className={`w-10 h-10 mb-2 ${theme.textSub}`} />
-           <p className={`text-sm font-bold ${theme.textSub}`}>{t.dashboard.motorStatus}</p>
-           <p className={`font-extrabold text-xl ${theme.textMain}`}>{t.dashboard.statusReady}</p>
-        </div>
-        <div className={`${theme.card} p-6 rounded-3xl shadow-sm border flex flex-col gap-2 justify-center items-center text-center transition-colors`}>
-           <Battery className="w-10 h-10 text-yellow-500 mb-2" />
-           <p className={`text-sm font-bold ${theme.textSub}`}>{t.dashboard.battery}</p>
-           <p className={`font-extrabold text-xl ${theme.textMain}`}>100%</p>
-        </div>
-      </div>
-
-      {/* Cài đặt PID nâng cao */}
-      <div className={`${theme.card} rounded-3xl shadow-sm border overflow-hidden mb-10 transition-colors`}>
-        <button onClick={() => setShowAdvanced(!showAdvanced)} className="w-full p-6 flex justify-between items-center hover:bg-black/5 transition-colors">
-          <span className={`font-bold flex items-center gap-3 text-lg ${theme.textMain}`}>
-            <Settings className="w-6 h-6 text-blue-500" /> {t.dashboard.advancedTuning}
-          </span>
-          {showAdvanced ? <ChevronUp className="text-blue-500 w-6 h-6" /> : <ChevronDown className="text-blue-500 w-6 h-6" />}
-        </button>
-        {showAdvanced && (
-          <div className={`p-6 border-t flex flex-col gap-6 ${isDarkMode ? 'border-slate-700' : 'border-blue-50'}`}>
-            <div className={`${theme.panel} p-5 rounded-2xl border transition-colors`}>
-              <p className={`text-sm font-black mb-4 uppercase tracking-wider ${theme.textMain}`}>{t.dashboard.axisPan}</p>
-              <div className="space-y-4"><PidSlider label="P" isDarkMode={isDarkMode} /><PidSlider label="I" isDarkMode={isDarkMode} /><PidSlider label="D" isDarkMode={isDarkMode} /></div>
-            </div>
-            <div className={`${theme.panel} p-5 rounded-2xl border transition-colors`}>
-              <p className={`text-sm font-black mb-4 uppercase tracking-wider ${theme.textMain}`}>{t.dashboard.axisTilt}</p>
-              <div className="space-y-4"><PidSlider label="P" isDarkMode={isDarkMode} /><PidSlider label="I" isDarkMode={isDarkMode} /><PidSlider label="D" isDarkMode={isDarkMode} /></div>
             </div>
           </div>
-        )}
+
+        </div>
       </div>
     </div>
   );
