@@ -1467,9 +1467,17 @@
 
   <!-- STICKY FROSTED NAVBAR (4 CLEAN NAV ITEMS + ACTIONS) -->
   <nav id="mainNavbar">
-    <div class="nav-brand" onclick="switchView('home')">
-      <div class="brand-mark" style="background:#1D1D1F; color:#FFF; font-weight:800; border-radius:6px; padding:2px 8px; font-size:13px;">TF</div>
-      <span style="font-weight:800; letter-spacing:-0.03em;">T-FLOW</span>
+    <div class="nav-brand" onclick="switchView('home')" style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+      <div class="brand-mark" style="width:34px; height:34px; background:#1D1D1F; color:#FFF; border-radius:10px; padding:6px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.12);">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%; display:block;">
+  <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="currentColor" stroke-width="12" stroke-linecap="round" fill="none" />
+  <path d="M 50 34 L 50 82" stroke="currentColor" stroke-width="12" stroke-linecap="round" />
+</svg>
+      </div>
+      <div style="display:flex; flex-direction:column; line-height:1;">
+        <span style="font-size:20px; font-weight:800; letter-spacing:-0.03em; color:var(--text-main); font-family:'Plus Jakarta Sans', sans-serif;">t-flow</span>
+        <span style="font-size:9.5px; font-weight:600; color:var(--text-secondary); letter-spacing:0.02em; text-transform:lowercase; margin-top:2px;">mượt mà từng khoảnh khắc</span>
+      </div>
     </div>
 
     <!-- MAIN VIEWS -->

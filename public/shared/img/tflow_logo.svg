@@ -1,0 +1,7 @@
+<svg viewBox="0 0 300 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:36px; width:auto; display:inline-block; vertical-align:middle;">
+  <g transform="translate(0, 5) scale(0.9)">
+    <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="currentColor" stroke-width="12" stroke-linecap="round" fill="none" />
+    <path d="M 50 34 L 50 82" stroke="currentColor" stroke-width="12" stroke-linecap="round" />
+  </g>
+  <text x="100" y="66" font-family="'Plus Jakarta Sans', -apple-system, sans-serif" font-size="44" font-weight="800" fill="currentColor" letter-spacing="-0.03em">t-flow</text>
+</svg>
