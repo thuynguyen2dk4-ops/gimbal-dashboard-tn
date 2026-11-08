@@ -26,7 +26,7 @@ final class SupabaseModuleStore: ObservableObject {
 
     @Published var userName: String = "Đặng Anh Dũng"
     @Published var userTier: String = "Pro Cinema Tier"
-    @Published var deviceName: String = "Smart Gimbal S1 Titanium"
+    @Published var deviceName: String = "T-Flow Cam S1 Titanium"
     @Published var modules: [Bool] = [true, true, true, true, true, true, true]
     @Published var isOnline: Bool = true
     @Published var lastSyncText: String = "Đã đồng bộ Supabase Cloud"
@@ -113,7 +113,7 @@ struct MainTabShellView: View {
 
             GimbalDeviceHubView()
                 .tabItem {
-                    Label("Gimbal S1", systemImage: "gyroscope")
+                    Label("T-Flow Pro", systemImage: "gyroscope")
                 }
                 .tag(1)
 
@@ -430,13 +430,13 @@ struct GimbalDeviceHubView: View {
         NavigationStack {
             List {
                 Section("Trạng Thái Phần Cứng BLE 5.3") {
-                    HStack { Text("Thiết bị"); Spacer(); Text("Smart Gimbal S1 Pro").foregroundColor(.secondary) }
+                    HStack { Text("Thiết bị"); Spacer(); Text("T-Flow Cam T-Flow Pro").foregroundColor(.secondary) }
                     HStack { Text("Tần số xung FOC"); Spacer(); Text("20 kHz Sine-Wave").foregroundColor(.green) }
                     HStack { Text("Dung lượng Pin"); Spacer(); Text("\(ble.batteryLevel)% (4500mAh)").foregroundColor(.green) }
                     HStack { Text("Firmware"); Spacer(); Text("v2.4.1 (Mới nhất)").foregroundColor(.secondary) }
                 }
             }
-            .navigationTitle("Thiết Bị Gimbal S1")
+            .navigationTitle("Thiết Bị T-Flow Pro")
         }
     }
 }
