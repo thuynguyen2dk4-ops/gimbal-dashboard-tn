@@ -1,0 +1,33 @@
+name: SmartGimbalPro
+options:
+  bundleIdPrefix: com.smartgimbal
+  deploymentTarget:
+    iOS: "16.0"
+targets:
+  SmartGimbalPro:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: Sources
+    info:
+      path: Sources/Info.plist
+      properties:
+        CFBundleDisplayName: "Smart Gimbal S1"
+        CFBundleShortVersionString: "2.4.1"
+        CFBundleVersion: "241"
+        LSRequiresIPhoneOS: true
+        UILaunchScreen: {}
+        UIStatusBarHidden: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSCameraUsageDescription: "Ứng dụng cần quyền truy cập Camera để quay phim 4K và chạy bám nét AI Vision."
+        NSMicrophoneUsageDescription: "Ứng dụng cần quyền Micro để thu âm video và điều khiển bằng giọng nói."
+        NSBluetoothAlwaysUsageDescription: "Ứng dụng cần quyền Bluetooth BLE 5.3 để kết nối và điều khiển động cơ Gimbal 3 trục FOC."
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.smartgimbal.s1pro
+        SWIFT_VERSION: "5.9"
+        TARGETED_DEVICE_FAMILY: "1"
