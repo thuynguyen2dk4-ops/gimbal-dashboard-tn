@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/web/index.html" },
+    { "source": "/app", "destination": "/web/mobile_app.html" },
+    { "source": "/admin", "destination": "/web/admin_dashboard.html" },
+    { "source": "/user", "destination": "/web/user_dashboard.html" },
+    { "source": "/studio", "destination": "/web/vibe_studio.html" }
+  ]
+}

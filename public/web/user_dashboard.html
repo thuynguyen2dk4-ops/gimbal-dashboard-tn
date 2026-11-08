@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cổng Khách Hàng — Smart Gimbal ID &amp; Thiết Bị</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #F5F5F7;
+      --card-bg: #FFFFFF;
+      --border: rgba(0, 0, 0, 0.08);
+      --border-hover: rgba(0, 0, 0, 0.16);
+      --text-main: #1D1D1F;
+      --text-secondary: #6E6E73;
+      --text-muted: #86868B;
+      --accent: #1D1D1F;
+      --link: #0071E3;
+      --green: #28A745;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.1);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      --font-mono: "JetBrains Mono", monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+
+    /* Sticky Nav */
+    header {
+      height: 64px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 36px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--text-main);
+      color: #FFF;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: #EBF7EE;
+      color: var(--green);
+      border: 1px solid rgba(40, 167, 69, 0.2);
+    }
+    .status-badge .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+    .btn-nav-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: #FFFFFF;
+      transition: all 0.2s ease;
+    }
+    .btn-nav-link:hover {
+      color: var(--text-main);
+      border-color: var(--border-hover);
+    }
+
+    .container {
+      max-width: 1140px;
+      margin: 40px auto 80px;
+      padding: 0 24px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* AUTH GATEWAY SCREEN */
+    .auth-gate-wrapper {
+      max-width: 480px;
+      margin: 40px auto 60px auto;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      box-shadow: var(--shadow-md);
+      animation: fadeIn 0.3s var(--ease);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .auth-gate-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .auth-gate-brand-mark {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: var(--text-main);
+      color: #FFF;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 20px;
+      margin: 0 auto 16px auto;
+    }
+    .auth-gate-title {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .auth-gate-sub {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .auth-tab-btn {
+      flex: 1;
+      text-align: center;
+      padding: 12px 0;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      position: relative;
+    }
+    .auth-tab-btn.active {
+      color: var(--text-main);
+      font-weight: 800;
+    }
+    .auth-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 2px;
+      background: var(--text-main);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-family: inherit;
+      font-size: 14px;
+      background: #FFFFFF;
+      transition: border 0.15s ease;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--text-main);
+    }
+
+    /* Demo accounts fast switch */
+    .demo-accounts-box {
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .demo-btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .demo-account-chip {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    .demo-account-chip:hover {
+      background: var(--text-main);
+      color: #FFF;
+      border-color: var(--text-main);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 24px;
+    }
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    /* User Profile Card (iOS App Style) */
+    .user-profile-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .profile-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .profile-avatar {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: var(--text-main);
+      color: #FFFFFF;
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      font-weight: 800;
+      box-shadow: var(--shadow-sm);
+    }
+    .profile-name {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .profile-meta {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .tier-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--text-main);
+      color: #FFFFFF;
+      padding: 4px 12px;
+      border-radius: var(--radius-full);
+      letter-spacing: 0.02em;
+    }
+    .profile-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* 7 Modules Grid (iOS App Settings) */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .module-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 120px;
+      transition: all 0.2s ease;
+    }
+    .module-card.unlocked {
+      background: #FFFFFF;
+      border-color: rgba(40, 167, 69, 0.3);
+      box-shadow: 0 2px 8px rgba(40, 167, 69, 0.05);
+    }
+    .module-name {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .module-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+    .module-status-pill {
+      margin-top: 12px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      width: fit-content;
+    }
+    .module-status-pill.active {
+      background: #EBF7EE;
+      color: var(--green);
+    }
+    .module-status-pill.locked {
+      background: #EAEAEA;
+      color: var(--text-muted);
+    }
+
+    /* Device & Warranty Card */
+    .device-info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-top: 16px;
+    }
+    .device-stat-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+    }
+    .device-stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .device-stat-val {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    /* Layout 2 Columns for Sliders & LUT */
+    .dashboard-2col {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 24px;
+    }
+
+    /* Sliders */
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .setting-row:last-child { border-bottom: none; }
+    .setting-label h4 { font-size: 14px; font-weight: 700; }
+    .setting-label p { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .slider-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 220px;
+    }
+    .slider-box input[type="range"] {
+      flex: 1;
+      accent-color: var(--text-main);
+    }
+    .slider-box span.val {
+      font-size: 13px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      width: 44px;
+      text-align: right;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 20px;
+      border-radius: var(--radius-full);
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .btn-dark { background: var(--text-main); color: #FFF; }
+    .btn-dark:hover { background: #000; }
+    .btn-outline { background: #FFF; border-color: var(--border); color: var(--text-main); }
+    .btn-outline:hover { background: var(--bg); border-color: var(--border-hover); }
+
+    /* Orders History Table */
+    .orders-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    .orders-table th {
+      text-align: left;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .orders-table td {
+      padding: 14px;
+      font-size: 13.5px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ENTERPRISE 4-COLUMN FOOTER */
+    .enterprise-footer {
+      background: #111827;
+      color: #9CA3AF;
+      padding: 72px 0 36px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin-top: auto;
+    }
+    .footer-grid-4col {
+      display: grid;
+      grid-template-columns: 1.4fr 0.9fr 0.9fr 1fr;
+      gap: 48px;
+      margin-bottom: 56px;
+    }
+    .footer-brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+    .footer-col-desc {
+      font-size: 13px;
+      color: #9CA3AF;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .footer-contact-info {
+      font-size: 12.5px;
+      color: #D1D5DB;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .footer-contact-info strong {
+      color: #FFFFFF;
+    }
+    .footer-col-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFFFFF;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 18px;
+    }
+    .footer-links-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-links-list a {
+      color: #9CA3AF;
+      transition: color 0.15s ease;
+      font-size: 13px;
+    }
+    .footer-links-list a:hover {
+      color: #FFFFFF;
+    }
+    .footer-bottom-bar {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 12px;
+      color: #6B7280;
+    }
+    .footer-legal-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-legal-links a {
+      color: #9CA3AF;
+      transition: color 0.15s ease;
+    }
+    .footer-legal-links a:hover {
+      color: #FFFFFF;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <span>Smart Gimbal ID &mdash; Cổng Khách Hàng</span>
+    </div>
+    <div class="nav-actions">
+      <div class="status-badge" id="navBleStatusBox" style="display:none;">
+        <div class="dot"></div>
+        <span id="navBleStatus">Đã kết nối BLE (Smart Gimbal S1 &bull; Pin 92%)</span>
+      </div>
+      <a href="index.html" class="btn-nav-link">Trang Chủ</a>
+      <a href="admin_dashboard.html" class="btn-nav-link">Admin CMS</a>
+      <button class="btn btn-outline" id="btnSwitchAccount" style="font-size:12.5px; display:none;" onclick="logoutUser()">Đăng Xuất</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- AUTH GATEWAY SCREEN (SHOWN WHEN USER NOT LOGGED IN) -->
+    <div class="auth-gate-wrapper" id="authGateSection">
+      <div class="auth-gate-header">
+        <div class="auth-gate-brand-mark">S</div>
+        <h1 class="auth-gate-title">Smart Gimbal ID</h1>
+        <p class="auth-gate-sub">
+          Vui lòng đăng nhập hoặc tạo tài khoản để quản lý thiết bị, kích hoạt bảo hành điện tử 12 tháng và đồng bộ 7 module tính năng.
+        </p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthTab('login')">Đăng Nhập</button>
+        <button class="auth-tab-btn" id="tabBtnRegister" onclick="switchAuthTab('register')">Đăng Ký Tài Khoản</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginForm">
+        <div class="form-group">
+          <label>Email Hoặc Số Điện Thoại</label>
+          <input type="text" class="form-control" id="loginEmail" placeholder="dung.travel@gmail.com">
+        </div>
+        <div class="form-group">
+          <label>Mật Khẩu</label>
+          <input type="password" class="form-control" id="loginPassword" value="123456" placeholder="Nhập mật khẩu">
+        </div>
+
+        <button class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:12px;" onclick="handleLoginSubmit()">Đăng Nhập Vào Cổng Khách Hàng</button>
+
+        <!-- 1-Click Demo Accounts for easy testing -->
+        <div class="demo-accounts-box">
+          <div style="font-size:12px; font-weight:700; color:var(--text-secondary); text-align:center;">Đăng Nhập Nhanh Tài Khoản Mẫu (1-Chạm):</div>
+          <div class="demo-btn-row">
+            <button class="demo-account-chip" onclick="quickLoginDemo('dung.travel@gmail.com')">
+              Đặng Anh Dũng<br><span style="font-size:11px; opacity:0.8;">Pro Cinema Tier</span>
+            </button>
+            <button class="demo-account-chip" onclick="quickLoginDemo('minh.vlog@gmail.com')">
+              Nguyễn Văn Minh<br><span style="font-size:11px; opacity:0.8;">Basic Creator Tier</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="registerForm" style="display:none;">
+        <div class="form-group">
+          <label>Họ và Tên</label>
+          <input type="text" class="form-control" id="regName" placeholder="Ví dụ: Lê Minh Hoàng">
+        </div>
+        <div class="form-group">
+          <label>Địa Chỉ Email</label>
+          <input type="email" class="form-control" id="regEmail" placeholder="hoang.film@gmail.com">
+        </div>
+        <div class="form-group">
+          <label>Số Điện Thoại</label>
+          <input type="tel" class="form-control" id="regPhone" placeholder="0918 888 999">
+        </div>
+        <div class="form-group">
+          <label>Mã Serial Thiết Bị (Tùy Chọn)</label>
+          <input type="text" class="form-control" id="regSerial" placeholder="SG-S1-VN-2026-XXXX">
+        </div>
+
+        <button class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:12px;" onclick="handleRegisterSubmit()">Tạo Tài Khoản &amp; Đăng Nhập</button>
+      </div>
+    </div>
+
+    <!-- MAIN DASHBOARD CONTENT (SHOWN WHEN LOGGED IN) -->
+    <div id="userDashboardMain" style="display:none;">
+      <!-- 1. USER PROFILE CARD (APPLE HIG / IOS APP STYLE) -->
+      <div class="card">
+        <div class="user-profile-header">
+          <div class="profile-left">
+            <div class="profile-avatar" id="userAvatar">D</div>
+            <div>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <h1 class="profile-name" id="userName">Đặng Anh Dũng</h1>
+                <span class="tier-badge" id="userTierBadge">Pro Cinema Tier</span>
+              </div>
+              <div class="profile-meta">
+                <span id="userEmail">dung.travel@gmail.com</span>
+                <span>&bull;</span>
+                <span id="userPhone">0908 123 456</span>
+                <span>&bull;</span>
+                <span>Thành viên từ <span id="userMemberSince">Tháng 03/2025</span></span>
+              </div>
+            </div>
+          </div>
+          <div class="profile-actions">
+            <button class="btn btn-outline" onclick="promptEditProfile()">Chỉnh Sửa Hồ Sơ</button>
+            <button class="btn btn-outline" onclick="logoutUser()">Đăng Xuất</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. 7 MODULES PERMISSIONS CARD (SYNCED WITH ADMIN CMS) -->
+      <div class="card">
+        <div class="card-title-row">
+          <div>
+            <div class="card-title">7 Module Tính Năng Ứng Dụng iOS</div>
+            <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
+              Đồng bộ thời gian thực từ Admin CMS theo cấp phép tài khoản và thiết bị của bạn.
+            </p>
+          </div>
+          <span class="tier-badge" id="modulesSyncStatus">Đã Đồng Bộ Cloud</span>
+        </div>
+
+        <div class="modules-grid" id="modulesGrid">
+          <!-- Dynamically rendered 7 modules with active/locked status -->
+        </div>
+      </div>
+
+      <!-- 3. LINKED DEVICE & E-WARRANTY -->
+      <div class="card">
+        <div class="card-title-row">
+          <div>
+            <div class="card-title">Thiết Bị Đã Liên Kết &amp; Bảo Hành Điện Tử</div>
+            <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
+              Thông số kỹ thuật thời gian thực và thời hạn bảo hành chính hãng 1 đổi 1.
+            </p>
+          </div>
+          <button class="btn btn-outline" style="font-size:12px;" onclick="checkOtaUpdate()">Kiểm Tra Cập Nhật OTA</button>
+        </div>
+
+        <div class="device-info-grid">
+          <div class="device-stat-box">
+            <div class="device-stat-label">Model Thiết Bị</div>
+            <div class="device-stat-val" id="deviceModel">Smart Gimbal S1 Titanium</div>
+          </div>
+          <div class="device-stat-box">
+            <div class="device-stat-label">Mã Serial Điện Tử</div>
+            <div class="device-stat-val" id="deviceSerial" style="font-family:var(--font-mono); font-size:14px;">SG-S1-VN-2025-8899</div>
+          </div>
+          <div class="device-stat-box">
+            <div class="device-stat-label">Thời Hạn Bảo Hành</div>
+            <div class="device-stat-val" id="deviceWarranty" style="color:var(--green);">Còn 342 Ngày (1 Đổi 1)</div>
+          </div>
+          <div class="device-stat-box">
+            <div class="device-stat-label">Dung Lượng Pin &amp; Firmware</div>
+            <div class="device-stat-val" id="deviceBattery">92% &bull; v2.4.1 Mới Nhất</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. WEB ORDER HISTORY -->
+      <div class="card">
+        <div class="card-title-row">
+          <div class="card-title">Lịch Sử Đơn Hàng Đã Mua Trên Web</div>
+          <a href="index.html" class="btn btn-outline" style="font-size:12px;">Mua Thêm Phụ Kiện &rarr;</a>
+        </div>
+        <div id="ordersTableWrapper">
+          <table class="orders-table">
+            <thead>
+              <tr>
+                <th>Mã Đơn</th>
+                <th>Ngày Đặt</th>
+                <th>Sản Phẩm &amp; Phân Cấp</th>
+                <th>Tổng Tiền</th>
+                <th>Trạng Thái</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <!-- Dynamically populated from catalog_store.getUserOrders() -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 5. 2 COLUMNS: GIMBAL FOC SLIDERS & 3D LUT FILE -->
+      <div class="dashboard-2col">
+        <!-- Sliders Column -->
+        <div class="card">
+          <div class="card-title-row">
+            <div class="card-title">Cấu Hình Động Cơ FOC &amp; Độ Mượt</div>
+            <span style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono);">OTA Sync BLE 4ms</span>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label">
+              <h4>Tốc Độ Xoay Trục Pan (Yaw Speed)</h4>
+              <p>Độ nhạy chuyển hướng khi rê tay ngang</p>
+            </div>
+            <div class="slider-box">
+              <input type="range" min="1" max="100" value="65" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="val">65%</span>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label">
+              <h4>Tốc Độ Trục Tilt (Pitch Speed)</h4>
+              <p>Độ nhạy góc gập lên / chúi xuống</p>
+            </div>
+            <div class="slider-box">
+              <input type="range" min="1" max="100" value="45" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="val">45%</span>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label">
+              <h4>Độ Mượt Chuyển Động (Smoothing Damping)</h4>
+              <p>Lực quán tính ảo triệt tiêu giật khựng</p>
+            </div>
+            <div class="slider-box">
+              <input type="range" min="1" max="100" value="80" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="val">80%</span>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-label">
+              <h4>Vùng Chết Cần Gạt Joystick (Deadband)</h4>
+              <p>Ngưỡng triệt tiêu trôi cần gạt do ngón tay chạm nhẹ</p>
+            </div>
+            <div class="slider-box">
+              <input type="range" min="0" max="20" value="4" oninput="this.nextElementSibling.innerText = this.value + '°'">
+              <span class="val">4°</span>
+            </div>
+          </div>
+
+          <div style="margin-top:24px; display:flex; justify-content:flex-end; gap:10px;">
+            <button class="btn btn-outline" onclick="alert('Đã khôi phục thông số động cơ mặc định!')">Mặc Định</button>
+            <button class="btn btn-dark" onclick="alert('Đã gửi thông số tới Smart Gimbal S1 qua BLE thành công!')">Lưu Cấu Hình</button>
+          </div>
+        </div>
+
+        <!-- 3D LUT Column -->
+        <div class="card">
+          <div class="card-title">Nạp File Màu 3D LUT (.cube)</div>
+          <p style="font-size:13px; color:var(--text-secondary); margin:6px 0 20px 0;">
+            Tải lên bảng màu để xem trước màu điện ảnh trực tiếp trên viewfinder ứng dụng iOS.
+          </p>
+
+          <div style="border:2px dashed var(--border); border-radius:var(--radius-md); padding:32px 20px; text-align:center; cursor:pointer;" onclick="alert('Mở hộp thoại tải file .cube...')">
+            <div style="font-size:24px; margin-bottom:8px;">&bull;</div>
+            <div style="font-size:13.5px; font-weight:700;">Kéo thả file .cube vào đây</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Hỗ trợ format 17x17x17 hoặc 33x33x33</div>
+          </div>
+
+          <div style="margin-top:20px; font-size:12.5px; color:var(--text-secondary);">
+            <div style="font-weight:700; margin-bottom:6px;">LUTs đang nạp sẵn trên máy:</div>
+            <div>&bull; Teal &amp; Orange Cinema v2</div>
+            <div>&bull; Kodak Portra 400 Natural</div>
+            <div>&bull; Apple Log to Rec.709 Standard</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENTERPRISE 4-COLUMN FOOTER -->
+  <footer class="enterprise-footer">
+    <div class="container" style="margin:0 auto; padding:0 24px;">
+      <div class="footer-grid-4col">
+        <!-- Col 1 -->
+        <div class="footer-col">
+          <div class="footer-brand-title">Smart Gimbal Enterprise</div>
+          <p class="footer-col-desc">
+            Hệ sinh thái thiết bị ổn định 3 trục chuẩn điện ảnh cho iPhone và máy ảnh di động. Đổi mới sáng tạo với động cơ FOC 20kHz và trải nghiệm phần mềm chuẩn Apple.
+          </p>
+          <div class="footer-contact-info">
+            <div><strong>Hotline Hỗ Trợ:</strong> 1900 8899 (8:00 - 21:00)</div>
+            <div><strong>Email Kỹ Thuật:</strong> enterprise@smartgimbal.vn</div>
+            <div><strong>Showroom &amp; R&amp;D:</strong> Tòa nhà R&amp;D TechHub, Khu Công Nghệ Cao, Hà Nội &amp; TP. Hồ Chí Minh</div>
+          </div>
+        </div>
+
+        <!-- Col 2 -->
+        <div class="footer-col">
+          <div class="footer-col-title">Dải Sản Phẩm</div>
+          <ul class="footer-links-list">
+            <li><a href="index.html">Smart Gimbal S1 (Flagship)</a></li>
+            <li><a href="index.html">Smart Gimbal S2 Cinema</a></li>
+            <li><a href="index.html">Smart Gimbal S1 Air (Siêu Nhẹ)</a></li>
+            <li><a href="index.html">SmartCam Pocket P1</a></li>
+            <li><a href="index.html">SmartCam Action X2</a></li>
+            <li><a href="index.html">Phụ Kiện Studio &amp; MagSafe</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3 -->
+        <div class="footer-col">
+          <div class="footer-col-title">Phần Mềm &amp; Hệ Thống</div>
+          <ul class="footer-links-list">
+            <li><a href="index.html">Ứng Dụng Smart Gimbal iOS</a></li>
+            <li><a href="user_dashboard.html">Cổng Khách Hàng (Smart Gimbal ID)</a></li>
+            <li><a href="admin_dashboard.html">Cổng Quản Trị Admin CMS</a></li>
+            <li><a href="javascript:void(0)" onclick="alert('Đang kết nối kho dữ liệu Firmware OTA...')">Cập Nhật Firmware OTA</a></li>
+            <li><a href="user_dashboard.html">Tải Bảng Màu 3D LUT (.cube)</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4 -->
+        <div class="footer-col">
+          <div class="footer-col-title">Chính Sách &amp; Hỗ Trợ</div>
+          <ul class="footer-links-list">
+            <li><a href="index.html">Chính Sách Bảo Hành 12 Tháng 1 Đổi 1</a></li>
+            <li><a href="index.html">Chính Sách Đổi Mới 30 Ngày Dùng Thử</a></li>
+            <li><a href="index.html">Hướng Dẫn Cân Chỉnh Trọng Tâm</a></li>
+            <li><a href="user_dashboard.html">Tra Cứu Đơn Hàng &amp; Bảo Hành</a></li>
+            <li><a href="javascript:void(0)" onclick="alert('Hotline trực tuyến 24/7: 1900 8899')">Trung Tâm Hỗ Trợ Kỹ Thuật 24/7</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Bottom Strip -->
+      <div class="footer-bottom-bar">
+        <div class="footer-copy-text">
+          &copy; 2026 Smart Gimbal Enterprise Inc. Bảo lưu mọi quyền. Tuân thủ chuẩn Apple Human Interface Guidelines (HIG).
+        </div>
+        <div class="footer-legal-links">
+          <a href="javascript:void(0)">Điều khoản sử dụng</a>
+          <span>&bull;</span>
+          <a href="javascript:void(0)">Chính sách bảo mật</a>
+          <span>&bull;</span>
+          <a href="javascript:void(0)">Pháp lý &amp; Tuân thủ</a>
+          <span>&bull;</span>
+          <a href="javascript:void(0)">Quy chuẩn bảo hành</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="../shared/catalog_store.js"></script>
+  <script>
+    const MODULE_NAMES = [
+      { id: "ai_vision", name: "AI Vision Optical Tracking", desc: "Thuật toán bám nét chủ thể quang học 120fps" },
+      { id: "prores_log", name: "Apple Log & ProRes 4K/60fps", desc: "Mở khóa ghi hình 10-bit màu điện ảnh" },
+      { id: "motionlapse", name: "Motionlapse Waypoint 5-Point", desc: "Lập trình quỹ đạo quay tua nhanh 5 điểm mốc" },
+      { id: "multi_cam", name: "Multi-Cam Director Studio", desc: "Kết nối đồng bộ 4 góc máy qua Wi-Fi Direct" },
+      { id: "lut_3d", name: "3D LUT Real-time Preview", desc: "Xem trước bảng màu điện ảnh thời gian thực" },
+      { id: "foc_tuning", name: "FOC Motor Micro-Tuning", desc: "Tinh chỉnh tần số PWM và phản hồi động cơ" },
+      { id: "stream_500hz", name: "500Hz Gyro Raw Telemetry", desc: "Truyền dữ liệu cảm biến con quay thời gian thực" }
+    ];
+
+    let currentUser = null;
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initUserDashboard();
+    });
+
+    function initUserDashboard() {
+      if (typeof SmartGimbalCatalog === 'undefined') {
+        console.error('SmartGimbalCatalog not loaded!');
+        return;
+      }
+
+      loadUserData();
+
+      // Listen for user or catalog updates
+      window.addEventListener(SmartGimbalCatalog.USER_EVENT, () => {
+        loadUserData();
+      });
+      window.addEventListener(SmartGimbalCatalog.SYNC_EVENT, () => {
+        loadUserData();
+      });
+    }
+
+    function loadUserData() {
+      currentUser = SmartGimbalCatalog.getCurrentUser();
+      
+      const authGate = document.getElementById('authGateSection');
+      const mainDash = document.getElementById('userDashboardMain');
+      const bleBox = document.getElementById('navBleStatusBox');
+      const btnLogout = document.getElementById('btnSwitchAccount');
+
+      if (!currentUser) {
+        // Show Auth Gate, Hide Dashboard
+        authGate.style.display = 'block';
+        mainDash.style.display = 'none';
+        bleBox.style.display = 'none';
+        btnLogout.style.display = 'none';
+        return;
+      }
+
+      // Hide Auth Gate, Show Dashboard
+      authGate.style.display = 'none';
+      mainDash.style.display = 'block';
+      bleBox.style.display = 'flex';
+      btnLogout.style.display = 'inline-flex';
+
+      renderUserProfile();
+      renderModulesGrid();
+      renderDeviceInfo();
+      renderOrdersHistory();
+    }
+
+    function renderUserProfile() {
+      document.getElementById('userName').textContent = currentUser.name || 'Khách Hàng';
+      document.getElementById('userAvatar').textContent = (currentUser.name || 'K').charAt(0).toUpperCase();
+      document.getElementById('userEmail').textContent = currentUser.email || '';
+      document.getElementById('userPhone').textContent = currentUser.phone || 'Chưa cập nhật SĐT';
+      document.getElementById('userTierBadge').textContent = currentUser.tierBadge || (currentUser.tier + ' Tier');
+      document.getElementById('userMemberSince').textContent = currentUser.memberSince || 'Tháng 01/2025';
+    }
+
+    function renderModulesGrid() {
+      const container = document.getElementById('modulesGrid');
+      container.innerHTML = '';
+
+      const modules = currentUser.modules || [true, false, false, false, false, false, false];
+
+      MODULE_NAMES.forEach((m, idx) => {
+        const isUnlocked = !!modules[idx];
+        const card = document.createElement('div');
+        card.className = `module-card ${isUnlocked ? 'unlocked' : ''}`;
+        card.innerHTML = `
+          <div>
+            <div class="module-name">${m.name}</div>
+            <div class="module-desc">${m.desc}</div>
+          </div>
+          <span class="module-status-pill ${isUnlocked ? 'active' : 'locked'}">
+            ${isUnlocked ? 'Đã Kích Hoạt' : 'Chưa Mở Khóa'}
+          </span>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderDeviceInfo() {
+      document.getElementById('deviceModel').textContent = currentUser.device || 'Smart Gimbal S1';
+      document.getElementById('deviceSerial').textContent = currentUser.serial || 'SG-S1-VN-2025-XXXX';
+      document.getElementById('deviceWarranty').textContent = `Còn ${currentUser.warrantyDays || 365} Ngày (1 Đổi 1)`;
+      document.getElementById('deviceBattery').textContent = `${currentUser.battery || 95}% &bull; ${currentUser.firmware || 'v2.4.1 Mới Nhất'}`;
+    }
+
+    function renderOrdersHistory() {
+      const tbody = document.getElementById('ordersTableBody');
+      tbody.innerHTML = '';
+
+      const orders = SmartGimbalCatalog.getUserOrders(currentUser.id);
+
+      if (!orders || orders.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align:center; padding:32px; color:var(--text-muted);">
+              Bạn chưa có đơn hàng nào. Hãy khám phá Dải Sản Phẩm trên web để đặt mua!
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      orders.forEach(ord => {
+        const tr = document.createElement('tr');
+        const itemsSummary = (ord.items || []).map(i => `${i.productName} (${i.tierLabel}) x${i.quantity}`).join('<br>');
+        tr.innerHTML = `
+          <td><b style="font-family:var(--font-mono);">${ord.orderId}</b></td>
+          <td style="color:var(--text-secondary);">${ord.dateFormatted || ord.createdAt.split('T')[0]}</td>
+          <td>${itemsSummary || 'Sản phẩm Smart Gimbal'}</td>
+          <td><b style="font-family:var(--font-mono);">${ord.totalFormatted || SmartGimbalCatalog.formatVND(ord.total)}</b></td>
+          <td><span style="color:${ord.statusColor || '#0071E3'}; font-weight:700;">${ord.status || 'Đang Giao Hàng'}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function promptEditProfile() {
+      const newName = prompt('Nhập Họ và Tên mới:', currentUser.name);
+      if (newName && newName.trim()) {
+        const newPhone = prompt('Nhập Số Điện Thoại mới:', currentUser.phone || '');
+        SmartGimbalCatalog.updateUserProfile(currentUser.id, {
+          name: newName.trim(),
+          phone: (newPhone || '').trim()
+        });
+        loadUserData();
+        alert('Cập nhật thông tin thành công!');
+      }
+    }
+
+    function checkOtaUpdate() {
+      alert('Đang kết nối BLE với Smart Gimbal...\nPhiên bản hiện tại v2.4.1 đã là phiên bản mới nhất và ổn định nhất!');
+    }
+
+    // AUTH GATEWAY TAB SWITCHER
+    function switchAuthTab(tab) {
+      document.getElementById('tabBtnLogin').classList.toggle('active', tab === 'login');
+      document.getElementById('tabBtnRegister').classList.toggle('active', tab === 'register');
+      document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+    }
+
+    function handleLoginSubmit() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const pass = document.getElementById('loginPassword').value;
+      if (!email) {
+        alert('Vui lòng nhập Email hoặc Số điện thoại!');
+        return;
+      }
+      const res = SmartGimbalCatalog.loginUser(email, pass);
+      if (res.success) {
+        loadUserData();
+      } else {
+        alert(res.message);
+      }
+    }
+
+    function quickLoginDemo(email) {
+      SmartGimbalCatalog.loginUser(email, '123456');
+      loadUserData();
+    }
+
+    function handleRegisterSubmit() {
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const serial = document.getElementById('regSerial').value.trim();
+
+      if (!name || !email) {
+        alert('Vui lòng nhập Họ tên và Email!');
+        return;
+      }
+
+      const res = SmartGimbalCatalog.registerUser({
+        name: name,
+        email: email,
+        phone: phone,
+        serial: serial,
+        tier: 'Basic Creator'
+      });
+
+      if (res.success) {
+        loadUserData();
+        alert(`Chúc mừng ${name}! Tài khoản của bạn đã được khởi tạo thành công.`);
+      } else {
+        alert(res.message);
+      }
+    }
+
+    function logoutUser() {
+      if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi Cổng Khách Hàng?')) {
+        SmartGimbalCatalog.logoutUser();
+        loadUserData();
+      }
+    }
+  </script>
+</body>
+</html>
