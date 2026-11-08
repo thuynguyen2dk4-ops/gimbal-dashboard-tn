@@ -2010,74 +2010,56 @@
   <div class="toast-msg" id="toastMsg">Đã cập nhật giỏ hàng</div>
 
   <!-- ENTERPRISE 4-COLUMN FOOTER (MONOCHROME LUXURY / DARK ENTERPRISE #111827) -->
-  <footer class="enterprise-footer">
+  <footer class="enterprise-footer" style="background:#0F1115; color:#F5F5F7; padding:64px 0 32px 0; border-top:1px solid rgba(255,255,255,0.1);">
     <div class="container">
-      <div class="footer-grid-4col">
-        <!-- Col 1 -->
-        <div class="footer-col">
-          <div class="footer-brand-title">Smart Gimbal Enterprise</div>
-          <p class="footer-col-desc">
-            Hệ sinh thái thiết bị ổn định 3 trục chuẩn điện ảnh cho iPhone và máy ảnh di động. Đổi mới sáng tạo với động cơ FOC 20kHz và trải nghiệm phần mềm chuẩn Apple.
-          </p>
-          <div class="footer-contact-info">
-            <div><strong>Hotline Hỗ Trợ:</strong> 1900 8899 (8:00 - 21:00)</div>
-            <div><strong>Email Kỹ Thuật:</strong> enterprise@smartgimbal.vn</div>
-            <div><strong>Showroom &amp; R&amp;D:</strong> Tòa nhà R&amp;D TechHub, Khu Công Nghệ Cao, Hà Nội &amp; TP. Hồ Chí Minh</div>
+      <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:48px; margin-bottom:48px;">
+        <div>
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+            <div style="width:38px; height:38px; background:#FFF; color:#1D1D1F; border-radius:10px; padding:7px; display:flex; align-items:center; justify-content:center;">
+              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+                <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="currentColor" stroke-width="12" stroke-linecap="round" fill="none" />
+                <path d="M 50 34 L 50 82" stroke="currentColor" stroke-width="12" stroke-linecap="round" />
+              </svg>
+            </div>
+            <div>
+              <div style="font-size:24px; font-weight:800; letter-spacing:-0.03em; line-height:1; color:#FFF;">t-flow</div>
+              <div style="font-size:11px; font-weight:600; color:#86868B; margin-top:3px; letter-spacing:0.02em;">mượt mà từng khoảnh khắc</div>
+            </div>
+          </div>
+          <div style="font-size:16px; font-weight:700; color:#FFF; margin-bottom:6px;">Công ty TNHH Công nghệ T-Flow Việt Nam</div>
+          <div style="font-size:13px; color:#A1A1A6; margin-bottom:14px;">T-Flow Tech Co., Ltd. • Giấy phép ĐKKD: 0109888888 do Sở KH&amp;ĐT Hà Nội cấp</div>
+          <div style="font-size:13px; color:#86868B; line-height:1.7;">
+            Trụ sở chính: Tòa nhà Công nghệ T-Flow, Hà Nội, Việt Nam.<br>
+            Hotline CSKH: 1900 8888 (8:00 - 21:00) • Email: support@tflow.tech
+          </div>
+          <div style="margin-top:18px; font-size:12px; font-family:monospace; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); padding:8px 14px; border-radius:8px; color:#E5E5EA; font-weight:600; display:inline-block;">
+            Chữ ký R&amp;D: "Engineered by T-Flow in Hanoi" • Pure FOC Inside
           </div>
         </div>
 
-        <!-- Col 2 -->
-        <div class="footer-col">
-          <div class="footer-col-title">Dải Sản Phẩm</div>
-          <ul class="footer-links-list">
-            <li><a href="javascript:void(0)" onclick="openProductDetail('s1')">Smart Gimbal S1 (Flagship)</a></li>
-            <li><a href="javascript:void(0)" onclick="openProductDetail('s2')">Smart Gimbal S2 Cinema</a></li>
-            <li><a href="javascript:void(0)" onclick="openProductDetail('s1-air')">Smart Gimbal S1 Air (Siêu Nhẹ)</a></li>
-            <li><a href="javascript:void(0)" onclick="openProductDetail('p1')">SmartCam Pocket P1</a></li>
-            <li><a href="javascript:void(0)" onclick="openProductDetail('x2')">SmartCam Action X2</a></li>
-            <li><a href="javascript:void(0)" onclick="filterCatalog('cat-acc', document.querySelector('.filter-chip'))">Phụ Kiện Studio &amp; MagSafe</a></li>
+        <div>
+          <h4 style="font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:18px; color:#FFF; letter-spacing:0.05em;">Sản Phẩm &amp; Dải Thiết Bị</h4>
+          <ul style="list-style:none; padding:0; font-size:13.5px; color:#A1A1A6; display:flex; flex-direction:column; gap:12px;">
+            <li><a href="javascript:void(0)" onclick="openProductDetail('tf-g31-pro')" style="color:inherit; text-decoration:none;">T-Flow Pro (Flagship 3 Trục)</a></li>
+            <li><a href="javascript:void(0)" onclick="switchView('catalog')" style="color:inherit; text-decoration:none;">Dải Sản Phẩm</a></li>
+            <li><a href="javascript:void(0)" onclick="openProductDetail('tf-g31-pro')" style="color:inherit; text-decoration:none;">Thông Số Kỹ Thuật Chi Tiết</a></li>
+            <li><a href="javascript:void(0)" onclick="switchView('reviews')" style="color:inherit; text-decoration:none;">Đánh Giá Từ Khách Hàng</a></li>
           </ul>
         </div>
 
-        <!-- Col 3 -->
-        <div class="footer-col">
-          <div class="footer-col-title">Phần Mềm &amp; Hệ Thống</div>
-          <ul class="footer-links-list">
-            <li><a href="javascript:void(0)" onclick="switchView('home')">Ứng Dụng Smart Gimbal iOS</a></li>
-            <li><a href="user_dashboard.html">Cổng Khách Hàng (Smart Gimbal ID)</a></li>
-            <li><a href="admin_dashboard.html">Cổng Quản Trị Admin CMS</a></li>
-            <li><a href="javascript:void(0)" onclick="alert('Đang kết nối kho dữ liệu Firmware OTA...')">Cập Nhật Firmware OTA</a></li>
-            <li><a href="user_dashboard.html">Tải Bảng Màu 3D LUT (.cube)</a></li>
-          </ul>
-        </div>
-
-        <!-- Col 4 -->
-        <div class="footer-col">
-          <div class="footer-col-title">Chính Sách &amp; Hỗ Trợ</div>
-          <ul class="footer-links-list">
-            <li><a href="javascript:void(0)" onclick="switchView('reviews')">Chính Sách Bảo Hành 12 Tháng 1 Đổi 1</a></li>
-            <li><a href="javascript:void(0)" onclick="switchView('reviews')">Chính Sách Đổi Mới 30 Ngày Dùng Thử</a></li>
-            <li><a href="javascript:void(0)" onclick="switchView('reviews')">Hướng Dẫn Cân Chỉnh Trọng Tâm</a></li>
-            <li><a href="user_dashboard.html">Tra Cứu Đơn Hàng &amp; Bảo Hành</a></li>
-            <li><a href="javascript:void(0)" onclick="alert('Hotline trực tuyến 24/7: 1900 8899')">Trung Tâm Hỗ Trợ Kỹ Thuật 24/7</a></li>
+        <div>
+          <h4 style="font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:18px; color:#FFF; letter-spacing:0.05em;">Hệ Thống &amp; Quản Trị</h4>
+          <ul style="list-style:none; padding:0; font-size:13.5px; color:#A1A1A6; display:flex; flex-direction:column; gap:12px;">
+            <li><a href="user_dashboard.html" style="color:inherit; text-decoration:none;">Cổng Thành Viên (Member Hub)</a></li>
+            <li><a href="javascript:void(0)" onclick="handleAdminNavClick()" style="color:#2997FF; font-weight:600; text-decoration:none;">Khóa Quản Trị (Admin Portal)</a></li>
+            <li><a href="javascript:void(0)" onclick="openProductDetail('tf-g31-pro')" style="color:inherit; text-decoration:none;">Chính Sách Bảo Hành 24 Tháng</a></li>
           </ul>
         </div>
       </div>
 
-      <!-- Bottom Strip -->
-      <div class="footer-bottom-bar">
-        <div class="footer-copy-text">
-          &copy; 2026 Smart Gimbal Enterprise Inc. Bảo lưu mọi quyền. Tuân thủ chuẩn Apple Human Interface Guidelines (HIG).
-        </div>
-        <div class="footer-legal-links">
-          <a href="javascript:void(0)">Điều khoản sử dụng</a>
-          <span>&bull;</span>
-          <a href="javascript:void(0)">Chính sách bảo mật</a>
-          <span>&bull;</span>
-          <a href="javascript:void(0)">Pháp lý &amp; Tuân thủ</a>
-          <span>&bull;</span>
-          <a href="javascript:void(0)">Quy chuẩn bảo hành</a>
-        </div>
+      <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:24px; display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:#86868B;">
+        <div>&copy; 2026 Công ty TNHH Công nghệ T-Flow Việt Nam. Toàn quyền bảo lưu. Slogan: <em>"Smooth Every Moment — Mượt mà từng khoảnh khắc."</em></div>
+        <div>Engineered with Pure FOC in Hanoi, Vietnam.</div>
       </div>
     </div>
   </footer>
