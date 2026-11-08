@@ -3,9 +3,6 @@ name: Build Native iOS App (.ipa) for iPhone
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'ios_app/**'
-      - '.github/workflows/build_ios_ipa.yml'
   workflow_dispatch:
 
 jobs:
@@ -16,25 +13,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
       - name: Generate Xcode Project via XcodeGen
         working-directory: ios_app
-        run: |
-          xcodegen generate
+        run: xcodegen generate
 
       - name: Compile Native iOS App (Release arm64)
         working-directory: ios_app
         run: |
-          xcodebuild -project SmartGimbalPro.xcodeproj \
-            -scheme SmartGimbalPro \
-            -configuration Release \
-            -sdk iphoneos \
-            -derivedDataPath build \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            AD_HOC_CODE_SIGNING_ALLOWED=YES
+          xcodebuild -project SmartGimbalPro.xcodeproj             -scheme SmartGimbalPro             -configuration Release             -sdk iphoneos             -derivedDataPath build             CODE_SIGN_IDENTITY=""             CODE_SIGNING_REQUIRED=NO             CODE_SIGNING_ALLOWED=NO             AD_HOC_CODE_SIGNING_ALLOWED=YES
 
-      - name: Package into SmartGimbal_Pro.ipa for Sideloadly / AltStore / 3uTools
+      - name: Package into SmartGimbal_Pro.ipa
         working-directory: ios_app
         run: |
           mkdir -p Payload
