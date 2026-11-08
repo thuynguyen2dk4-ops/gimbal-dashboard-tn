@@ -16,7 +16,7 @@
 }(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  var STORAGE_KEY = 'TFLOW_REAL_STORE_V5';
+  var STORAGE_KEY = 'TFLOW_STORE_FINAL_V6';
   var CART_KEY = 'TFLOW_CART_V4';
   var ORDERS_KEY = 'TFLOW_ORDERS_V4';
   var CURRENT_USER_KEY = 'TFLOW_CURRENT_USER_V4';
@@ -141,7 +141,7 @@
       "groupId": "group-gimbal",
       "name": "T-Flow Pro",
       "tagline": "Vững khung hình, Trọn cảm xúc. Đỉnh cao chống rung 3 trục cho Smartphone.",
-      "subtitle": "Gimbal 3 trục thông minh cho iPhone và Smartphone cao cấp. Động cơ tải trọng 450g, thuật toán Pure FOC 20kHz, vòng xoay lấy nét Focus Wheel và khung hợp kim hàng không kết hợp sợi Carbon.",
+      "subtitle": "Gimbal 3 trục thông minh cho iPhone và Smartphone cao cấp. Động cơ tải trọng 450g, thuật toán Pure FOC 20kHz, vòng xoay lấy nét Focus Wheel và khung hợp kim hàng không kết hợp sợi Carbon dệt 8 lớp.",
       "badge": "Flagship 2026",
       "img": "../shared/img/feed_portrait_dusk.jpg",
       "status": "Đang Mở Bán",
@@ -179,7 +179,7 @@
         },
         {
           "title": "Động Cơ Tải Trọng Lớn 450g & Thuật Toán Pure FOC 20kHz",
-          "desc": "Cân mọi dòng điện thoại kích thước lớn (kể cả iPhone 13-16 Pro Max kèm ốp lưng, lens rời và micro). Tần số điều khiển vector 20kHz triệt tiêu hoàn toàn rung giật micro-jitter.",
+          "desc": "Cân mọi dòng điện thoại kích thước lớn kể cả iPhone 13-16 Pro Max kèm phụ kiện kính lọc và micro. Tần số điều khiển vector 20kHz triệt tiêu hoàn toàn rung giật micro-jitter.",
           "img": "../shared/img/feed_portrait_day.jpg"
         },
         {
@@ -189,61 +189,24 @@
         }
       ],
       "boxContents": [
-        {
-          "name": "Thân Gimbal 3 trục T-Flow Pro (TF-G31-PRO)",
-          "qty": "1 cái"
-        },
-        {
-          "name": "Chân đế Tripod hợp kim nhôm bọc silicon chống trượt",
-          "qty": "1 cái"
-        },
-        {
-          "name": "Cáp sạc nhanh USB-C bện dù cao cấp (1.2m)",
-          "qty": "1 sợi"
-        },
-        {
-          "name": "Túi đựng chống sốc cao cấp chuẩn du lịch",
-          "qty": "1 chiếc"
-        },
-        {
-          "name": "Sách HDSD tiếng Việt & Thẻ bảo hành chính hãng 24 tháng",
-          "qty": "1 bộ"
-        }
+        "Thân Gimbal 3 trục T-Flow Pro (Mã SKU: TF-G31-PRO)",
+        "Chân đế Tripod hợp kim nhôm bọc silicon chống trượt",
+        "Cáp sạc nhanh Type-C bện dù cao cấp (1.2m) hỗ trợ PD 18W",
+        "Túi đựng chống sốc cao cấp chuẩn du lịch kháng nước",
+        "Sách hướng dẫn sử dụng tiếng Việt & Thẻ bảo hành chính hãng 24 tháng"
       ],
-      "specs": [
-        {
-          "label": "Mã Kỹ Thuật (SKU / PCB)",
-          "val": "TF-G31-PRO-R1.0"
-        },
-        {
-          "label": "Tải Trọng Hỗ Trợ",
-          "val": "150g - 450g (Tương thích mọi smartphone)"
-        },
-        {
-          "label": "Dung Lượng Pin & Thời Gian Dùng",
-          "val": "4800 mAh Li-ion (Dùng liên tục 18 giờ)"
-        },
-        {
-          "label": "Thời Gian Sạc Đầy",
-          "val": "2 giờ (Sạc nhanh USB-C PD 18W)"
-        },
-        {
-          "label": "Góc Quay Cơ Học",
-          "val": "Pan 360° Không giới hạn • Roll 335° • Tilt 335°"
-        },
-        {
-          "label": "Kết Nối Không Dây",
-          "val": "Bluetooth 5.3 Low Energy (Độ trễ < 8ms)"
-        },
-        {
-          "label": "Cổng Xuất Nguồn Sạc",
-          "val": "USB-C 5V/1A sạc ngược cho điện thoại khi quay"
-        },
-        {
-          "label": "Trọng Lượng Thân Máy",
-          "val": "465 g"
-        }
-      ],
+      "specs": {
+        "Mã Kỹ Thuật (SKU / In trên PCB)": "TF-G31-PRO-R1.0",
+        "Số Trục Ổn Định": "3 Trục (Pan • Roll • Tilt) điều khiển độc lập Pure FOC",
+        "Tải Trọng Hỗ Trợ Tối Đa": "150g – 450g (Tương thích iPhone 13-16 Pro Max)",
+        "Phạm Vi Góc Quay Cơ Học": "Pan 360° Không giới hạn • Roll 335° • Tilt 335°",
+        "Dung Lượng Pin & Thời Gian Dùng": "4800 mAh Li-ion (Dùng liên tục 18 giờ)",
+        "Thời Gian Sạc Đầy": "2 giờ qua cổng USB-C Power Delivery 18W",
+        "Cổng Xuất Nguồn Sạc": "USB-C 5V/1A sạc ngược trực tiếp cho điện thoại",
+        "Kết Nối Không Dây": "Bluetooth 5.3 Low Energy (Độ trễ < 8ms)",
+        "Vật Liệu Khung Thân": "Hợp kim nhôm AL6061 kết hợp sợi Carbon dệt 8 lớp",
+        "Chữ Ký Kỹ Thuật Silkscreen": "Engineered by T-Flow in Hanoi • Pure FOC Inside"
+      },
       "warranty": "Bảo hành chính hãng 24 tháng 1 đổi 1 trong 30 ngày đầu tiên tại Công ty TNHH Công nghệ T-Flow Việt Nam.",
       "tiers": [
         {
@@ -256,6 +219,7 @@
           "oldPriceFormatted": "3.290.000₫",
           "sku": "TF-G31-PRO-STD",
           "badge": "Bán Chạy Nhất",
+          "specs": "Thân T-Flow Pro + Mini Tripod + Cáp sạc PD + Túi chống sốc",
           "desc": "Thân T-Flow Pro + Chân đế Mini Tripod nhôm + Cáp sạc USB-C + Túi chống sốc",
           "is_featured": true,
           "highlights": [
@@ -275,6 +239,7 @@
           "oldPriceFormatted": "4.190.000₫",
           "sku": "TF-G31-PRO-COMBO",
           "badge": "Khuyên Dùng",
+          "specs": "Kèm Mắt thần AI T-Flow Eye + Đèn trợ sáng T-Flow Glow",
           "desc": "T-Flow Pro + Mắt thần AI T-Flow Eye (bám nét không cần App) + Đèn trợ sáng T-Flow Glow",
           "is_featured": false,
           "highlights": [
@@ -294,6 +259,7 @@
           "oldPriceFormatted": "5.290.000₫",
           "sku": "TF-G31-PRO-CINE",
           "badge": "Chuyên Nghiệp",
+          "specs": "Trọn bộ Kèm Vali nhôm IP67 + Micro không dây 2.4GHz",
           "desc": "Trọn bộ T-Flow Pro + T-Flow Eye AI + T-Flow Glow + Vali nhôm chống nước IP67 + Micro không dây 2.4GHz",
           "is_featured": false,
           "highlights": [

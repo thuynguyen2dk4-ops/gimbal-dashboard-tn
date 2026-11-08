@@ -3,183 +3,279 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>T-Flow Pro — Mượt mà từng khoảnh khắc | Gimbal 3 Trục Thông Minh</title>
+  <title>t-flow — mượt mà từng khoảnh khắc | T-Flow Pro Flagship</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <style>
+    /* ==========================================================================
+       APPLE STORE / DJI MONOCHROME DESIGN SYSTEM
+       ========================================================================== */
     :root {
-      --bg: #F5F5F7;
-      --card-bg: #FFFFFF;
+      --bg: #FFFFFF;
+      --bg-alt: #F5F5F7;
+      --bg-card: #FFFFFF;
       --border: rgba(0, 0, 0, 0.08);
-      --border-hover: rgba(0, 0, 0, 0.16);
+      --border-hover: rgba(0, 0, 0, 0.2);
       --text-main: #1D1D1F;
       --text-secondary: #6E6E73;
       --text-muted: #86868B;
+      --accent: #1D1D1F;
       --link: #0071E3;
-      --green: #28A745;
+      --link-hover: #0077ED;
       --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
       --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
-      --shadow-lg: 0 20px 48px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.09);
       --radius-sm: 8px;
       --radius-md: 14px;
-      --radius-lg: 24px;
+      --radius-lg: 20px;
       --radius-full: 9999px;
       --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-      --ease: cubic-bezier(0.25, 1, 0.5, 1);
+      --font-mono: "JetBrains Mono", monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
       font-family: var(--font);
       background-color: var(--bg);
       color: var(--text-main);
-      -webkit-font-smoothing: antialiased;
       line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
     }
-
-    /* Container */
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
 
     /* Frosted Sticky Navbar */
     nav {
       position: sticky;
-      top: 0;
-      z-index: 1000;
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
+      top: 0; left: 0; right: 0;
       height: 64px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      z-index: 500;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 32px;
-      transition: all 0.3s var(--ease);
+      padding: 0 36px;
+      transition: all 0.2s var(--ease);
     }
     .nav-brand {
       display: flex;
       align-items: center;
       gap: 10px;
-      text-decoration: none;
       cursor: pointer;
-    }
-    .brand-icon-box {
-      width: 34px;
-      height: 34px;
-      background: #1D1D1F;
-      color: #FFF;
-      border-radius: 9px;
-      padding: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-    }
-    .brand-icon-box svg { width: 100%; height: 100%; }
-    .brand-text {
-      font-size: 21px;
+      font-size: 16px;
       font-weight: 800;
-      letter-spacing: -0.03em;
-      color: var(--text-main);
-      line-height: 1;
+      letter-spacing: -0.02em;
     }
-    .brand-slogan {
-      font-size: 9.5px;
-      font-weight: 600;
-      color: var(--text-secondary);
-      letter-spacing: 0.02em;
-      margin-top: 2px;
-      text-transform: lowercase;
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--text-main);
+      color: #FFF;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 14px;
     }
 
     .nav-links {
       display: flex;
-      gap: 28px;
+      align-items: center;
+      gap: 6px;
       list-style: none;
     }
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text-secondary);
-      font-size: 14px;
+    .nav-links li button {
+      background: transparent;
+      border: none;
+      font-size: 13.5px;
       font-weight: 500;
-      transition: color 0.2s;
+      color: var(--text-secondary);
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
     }
-    .nav-links a:hover { color: var(--text-main); }
+    .nav-links li button:hover {
+      color: var(--text-main);
+      background: var(--bg-alt);
+    }
+    .nav-links li button.active {
+      color: var(--text-main);
+      background: var(--bg-alt);
+      font-weight: 700;
+    }
 
     .nav-actions {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
     .btn-nav-cart {
-      background: none;
+      position: relative;
+      background: transparent;
       border: 1px solid var(--border);
-      padding: 7px 16px;
+      padding: 8px 16px;
       border-radius: var(--radius-full);
       font-size: 13px;
       font-weight: 600;
+      color: var(--text-main);
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       transition: all 0.2s var(--ease);
     }
-    .btn-nav-cart:hover { border-color: var(--border-hover); background: #FFF; }
+    .btn-nav-cart:hover {
+      background: var(--bg-alt);
+      border-color: var(--border-hover);
+    }
     .cart-badge {
-      background: #1D1D1F;
+      background: var(--text-main);
       color: #FFF;
       font-size: 11px;
       font-weight: 700;
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .btn-nav-primary {
-      background: #1D1D1F;
-      color: #FFF;
-      border: none;
-      padding: 8px 20px;
+      padding: 2px 7px;
       border-radius: var(--radius-full);
+    }
+    .btn-nav-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      transition: color 0.15s ease;
+    }
+    .btn-nav-link:hover { color: var(--text-main); }
+    .btn-nav-primary {
+      background: var(--text-main);
+      color: #FFFFFF;
       font-size: 13px;
       font-weight: 600;
+      padding: 8px 18px;
+      border-radius: var(--radius-full);
+      border: none;
       cursor: pointer;
-      transition: transform 0.2s, background 0.2s;
-      text-decoration: none;
+      transition: opacity 0.15s ease;
     }
-    .btn-nav-primary:hover {
-      background: #000;
-      transform: scale(1.02);
+    .btn-nav-primary:hover { opacity: 0.88; }
+
+    /* VIEW PANELS (MULTI-VIEW ISOLATION) */
+    .view-panel {
+      display: none;
+      min-height: calc(100vh - 120px);
+    }
+    .view-panel.active {
+      display: block;
+      animation: viewFadeSlide 0.35s var(--ease);
+    }
+    @keyframes viewFadeSlide {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
-    /* HERO SHOWCASE SECTION */
-    .hero-section {
-      padding: 56px 0 80px 0;
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .container-wide {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Common typography */
+    .section-header-clean {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 48px auto;
+    }
+    .tag-clean {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .title-clean {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .sub-clean {
+      font-size: 16px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Buttons */
+    .btn-dark {
+      background: var(--text-main);
+      color: #FFF;
+      padding: 13px 26px;
+      border-radius: var(--radius-full);
+      font-size: 14.5px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s var(--ease);
+    }
+    .btn-dark:hover {
+      background: #000;
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    .btn-ghost {
+      background: var(--bg-alt);
+      color: var(--text-main);
+      padding: 13px 26px;
+      border-radius: var(--radius-full);
+      font-size: 14.5px;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s var(--ease);
+    }
+    .btn-ghost:hover {
+      background: #EBEBEF;
+      border-color: var(--border-hover);
+    }
+
+    /* ==========================================================================
+       VIEW 1: TRANG CHỦ (HERO FLAGSHIP SHOWCASE + BENTO GRID + APPS)
+       ========================================================================== */
+    /* Flagship Showcase (Hero MVP) */
+    .hero-flagship-showcase {
+      padding: 48px 0 80px 0;
       background: linear-gradient(180deg, #FFFFFF 0%, #F5F5F7 100%);
       border-bottom: 1px solid var(--border);
     }
-    .hero-grid {
+    .flagship-grid {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
+      grid-template-columns: 1.1fr 0.9fr;
       gap: 56px;
-      align-items: flex-start;
+      align-items: center;
     }
-
-    /* Gallery (Sticky) */
-    .gallery-sticky-box {
-      position: sticky;
-      top: 96px;
-    }
-    .main-img-card {
+    .flagship-media-box {
+      position: relative;
       background: #FFFFFF;
       border-radius: var(--radius-lg);
       padding: 40px;
@@ -188,25 +284,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
-      margin-bottom: 16px;
       overflow: hidden;
+      perspective: 1000px;
     }
-    .main-img-card img {
+    .flagship-media-box img {
       max-width: 100%;
       height: 440px;
       object-fit: contain;
+      transition: transform 0.6s var(--ease);
       filter: drop-shadow(0 20px 30px rgba(0,0,0,0.12));
-      transition: transform 0.5s var(--ease);
     }
-    .main-img-card:hover img {
-      transform: scale(1.03);
+    .flagship-media-box:hover img {
+      transform: scale(1.04) rotate(0.5deg);
     }
-    .hero-badge-pill {
+    .flagship-badge {
       position: absolute;
       top: 24px;
       left: 24px;
-      background: #1D1D1F;
+      background: var(--text-main);
       color: #FFF;
       font-size: 11px;
       font-weight: 700;
@@ -215,1025 +310,2442 @@
       padding: 6px 14px;
       border-radius: var(--radius-full);
     }
-    .hero-thumbs-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-    }
-    .thumb-btn {
-      background: #FFF;
-      border: 2px solid transparent;
-      border-radius: var(--radius-md);
-      padding: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.2s var(--ease);
-      height: 84px;
-    }
-    .thumb-btn.active {
-      border-color: #1D1D1F;
-    }
-    .thumb-btn img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-    }
 
-    /* Product Configurator Info */
-    .config-info-box h1 {
+    .flagship-info h1 {
       font-size: 44px;
       font-weight: 800;
       letter-spacing: -0.03em;
       line-height: 1.15;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
-    .config-tagline {
-      font-size: 18px;
+    .flagship-tagline {
+      font-size: 19px;
       font-weight: 600;
       color: var(--text-secondary);
-      margin-bottom: 18px;
+      margin-bottom: 16px;
       line-height: 1.4;
     }
-    .config-desc {
+    .flagship-desc {
       font-size: 14.5px;
       color: var(--text-secondary);
       margin-bottom: 28px;
       line-height: 1.6;
     }
 
-    /* Step Selector Blocks */
-    .config-step-block {
-      background: #FFFFFF;
-      padding: 24px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
+    /* Tier Selector Pills on Hero */
+    .hero-tier-selector {
+      display: flex;
+      gap: 10px;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
-    .step-title {
+    .hero-tier-btn {
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: #FFFFFF;
       font-size: 13px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 14px;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    /* Color Swatches */
-    .color-swatch-list {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    .color-dot {
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      cursor: pointer;
-      border: 2px solid transparent;
-      outline: 2px solid transparent;
-      outline-offset: 2px;
-      transition: all 0.2s var(--ease);
-    }
-    .color-dot.active {
-      outline-color: var(--text-main);
-      transform: scale(1.1);
-    }
-    .selected-color-label {
-      font-size: 14px;
       font-weight: 600;
-      color: var(--text-main);
-      margin-left: 10px;
-    }
-
-    /* Tier Select Cards */
-    .tier-cards-col {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .tier-option-card {
-      border: 2px solid var(--border);
-      border-radius: var(--radius-md);
-      padding: 16px 20px;
       cursor: pointer;
       transition: all 0.2s var(--ease);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .tier-option-card:hover {
-      border-color: var(--border-hover);
-    }
-    .tier-option-card.active {
-      border-color: #1D1D1F;
-      background: rgba(29, 29, 31, 0.02);
-    }
-    .tier-title-text {
-      font-size: 16px;
-      font-weight: 700;
-      margin-bottom: 4px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    .tier-badge-subtle {
-      font-size: 11px;
-      font-weight: 700;
-      background: rgba(0, 113, 227, 0.1);
-      color: var(--link);
-      padding: 2px 8px;
-      border-radius: var(--radius-full);
+    .hero-tier-btn:hover {
+      border-color: var(--text-main);
     }
-    .tier-sub-desc {
-      font-size: 13px;
+    .hero-tier-btn.active {
+      background: var(--text-main);
+      color: #FFFFFF;
+      border-color: var(--text-main);
+    }
+
+    /* Color dots on Hero */
+    .color-swatches-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .color-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 0 0 1px var(--border);
+      transition: all 0.2s var(--ease);
+    }
+    .color-dot.active {
+      box-shadow: 0 0 0 2px var(--text-main);
+      transform: scale(1.15);
+    }
+    .color-name-text {
+      font-size: 12.5px;
+      font-weight: 600;
       color: var(--text-secondary);
     }
-    .tier-price-box {
-      text-align: right;
+
+    .hero-price-box {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 28px;
     }
-    .tier-real-price {
-      font-size: 18px;
+    .hero-price-val {
+      font-size: 32px;
       font-weight: 800;
       letter-spacing: -0.02em;
+      font-family: var(--font-mono);
     }
-    .tier-old-price {
-      font-size: 12px;
+    .hero-price-old {
+      font-size: 18px;
       color: var(--text-muted);
       text-decoration: line-through;
     }
-
-    /* Price Summary & Action Box */
-    .action-checkout-box {
-      background: #FFFFFF;
-      padding: 24px;
-      border-radius: var(--radius-md);
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-    }
-    .final-price-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      margin-bottom: 18px;
-    }
-    .final-price-val {
-      font-size: 32px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      color: #1D1D1F;
-    }
-    .actions-dual-btn {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .btn-action-cart {
-      background: #FFF;
-      color: #1D1D1F;
-      border: 1.5px solid #1D1D1F;
-      padding: 14px;
-      border-radius: var(--radius-full);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s var(--ease);
-    }
-    .btn-action-cart:hover { background: #F5F5F7; }
-    .btn-action-buy {
-      background: #1D1D1F;
-      color: #FFF;
-      border: none;
-      padding: 14px;
-      border-radius: var(--radius-full);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s var(--ease);
-    }
-    .btn-action-buy:hover { background: #000; transform: scale(1.02); }
-    .guarantee-list {
-      display: flex;
-      justify-content: space-between;
+    .hero-price-save {
+      background: #EBF7EE;
+      color: #28A745;
       font-size: 12px;
-      color: var(--text-secondary);
-      border-top: 1px solid var(--border);
-      padding-top: 16px;
-    }
-
-    /* PRODUCT DEEP-DIVE SECTION (PDP OVERVIEW, BOX, SPECS, WARRANTY) */
-    .pdp-section {
-      padding: 80px 0;
-    }
-    .pdp-tabs-nav {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      margin-bottom: 48px;
-    }
-    .pdp-tab-btn {
-      padding: 10px 24px;
-      border-radius: var(--radius-full);
-      border: 1px solid var(--border);
-      background: #FFF;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s var(--ease);
-    }
-    .pdp-tab-btn.active {
-      background: #1D1D1F;
-      color: #FFF;
-      border-color: #1D1D1F;
-    }
-
-    /* Overview Highlights */
-    .highlight-card {
-      background: #FFF;
-      border-radius: var(--radius-lg);
-      padding: 48px;
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 48px;
-      align-items: center;
-      margin-bottom: 32px;
-    }
-    .highlight-card.reverse {
-      grid-template-columns: 1fr 1fr;
-      direction: rtl;
-    }
-    .highlight-card.reverse > div {
-      direction: ltr;
-    }
-    .highlight-tag {
-      font-size: 11px;
       font-weight: 700;
-      color: var(--link);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 12px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
     }
-    .highlight-card h3 {
-      font-size: 28px;
+
+    .hero-action-buttons {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Bento Grid (FOC Core Technology) */
+    .bento-section {
+      padding: 100px 0;
+    }
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .bento-card {
+      background: var(--bg-alt);
+      border-radius: var(--radius-lg);
+      padding: 36px;
+      border: 1px solid var(--border);
+      transition: all 0.35s var(--ease);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .bento-card:hover {
+      background: #FFFFFF;
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lg);
+    }
+    .bento-span-2 { grid-column: span 2; }
+    .bento-card-title {
+      font-size: 22px;
       font-weight: 800;
       letter-spacing: -0.02em;
-      margin-bottom: 14px;
-      line-height: 1.25;
+      margin-bottom: 10px;
     }
-    .highlight-card p {
-      font-size: 16px;
+    .bento-card-desc {
+      font-size: 14.5px;
       color: var(--text-secondary);
       line-height: 1.6;
     }
-    .highlight-card img {
+    .bento-metric-large {
+      font-size: 52px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      letter-spacing: -0.03em;
+      margin: 20px 0 10px 0;
+    }
+
+    /* Ecosystem & iOS Apps Section */
+    .eco-section {
+      padding: 100px 0;
+      background: var(--bg-alt);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .eco-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    .eco-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s var(--ease);
+    }
+    .eco-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+    .eco-card img {
       width: 100%;
-      height: 340px;
+      height: 280px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      margin-top: 24px;
+    }
+
+    /* Warranty & Trust */
+    .trust-section {
+      padding: 80px 0;
+      text-align: center;
+    }
+    .trust-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-top: 40px;
+    }
+    .trust-item {
+      padding: 24px;
+      border-radius: var(--radius-md);
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+    }
+    .trust-item h4 {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .trust-item p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ==========================================================================
+       VIEW 2: DẢI SẢN PHẨM (STORE GRID)
+       ========================================================================== */
+    .catalog-section {
+      padding: 60px 0 120px 0;
+    }
+    .catalog-filters {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 48px;
+      flex-wrap: wrap;
+    }
+    .filter-chip {
+      padding: 10px 22px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: #FFFFFF;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+    }
+    .filter-chip:hover {
+      color: var(--text-main);
+      border-color: var(--border-hover);
+    }
+    .filter-chip.active {
+      background: var(--text-main);
+      color: #FFFFFF;
+      border-color: var(--text-main);
+    }
+
+    .products-grid-3col {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+    .store-product-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.35s var(--ease);
+      position: relative;
+    }
+    .store-product-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border-hover);
+    }
+    .store-card-img-wrap {
+      height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .store-card-img-wrap img {
+      max-height: 220px;
+      max-width: 100%;
+      object-fit: contain;
+      transition: transform 0.5s var(--ease);
+    }
+    .store-product-card:hover .store-card-img-wrap img {
+      transform: scale(1.05);
+    }
+    .store-card-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .store-card-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+    .store-card-sub {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin-bottom: 18px;
+      line-height: 1.5;
+      height: 40px;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+    .store-card-colors {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .store-mini-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,0,0,0.15);
+    }
+    .store-card-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid var(--border);
+      padding-top: 18px;
+      margin-top: 10px;
+    }
+    .store-price-text {
+      font-size: 18px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+    }
+    .store-action-link {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--link);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ==========================================================================
+       VIEW 3: TRANG CHI TIẾT SẢN PHẨM RIÊNG (APPLE STORE BUY PAGE)
+       ========================================================================== */
+    .product-detail-view {
+      padding: 40px 0 120px 0;
+    }
+    .breadcrumb-nav {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .breadcrumb-nav span { color: var(--text-main); font-weight: 600; }
+    .breadcrumb-nav a:hover { color: var(--text-main); }
+
+    /* Top 2 Columns */
+    .detail-top-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 60px;
+      align-items: start;
+      margin-bottom: 100px;
+    }
+    .sticky-gallery-col {
+      position: sticky;
+      top: 90px;
+    }
+    .gallery-main-frame {
+      background: var(--bg-alt);
+      border-radius: var(--radius-lg);
+      padding: 40px;
+      border: 1px solid var(--border);
+      height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+    .gallery-main-frame img {
+      max-height: 420px;
+      max-width: 100%;
+      object-fit: contain;
+      transition: transform 0.4s var(--ease);
+      filter: drop-shadow(0 14px 24px rgba(0,0,0,0.08));
+    }
+    .gallery-main-frame:hover img {
+      transform: scale(1.05);
+    }
+    .gallery-thumbs-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .thumb-item {
+      height: 84px;
+      background: var(--bg-alt);
+      border-radius: var(--radius-md);
+      border: 2px solid transparent;
+      padding: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s var(--ease);
+    }
+    .thumb-item img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+    }
+    .thumb-item.active {
+      border-color: var(--text-main);
+      background: #FFFFFF;
+    }
+
+    /* Right Configurator Column */
+    .configurator-col {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    .detail-heading h1 {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+    .detail-tagline {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    .detail-short-desc {
+      font-size: 14.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .config-step-box {
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+    }
+    .config-step-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    /* Step 1: Tier Cards (Apple Store style) */
+    .tier-card-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .tier-select-card {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px 20px;
+      cursor: pointer;
+      transition: all 0.2s var(--ease);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #FFFFFF;
+    }
+    .tier-select-card:hover {
+      border-color: var(--border-hover);
+    }
+    .tier-select-card.active {
+      border-color: var(--text-main);
+      background: var(--bg-alt);
+      box-shadow: 0 0 0 1px var(--text-main);
+    }
+    .tier-card-label {
+      font-size: 15.5px;
+      font-weight: 700;
+    }
+    .tier-card-diff {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+    .tier-card-price {
+      font-size: 16px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      text-align: right;
+    }
+
+    /* Step 2: Color selector */
+    .colors-config-list {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .color-swatch-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #FFF;
+      box-shadow: 0 0 0 1px var(--border);
+      transition: all 0.2s var(--ease);
+    }
+    .color-swatch-btn.active {
+      box-shadow: 0 0 0 2.5px var(--text-main);
+      transform: scale(1.1);
+    }
+
+    /* Price summary box */
+    .detail-summary-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+    }
+    .summary-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .summary-current-price {
+      font-size: 32px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+    }
+    .summary-old-price {
+      font-size: 16px;
+      color: var(--text-muted);
+      text-decoration: line-through;
+    }
+    .summary-gift-tag {
+      font-size: 13px;
+      color: var(--text-main);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+    .summary-perks {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .detail-ctas-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .detail-ctas-row button {
+      flex: 1;
+      padding: 15px 0;
+      font-size: 15px;
+      justify-content: center;
+    }
+
+    /* Deep sections below detail */
+    .deep-tabs-nav {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      gap: 32px;
+      margin-bottom: 48px;
+    }
+    .deep-tab-btn {
+      background: transparent;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding-bottom: 16px;
+      cursor: pointer;
+      position: relative;
+    }
+    .deep-tab-btn.active {
+      color: var(--text-main);
+      font-weight: 800;
+    }
+    .deep-tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 2px;
+      background: var(--text-main);
+    }
+
+    /* Overview Highlights (Alternating) */
+    .overview-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+      margin-bottom: 64px;
+    }
+    .overview-row.reverse {
+      direction: rtl;
+    }
+    .overview-row.reverse > * {
+      direction: ltr;
+    }
+    .overview-text-box h3 {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 14px;
+    }
+    .overview-text-box p {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .overview-img-box {
+      background: var(--bg-alt);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      height: 320px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .overview-img-box img {
+      max-height: 100%;
+      max-width: 100%;
       object-fit: cover;
       border-radius: var(--radius-md);
     }
 
-    /* Box Grid */
-    .box-grid {
+    /* What's in the Box Grid */
+    .box-contents-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 20px;
     }
     .box-item-card {
-      background: #FFF;
-      padding: 24px;
-      border-radius: var(--radius-md);
+      background: var(--bg-alt);
       border: 1px solid var(--border);
-      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      font-size: 14px;
+      font-weight: 600;
       display: flex;
-      gap: 16px;
       align-items: center;
+      gap: 12px;
     }
-    .box-item-bullet {
-      width: 12px;
-      height: 12px;
+    .box-bullet {
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: #1D1D1F;
+      background: var(--text-main);
       flex-shrink: 0;
     }
 
-    /* Specs Table */
-    .specs-table-box {
-      background: #FFF;
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      overflow: hidden;
-      box-shadow: var(--shadow-sm);
-    }
+    /* Tech Specs Table */
     .specs-table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 16px;
     }
     .specs-table tr {
       border-bottom: 1px solid var(--border);
     }
-    .specs-table tr:last-child { border-bottom: none; }
     .specs-table td {
-      padding: 18px 24px;
-      font-size: 14.5px;
+      padding: 16px 20px;
+      font-size: 14px;
     }
     .specs-table td:first-child {
       font-weight: 700;
-      color: var(--text-main);
       width: 35%;
-      background: #FAFAFA;
-    }
-    .specs-table td:last-child {
       color: var(--text-secondary);
+      background: var(--bg-alt);
     }
 
-    /* Footer */
-    footer {
-      background: #FFFFFF;
-      border-top: 1px solid var(--border);
-      padding: 64px 0 32px 0;
-    }
-
-    /* Sticky Buy Bar */
-    .sticky-bar {
+    /* Sticky Buy Bar (appears when scrolled past main buy box) */
+    .sticky-buy-bar {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(255, 255, 255, 0.95);
+      top: 64px; left: 0; right: 0;
+      height: 60px;
+      background: rgba(255, 255, 255, 0.94);
       backdrop-filter: blur(20px);
-      border-top: 1px solid var(--border);
-      padding: 12px 32px;
-      display: flex;
-      justify-content: space-between;
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      z-index: 450;
+      display: none;
       align-items: center;
-      z-index: 999;
-      box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
-      transform: translateY(100%);
-      transition: transform 0.3s var(--ease);
+      justify-content: space-between;
+      padding: 0 40px;
+      transform: translateY(-100%);
+      transition: transform 0.25s var(--ease);
     }
-    .sticky-bar.visible { transform: translateY(0); }
+    .sticky-buy-bar.visible {
+      display: flex;
+      transform: translateY(0);
+    }
+    .sticky-bar-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .sticky-bar-info img {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+    }
+    .sticky-bar-title {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .sticky-bar-price {
+      font-size: 15px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+    }
 
-    /* Shopping Bag Drawer */
+    /* ==========================================================================
+       VIEW 4: ĐÁNH GIÁ & HỎI ĐÁP
+       ========================================================================== */
+    .reviews-section {
+      padding: 60px 0 100px 0;
+    }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+    .testimonial-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .testi-quote {
+      font-size: 14.5px;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-bottom: 24px;
+    }
+    .testi-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .testi-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--text-main);
+      color: #FFF;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .testi-name { font-size: 14px; font-weight: 700; }
+    .testi-role { font-size: 12px; color: var(--text-muted); }
+
+    /* FAQ Accordion */
+    .faq-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+      padding: 20px 0;
+    }
+    .faq-question {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 17px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .faq-answer {
+      display: none;
+      padding-top: 12px;
+      font-size: 14.5px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .faq-item.open .faq-answer {
+      display: block;
+    }
+    .faq-item.open .faq-toggle-icon {
+      transform: rotate(45deg);
+    }
+    .faq-toggle-icon {
+      font-size: 20px;
+      transition: transform 0.2s ease;
+    }
+
+    /* ==========================================================================
+       SLIDE-OVER SHOPPING BAG DRAWER (APPLE STORE SLIDE-OVER)
+       ========================================================================== */
     .cart-drawer-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(4px);
-      z-index: 2000;
-      display: none;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      z-index: 900;
       opacity: 0;
-      transition: opacity 0.3s;
+      visibility: hidden;
+      transition: all 0.3s var(--ease);
     }
-    .cart-drawer-overlay.open { display: block; opacity: 1; }
+    .cart-drawer-overlay.open {
+      opacity: 1;
+      visibility: visible;
+    }
     .cart-drawer {
       position: fixed;
       top: 0; right: 0; bottom: 0;
-      width: 420px;
-      max-width: 90vw;
-      background: #FFF;
-      z-index: 2001;
-      box-shadow: var(--shadow-lg);
-      transform: translateX(100%);
-      transition: transform 0.35s var(--ease);
+      width: 440px;
+      max-width: 100%;
+      background: #FFFFFF;
+      box-shadow: -10px 0 40px rgba(0, 0, 0, 0.15);
+      z-index: 950;
       display: flex;
       flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.35s var(--ease);
     }
-    .cart-drawer.open { transform: translateX(0); }
-    .drawer-header {
-      padding: 20px 24px;
+    .cart-drawer-overlay.open .cart-drawer {
+      transform: translateX(0);
+    }
+    .cart-header {
+      height: 64px;
+      padding: 0 28px;
       border-bottom: 1px solid var(--border);
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
     }
-    .drawer-body {
+    .cart-header h3 {
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .btn-close-cart {
+      background: transparent;
+      border: none;
+      font-size: 22px;
+      cursor: pointer;
+      color: var(--text-secondary);
+      padding: 4px 8px;
+    }
+    .cart-body {
       flex: 1;
       overflow-y: auto;
-      padding: 24px;
+      padding: 24px 28px;
     }
-    .drawer-footer {
-      padding: 24px;
+    .cart-empty-msg {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--text-muted);
+      font-size: 14.5px;
+    }
+
+    .cart-item-row {
+      display: flex;
+      gap: 16px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .cart-item-thumb {
+      width: 72px;
+      height: 72px;
+      background: var(--bg-alt);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .cart-item-thumb img {
+      max-width: 80%;
+      max-height: 80%;
+      object-fit: contain;
+    }
+    .cart-item-details {
+      flex: 1;
+    }
+    .cart-item-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+    .cart-item-meta {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .cart-item-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .cart-qty-ctrl {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-full);
+      padding: 2px 8px;
+    }
+    .cart-qty-btn {
+      background: transparent;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--text-main);
+      padding: 0 4px;
+    }
+    .cart-qty-val {
+      font-size: 12.5px;
+      font-weight: 700;
+      font-family: var(--font-mono);
+    }
+    .cart-item-price {
+      font-size: 14px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+    }
+    .cart-item-del {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .cart-item-del:hover { color: #DC3545; }
+
+    .cart-footer {
       border-top: 1px solid var(--border);
-      background: #FAFAFA;
+      padding: 24px 28px;
+      background: var(--bg-alt);
+    }
+    .cart-calc-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .cart-total-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .btn-checkout {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px 0;
+      font-size: 15px;
+      justify-content: center;
+    }
+
+    /* ==========================================================================
+       CHECKOUT MODAL
+       ========================================================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open {
+      display: flex;
+      animation: modalFade 0.25s var(--ease);
+    }
+    @keyframes modalFade {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-card {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      max-width: 520px;
+      width: 100%;
+      padding: 36px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .modal-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .modal-sub {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-family: inherit;
+      font-size: 14px;
+      background: #FFFFFF;
+      transition: border 0.15s ease;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--text-main);
+    }
+
+    /* ENTERPRISE 4-COLUMN FOOTER */
+    .enterprise-footer {
+      background: #111827;
+      color: #9CA3AF;
+      padding: 72px 0 36px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+    .footer-grid-4col {
+      display: grid;
+      grid-template-columns: 1.4fr 0.9fr 0.9fr 1fr;
+      gap: 48px;
+      margin-bottom: 56px;
+    }
+    .footer-brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+    .footer-col-desc {
+      font-size: 13px;
+      color: #9CA3AF;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .footer-contact-info {
+      font-size: 12.5px;
+      color: #D1D5DB;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .footer-contact-info strong {
+      color: #FFFFFF;
+    }
+    .footer-col-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFFFFF;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 18px;
+    }
+    .footer-links-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-links-list a {
+      color: #9CA3AF;
+      transition: color 0.15s ease;
+      font-size: 13px;
+    }
+    .footer-links-list a:hover {
+      color: #FFFFFF;
+    }
+    .footer-bottom-bar {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 12px;
+      color: #6B7280;
+    }
+    .footer-legal-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-legal-links a {
+      color: #9CA3AF;
+      transition: color 0.15s ease;
+    }
+    .footer-legal-links a:hover {
+      color: #FFFFFF;
+    }
+
+    /* Toast */
+    .toast-msg {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(40px);
+      background: var(--text-main);
+      color: #FFF;
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      z-index: 1200;
+      opacity: 0;
+      transition: all 0.3s var(--ease);
+      pointer-events: none;
+    }
+    .toast-msg.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
     }
   </style>
 </head>
 <body>
 
-  <!-- STICKY FROSTED NAVBAR (CLEAN CONSUMER NAV) -->
+  <!-- STICKY FROSTED NAVBAR (4 CLEAN NAV ITEMS + ACTIONS) -->
   <nav id="mainNavbar">
-    <a href="#hero" class="nav-brand">
-      <div class="brand-icon-box">
-        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <div class="nav-brand" onclick="switchView('home')" style="display:flex; align-items:center; gap:10px; cursor:pointer;">
+      <div class="brand-mark" style="width:34px; height:34px; background:#1D1D1F; color:#FFF; border-radius:9px; padding:6px; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.12);">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
           <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="currentColor" stroke-width="12" stroke-linecap="round" fill="none" />
           <path d="M 50 34 L 50 82" stroke="currentColor" stroke-width="12" stroke-linecap="round" />
         </svg>
       </div>
-      <div>
-        <div class="brand-text">t-flow</div>
-        <div class="brand-slogan">mượt mà từng khoảnh khắc</div>
+      <div style="display:flex; flex-direction:column; line-height:1;">
+        <span style="font-size:20px; font-weight:800; letter-spacing:-0.03em; color:var(--text-main); font-family:'Plus Jakarta Sans', sans-serif;">t-flow</span>
+        <span style="font-size:9.5px; font-weight:600; color:var(--text-secondary); letter-spacing:0.02em; text-transform:lowercase; margin-top:2px;">mượt mà từng khoảnh khắc</span>
       </div>
-    </a>
+    </div>
 
-    <!-- MAIN CONSUMER LINKS -->
+    <!-- MAIN VIEWS -->
     <ul class="nav-links">
-      <li><a href="#hero">Tổng Quan</a></li>
-      <li><a href="#pricing">Các Gói Sản Phẩm</a></li>
-      <li><a href="#highlights">Tính Năng Đột Phá</a></li>
-      <li><a href="#specs">Thông Số Kỹ Thuật</a></li>
-      <li><a href="#reviews">Đánh Giá</a></li>
+      <li><button class="nav-btn active" id="btnNavHome" onclick="switchView('home')">Trang Chủ</button></li>
+      <li><button class="nav-btn" id="btnNavCatalog" onclick="switchView('catalog')">Dải Sản Phẩm</button></li>
+      <li><button class="nav-btn" id="btnNavReviews" onclick="switchView('reviews')">Đánh Giá &amp; Hỏi Đáp</button></li>
     </ul>
 
     <!-- ACTIONS -->
     <div class="nav-actions">
-      <button class="btn-nav-cart" onclick="toggleCartDrawer(true)">
+      <button class="btn-nav-cart" onclick="openCartDrawer()">
         <span>Giỏ Hàng</span>
         <span class="cart-badge" id="navCartCount">0</span>
       </button>
-      <a href="user_dashboard.html" class="btn-nav-cart" style="text-decoration:none;">Cổng Thành Viên</a>
-      <a href="#pricing" class="btn-nav-primary">Mua Ngay</a>
+      <a href="user_dashboard.html" class="btn-nav-link" id="navUserBtn">Cổng Khách Hàng</a>
+      <a href="javascript:void(0)" onclick="handleAdminNavClick()" class="btn-nav-link" style="color:var(--text-secondary);">Admin CMS</a>
+      <button class="btn-nav-primary" onclick="switchView('catalog')">Mua Ngay</button>
     </div>
   </nav>
 
-  <!-- ==========================================================================
-       HERO SHOWCASE SECTION: T-FLOW PRO
-       ========================================================================== -->
-  <section class="hero-section" id="hero">
-    <div class="container">
-      <div class="hero-grid">
-
-        <!-- Left: Sticky Gallery -->
-        <div class="gallery-sticky-box">
-          <div class="main-img-card">
-            <span class="hero-badge-pill">Flagship B2C 2026</span>
-            <img id="mainProductImg" src="../shared/img/feed_portrait_dusk.jpg" alt="T-Flow Pro">
-          </div>
-          <div class="hero-thumbs-row">
-            <button class="thumb-btn active" onclick="switchGalleryImg('../shared/img/feed_portrait_dusk.jpg', this)">
-              <img src="../shared/img/feed_portrait_dusk.jpg" alt="Góc nghiêng">
-            </button>
-            <button class="thumb-btn" onclick="switchGalleryImg('../shared/img/feed_portrait_day.jpg', this)">
-              <img src="../shared/img/feed_portrait_day.jpg" alt="Động cơ FOC">
-            </button>
-            <button class="thumb-btn" onclick="switchGalleryImg('../shared/img/feed_person_portrait.jpg', this)">
-              <img src="../shared/img/feed_person_portrait.jpg" alt="Focus Wheel">
-            </button>
-            <button class="thumb-btn" onclick="switchGalleryImg('../shared/img/feed_land_dusk.jpg', this)">
-              <img src="../shared/img/feed_land_dusk.jpg" alt="Toàn cảnh">
-            </button>
-          </div>
-        </div>
-
-        <!-- Right: Configurator & Real-world Tiers -->
-        <div class="config-info-box" id="pricing">
-          <h1>T-Flow Pro</h1>
-          <div class="config-tagline">Vững khung hình, Trọn cảm xúc. Đỉnh cao chống rung 3 trục chuyên nghiệp.</div>
-          <div class="config-desc">
-            Thiết kế chuyên biệt cho nhà sáng tạo nội dung, vlogger và nhà làm phim di động. Động cơ tải trọng cực đại 450g, thuật toán Pure FOC 20kHz triệt tiêu rung giật tuyệt đối, tích hợp vòng xoay cơ khí Focus Wheel và khung sợi Carbon dệt 8 lớp siêu nhẹ.
-          </div>
-
-          <!-- Bước 1: Chọn màu sắc -->
-          <div class="config-step-block">
-            <div class="step-title">
-              <span>Bước 1: Chọn màu sắc hoàn thiện</span>
-              <span id="selectedColorName" class="selected-color-label" style="margin:0;">Đen Carbon (Titanium)</span>
-            </div>
-            <div class="color-swatch-list">
-              <div class="color-dot active" style="background-color:#1C1C1E;" title="Đen Carbon" onclick="selectColor('carbon-black', 'Đen Carbon (Titanium)', this)"></div>
-              <div class="color-dot" style="background-color:#D1D1D6;" title="Bạc Ánh Kim" onclick="selectColor('silver-frost', 'Bạc Ánh Kim (Silver Frost)', this)"></div>
-              <div class="color-dot" style="background-color:#1A2A3A;" title="Xanh Biển Sâu" onclick="selectColor('deep-navy', 'Xanh Biển Sâu (Deep Navy)', this)"></div>
-            </div>
-          </div>
-
-          <!-- Bước 2: Chọn gói phiên bản thực tế -->
-          <div class="config-step-block">
-            <div class="step-title">
-              <span>Bước 2: Chọn gói trang bị sản phẩm</span>
-              <span style="color:#28A745; font-weight:700;">Chính Hãng T-Flow</span>
-            </div>
-            <div class="tier-cards-col">
-              
-              <!-- Gói 1: Tiêu chuẩn -->
-              <div class="tier-option-card active" onclick="selectTier('tier-pro-std', 2890000, '2.890.000₫', 'Gói Tiêu Chuẩn (Standard Kit)', this)">
-                <div>
-                  <div class="tier-title-text">
-                    Gói Tiêu Chuẩn (Standard)
-                    <span class="tier-badge-subtle">Bán Chạy Nhất</span>
-                  </div>
-                  <div class="tier-sub-desc">Thân T-Flow Pro + Mini Tripod nhôm + Cáp sạc PD + Túi chống sốc</div>
-                </div>
-                <div class="tier-price-box">
-                  <div class="tier-real-price">2.890.000₫</div>
-                  <div class="tier-old-price">3.290.000₫</div>
-                </div>
-              </div>
-
-              <!-- Gói 2: Combo Sáng Tạo -->
-              <div class="tier-option-card" onclick="selectTier('tier-pro-combo', 3490000, '3.490.000₫', 'Combo Sáng Tạo (Creator Kit)', this)">
-                <div>
-                  <div class="tier-title-text">
-                    Combo Sáng Tạo (Creator Kit)
-                    <span class="tier-badge-subtle" style="background:rgba(40,167,69,0.1); color:#28A745;">Khuyên Dùng</span>
-                  </div>
-                  <div class="tier-sub-desc">Kèm Mắt thần AI T-Flow Eye (bám nét không cần App) + Đèn T-Flow Glow</div>
-                </div>
-                <div class="tier-price-box">
-                  <div class="tier-real-price">3.490.000₫</div>
-                  <div class="tier-old-price">4.190.000₫</div>
-                </div>
-              </div>
-
-              <!-- Gói 3: Combo Điện Ảnh -->
-              <div class="tier-option-card" onclick="selectTier('tier-pro-cine', 4290000, '4.290.000₫', 'Combo Điện Ảnh (Cinematic Master)', this)">
-                <div>
-                  <div class="tier-title-text">
-                    Combo Điện Ảnh (Cinematic Master)
-                    <span class="tier-badge-subtle" style="background:rgba(175,82,222,0.1); color:#AF52DE;">Đầy Đủ Nhất</span>
-                  </div>
-                  <div class="tier-sub-desc">Trọn bộ T-Flow Pro + Eye AI + Glow LED + Vali nhôm IP67 + Micro không dây</div>
-                </div>
-                <div class="tier-price-box">
-                  <div class="tier-real-price">4.290.000₫</div>
-                  <div class="tier-old-price">5.290.000₫</div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-
-          <!-- Checkout Box -->
-          <div class="action-checkout-box">
-            <div class="final-price-row">
-              <div>
-                <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Giá thanh toán niêm yết</div>
-                <div style="font-size:14px; color:var(--text-secondary);" id="selectedTierSummaryName">Gói Tiêu Chuẩn (Standard Kit)</div>
-              </div>
-              <div class="final-price-val" id="displayFinalPrice">2.890.000₫</div>
-            </div>
-            <div class="actions-dual-btn">
-              <button class="btn-action-cart" onclick="addToCart()">Thêm Vào Giỏ Hàng</button>
-              <button class="btn-action-buy" onclick="buyNow()">Đặt Mua Ngay</button>
-            </div>
-            <div class="guarantee-list">
-              <span>✓ Bảo hành 24 tháng 1 đổi 1</span>
-              <span>✓ Đổi mới 30 ngày dùng thử</span>
-              <span>✓ Miễn phí giao hàng toàn quốc</span>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ==========================================================================
-       PRODUCT DEEP-DIVE: TÍNH NĂNG, UNBOXING, THÔNG SỐ, BẢO HÀNH
-       ========================================================================== -->
-  <section class="pdp-section" id="highlights">
-    <div class="container">
-      
-      <!-- PDP Tabs Navigation -->
-      <div class="pdp-tabs-nav">
-        <button class="pdp-tab-btn active" onclick="switchPdpTab('highlights', this)">Điểm Nhấn Đột Phá</button>
-        <button class="pdp-tab-btn" onclick="switchPdpTab('unboxing', this)">Trong Hộp Có Gì</button>
-        <button class="pdp-tab-btn" id="specsTabBtn" onclick="switchPdpTab('specs', this)">Bảng Thông Số Kỹ Thuật</button>
-        <button class="pdp-tab-btn" onclick="switchPdpTab('warranty', this)">Chính Sách Bảo Hành</button>
-      </div>
-
-      <!-- TAB 1: 3 HIGHLIGHTS -->
-      <div class="pdp-tab-content" id="tabContentHighlights">
-        
-        <div class="highlight-card">
-          <div>
-            <div class="highlight-tag">Đột Phá 01 • Cơ Khí Điện Ảnh</div>
-            <h3>Vòng Xoay Focus &amp; Zoom Vật Lý Chính Xác Tuyệt Đối</h3>
-            <p>Vòng xoay kim loại CNC đa năng ở cạnh thân máy cho phép người dùng vê nét mượt mà như ống kính máy quay điện ảnh chuyên nghiệp hoặc điều khiển tiêu cự zoom từng milimet êm ái, không rung lắc.</p>
-          </div>
-          <div>
-            <img src="../shared/img/feed_person_portrait.jpg" alt="Focus Wheel">
-          </div>
-        </div>
-
-        <div class="highlight-card reverse">
-          <div>
-            <div class="highlight-tag">Đột Phá 02 • Sức Mạnh Thuật Toán</div>
-            <h3>Động Cơ Tải Trọng 450g &amp; Thuật Toán Pure FOC 20kHz</h3>
-            <p>Cân mọi dòng điện thoại kích thước lớn kể cả iPhone 13-16 Pro Max kèm phụ kiện kính lọc và micro. Tần số điều chế vector 20kHz phản hồi tức thì trong 0.05ms, triệt tiêu hoàn toàn rung giật micro-jitter.</p>
-          </div>
-          <div>
-            <img src="../shared/img/feed_portrait_day.jpg" alt="FOC 20kHz">
-          </div>
-        </div>
-
-        <div class="highlight-card">
-          <div>
-            <div class="highlight-tag">Đột Phá 03 • Vật Liệu Hàng Không</div>
-            <h3>Khung Hợp Kim Nhôm &amp; Sợi Carbon Dệt 8 Lớp</h3>
-            <p>Sự kết hợp tinh tế giữa hợp kim nhôm gia công CNC và sợi Carbon siêu bền giúp hấp thụ tối đa các rung động tần số cao, mang lại cảm giác cầm đầm tay, bền bỉ và không gây mỏi khi quay cả ngày.</p>
-          </div>
-          <div>
-            <img src="../shared/img/feed_portrait_dusk.jpg" alt="Carbon Frame">
-          </div>
-        </div>
-
-      </div>
-
-      <!-- TAB 2: UNBOXING -->
-      <div class="pdp-tab-content" id="tabContentUnboxing" style="display:none;">
-        <div style="text-align:center; max-width:600px; margin:0 auto 40px auto;">
-          <h2 style="font-size:28px; font-weight:800; margin-bottom:10px;">Trọn Bộ Phụ Kiện Trong Hộp</h2>
-          <p style="color:var(--text-secondary);">Mở hộp T-Flow Pro với đầy đủ phụ kiện chuẩn mực sẵn sàng cho mọi hành trình sáng tạo nội dung.</p>
-        </div>
-        <div class="box-grid">
-          <div class="box-item-card">
-            <div class="box-item-bullet"></div>
-            <div>
-              <div style="font-weight:700; color:#1D1D1F;">Thân Gimbal T-Flow Pro</div>
-              <div style="font-size:13px; color:var(--text-secondary);">Mã kỹ thuật: TF-G31-PRO (1 cái)</div>
-            </div>
-          </div>
-          <div class="box-item-card">
-            <div class="box-item-bullet"></div>
-            <div>
-              <div style="font-weight:700; color:#1D1D1F;">Chân Đế Tripod Hợp Kim Nhôm</div>
-              <div style="font-size:13px; color:var(--text-secondary);">Bọc silicon chống trượt (1 cái)</div>
-            </div>
-          </div>
-          <div class="box-item-card">
-            <div class="box-item-bullet"></div>
-            <div>
-              <div style="font-weight:700; color:#1D1D1F;">Cáp Sạc Nhanh Type-C Bện Dù</div>
-              <div style="font-size:13px; color:var(--text-secondary);">Chiều dài 1.2m hỗ trợ PD 18W (1 sợi)</div>
-            </div>
-          </div>
-          <div class="box-item-card">
-            <div class="box-item-bullet"></div>
-            <div>
-              <div style="font-weight:700; color:#1D1D1F;">Túi Đựng Chống Sốc Du Lịch</div>
-              <div style="font-size:13px; color:var(--text-secondary);">Chất liệu nỉ EVA kháng nước nhẹ (1 chiếc)</div>
-            </div>
-          </div>
-          <div class="box-item-card">
-            <div class="box-item-bullet"></div>
-            <div>
-              <div style="font-weight:700; color:#1D1D1F;">Sách Hướng Dẫn &amp; Thẻ Bảo Hành</div>
-              <div style="font-size:13px; color:var(--text-secondary);">Kèm mã kích hoạt VIP 24 tháng (1 bộ)</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: FULL SPECS TABLE -->
-      <div class="pdp-tab-content" id="tabContentSpecs" style="display:none;">
-        <div style="text-align:center; max-width:600px; margin:0 auto 40px auto;">
-          <h2 style="font-size:28px; font-weight:800; margin-bottom:10px;">Bảng Thông Số Kỹ Thuật Chi Tiết</h2>
-          <p style="color:var(--text-secondary);">Engineered by T-Flow in Hanoi • Pure FOC Inside - Zero Jitter</p>
-        </div>
-        <div class="specs-table-box">
-          <table class="specs-table">
-            <tr><td>Mã Kỹ Thuật (SKU / In trên PCB)</td><td><strong>TF-G31-PRO-R1.0</strong></td></tr>
-            <tr><td>Số Trục Ổn Định</td><td>3 Trục (Pan • Roll • Tilt) điều khiển độc lập FOC</td></tr>
-            <tr><td>Tải Trọng Hỗ Trợ Tối Đa</td><td>150g – 450g (Tương thích iPhone 13, 14, 15, 16 Pro Max và máy Android lớn)</td></tr>
-            <tr><td>Phạm Vi Góc Quay Cơ Học</td><td>Trục Pan: 360° Không giới hạn • Trục Roll: 335° • Trục Tilt: 335°</td></tr>
-            <tr><td>Dung Lượng Pin &amp; Thời Gian Sử Dụng</td><td>4800 mAh Li-ion (Dùng liên tục 18 giờ)</td></tr>
-            <tr><td>Thời Gian Sạc Đầy</td><td>2 giờ qua cổng USB-C hỗ trợ Power Delivery (PD) 18W</td></tr>
-            <tr><td>Cổng Xuất Nguồn Dự Phòng</td><td>Cổng USB-C 5V/1A sạc trực tiếp cho điện thoại trong khi quay</td></tr>
-            <tr><td>Kết Nối Không Dây</td><td>Bluetooth 5.3 Low Energy (Độ trễ truyền tín hiệu &lt; 8ms)</td></tr>
-            <tr><td>Vật Liệu Khung Thân</td><td>Hợp kim nhôm hàng không AL6061 kết hợp sợi Carbon dệt 8 lớp</td></tr>
-            <tr><td>Trọng Lượng Thân Máy</td><td>465 g</td></tr>
-          </table>
-        </div>
-      </div>
-
-      <!-- TAB 4: WARRANTY -->
-      <div class="pdp-tab-content" id="tabContentWarranty" style="display:none;">
-        <div style="background:#FFF; padding:48px; border-radius:var(--radius-lg); border:1px solid var(--border); box-shadow:var(--shadow-sm); max-width:880px; margin:0 auto;">
-          <h3 style="font-size:24px; font-weight:800; margin-bottom:16px;">Chính Sách Bảo Hành &amp; Dịch Vụ Khách Hàng</h3>
-          <p style="color:var(--text-secondary); line-height:1.7; margin-bottom:20px;">
-            Sản phẩm <strong>T-Flow Pro</strong> được nghiên cứu, phát triển và bảo hành chính hãng bởi <strong>Công ty TNHH Công nghệ T-Flow Việt Nam</strong> với tiêu chuẩn khắt khe nhất:
-          </p>
-          <ul style="color:var(--text-secondary); line-height:1.8; margin-left:24px; margin-bottom:24px;">
-            <li><strong>Bảo hành 24 tháng chính hãng:</strong> Áp dụng cho toàn bộ bo mạch chủ, động cơ FOC và cảm biến IMU.</li>
-            <li><strong>1 đổi 1 trong 30 ngày đầu:</strong> Nếu phát sinh bất kỳ lỗi kỹ thuật nào từ nhà sản xuất.</li>
-            <li><strong>Hỗ trợ kỹ thuật trọn đời:</strong> Miễn phí cập nhật thuật toán chống rung và Firmware mới qua ứng dụng T-Flow Cam.</li>
-            <li><strong>Trung tâm tiếp nhận:</strong> Tòa nhà Công nghệ T-Flow, Hà Nội. Hotline: 1900 8888.</li>
-          </ul>
-        </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ==========================================================================
-       REVIEWS & COMMUNITY
-       ========================================================================== -->
-  <section id="reviews" style="padding: 60px 0 80px 0; background:#FFF; border-top:1px solid var(--border);">
-    <div class="container">
-      <div style="text-align:center; max-width:600px; margin:0 auto 48px auto;">
-        <span style="font-size:12px; font-weight:700; color:#28A745; text-transform:uppercase;">Đánh Giá Từ Cộng Đồng</span>
-        <h2 style="font-size:32px; font-weight:800; margin:8px 0;">Được Tin Dùng Bởi Các Creator Hàng Đầu</h2>
-        <div style="font-size:18px; color:#FF9500; margin-top:8px;">★★★★★ <span style="font-size:15px; font-weight:700; color:#1D1D1F;">4.9 / 5.0</span> (Hơn 1.800 đánh giá xác thực)</div>
-      </div>
-
-      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:24px;">
-        <div style="background:var(--bg); padding:28px; border-radius:var(--radius-md); border:1px solid var(--border);">
-          <div style="color:#FF9500; margin-bottom:8px;">★★★★★</div>
-          <p style="font-size:14.5px; color:var(--text-main); line-height:1.6; margin-bottom:16px;">"Mình dùng T-Flow Pro quay vlog du lịch suốt 3 tuần. Động cơ khỏe thực sự, gắn iPhone 15 Pro Max kèm lens anamorphic vẫn xoay mượt mà không bị rùng góc như gimbal cũ."</p>
-          <div style="font-weight:700; font-size:14px;">Hoàng Nam</div>
-          <div style="font-size:12px; color:var(--text-secondary);">Travel Blogger &amp; Filmmaker</div>
-        </div>
-
-        <div style="background:var(--bg); padding:28px; border-radius:var(--radius-md); border:1px solid var(--border);">
-          <div style="color:#FF9500; margin-bottom:8px;">★★★★★</div>
-          <p style="font-size:14.5px; color:var(--text-main); line-height:1.6; margin-bottom:16px;">"Cái vòng xoay Focus Wheel lấy nét rất mượt, cảm giác cơ khí cực kỳ chuyên nghiệp. Mô-đun AI T-Flow Eye bám nét khuôn mặt siêu nhạy mà không cần phải mở app bên thứ ba."</p>
-          <div style="font-weight:700; font-size:14px;">Thùy Dung</div>
-          <div style="font-size:12px; color:var(--text-secondary);">Reviewer Công Nghệ</div>
-        </div>
-
-        <div style="background:var(--bg); padding:28px; border-radius:var(--radius-md); border:1px solid var(--border);">
-          <div style="color:#FF9500; margin-bottom:8px;">★★★★★</div>
-          <p style="font-size:14.5px; color:var(--text-main); line-height:1.6; margin-bottom:16px;">"Thiết kế đen carbon rất sang trọng. Pin trâu quay cả ngày không hết, có thể cắm sạc ngược cho iPhone ngay lúc quay nữa, rất đáng đồng tiền!"</p>
-          <div style="font-weight:700; font-size:14px;">Văn Hùng</div>
-          <div style="font-size:12px; color:var(--text-secondary);">Vlogger Hà Nội</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- STICKY BUY BAR (ON SCROLL) -->
-  <div class="sticky-bar" id="stickyBuyBar">
-    <div style="display:flex; align-items:center; gap:14px;">
-      <img src="../shared/img/feed_portrait_dusk.jpg" alt="Thumb" style="width:44px; height:44px; object-fit:contain; border-radius:8px; border:1px solid var(--border);">
+  <!-- STICKY BUY BAR (VISIBLE ON DETAIL VIEW SCROLL) -->
+  <div class="sticky-buy-bar" id="stickyBuyBar">
+    <div class="sticky-bar-info">
+      <img id="stickyBarImg" src="../shared/img/feed_portrait_dusk.jpg" alt="Thumb">
       <div>
-        <div style="font-weight:700; font-size:14px;" id="stickyTierTitle">T-Flow Pro — Gói Tiêu Chuẩn</div>
-        <div style="font-size:15px; font-weight:800; color:#1D1D1F;" id="stickyTierPrice">2.890.000₫</div>
+        <div class="sticky-bar-title" id="stickyBarTitle">Smart Gimbal S1</div>
+        <div class="sticky-bar-price" id="stickyBarPrice">2.890.000₫</div>
       </div>
     </div>
     <div style="display:flex; gap:10px;">
-      <button class="btn-action-cart" style="padding:10px 20px; font-size:13px;" onclick="addToCart()">Thêm Vào Giỏ</button>
-      <button class="btn-action-buy" style="padding:10px 24px; font-size:13px;" onclick="buyNow()">Mua Ngay</button>
+      <button class="btn-ghost" style="padding:8px 18px; font-size:13px;" onclick="addCurrentDetailToCart()">Thêm Vào Giỏ</button>
+      <button class="btn-dark" style="padding:8px 18px; font-size:13px;" onclick="buyNowCurrentDetail()">Mua Ngay</button>
     </div>
   </div>
 
-  <!-- SLIDE-OVER SHOPPING BAG DRAWER -->
-  <div class="cart-drawer-overlay" id="cartOverlay" onclick="toggleCartDrawer(false)"></div>
-  <div class="cart-drawer" id="cartDrawer">
-    <div class="drawer-header">
-      <div style="font-size:18px; font-weight:800;">Giỏ Hàng Của Bạn</div>
-      <button onclick="toggleCartDrawer(false)" style="background:none; border:none; font-size:24px; cursor:pointer; color:#86868B;">&times;</button>
-    </div>
-    <div class="drawer-body" id="cartItemsList">
-      <!-- Injected via JS -->
-    </div>
-    <div class="drawer-footer">
-      <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-        <span style="font-size:15px; font-weight:600;">Tổng thanh toán:</span>
-        <span style="font-size:20px; font-weight:800; color:#1D1D1F;" id="cartTotalDisplay">0₫</span>
-      </div>
-      <button class="btn-action-buy" style="width:100%; padding:14px;" onclick="handleCheckout()">Tiến Hành Đặt Hàng</button>
-    </div>
-  </div>
+  <!-- ==========================================================================
+       VIEW 1: TRANG CHỦ (HERO FLAGSHIP MVP SHOWCASE + BENTO TECH + APPS)
+       ========================================================================== -->
+  <main class="view-panel active" id="viewHome">
+    <!-- HERO FLAGSHIP MVP SHOWCASE (REQUIREMENT 1) -->
+    <section class="hero-flagship-showcase" id="homeMvpSection">
+      <div class="container">
+        <div class="flagship-grid">
+          <!-- Left: Big Media Box -->
+          <div class="flagship-media-box">
+            <span class="flagship-badge">Sản Phẩm Nổi Bật</span>
+            <img id="heroFlagshipImg" src="../shared/img/feed_portrait_dusk.jpg" alt="Flagship Product">
+          </div>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="container">
-      <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:48px; margin-bottom:48px;">
-        <div>
-          <div style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-            <div style="width:36px; height:36px; background:#1D1D1F; color:#FFF; border-radius:9px; padding:6px; display:flex; align-items:center; justify-content:center;">
-              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
-                <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="currentColor" stroke-width="12" stroke-linecap="round" fill="none" />
-                <path d="M 50 34 L 50 82" stroke="currentColor" stroke-width="12" stroke-linecap="round" />
-              </svg>
+          <!-- Right: Flagship Info & Configurator -->
+          <div class="flagship-info">
+            <div class="tag-clean">Đột Phá 2026 • FOC 20kHz</div>
+            <h1 id="heroFlagshipTitle">Smart Gimbal S1</h1>
+            <div class="flagship-tagline" id="heroFlagshipTagline">Đưa thước phim di động lên tầm điện ảnh.</div>
+            <p class="flagship-desc" id="heroFlagshipDesc">
+              Thiết bị ổn định 3 trục thế hệ mới cho iPhone. Thuật toán FOC 20kHz, ngàm từ tính MagSafe N52 lực hút 2.8kg và pin 18 giờ liên tục.
+            </p>
+
+            <!-- Tiers selector on Hero -->
+            <div style="margin-bottom:8px; font-size:12.5px; font-weight:700; color:var(--text-secondary);">Chọn Phiên Bản:</div>
+            <div class="hero-tier-selector" id="heroTierSelector">
+              <!-- Dynamically populated from MVP product tiers -->
             </div>
+
+            <!-- Colors on Hero -->
+            <div style="margin-bottom:8px; font-size:12.5px; font-weight:700; color:var(--text-secondary);">Màu Sắc:</div>
+            <div class="color-swatches-row" id="heroColorSwatches">
+              <!-- Dynamically populated from MVP colors -->
+            </div>
+
+            <!-- Price Box -->
+            <div class="hero-price-box">
+              <span class="hero-price-val" id="heroPriceVal">2.890.000₫</span>
+              <span class="hero-price-old" id="heroPriceOld">3.490.000₫</span>
+              <span class="hero-price-save" id="heroPriceSave">Tiết kiệm 600.000₫</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="hero-action-buttons">
+              <button class="btn-dark" onclick="buyMvpNow()">Mua Ngay</button>
+              <button class="btn-ghost" onclick="addMvpToCart()">Thêm Vào Giỏ Hàng</button>
+              <button class="btn-ghost" onclick="openMvpDetail()">Xem Chi Tiết &rarr;</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BENTO GRID: CORE TECHNOLOGY -->
+    <section class="bento-section">
+      <div class="container">
+        <div class="section-header-clean">
+          <div class="tag-clean">Công Nghệ Cốt Lõi</div>
+          <h2 class="title-clean">Chuẩn mực cơ học chính xác</h2>
+          <p class="sub-clean">Sự kết hợp hoàn hảo giữa thuật toán điều khiển động cơ vi bước và phần cứng hợp kim siêu nhẹ.</p>
+        </div>
+
+        <div class="bento-grid">
+          <!-- Bento 1 (Span 2) -->
+          <div class="bento-card bento-span-2">
             <div>
-              <div style="font-size:20px; font-weight:800; letter-spacing:-0.03em; line-height:1; color:#1D1D1F;">t-flow</div>
-              <div style="font-size:11px; font-weight:600; color:#6E6E73; margin-top:2px;">mượt mà từng khoảnh khắc</div>
+              <div class="tag-clean">Động Cơ FOC</div>
+              <div class="bento-card-title">Tần số quét 20.000 lần mỗi giây</div>
+              <p class="bento-card-desc">
+                Thuật toán Field Oriented Control liên tục tính toán vector lực trên 3 trục Pan, Tilt, Roll trong 0.05 mili-giây, triệt tiêu mọi rung chấn bước chân dù bạn chạy bộ hay quay trên xe địa hình.
+              </p>
+            </div>
+            <div class="bento-metric-large">20kHz</div>
+          </div>
+
+          <!-- Bento 2 -->
+          <div class="bento-card">
+            <div>
+              <div class="tag-clean">Từ Tính N52</div>
+              <div class="bento-card-title">MagSafe Quick-Snap</div>
+              <p class="bento-card-desc">Lực hút 2.8kg với nam châm Neodymium N52. Tháo lắp điện thoại trong 1 giây không cần kẹp siết.</p>
+            </div>
+            <div class="bento-metric-large">2.8kg</div>
+          </div>
+
+          <!-- Bento 3 -->
+          <div class="bento-card">
+            <div>
+              <div class="tag-clean">Thời Lượng Pin</div>
+              <div class="bento-card-title">18 Giờ Sáng Tạo</div>
+              <p class="bento-card-desc">Dung lượng pin 4500mAh hỗ trợ sạc ngược Type-C 18W trực tiếp cho iPhone suốt ngày dài.</p>
+            </div>
+            <div class="bento-metric-large">18h</div>
+          </div>
+
+          <!-- Bento 4 (Span 2) -->
+          <div class="bento-card bento-span-2">
+            <div>
+              <div class="tag-clean">Tích Hợp Sâu iOS</div>
+              <div class="bento-card-title">Bánh xe Focus CNC &amp; Dynamic Island</div>
+              <p class="bento-card-desc">
+                Bánh xe lấy nét cơ học bên hông điều chỉnh cự ly nét mượt mà. Thông số góc nghiêng và thời lượng pin hiển thị tức thời trên Dynamic Island.
+              </p>
+            </div>
+            <div class="bento-metric-large">0.005°</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ECOSYSTEM & APPS SHOWCASE -->
+    <section class="eco-section">
+      <div class="container">
+        <div class="section-header-clean">
+          <div class="tag-clean">Hệ Sinh Thái Đồng Bộ</div>
+          <h2 class="title-clean">Phần cứng &amp; Ứng dụng iOS</h2>
+          <p class="sub-clean">Trải nghiệm liền mạch từ lúc bật nguồn đến khi dựng phim điện ảnh.</p>
+        </div>
+
+        <div class="eco-grid">
+          <!-- Card App Basic -->
+          <div class="eco-card">
+            <div class="tag-clean">Ứng Dụng Cơ Bản</div>
+            <h3 style="font-size:22px; font-weight:800; margin-bottom:10px;">Chụp Nhanh &amp; Bám Nét Tự Động</h3>
+            <p style="font-size:14.5px; color:var(--text-secondary); line-height:1.6;">
+              Giao diện tối giản dành cho sáng tạo nội dung hàng ngày. Tự động nhận diện khuôn mặt, chuyển đổi dọc ngang 1 chạm cho TikTok và Reels.
+            </p>
+            <img src="../preview/01_camera_basic_dark.png" alt="Basic App Preview">
+          </div>
+
+          <!-- Card App Pro -->
+          <div class="eco-card">
+            <div class="tag-clean">Ứng Dụng Pro Cinema</div>
+            <h3 style="font-size:22px; font-weight:800; margin-bottom:10px;">Kiểm Soát Thông Số Độc Lập</h3>
+            <p style="font-size:14.5px; color:var(--text-secondary); line-height:1.6;">
+              Hỗ trợ chuẩn quay Apple Log, ProRes 4K/60fps, nạp bảng màu 3D LUT trực tiếp và kiểm soát Focus Pulling như máy quay điện ảnh chuyên nghiệp.
+            </p>
+            <img src="../preview/02_camera_pro_dark.png" alt="Pro Cinema App Preview">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST & COMMITMENT -->
+    <section class="trust-section">
+      <div class="container">
+        <div class="tag-clean">Cam Kết Doanh Nghiệp</div>
+        <h2 style="font-size:28px; font-weight:800;">Chính sách bảo hành vàng 1 đổi 1</h2>
+        <div class="trust-grid">
+          <div class="trust-item">
+            <h4>Bảo Hành 12 Tháng</h4>
+            <p>1 đổi 1 ngay lập tức nếu phát sinh lỗi kỹ thuật từ nhà sản xuất.</p>
+          </div>
+          <div class="trust-item">
+            <h4>30 Ngày Dùng Thử</h4>
+            <p>Đổi mới miễn phí trong 30 ngày đầu trải nghiệm sản phẩm.</p>
+          </div>
+          <div class="trust-item">
+            <h4>Miễn Phí Vận Chuyển</h4>
+            <p>Giao hàng hỏa tốc toàn quốc, kiểm tra hàng trước khi thanh toán.</p>
+          </div>
+          <div class="trust-item">
+            <h4>Hỗ Trợ OTA Trọn Đời</h4>
+            <p>Cập nhật thuật toán chống rung và tính năng mới liên tục qua ứng dụng.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       VIEW 2: DẢI SẢN PHẨM (CATALOG STORE GRID - REQUIREMENT 1 & 6)
+       ========================================================================== -->
+  <main class="view-panel" id="viewCatalog">
+    <section class="catalog-section">
+      <div class="container">
+        <div class="section-header-clean">
+          <div class="tag-clean">Bộ Sưu Tập Chính Hãng</div>
+          <h2 class="title-clean">Dải Sản Phẩm Smart Gimbal</h2>
+          <p class="sub-clean">Khám phá các dòng thiết bị ổn định 3 trục và phụ kiện sáng tạo nội dung hàng đầu.</p>
+        </div>
+
+        <!-- Filter Chips (Dynamically rendered from SmartGimbalCatalog.getGroups()) -->
+        <div class="catalog-filters" id="catalogFilterChips">
+          <!-- Populated by renderCatalogFilterChips() -->
+        </div>
+
+        <!-- 3-Column Products Grid -->
+        <div class="products-grid-3col" id="catalogProductsGrid">
+          <!-- Dynamically populated from SmartGimbalCatalog.getProducts() -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       VIEW 3: TRANG CHI TIẾT SẢN PHẨM RIÊNG (APPLE STORE BUY PAGE - REQ 2)
+       ========================================================================== -->
+  <main class="view-panel" id="viewProductDetail">
+    <section class="product-detail-view">
+      <div class="container">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-nav">
+          <a href="javascript:void(0)" onclick="switchView('home')">Trang Chủ</a>
+          <span>&rsaquo;</span>
+          <a href="javascript:void(0)" onclick="switchView('catalog')">Dải Sản Phẩm</a>
+          <span>&rsaquo;</span>
+          <span id="detailBreadcrumbName">Smart Gimbal S1</span>
+        </div>
+
+        <!-- TOP 2-COLUMN SECTION: STICKY GALLERY + CONFIGURATOR -->
+        <div class="detail-top-grid">
+          <!-- Left: Sticky Gallery -->
+          <div class="sticky-gallery-col">
+            <div class="gallery-main-frame">
+              <img id="detailMainImg" src="../shared/img/feed_portrait_dusk.jpg" alt="Product Image">
+            </div>
+            <div class="gallery-thumbs-row" id="detailThumbsRow">
+              <!-- Dynamically populated 4 angle shots -->
             </div>
           </div>
-          <div style="font-size:15px; font-weight:700; color:#1D1D1F; margin-bottom:6px;">Công ty TNHH Công nghệ T-Flow Việt Nam</div>
-          <div style="font-size:13px; color:#6E6E73; margin-bottom:12px;">T-Flow Tech Co., Ltd. • Giấy phép ĐKKD: 0109888888 do Sở KH&amp;ĐT Hà Nội cấp</div>
-          <div style="font-size:13px; color:#86868B; line-height:1.6;">
-            Trụ sở chính: Tòa nhà Công nghệ T-Flow, Hà Nội, Việt Nam.<br>
-            Hotline CSKH: 1900 8888 • Email Hỗ Trợ: support@tflow.tech
-          </div>
-          <div style="margin-top:16px; font-size:12px; font-family:monospace; background:#F5F5F7; padding:6px 12px; border-radius:6px; color:#1D1D1F; font-weight:600; display:inline-block;">
-            Chữ ký R&amp;D: "Engineered by T-Flow in Hanoi"
+
+          <!-- Right: Configurator -->
+          <div class="configurator-col">
+            <div class="detail-heading">
+              <div class="tag-clean" id="detailCategoryTag">Gimbal Điện Thoại</div>
+              <h1 id="detailTitle">Smart Gimbal S1</h1>
+              <div class="detail-tagline" id="detailTagline">Đưa thước phim di động lên tầm điện ảnh.</div>
+              <p class="detail-short-desc" id="detailShortDesc">
+                Thiết bị ổn định 3 trục thế hệ mới cho iPhone. Thuật toán FOC 20kHz, ngàm từ tính MagSafe N52 lực hút 2.8kg và pin 18 giờ liên tục.
+              </p>
+            </div>
+
+            <!-- Step 1: Select Version / Tier -->
+            <div class="config-step-box">
+              <div class="config-step-title">Bước 1: Chọn phiên bản phù hợp với bạn</div>
+              <div class="tier-card-group" id="detailTierCards">
+                <!-- Dynamically populated tier cards -->
+              </div>
+            </div>
+
+            <!-- Step 2: Select Color -->
+            <div class="config-step-box">
+              <div class="config-step-title">
+                Bước 2: Chọn màu sắc yêu thích &mdash; <span id="detailSelectedColorName" style="color:var(--text-secondary); font-weight:500;">Titanium Tự Nhiên</span>
+              </div>
+              <div class="colors-config-list" id="detailColorList">
+                <!-- Dynamically populated color swatches -->
+              </div>
+            </div>
+
+            <!-- Price & Summary Box -->
+            <div class="detail-summary-card">
+              <div class="summary-price-row">
+                <span class="summary-current-price" id="detailCurrentPrice">2.890.000₫</span>
+                <span class="summary-old-price" id="detailOldPrice">3.490.000₫</span>
+              </div>
+              <div class="summary-gift-tag" id="detailGiftTag">Tặng kèm: Ngàm MagSafe + Tripod Mini Carbon</div>
+              <div class="summary-perks">
+                <div>&bull; Miễn phí giao hàng tiêu chuẩn toàn quốc (2 - 3 ngày)</div>
+                <div>&bull; Bảo hành chính hãng 12 tháng 1 đổi 1 tận nơi</div>
+                <div>&bull; 30 ngày dùng thử đổi mới miễn phí</div>
+              </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="detail-ctas-row">
+              <button class="btn-ghost" onclick="addCurrentDetailToCart()">Thêm Vào Giỏ Hàng</button>
+              <button class="btn-dark" onclick="buyNowCurrentDetail()">Mua Ngay</button>
+            </div>
           </div>
         </div>
 
-        <div>
-          <h4 style="font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:16px; color:#1D1D1F;">Sản Phẩm &amp; Phụ Kiện</h4>
-          <ul style="list-style:none; padding:0; font-size:13.5px; color:#6E6E73; display:flex; flex-direction:column; gap:10px;">
-            <li><a href="#hero" style="color:inherit; text-decoration:none;">T-Flow Pro (Flagship)</a></li>
-            <li><a href="#pricing" style="color:inherit; text-decoration:none;">Combo Sáng Tạo (Creator Kit)</a></li>
-            <li><a href="#pricing" style="color:inherit; text-decoration:none;">Combo Điện Ảnh (Cinematic Master)</a></li>
-            <li><a href="#specs" style="color:inherit; text-decoration:none;">Bảng Thông Số Kỹ Thuật</a></li>
+        <!-- BOTTOM DEEP SECTIONS (4 TABS / BLOCKS) -->
+        <div class="deep-tabs-nav">
+          <button class="deep-tab-btn active" onclick="switchDetailTab('overview', this)">Tổng Quan Sản Phẩm</button>
+          <button class="deep-tab-btn" onclick="switchDetailTab('box', this)">Trong Hộp Có Gì</button>
+          <button class="deep-tab-btn" onclick="switchDetailTab('specs', this)">Thông Số Kỹ Thuật</button>
+          <button class="deep-tab-btn" onclick="switchDetailTab('warranty', this)">Bảo Hành &amp; Hỗ Trợ</button>
+        </div>
+
+        <!-- Deep Tab 1: Overview (Alternating) -->
+        <div id="deepTabOverview" class="deep-tab-panel">
+          <div id="detailOverviewContainer">
+            <!-- Dynamically populated 3 highlight blocks -->
+          </div>
+        </div>
+
+        <!-- Deep Tab 2: What's in the Box -->
+        <div id="deepTabBox" class="deep-tab-panel" style="display:none;">
+          <div class="box-contents-grid" id="detailBoxGrid">
+            <!-- Dynamically populated box items -->
+          </div>
+        </div>
+
+        <!-- Deep Tab 3: Tech Specs -->
+        <div id="deepTabSpecs" class="deep-tab-panel" style="display:none;">
+          <table class="specs-table" id="detailSpecsTable">
+            <!-- Dynamically populated specs table -->
+          </table>
+        </div>
+
+        <!-- Deep Tab 4: Warranty -->
+        <div id="deepTabWarranty" class="deep-tab-panel" style="display:none;">
+          <div style="background:var(--bg-alt); padding:36px; border-radius:var(--radius-lg); border:1px solid var(--border);">
+            <h3 style="font-size:20px; font-weight:800; margin-bottom:12px;">Chính Sách Bảo Hành &amp; Dịch Vụ Khách Hàng</h3>
+            <p id="detailWarrantyText" style="font-size:15px; color:var(--text-secondary); line-height:1.7;">
+              Bảo hành 12 tháng 1 đổi 1 chính hãng, 30 ngày dùng thử đổi mới, hỗ trợ cập nhật firmware OTA trọn đời.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       VIEW 4: ĐÁNH GIÁ & HỎI ĐÁP
+       ========================================================================== -->
+  <main class="view-panel" id="viewReviews">
+    <section class="reviews-section">
+      <div class="container">
+        <div class="section-header-clean">
+          <div class="tag-clean">Cảm Nhận Thực Tế</div>
+          <h2 class="title-clean">Được tin dùng bởi các nhà làm phim</h2>
+          <p class="sub-clean">Lắng nghe chia sẻ từ những người sáng tạo nội dung chuyên nghiệp đã đồng hành cùng Smart Gimbal.</p>
+        </div>
+
+        <!-- Testimonials -->
+        <div class="testimonials-grid">
+          <div class="testimonial-card">
+            <p class="testi-quote">
+              "Ngàm MagSafe là bước cải tiến xuất sắc nhất. Khi cần rút máy ra nghe điện thoại hoặc đổi góc quay cầm tay, chỉ mất đúng một giây mà không phải cân lại trục."
+            </p>
+            <div class="testi-author">
+              <div class="testi-avatar">D</div>
+              <div>
+                <div class="testi-name">Đặng Anh Dũng</div>
+                <div class="testi-role">Travel Filmmaker &bull; 1.2M Followers</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <p class="testi-quote">
+              "Bánh xe lấy nét cơ học rất êm và có lực cản vừa phải. Khi kết hợp với chế độ quay Apple Log trên iPhone 16 Pro Max, kết quả cho ra như máy quay phim rạp."
+            </p>
+            <div class="testi-author">
+              <div class="testi-avatar">M</div>
+              <div>
+                <div class="testi-name">Mai Linh Creative</div>
+                <div class="testi-role">Đạo Diễn Hình Ảnh (DoP)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="testimonial-card">
+            <p class="testi-quote">
+              "Động cơ FOC triệt tiêu hoàn toàn hiện tượng rung giật micro-jitter. Ngay cả khi đi bộ nhanh trên địa hình sỏi đá, đường chân trời vẫn thẳng tắp."
+            </p>
+            <div class="testi-author">
+              <div class="testi-avatar">N</div>
+              <div>
+                <div class="testi-name">Trần Hoàng Nam</div>
+                <div class="testi-role">Tech Reviewer &amp; Nhiếp Ảnh Gia</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="section-header-clean" style="margin-top:60px;">
+          <div class="tag-clean">Giải Đáp Thắc Mắc</div>
+          <h2 class="title-clean">Câu Hỏi Thường Gặp</h2>
+        </div>
+
+        <div class="faq-container">
+          <div class="faq-item open">
+            <div class="faq-question" onclick="toggleFaq(this)">
+              <span>Smart Gimbal S1 tương thích với những dòng điện thoại nào?</span>
+              <span class="faq-toggle-icon">+</span>
+            </div>
+            <div class="faq-answer">
+              Smart Gimbal S1 tương thích hoàn hảo với mọi dòng iPhone từ iPhone 12 trở lên có MagSafe nguyên bản. Với các dòng điện thoại khác hoặc ốp lưng không có từ tính, sản phẩm đi kèm sẵn vòng từ tính trợ lực siêu mỏng dán mặt lưng.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+              <span>Ngàm hít MagSafe có đủ an toàn khi vận động mạnh không?</span>
+              <span class="faq-toggle-icon">+</span>
+            </div>
+            <div class="faq-answer">
+              Ngàm được chế tác từ nam châm Neodymium N52 phân bố đa cực với lực hút đạt 2.8kg, gấp gần 10 lần trọng lượng của một chiếc iPhone 16 Pro Max, đảm bảo cố định chắc chắn ngay cả khi chạy nhanh.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+              <span>Thời lượng pin 18 giờ có thể dùng để sạc ngược cho điện thoại không?</span>
+              <span class="faq-toggle-icon">+</span>
+            </div>
+            <div class="faq-answer">
+              Có. Gimbal tích hợp cổng Type-C hỗ trợ chuẩn sạc nhanh PD 18W, vừa cân bằng chống rung vừa truyền nguồn sạc ngược cho iPhone khi đang quay phim dài.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+              <span>Chính sách bảo hành 1 đổi 1 áp dụng như thế nào?</span>
+              <span class="faq-toggle-icon">+</span>
+            </div>
+            <div class="faq-answer">
+              Tất cả sản phẩm Smart Gimbal được bảo hành chính hãng 12 tháng. Nếu phát sinh lỗi cơ học hoặc mạch điều khiển FOC từ nhà sản xuất, khách hàng được đổi mới thiết bị 100% trong vòng 24 giờ.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       SLIDE-OVER SHOPPING BAG DRAWER (REQUIREMENT 3)
+       ========================================================================== -->
+  <div class="cart-drawer-overlay" id="cartOverlay" onclick="closeCartDrawer(event)">
+    <div class="cart-drawer" onclick="event.stopPropagation()">
+      <div class="cart-header">
+        <h3>Túi Hàng Của Bạn</h3>
+        <button class="btn-close-cart" onclick="closeCartDrawer()">&times;</button>
+      </div>
+      <div class="cart-body" id="cartItemList">
+        <!-- Dynamically rendered cart items -->
+      </div>
+      <div class="cart-footer">
+        <div class="cart-calc-row">
+          <span>Tạm tính</span>
+          <span id="cartSubtotal" style="font-family:var(--font-mono); font-weight:700;">0₫</span>
+        </div>
+        <div class="cart-calc-row">
+          <span>Phí vận chuyển</span>
+          <span style="color:#28A745; font-weight:600;">Miễn phí toàn quốc</span>
+        </div>
+        <div class="cart-total-row">
+          <span>Tổng thanh toán</span>
+          <span id="cartGrandTotal" style="font-family:var(--font-mono); font-weight:800; font-size:20px;">0₫</span>
+        </div>
+        <button class="btn-dark btn-checkout" onclick="openCheckoutModal()">Tiến Hành Đặt Hàng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHECKOUT MODAL -->
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-card">
+      <div class="modal-title">Xác Nhận Đơn Hàng</div>
+      <div class="modal-sub">Vui lòng cung cấp thông tin nhận hàng để hoàn tất đặt mua.</div>
+
+      <div class="form-group">
+        <label>Họ và Tên Người Nhận</label>
+        <input type="text" class="form-control" id="orderCustName" placeholder="Ví dụ: Đặng Anh Dũng">
+      </div>
+      <div class="form-group">
+        <label>Số Điện Thoại Nhận Hàng</label>
+        <input type="text" class="form-control" id="orderCustPhone" placeholder="Ví dụ: 0908 123 456">
+      </div>
+      <div class="form-group">
+        <label>Địa Chỉ Giao Hàng Chi Tiết</label>
+        <input type="text" class="form-control" id="orderCustAddress" placeholder="Số nhà, tên đường, phường/xã, quận/huyện...">
+      </div>
+      <div class="form-group">
+        <label>Hình Thức Thanh Toán</label>
+        <select class="form-control" id="orderPaymentMethod">
+          <option value="COD">Thanh toán khi nhận hàng (COD)</option>
+          <option value="BANK">Chuyển khoản ngân hàng (QR Code)</option>
+          <option value="APPLE_PAY">Apple Pay / Thẻ Quốc Tế</option>
+        </select>
+      </div>
+
+      <div style="background:var(--bg-alt); padding:14px; border-radius:var(--radius-sm); margin:18px 0; font-size:13px;">
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+          <span>Tổng thanh toán:</span>
+          <b id="checkoutTotalVal" style="font-family:var(--font-mono); font-size:15px;">0₫</b>
+        </div>
+        <div style="color:var(--text-muted); font-size:11.5px;">Bảo hành 12 tháng 1 đổi 1 &bull; Miễn phí giao hàng toàn quốc</div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:20px;">
+        <button class="btn-ghost" style="flex:1; justify-content:center;" onclick="closeCheckoutModal()">Hủy</button>
+        <button class="btn-dark" style="flex:2; justify-content:center;" onclick="submitOrder()">Xác Nhận Đặt Mua</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-msg" id="toastMsg">Đã cập nhật giỏ hàng</div>
+
+  <!-- ENTERPRISE 4-COLUMN FOOTER (MONOCHROME LUXURY / DARK ENTERPRISE #111827) -->
+  <footer class="enterprise-footer">
+    <div class="container">
+      <div class="footer-grid-4col">
+        <!-- Col 1 -->
+        <div class="footer-col">
+          <div class="footer-brand-title">Smart Gimbal Enterprise</div>
+          <p class="footer-col-desc">
+            Hệ sinh thái thiết bị ổn định 3 trục chuẩn điện ảnh cho iPhone và máy ảnh di động. Đổi mới sáng tạo với động cơ FOC 20kHz và trải nghiệm phần mềm chuẩn Apple.
+          </p>
+          <div class="footer-contact-info">
+            <div><strong>Hotline Hỗ Trợ:</strong> 1900 8899 (8:00 - 21:00)</div>
+            <div><strong>Email Kỹ Thuật:</strong> enterprise@smartgimbal.vn</div>
+            <div><strong>Showroom &amp; R&amp;D:</strong> Tòa nhà R&amp;D TechHub, Khu Công Nghệ Cao, Hà Nội &amp; TP. Hồ Chí Minh</div>
+          </div>
+        </div>
+
+        <!-- Col 2 -->
+        <div class="footer-col">
+          <div class="footer-col-title">Dải Sản Phẩm</div>
+          <ul class="footer-links-list">
+            <li><a href="javascript:void(0)" onclick="openProductDetail('s1')">Smart Gimbal S1 (Flagship)</a></li>
+            <li><a href="javascript:void(0)" onclick="openProductDetail('s2')">Smart Gimbal S2 Cinema</a></li>
+            <li><a href="javascript:void(0)" onclick="openProductDetail('s1-air')">Smart Gimbal S1 Air (Siêu Nhẹ)</a></li>
+            <li><a href="javascript:void(0)" onclick="openProductDetail('p1')">SmartCam Pocket P1</a></li>
+            <li><a href="javascript:void(0)" onclick="openProductDetail('x2')">SmartCam Action X2</a></li>
+            <li><a href="javascript:void(0)" onclick="filterCatalog('cat-acc', document.querySelector('.filter-chip'))">Phụ Kiện Studio &amp; MagSafe</a></li>
           </ul>
         </div>
 
-        <div>
-          <h4 style="font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:16px; color:#1D1D1F;">Hệ Thống &amp; Bảo Mật</h4>
-          <ul style="list-style:none; padding:0; font-size:13.5px; color:#6E6E73; display:flex; flex-direction:column; gap:10px;">
-            <li><a href="user_dashboard.html" style="color:inherit; text-decoration:none;">Cổng Thành Viên (Member Hub)</a></li>
-            <li><a href="javascript:void(0)" onclick="promptAdminLogin()" style="color:#86868B; text-decoration:none;">Khóa Quản Trị (Admin Portal)</a></li>
-            <li><a href="#warranty" style="color:inherit; text-decoration:none;">Quy Chuẩn Bảo Hành 24 Tháng</a></li>
+        <!-- Col 3 -->
+        <div class="footer-col">
+          <div class="footer-col-title">Phần Mềm &amp; Hệ Thống</div>
+          <ul class="footer-links-list">
+            <li><a href="javascript:void(0)" onclick="switchView('home')">Ứng Dụng Smart Gimbal iOS</a></li>
+            <li><a href="user_dashboard.html">Cổng Khách Hàng (Smart Gimbal ID)</a></li>
+            <li><a href="admin_dashboard.html">Cổng Quản Trị Admin CMS</a></li>
+            <li><a href="javascript:void(0)" onclick="alert('Đang kết nối kho dữ liệu Firmware OTA...')">Cập Nhật Firmware OTA</a></li>
+            <li><a href="user_dashboard.html">Tải Bảng Màu 3D LUT (.cube)</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 4 -->
+        <div class="footer-col">
+          <div class="footer-col-title">Chính Sách &amp; Hỗ Trợ</div>
+          <ul class="footer-links-list">
+            <li><a href="javascript:void(0)" onclick="switchView('reviews')">Chính Sách Bảo Hành 12 Tháng 1 Đổi 1</a></li>
+            <li><a href="javascript:void(0)" onclick="switchView('reviews')">Chính Sách Đổi Mới 30 Ngày Dùng Thử</a></li>
+            <li><a href="javascript:void(0)" onclick="switchView('reviews')">Hướng Dẫn Cân Chỉnh Trọng Tâm</a></li>
+            <li><a href="user_dashboard.html">Tra Cứu Đơn Hàng &amp; Bảo Hành</a></li>
+            <li><a href="javascript:void(0)" onclick="alert('Hotline trực tuyến 24/7: 1900 8899')">Trung Tâm Hỗ Trợ Kỹ Thuật 24/7</a></li>
           </ul>
         </div>
       </div>
 
-      <div style="border-top:1px solid var(--border); padding-top:24px; display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:#86868B;">
-        <div>&copy; 2026 Công ty TNHH Công nghệ T-Flow Việt Nam. Toàn quyền bảo lưu. Slogan: <em>"Smooth Every Moment — Mượt mà từng khoảnh khắc."</em></div>
-        <div>Pure FOC Inside • Zero Jitter</div>
+      <!-- Bottom Strip -->
+      <div class="footer-bottom-bar">
+        <div class="footer-copy-text">
+          &copy; 2026 Smart Gimbal Enterprise Inc. Bảo lưu mọi quyền. Tuân thủ chuẩn Apple Human Interface Guidelines (HIG).
+        </div>
+        <div class="footer-legal-links">
+          <a href="javascript:void(0)">Điều khoản sử dụng</a>
+          <span>&bull;</span>
+          <a href="javascript:void(0)">Chính sách bảo mật</a>
+          <span>&bull;</span>
+          <a href="javascript:void(0)">Pháp lý &amp; Tuân thủ</a>
+          <span>&bull;</span>
+          <a href="javascript:void(0)">Quy chuẩn bảo hành</a>
+        </div>
       </div>
     </div>
   </footer>
 
-  <!-- SCRIPT -->
+  <!-- ==========================================================================
+       LOGIC & DYNAMIC STORE INTEGRATION
+       ========================================================================== -->
   <script src="../shared/catalog_store.js"></script>
   <script>
-    // State for T-Flow Pro
-    let selectedTier = {
-      key: 'tier-pro-std',
-      name: 'Gói Tiêu Chuẩn (Standard Kit)',
-      price: 2890000,
-      priceFormatted: '2.890.000₫'
-    };
-    let selectedColor = {
-      id: 'carbon-black',
-      name: 'Đen Carbon (Titanium)'
-    };
+    // State
+    let currentMvp = null;
+    let currentMvpTierKey = 'standard';
+    let currentMvpColorId = 'natural-titanium';
 
-    let cart = [];
+    let currentDetailProduct = null;
+    let currentDetailTierKey = 'standard';
+    let currentDetailColorId = 'natural-titanium';
+
+    let selectedCatalogFilter = 'all';
+
+    // Init on DOM ready
+    
+    // Admin CMS Permission Check on Nav Click
+    function handleAdminNavClick() {
+      if (sessionStorage.getItem('TFLOW_ADMIN_AUTH') === 'true') {
+        window.location.href = 'admin_dashboard.html';
+      } else {
+        const pwd = prompt('KHÓA BẢO MẬT QUẢN TRỊ VIÊN T-FLOW\nVui lòng nhập mật khẩu Quản Trị Viên (Mặc định: tflow2026 hoặc 8888):');
+        if (pwd === 'tflow2026' || pwd === '8888') {
+          sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
+          window.location.href = 'admin_dashboard.html';
+        } else if (pwd !== null) {
+          alert('Mật khẩu không chính xác! Chỉ tài khoản Quản Trị Viên mới có quyền truy cập.');
+        }
+      }
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
-      // Load cart from localStorage
-      try {
-        const saved = localStorage.getItem('TFLOW_CART_ITEMS');
-        if (saved) cart = JSON.parse(saved);
-      } catch (e) {}
-      updateCartDisplay();
-
-      // Scroll listener for sticky buy bar
-      window.addEventListener('scroll', () => {
-        const pricingEl = document.getElementById('pricing');
-        const stickyBar = document.getElementById('stickyBuyBar');
-        if (!pricingEl || !stickyBar) return;
-        const rect = pricingEl.getBoundingClientRect();
-        if (rect.bottom < 0) {
-          stickyBar.classList.add('visible');
-        } else {
-          stickyBar.classList.remove('visible');
-        }
-      });
+      initApp();
     });
 
-    function switchGalleryImg(src, btn) {
-      document.getElementById('mainProductImg').src = src;
-      document.querySelectorAll('.thumb-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
-
-    function selectColor(colorId, colorName, dotEl) {
-      selectedColor = { id: colorId, name: colorName };
-      document.getElementById('selectedColorName').textContent = colorName;
-      document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-      dotEl.classList.add('active');
-    }
-
-    function selectTier(tierKey, price, priceFormatted, tierName, cardEl) {
-      selectedTier = { key: tierKey, name: tierName, price: price, priceFormatted: priceFormatted };
-      document.getElementById('displayFinalPrice').textContent = priceFormatted;
-      document.getElementById('selectedTierSummaryName').textContent = tierName;
-      document.getElementById('stickyTierTitle').textContent = `T-Flow Pro — ${tierName}`;
-      document.getElementById('stickyTierPrice').textContent = priceFormatted;
-      
-      document.querySelectorAll('.tier-option-card').forEach(c => c.classList.remove('active'));
-      cardEl.classList.add('active');
-    }
-
-    function switchPdpTab(tabName, btn) {
-      const tabs = ['highlights', 'unboxing', 'specs', 'warranty'];
-      tabs.forEach(t => {
-        const el = document.getElementById('tabContent' + t.charAt(0).toUpperCase() + t.slice(1));
-        if (el) el.style.display = (t === tabName) ? 'block' : 'none';
-      });
-      document.querySelectorAll('.pdp-tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    }
-
-    function addToCart() {
-      const item = {
-        id: 'tf-g31-pro',
-        name: 'T-Flow Pro',
-        tier: selectedTier.name,
-        tierKey: selectedTier.key,
-        color: selectedColor.name,
-        price: selectedTier.price,
-        priceFormatted: selectedTier.priceFormatted,
-        img: '../shared/img/feed_portrait_dusk.jpg',
-        qty: 1
-      };
-      
-      const existing = cart.find(i => i.tierKey === item.tierKey && i.color === item.color);
-      if (existing) {
-        existing.qty += 1;
-      } else {
-        cart.push(item);
-      }
-      saveCart();
-      toggleCartDrawer(true);
-    }
-
-    function buyNow() {
-      addToCart();
-    }
-
-    function saveCart() {
-      try {
-        localStorage.setItem('TFLOW_CART_ITEMS', JSON.stringify(cart));
-      } catch (e) {}
-      updateCartDisplay();
-    }
-
-    function updateCartDisplay() {
-      const countEl = document.getElementById('navCartCount');
-      const totalQty = cart.reduce((acc, i) => acc + i.qty, 0);
-      if (countEl) countEl.textContent = totalQty;
-
-      const listEl = document.getElementById('cartItemsList');
-      const totalEl = document.getElementById('cartTotalDisplay');
-      if (!listEl || !totalEl) return;
-
-      if (cart.length === 0) {
-        listEl.innerHTML = '<div style="text-align:center; padding:60px 0; color:#86868B;">Giỏ hàng của bạn đang trống.</div>';
-        totalEl.textContent = '0₫';
+    function initApp() {
+      if (typeof SmartGimbalCatalog === 'undefined') {
+        console.error('SmartGimbalCatalog script not loaded!');
         return;
       }
 
-      let total = 0;
-      let html = '';
-      cart.forEach((item, idx) => {
-        total += item.price * item.qty;
-        html += `
-          <div style="display:flex; gap:14px; padding:16px 0; border-bottom:1px solid var(--border);">
-            <img src="${item.img}" style="width:60px; height:60px; object-fit:contain; border-radius:8px; border:1px solid var(--border);">
-            <div style="flex:1;">
-              <div style="font-weight:700; font-size:14px;">${item.name}</div>
-              <div style="font-size:12px; color:var(--text-secondary);">${item.tier} • ${item.color}</div>
-              <div style="font-weight:700; font-size:14px; margin-top:4px;">${item.priceFormatted} &times; ${item.qty}</div>
-            </div>
-            <button onclick="removeItem(${idx})" style="background:none; border:none; color:#FF3B30; font-size:12px; cursor:pointer; font-weight:600;">Xóa</button>
+      loadMvpData();
+      renderCatalogFilterChips();
+      renderCatalogGrid();
+      updateNavCartCount();
+
+      // Listen for store catalog updates
+      window.addEventListener(SmartGimbalCatalog.SYNC_EVENT, () => {
+        loadMvpData();
+        renderCatalogFilterChips();
+        renderCatalogGrid();
+        if (currentDetailProduct) {
+          const refreshed = SmartGimbalCatalog.getProduct(currentDetailProduct.id);
+          if (refreshed) openProductDetail(refreshed.id, false);
+        }
+      });
+
+      // Listen for cart updates
+      window.addEventListener(SmartGimbalCatalog.CART_EVENT, () => {
+        updateNavCartCount();
+        renderCartDrawer();
+      });
+
+      // Scroll listener for sticky buy bar
+      window.addEventListener('scroll', handleStickyBuyBar);
+    }
+
+
+
+    // ==========================================================================
+    // 1. VIEW SWITCHER (MULTI-VIEW ISOLATION)
+    // ==========================================================================
+    function switchView(viewName) {
+      const views = {
+        'home': document.getElementById('viewHome'),
+        'catalog': document.getElementById('viewCatalog'),
+        'detail': document.getElementById('viewProductDetail'),
+        'reviews': document.getElementById('viewReviews')
+      };
+
+      const navBtns = {
+        'home': document.getElementById('btnNavHome'),
+        'catalog': document.getElementById('btnNavCatalog'),
+        'reviews': document.getElementById('btnNavReviews')
+      };
+
+      // Hide all panels
+      Object.values(views).forEach(v => {
+        if (v) v.classList.remove('active');
+      });
+
+      // Remove active from nav buttons
+      Object.values(navBtns).forEach(b => {
+        if (b) b.classList.remove('active');
+      });
+
+      if (views[viewName]) {
+        views[viewName].classList.add('active');
+      }
+      if (navBtns[viewName]) {
+        navBtns[viewName].classList.add('active');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      handleStickyBuyBar();
+    }
+
+    // ==========================================================================
+    // 2. HERO FLAGSHIP MVP LOGIC (REQUIREMENT 1)
+    // ==========================================================================
+    function loadMvpData() {
+      currentMvp = SmartGimbalCatalog.getMvpProduct();
+      if (!currentMvp) return;
+
+      document.getElementById('heroFlagshipTitle').textContent = currentMvp.name;
+      document.getElementById('heroFlagshipTagline').textContent = currentMvp.tagline || currentMvp.subtitle || '';
+      document.getElementById('heroFlagshipDesc').textContent = currentMvp.subtitle || '';
+      document.getElementById('heroFlagshipImg').src = currentMvp.img || '../shared/img/feed_portrait_dusk.jpg';
+
+      // Render Tiers
+      const tierContainer = document.getElementById('heroTierSelector');
+      tierContainer.innerHTML = '';
+      if (currentMvp.tiers && currentMvp.tiers.length > 0) {
+        currentMvp.tiers.forEach((t, idx) => {
+          const btn = document.createElement('button');
+          btn.className = `hero-tier-btn ${t.key === currentMvpTierKey ? 'active' : ''}`;
+          btn.textContent = `${t.label} — ${t.priceFormatted}`;
+          btn.onclick = () => selectHeroTier(t.key);
+          tierContainer.appendChild(btn);
+        });
+      }
+
+      // Render Colors
+      const colorContainer = document.getElementById('heroColorSwatches');
+      colorContainer.innerHTML = '';
+      if (currentMvp.colors && currentMvp.colors.length > 0) {
+        currentMvp.colors.forEach((c, idx) => {
+          const dot = document.createElement('div');
+          dot.className = `color-dot ${c.id === currentMvpColorId ? 'active' : ''}`;
+          dot.style.backgroundColor = c.hex;
+          dot.title = c.name;
+          dot.onclick = () => selectHeroColor(c.id);
+          colorContainer.appendChild(dot);
+        });
+        const activeColor = currentMvp.colors.find(c => c.id === currentMvpColorId) || currentMvp.colors[0];
+        const span = document.createElement('span');
+        span.className = 'color-name-text';
+        span.id = 'heroColorNameDisplay';
+        span.textContent = activeColor.name;
+        colorContainer.appendChild(span);
+      }
+
+      updateHeroPrice();
+    }
+
+    function selectHeroTier(tierKey) {
+      currentMvpTierKey = tierKey;
+      document.querySelectorAll('.hero-tier-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.includes(currentMvp.tiers.find(t=>t.key===tierKey).label));
+      });
+      updateHeroPrice();
+    }
+
+    function selectHeroColor(colorId) {
+      currentMvpColorId = colorId;
+      document.querySelectorAll('#heroColorSwatches .color-dot').forEach((dot, idx) => {
+        dot.classList.toggle('active', currentMvp.colors[idx].id === colorId);
+      });
+      const c = currentMvp.colors.find(cl => cl.id === colorId);
+      if (c && document.getElementById('heroColorNameDisplay')) {
+        document.getElementById('heroColorNameDisplay').textContent = c.name;
+      }
+    }
+
+    function updateHeroPrice() {
+      if (!currentMvp || !currentMvp.tiers) return;
+      const tier = currentMvp.tiers.find(t => t.key === currentMvpTierKey) || currentMvp.tiers[0];
+      if (tier) {
+        document.getElementById('heroPriceVal').textContent = tier.priceFormatted;
+        document.getElementById('heroPriceOld').textContent = tier.oldPriceFormatted || '';
+        document.getElementById('heroPriceSave').textContent = tier.save || 'Ưu đãi chính hãng';
+      }
+    }
+
+    function buyMvpNow() {
+      addMvpToCart();
+      openCartDrawer();
+    }
+
+    function addMvpToCart() {
+      if (!currentMvp) return;
+      SmartGimbalCatalog.addToCart({
+        productId: currentMvp.id,
+        tierKey: currentMvpTierKey,
+        colorId: currentMvpColorId,
+        quantity: 1
+      });
+      showToast(`Đã thêm ${currentMvp.name} vào giỏ hàng`);
+    }
+
+    function openMvpDetail() {
+      if (currentMvp) openProductDetail(currentMvp.id);
+    }
+
+    // ==========================================================================
+    // 3. CATALOG STORE GRID (REQUIREMENT 6)
+    // ==========================================================================
+    function renderCatalogGrid() {
+      const container = document.getElementById('catalogProductsGrid');
+      container.innerHTML = '';
+
+      const products = SmartGimbalCatalog.getProducts(selectedCatalogFilter);
+      products.forEach(p => {
+        const group = SmartGimbalCatalog.getGroup(p.groupId);
+        const groupName = group ? group.name : 'Gimbal';
+        const startingTier = p.tiers && p.tiers[0] ? p.tiers[0] : null;
+        const priceDisplay = startingTier ? startingTier.priceFormatted : '1.990.000₫';
+
+        let colorsHtml = '';
+        if (p.colors && p.colors.length > 0) {
+          p.colors.forEach(c => {
+            colorsHtml += `<div class="store-mini-dot" style="background:${c.hex};" title="${c.name}"></div>`;
+          });
+        }
+
+        const card = document.createElement('div');
+        card.className = 'store-product-card';
+        card.onclick = () => openProductDetail(p.id);
+        card.innerHTML = `
+          <div class="store-card-img-wrap">
+            <img src="${p.img || '../shared/img/feed_portrait_dusk.jpg'}" alt="${p.name}">
+          </div>
+          <div>
+            <div class="store-card-tag">${groupName}</div>
+            <div class="store-card-title">${p.name}</div>
+            <div class="store-card-sub">${p.tagline || p.subtitle || ''}</div>
+            <div class="store-card-colors">${colorsHtml}</div>
+          </div>
+          <div class="store-card-bottom">
+            <div class="store-price-text">${priceDisplay}</div>
+            <div class="store-action-link">Xem Chi Tiết &rarr;</div>
           </div>
         `;
+        container.appendChild(card);
       });
-      listEl.innerHTML = html;
-      totalEl.textContent = total.toLocaleString('vi-VN') + '₫';
     }
 
-    function removeItem(idx) {
-      cart.splice(idx, 1);
-      saveCart();
+    function renderCatalogFilterChips() {
+      const container = document.getElementById('catalogFilterChips');
+      if (!container || typeof SmartGimbalCatalog === 'undefined') return;
+      const groups = SmartGimbalCatalog.getGroups();
+
+      // Validate selectedCatalogFilter
+      if (selectedCatalogFilter !== 'all' && !groups.some(g => g.id === selectedCatalogFilter)) {
+        selectedCatalogFilter = 'all';
+      }
+
+      let html = `<button class="filter-chip ${selectedCatalogFilter === 'all' ? 'active' : ''}" onclick="filterCatalog('all', this)">Tất Cả Sản Phẩm</button>`;
+      groups.forEach(g => {
+        const isActive = selectedCatalogFilter === g.id ? 'active' : '';
+        const safeName = (g.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        html += `<button class="filter-chip ${isActive}" onclick="filterCatalog('${g.id}', this)">${safeName}</button>`;
+      });
+      container.innerHTML = html;
     }
 
-    function toggleCartDrawer(open) {
-      const drawer = document.getElementById('cartDrawer');
-      const overlay = document.getElementById('cartOverlay');
-      if (drawer && overlay) {
-        drawer.classList.toggle('open', open);
-        overlay.classList.toggle('open', open);
+    function filterCatalog(groupId, btn) {
+      selectedCatalogFilter = groupId;
+      renderCatalogFilterChips();
+      renderCatalogGrid();
+    }
+
+    // ==========================================================================
+    // 4. DEEP APPLE STORE-STYLE PRODUCT DETAIL PAGE (REQUIREMENT 2)
+    // ==========================================================================
+    function openProductDetail(productId, shouldScroll = true) {
+      const prod = SmartGimbalCatalog.getProduct(productId) || SmartGimbalCatalog.getMvpProduct();
+      if (!prod) return;
+
+      currentDetailProduct = prod;
+      currentDetailTierKey = (prod.tiers && prod.tiers[0]) ? (prod.tiers[0].key || prod.tiers[0].id) : 'tier-pro-std';
+      currentDetailColorId = (prod.colors && prod.colors[0]) ? prod.colors[0].id : 'carbon-black';
+
+      // Heading info
+      const elBreadcrumb = document.getElementById('detailBreadcrumbName');
+      if (elBreadcrumb) elBreadcrumb.textContent = prod.name;
+      const elTitle = document.getElementById('detailTitle');
+      if (elTitle) elTitle.textContent = prod.name;
+      const elTagline = document.getElementById('detailTagline');
+      if (elTagline) elTagline.textContent = prod.tagline || prod.subtitle || '';
+      const elShortDesc = document.getElementById('detailShortDesc');
+      if (elShortDesc) elShortDesc.textContent = prod.subtitle || '';
+
+      const group = SmartGimbalCatalog.getGroup(prod.groupId);
+      const elCatTag = document.getElementById('detailCategoryTag');
+      if (elCatTag) elCatTag.textContent = group ? group.name : 'Gimbal Cầm Tay';
+
+      // Gallery main image
+      const elMainImg = document.getElementById('detailMainImg');
+      if (elMainImg) elMainImg.src = prod.img || '../shared/img/feed_portrait_dusk.jpg';
+
+      // Thumbnails (4 photos)
+      const thumbsContainer = document.getElementById('detailThumbsRow');
+      if (thumbsContainer) {
+        thumbsContainer.innerHTML = '';
+        const gallery = (prod.gallery && prod.gallery.length > 0) ? prod.gallery : [prod.img || '../shared/img/feed_portrait_dusk.jpg'];
+        gallery.forEach((imgSrc, idx) => {
+          const thumb = document.createElement('div');
+          thumb.className = `thumb-item ${idx === 0 ? 'active' : ''}`;
+          thumb.innerHTML = `<img src="${imgSrc}" alt="thumb">`;
+          thumb.onclick = () => {
+            if (elMainImg) elMainImg.src = imgSrc;
+            document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
+            thumb.classList.add('active');
+          };
+          thumbsContainer.appendChild(thumb);
+        });
+      }
+
+      // Step 1: Tier Selector Cards
+      const tierContainer = document.getElementById('detailTierCards');
+      if (tierContainer) {
+        tierContainer.innerHTML = '';
+        if (prod.tiers && prod.tiers.length > 0) {
+          prod.tiers.forEach(t => {
+            const tKey = t.key || t.id;
+            const tLabel = t.label || t.name;
+            const tPrice = t.priceFormatted || (t.price ? t.price.toLocaleString('vi-VN') + '₫' : '2.890.000₫');
+            const tSpecDesc = t.specs || (t.highlights && t.highlights[0]) || t.desc || 'Phiên bản chính hãng';
+
+            const card = document.createElement('div');
+            card.className = `tier-select-card ${tKey === currentDetailTierKey ? 'active' : ''}`;
+            card.onclick = () => selectDetailTier(tKey);
+            card.innerHTML = `
+              <div>
+                <div class="tier-card-label">${tLabel}</div>
+                <div class="tier-card-diff">${tSpecDesc}</div>
+              </div>
+              <div class="tier-card-price">${tPrice}</div>
+            `;
+            tierContainer.appendChild(card);
+          });
+        }
+      }
+
+      // Step 2: Color selector
+      const colorContainer = document.getElementById('detailColorList');
+      if (colorContainer) {
+        colorContainer.innerHTML = '';
+        if (prod.colors && prod.colors.length > 0) {
+          prod.colors.forEach((c, idx) => {
+            const btn = document.createElement('div');
+            btn.className = `color-swatch-btn ${c.id === currentDetailColorId ? 'active' : ''}`;
+            btn.style.backgroundColor = c.hex;
+            btn.title = c.name;
+            btn.onclick = () => selectDetailColor(c.id);
+            colorContainer.appendChild(btn);
+          });
+          const activeColor = prod.colors.find(c => c.id === currentDetailColorId) || prod.colors[0];
+          const elColorName = document.getElementById('detailSelectedColorName');
+          if (elColorName) elColorName.textContent = activeColor.name;
+        }
+      }
+
+      updateDetailPriceBox();
+
+      // Deep Tab 1: Overview (3 highlights)
+      const overviewContainer = document.getElementById('detailOverviewContainer');
+      if (overviewContainer) {
+        overviewContainer.innerHTML = '';
+        if (prod.overview && prod.overview.length > 0) {
+          prod.overview.forEach((h, idx) => {
+            const row = document.createElement('div');
+            row.className = `overview-row ${idx % 2 === 1 ? 'reverse' : ''}`;
+            row.innerHTML = `
+              <div class="overview-text-box">
+                <div class="tag-clean">Điểm Nhấn 0${idx + 1}</div>
+                <h3>${h.title}</h3>
+                <p>${h.desc}</p>
+              </div>
+              <div class="overview-img-box">
+                <img src="${h.img || prod.img}" alt="${h.title}">
+              </div>
+            `;
+            overviewContainer.appendChild(row);
+          });
+        }
+      }
+
+      // Deep Tab 2: What's in the Box
+      const boxContainer = document.getElementById('detailBoxGrid');
+      if (boxContainer) {
+        boxContainer.innerHTML = '';
+        if (prod.boxContents && prod.boxContents.length > 0) {
+          prod.boxContents.forEach(item => {
+            const itemText = (typeof item === 'object') ? `${item.name} (${item.qty})` : item;
+            const boxItem = document.createElement('div');
+            boxItem.className = 'box-item-card';
+            boxItem.innerHTML = `<div class="box-bullet"></div><div>${itemText}</div>`;
+            boxContainer.appendChild(boxItem);
+          });
+        }
+      }
+
+      // Deep Tab 3: Specs Table
+      const specsTable = document.getElementById('detailSpecsTable');
+      if (specsTable) {
+        specsTable.innerHTML = '';
+        if (prod.specs && typeof prod.specs === 'object') {
+          if (Array.isArray(prod.specs)) {
+            prod.specs.forEach(s => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `<td>${s.label}</td><td>${s.val}</td>`;
+              specsTable.appendChild(tr);
+            });
+          } else {
+            Object.entries(prod.specs).forEach(([k, v]) => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `<td>${k}</td><td>${v}</td>`;
+              specsTable.appendChild(tr);
+            });
+          }
+        }
+      }
+
+      // Deep Tab 4: Warranty
+      const elWarranty = document.getElementById('detailWarrantyText');
+      if (elWarranty && prod.warranty) {
+        elWarranty.textContent = prod.warranty;
+      }
+
+      // Sticky buy bar setup
+      const stickyImg = document.getElementById('stickyBarImg');
+      if (stickyImg) stickyImg.src = prod.img || '../shared/img/feed_portrait_dusk.jpg';
+      const stickyTitle = document.getElementById('stickyBarTitle');
+      if (stickyTitle) stickyTitle.textContent = prod.name;
+
+      // Switch view smoothly!
+      switchView('detail');
+      if (shouldScroll) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     }
 
-    function handleCheckout() {
-      if (cart.length === 0) {
-        alert('Giỏ hàng của bạn đang trống!');
+    function selectDetailTier(tierKey) {
+      currentDetailTierKey = tierKey;
+      document.querySelectorAll('#detailTierCards .tier-select-card').forEach((card, idx) => {
+        card.classList.toggle('active', currentDetailProduct.tiers[idx].key === tierKey);
+      });
+      updateDetailPriceBox();
+    }
+
+    function selectDetailColor(colorId) {
+      currentDetailColorId = colorId;
+      document.querySelectorAll('#detailColorList .color-swatch-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', currentDetailProduct.colors[idx].id === colorId);
+      });
+      const c = currentDetailProduct.colors.find(cl => cl.id === colorId);
+      if (c) {
+        document.getElementById('detailSelectedColorName').textContent = c.name;
+      }
+    }
+
+    function updateDetailPriceBox() {
+      if (!currentDetailProduct || !currentDetailProduct.tiers) return;
+      const tier = currentDetailProduct.tiers.find(t => t.key === currentDetailTierKey) || currentDetailProduct.tiers[0];
+      if (tier) {
+        document.getElementById('detailCurrentPrice').textContent = tier.priceFormatted;
+        document.getElementById('detailOldPrice').textContent = tier.oldPriceFormatted || '';
+        document.getElementById('detailGiftTag').textContent = `Tặng kèm: ${tier.gift || 'Phụ kiện chính hãng'}`;
+        document.getElementById('stickyBarPrice').textContent = tier.priceFormatted;
+      }
+    }
+
+    function switchDetailTab(tabKey, btn) {
+      document.querySelectorAll('.deep-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      document.getElementById('deepTabOverview').style.display = tabKey === 'overview' ? 'block' : 'none';
+      document.getElementById('deepTabBox').style.display = tabKey === 'box' ? 'block' : 'none';
+      document.getElementById('deepTabSpecs').style.display = tabKey === 'specs' ? 'block' : 'none';
+      document.getElementById('deepTabWarranty').style.display = tabKey === 'warranty' ? 'block' : 'none';
+    }
+
+    function addCurrentDetailToCart() {
+      if (!currentDetailProduct) return;
+      SmartGimbalCatalog.addToCart({
+        productId: currentDetailProduct.id,
+        tierKey: currentDetailTierKey,
+        colorId: currentDetailColorId,
+        quantity: 1
+      });
+      showToast(`Đã thêm ${currentDetailProduct.name} vào giỏ hàng`);
+    }
+
+    function buyNowCurrentDetail() {
+      addCurrentDetailToCart();
+      openCartDrawer();
+    }
+
+    // Sticky buy bar show/hide
+    function handleStickyBuyBar() {
+      const detailView = document.getElementById('viewProductDetail');
+      const stickyBar = document.getElementById('stickyBuyBar');
+      if (!detailView || !stickyBar) return;
+
+      if (detailView.classList.contains('active') && window.scrollY > 480) {
+        stickyBar.classList.add('visible');
+      } else {
+        stickyBar.classList.remove('visible');
+      }
+    }
+
+    // ==========================================================================
+    // 5. SHOPPING CART & CHECKOUT (REQUIREMENT 3)
+    // ==========================================================================
+    function updateNavCartCount() {
+      const count = SmartGimbalCatalog.getCartCount();
+      const badge = document.getElementById('navCartCount');
+      if (badge) badge.textContent = count;
+    }
+
+    function openCartDrawer() {
+      renderCartDrawer();
+      document.getElementById('cartOverlay').classList.add('open');
+    }
+
+    function closeCartDrawer(e) {
+      document.getElementById('cartOverlay').classList.remove('open');
+    }
+
+    function renderCartDrawer() {
+      const container = document.getElementById('cartItemList');
+      const cart = SmartGimbalCatalog.getCart();
+
+      if (!cart || cart.length === 0) {
+        container.innerHTML = `
+          <div class="cart-empty-msg">
+            <div style="font-size:32px; margin-bottom:12px;">&bull;</div>
+            <p>Túi hàng của bạn đang trống</p>
+            <button class="btn-dark" style="margin-top:20px; padding:10px 20px; font-size:13px;" onclick="closeCartDrawer(); switchView('catalog');">Khám Phá Dải Sản Phẩm</button>
+          </div>
+        `;
+        document.getElementById('cartSubtotal').textContent = '0₫';
+        document.getElementById('cartGrandTotal').textContent = '0₫';
         return;
       }
-      alert('Cảm ơn bạn! Đơn hàng T-Flow Pro đã được tiếp nhận. Đội ngũ CSKH T-Flow Tech (Hotline 1900 8888) sẽ liên hệ xác nhận trong vòng 15 phút.');
-      cart = [];
-      saveCart();
-      toggleCartDrawer(false);
+
+      container.innerHTML = '';
+      cart.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'cart-item-row';
+        row.innerHTML = `
+          <div class="cart-item-thumb">
+            <img src="${item.img || '../shared/img/feed_portrait_dusk.jpg'}" alt="${item.productName}">
+          </div>
+          <div class="cart-item-details">
+            <div class="cart-item-title">${item.productName}</div>
+            <div class="cart-item-meta">${item.tierLabel} &bull; ${item.colorName}</div>
+            <div class="cart-item-bottom">
+              <div class="cart-qty-ctrl">
+                <button class="cart-qty-btn" onclick="adjustCartQty('${item.cartId}', -1)">&minus;</button>
+                <span class="cart-qty-val">${item.quantity}</span>
+                <button class="cart-qty-btn" onclick="adjustCartQty('${item.cartId}', 1)">&#43;</button>
+              </div>
+              <div style="display:flex; align-items:center;">
+                <span class="cart-item-price">${SmartGimbalCatalog.formatVND(item.price * item.quantity)}</span>
+                <span class="cart-item-del" onclick="removeCartItem('${item.cartId}')">Xóa</span>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      const total = SmartGimbalCatalog.getCartTotal();
+      document.getElementById('cartSubtotal').textContent = SmartGimbalCatalog.formatVND(total);
+      document.getElementById('cartGrandTotal').textContent = SmartGimbalCatalog.formatVND(total);
     }
 
-    // Discreet Admin Login Prompt
-    function promptAdminLogin() {
-      const pwd = prompt('Vui lòng nhập mật khẩu xác thực Quản Trị Viên T-Flow:');
-      if (pwd === 'tflow2026' || pwd === '8888') {
-        sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
-        window.location.href = 'admin_dashboard.html';
-      } else if (pwd !== null) {
-        alert('Mật khẩu không chính xác! Quyền truy cập bị từ chối.');
+    function adjustCartQty(cartId, delta) {
+      SmartGimbalCatalog.updateCartQty(cartId, delta);
+    }
+
+    function removeCartItem(cartId) {
+      SmartGimbalCatalog.removeFromCart(cartId);
+    }
+
+    // Checkout Modal
+    function openCheckoutModal() {
+      const cart = SmartGimbalCatalog.getCart();
+      if (!cart || cart.length === 0) {
+        showToast('Túi hàng trống, vui lòng chọn sản phẩm');
+        return;
       }
+      closeCartDrawer();
+      const total = SmartGimbalCatalog.getCartTotal();
+      document.getElementById('checkoutTotalVal').textContent = SmartGimbalCatalog.formatVND(total);
+
+      // Pre-fill user data if logged in
+      const curUser = SmartGimbalCatalog.getCurrentUser();
+      if (curUser) {
+        document.getElementById('orderCustName').value = curUser.name || '';
+        document.getElementById('orderCustPhone').value = curUser.phone || '';
+      }
+
+      document.getElementById('checkoutModal').classList.add('open');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkoutModal').classList.remove('open');
+    }
+
+    function submitOrder() {
+      const name = document.getElementById('orderCustName').value.trim();
+      const phone = document.getElementById('orderCustPhone').value.trim();
+      const addr = document.getElementById('orderCustAddress').value.trim();
+      const payment = document.getElementById('orderPaymentMethod').value;
+
+      if (!name || !phone || !addr) {
+        alert('Vui lòng điền đầy đủ Họ tên, Số điện thoại và Địa chỉ giao hàng!');
+        return;
+      }
+
+      const cart = SmartGimbalCatalog.getCart();
+      const total = SmartGimbalCatalog.getCartTotal();
+      const curUser = SmartGimbalCatalog.getCurrentUser();
+
+      const order = SmartGimbalCatalog.createOrder({
+        userId: curUser ? curUser.id : 'guest',
+        customerName: name,
+        phone: phone,
+        address: addr,
+        paymentMethod: payment,
+        items: cart,
+        total: total,
+        totalFormatted: SmartGimbalCatalog.formatVND(total)
+      });
+
+      closeCheckoutModal();
+      showToast(`Đặt hàng thành công! Mã đơn: ${order.orderId}`);
+
+      setTimeout(() => {
+        alert(`Chúc mừng ${name}! Đơn hàng ${order.orderId} đã được tạo thành công.\nTổng thanh toán: ${order.totalFormatted}.\nBạn có thể vào Cổng Khách Hàng để theo dõi tiến độ giao hàng.`);
+      }, 400);
+    }
+
+    // FAQ Toggle
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      item.classList.toggle('open');
+    }
+
+    // Toast
+    function showToast(msg) {
+      const t = document.getElementById('toastMsg');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => {
+        t.classList.remove('show');
+      }, 2500);
     }
   </script>
 </body>
