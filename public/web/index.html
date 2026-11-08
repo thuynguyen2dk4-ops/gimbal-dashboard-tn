@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Gimbal — Thiết Bị Ổn Định 3 Trục Chuẩn Điện Ảnh</title>
+  <title>T-Flow — Smooth Every Moment | Thiết Bị Ổn Định 3 Trục & Hệ Sinh Thái FOC</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1468,8 +1468,8 @@
   <!-- STICKY FROSTED NAVBAR (4 CLEAN NAV ITEMS + ACTIONS) -->
   <nav id="mainNavbar">
     <div class="nav-brand" onclick="switchView('home')">
-      <div class="brand-mark">S</div>
-      <span>Smart Gimbal</span>
+      <div class="brand-mark" style="background:#1D1D1F; color:#FFF; font-weight:800; border-radius:6px; padding:2px 8px; font-size:13px;">TF</div>
+      <span style="font-weight:800; letter-spacing:-0.03em;">T-FLOW</span>
     </div>
 
     <!-- MAIN VIEWS -->
@@ -1477,6 +1477,7 @@
       <li><button class="nav-btn active" id="btnNavHome" onclick="switchView('home')">Trang Chủ</button></li>
       <li><button class="nav-btn" id="btnNavCatalog" onclick="switchView('catalog')">Dải Sản Phẩm</button></li>
       <li><button class="nav-btn" id="btnNavReviews" onclick="switchView('reviews')">Đánh Giá &amp; Hỏi Đáp</button></li>
+      <li><button class="nav-btn" id="btnNavRules" onclick="switchView('rules')">Tra Cứu SKU &amp; Naming Rules</button></li>
     </ul>
 
     <!-- ACTIONS -->
@@ -1496,7 +1497,7 @@
     <div class="sticky-bar-info">
       <img id="stickyBarImg" src="../shared/img/feed_portrait_dusk.jpg" alt="Thumb">
       <div>
-        <div class="sticky-bar-title" id="stickyBarTitle">Smart Gimbal S1</div>
+        <div class="sticky-bar-title" id="stickyBarTitle">T-Flow Pro</div>
         <div class="sticky-bar-price" id="stickyBarPrice">2.890.000₫</div>
       </div>
     </div>
@@ -1523,7 +1524,7 @@
           <!-- Right: Flagship Info & Configurator -->
           <div class="flagship-info">
             <div class="tag-clean">Đột Phá 2026 • FOC 20kHz</div>
-            <h1 id="heroFlagshipTitle">Smart Gimbal S1</h1>
+            <h1 id="heroFlagshipTitle">T-Flow Pro</h1>
             <div class="flagship-tagline" id="heroFlagshipTagline">Đưa thước phim di động lên tầm điện ảnh.</div>
             <p class="flagship-desc" id="heroFlagshipDesc">
               Thiết bị ổn định 3 trục thế hệ mới cho iPhone. Thuật toán FOC 20kHz, ngàm từ tính MagSafe N52 lực hút 2.8kg và pin 18 giờ liên tục.
@@ -1713,7 +1714,7 @@
           <span>&rsaquo;</span>
           <a href="javascript:void(0)" onclick="switchView('catalog')">Dải Sản Phẩm</a>
           <span>&rsaquo;</span>
-          <span id="detailBreadcrumbName">Smart Gimbal S1</span>
+          <span id="detailBreadcrumbName">T-Flow Pro</span>
         </div>
 
         <!-- TOP 2-COLUMN SECTION: STICKY GALLERY + CONFIGURATOR -->
@@ -1732,7 +1733,7 @@
           <div class="configurator-col">
             <div class="detail-heading">
               <div class="tag-clean" id="detailCategoryTag">Gimbal Điện Thoại</div>
-              <h1 id="detailTitle">Smart Gimbal S1</h1>
+              <h1 id="detailTitle">T-Flow Pro</h1>
               <div class="detail-tagline" id="detailTagline">Đưa thước phim di động lên tầm điện ảnh.</div>
               <p class="detail-short-desc" id="detailShortDesc">
                 Thiết bị ổn định 3 trục thế hệ mới cho iPhone. Thuật toán FOC 20kHz, ngàm từ tính MagSafe N52 lực hút 2.8kg và pin 18 giờ liên tục.
@@ -1884,11 +1885,11 @@
         <div class="faq-container">
           <div class="faq-item open">
             <div class="faq-question" onclick="toggleFaq(this)">
-              <span>Smart Gimbal S1 tương thích với những dòng điện thoại nào?</span>
+              <span>T-Flow Pro tương thích với những dòng điện thoại nào?</span>
               <span class="faq-toggle-icon">+</span>
             </div>
             <div class="faq-answer">
-              Smart Gimbal S1 tương thích hoàn hảo với mọi dòng iPhone từ iPhone 12 trở lên có MagSafe nguyên bản. Với các dòng điện thoại khác hoặc ốp lưng không có từ tính, sản phẩm đi kèm sẵn vòng từ tính trợ lực siêu mỏng dán mặt lưng.
+              T-Flow Pro tương thích hoàn hảo với mọi dòng iPhone từ iPhone 12 trở lên có MagSafe nguyên bản. Với các dòng điện thoại khác hoặc ốp lưng không có từ tính, sản phẩm đi kèm sẵn vòng từ tính trợ lực siêu mỏng dán mặt lưng.
             </div>
           </div>
 
@@ -1925,6 +1926,65 @@
       </div>
     </section>
   </main>
+
+  
+  <!-- ==========================================================================
+       VIEW 4: TRA CỨU MÃ KỸ THUẬT & QUY CHUẨN ĐẶT TÊN (NAMING RULES & SKU LOOKUP)
+       ========================================================================== -->
+  <section class="main-view" id="viewRules" style="display:none; padding: 48px 0 80px 0;">
+    <div class="container">
+      <div style="text-align:center; max-width:760px; margin: 0 auto 40px auto;">
+        <span class="badge-subtle" style="background:rgba(0,113,227,0.1); color:#0071E3; font-weight:700; padding:4px 12px; border-radius:99px; font-size:12px; text-transform:uppercase;">Tiêu Chuẩn R&amp;D Chính Hãng</span>
+        <h2 style="font-size:36px; font-weight:800; margin:12px 0; letter-spacing:-0.02em;">Hệ Thống Naming Rules &amp; Tra Cứu SKU T-Flow</h2>
+        <p style="color:var(--text-secondary); font-size:16px; line-height:1.5;">Hệ sinh thái T-Flow được chuẩn hóa chặt chẽ theo 2 lớp: <strong>Tên Thương Mại (B2C)</strong> thân thiện cho khách hàng và <strong>Mã Kỹ Thuật (SKU / In trên PCB)</strong> phục vụ quản lý sản xuất, bản vẽ CAD 3D và Firmware.</p>
+      </div>
+
+      <!-- INTERACTIVE SKU SEARCH BAR -->
+      <div style="max-width:680px; margin:0 auto 48px auto; background:#FFF; padding:16px 20px; border-radius:var(--radius-md); box-shadow:var(--shadow-md); border:1px solid var(--border); display:flex; gap:12px; align-items:center;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6E6E73" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="skuSearchInput" placeholder="Nhập mã SKU hoặc tên (ví dụ: TF-G31-PRO, TF-CAM-AI01, TF-D3X-FOC)..." style="flex:1; border:none; outline:none; font-size:15px; font-family:inherit;" oninput="handleSkuSearch()">
+        <span style="font-size:12px; font-weight:600; color:#86868B; background:#F5F5F7; padding:4px 10px; border-radius:6px; font-family:monospace;">TF-PREFIX</span>
+      </div>
+
+      <!-- SEARCH RESULT CONTAINER -->
+      <div id="skuSearchResult" style="max-width:880px; margin:0 auto 40px auto;"></div>
+
+      <!-- 5 NAMING RULES ACCORDION / CARDS -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:24px;">
+        <div style="background:#FFF; padding:28px; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm);">
+          <div style="font-size:12px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:8px;">Quy Tắc 1</div>
+          <h3 style="font-size:18px; font-weight:700; margin-bottom:8px;">Tên Thương Mại (B2C)</h3>
+          <div style="background:#F5F5F7; padding:8px 12px; border-radius:6px; font-family:monospace; font-size:13px; font-weight:600; margin-bottom:12px; color:#1D1D1F;">T-Flow + [Tên Dòng] + [Hậu Tố]</div>
+          <p style="font-size:14px; color:var(--text-secondary); line-height:1.5;">Không dùng mã số kỹ thuật phức tạp. Giữ tên gọi dưới 4 từ để hiển thị đẹp trên bao bì và sàn TMĐT. Quy ước hậu tố: Go/Air (Gọn nhẹ) • Pro/Max (Cao cấp tải nặng) • SE (Rút gọn).</p>
+          <div style="margin-top:12px; font-size:13px; font-weight:600; color:#1D1D1F;">Ví dụ: T-Flow Go, T-Flow Pro, T-Flow Air, T-Flow Eye</div>
+        </div>
+
+        <div style="background:#FFF; padding:28px; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm);">
+          <div style="font-size:12px; font-weight:700; color:#28A745; text-transform:uppercase; margin-bottom:8px;">Quy Tắc 2</div>
+          <h3 style="font-size:18px; font-weight:700; margin-bottom:8px;">Mã Kỹ Thuật (SKU / PCB)</h3>
+          <div style="background:#F5F5F7; padding:8px 12px; border-radius:6px; font-family:monospace; font-size:13px; font-weight:600; margin-bottom:12px; color:#1D1D1F;">TF - [Phân Hệ][Thông Số] - [Chức Năng] - [Rev]</div>
+          <p style="font-size:14px; color:var(--text-secondary); line-height:1.5;">TF là tiền tố cố định. Phân hệ: G (Gimbal), CAM (Camera), M (Mainboard), D (Driver), X (Mở rộng/Cảm biến), B (Bridge). In lụa Silkscreen: 'Engineered by T-Flow in Hanoi' &amp; 'Pure FOC Inside'.</p>
+          <div style="margin-top:12px; font-size:13px; font-weight:600; color:#1D1D1F;">Ví dụ: TF-G31-PRO-R1.0, TF-D3X-FOC-R1.0</div>
+        </div>
+
+        <div style="background:#FFF; padding:28px; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm);">
+          <div style="font-size:12px; font-weight:700; color:#FF9500; text-transform:uppercase; margin-bottom:8px;">Quy Tắc 3</div>
+          <h3 style="font-size:18px; font-weight:700; margin-bottom:8px;">Chi Tiết Cơ Khí &amp; In 3D</h3>
+          <div style="background:#F5F5F7; padding:8px 12px; border-radius:6px; font-family:monospace; font-size:13px; font-weight:600; margin-bottom:12px; color:#1D1D1F;">TF - [Mã Máy] - MEC - [STT] - [Vật Liệu]</div>
+          <p style="font-size:14px; color:var(--text-secondary); line-height:1.5;">Quản lý toàn bộ các chi tiết CAD 3D, STL in 3D và gia công CNC. Vật liệu: PETG (nhựa in 3D), AL6061 (nhôm hàng không CNC), CF (sợi carbon 8 lớp).</p>
+          <div style="margin-top:12px; font-size:13px; font-weight:600; color:#1D1D1F;">Ví dụ: TF-G31-MEC-01-PETG, TF-G31-MEC-02-AL6061</div>
+        </div>
+
+        <div style="background:#FFF; padding:28px; border-radius:var(--radius-md); border:1px solid var(--border); box-shadow:var(--shadow-sm);">
+          <div style="font-size:12px; font-weight:700; color:#AF52DE; text-transform:uppercase; margin-bottom:8px;">Quy Tắc 4 &amp; 5</div>
+          <h3 style="font-size:18px; font-weight:700; margin-bottom:8px;">Git Repo &amp; Versioning</h3>
+          <div style="background:#F5F5F7; padding:8px 12px; border-radius:6px; font-family:monospace; font-size:13px; font-weight:600; margin-bottom:12px; color:#1D1D1F;">tflow-[phân-hệ]-[loại-code] | v[Major].[Minor].[Patch]</div>
+          <p style="font-size:14px; color:var(--text-secondary); line-height:1.5;">Repo viết thường nối dấu gạch ngang (-). Phiên bản tuân thủ Semantic Versioning chặt chẽ cho cả Firmware vi điều khiển, App điện thoại và Phần mềm máy tính.</p>
+          <div style="margin-top:12px; font-size:13px; font-weight:600; color:#1D1D1F;">Ví dụ: tflow-g31-firmware, FW-TF-G31-v1.2.0</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ==========================================================================
        SLIDE-OVER SHOPPING BAG DRAWER (REQUIREMENT 3)
@@ -2022,9 +2082,9 @@
         <div class="footer-col">
           <div class="footer-col-title">Dải Sản Phẩm</div>
           <ul class="footer-links-list">
-            <li><a href="javascript:void(0)" onclick="openProductDetail('s1')">Smart Gimbal S1 (Flagship)</a></li>
+            <li><a href="javascript:void(0)" onclick="openProductDetail('s1')">T-Flow Pro (Flagship)</a></li>
             <li><a href="javascript:void(0)" onclick="openProductDetail('s2')">Smart Gimbal S2 Cinema</a></li>
-            <li><a href="javascript:void(0)" onclick="openProductDetail('s1-air')">Smart Gimbal S1 Air (Siêu Nhẹ)</a></li>
+            <li><a href="javascript:void(0)" onclick="openProductDetail('s1-air')">T-Flow Pro Air (Siêu Nhẹ)</a></li>
             <li><a href="javascript:void(0)" onclick="openProductDetail('p1')">SmartCam Pocket P1</a></li>
             <li><a href="javascript:void(0)" onclick="openProductDetail('x2')">SmartCam Action X2</a></li>
             <li><a href="javascript:void(0)" onclick="filterCatalog('cat-acc', document.querySelector('.filter-chip'))">Phụ Kiện Studio &amp; MagSafe</a></li>
@@ -2091,6 +2151,64 @@
     let selectedCatalogFilter = 'all';
 
     // Init on DOM ready
+    
+    // Switch View to Rules
+    const origSwitchView = window.switchView;
+    window.switchView = function(viewName) {
+      const views = ['home', 'catalog', 'detail', 'reviews', 'rules'];
+      views.forEach(v => {
+        const el = document.getElementById('view' + v.charAt(0).toUpperCase() + v.slice(1));
+        if (el) el.style.display = (v === viewName) ? 'block' : 'none';
+      });
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById('btnNav' + viewName.charAt(0).toUpperCase() + viewName.slice(1));
+      if (activeBtn) activeBtn.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    function handleSkuSearch() {
+      const q = (document.getElementById('skuSearchInput').value || '').trim().toLowerCase();
+      const container = document.getElementById('skuSearchResult');
+      if (!q) {
+        container.innerHTML = '';
+        return;
+      }
+      const cat = (typeof SmartGimbalCatalog !== 'undefined') ? SmartGimbalCatalog.getCatalog() : null;
+      if (!cat) return;
+      
+      const matched = cat.products.filter(p => 
+        (p.sku && p.sku.toLowerCase().includes(q)) || 
+        (p.name && p.name.toLowerCase().includes(q)) ||
+        (p.id && p.id.toLowerCase().includes(q)) ||
+        (p.specs && JSON.stringify(p.specs).toLowerCase().includes(q))
+      );
+
+      if (matched.length === 0) {
+        container.innerHTML = '<div style="background:#FFF; padding:24px; border-radius:12px; text-align:center; color:#86868B; border:1px dashed #D2D2D7;">Không tìm thấy mã kỹ thuật nào khớp với từ khóa "' + q + '". Thử gõ "TF-G31", "PRO", "FOC", hoặc "CAM".</div>';
+        return;
+      }
+
+      let html = '<div style="display:flex; flex-direction:column; gap:16px;">';
+      matched.forEach(p => {
+        html += `
+          <div style="background:#FFF; padding:20px 24px; border-radius:14px; border:1px solid var(--border); box-shadow:var(--shadow-sm); display:flex; justify-content:space-between; align-items:center; gap:20px;">
+            <div>
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+                <span style="font-family:monospace; font-weight:700; font-size:14px; background:#1D1D1F; color:#FFF; padding:3px 8px; border-radius:4px;">${p.sku || p.id}</span>
+                <span style="font-size:16px; font-weight:700; color:#1D1D1F;">${p.name}</span>
+                <span style="font-size:11px; font-weight:600; background:rgba(0,113,227,0.1); color:#0071E3; padding:2px 8px; border-radius:99px;">${p.badge || ''}</span>
+              </div>
+              <div style="font-size:13px; color:#6E6E73; margin-bottom:8px;">${p.tagline || p.subtitle || ''}</div>
+              <div style="font-size:12px; font-family:monospace; color:#86868B;">Silkscreen: "Engineered by T-Flow in Hanoi" • Pure FOC Inside</div>
+            </div>
+            <button class="btn-dark" style="padding:8px 16px; font-size:13px; white-space:nowrap;" onclick="openProductDetail('${p.id}')">Xem Chi Tiết</button>
+          </div>
+        `;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       initApp();
     });
