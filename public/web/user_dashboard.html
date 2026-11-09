@@ -578,7 +578,7 @@
         <span id="navBleStatus">Đã kết nối BLE (T-Flow S1 &bull; Pin 92%)</span>
       </div>
       <a href="index.html" class="btn-nav-link">Trang Chủ</a>
-      <a href="admin_dashboard.html" class="btn-nav-link">Admin CMS</a>
+      <a href="admin_dashboard.html" class="btn-nav-link" id="navAdminCmsBtn" style="display:none; color:#FFF; background:#1D1D1F; font-weight:700;">⚙️ Admin CMS</a>
       <button class="btn btn-outline" id="btnSwitchAccount" style="font-size:12.5px; display:none;" onclick="logoutUser()">Đăng Xuất</button>
     </div>
   </header>
@@ -871,7 +871,7 @@
           <ul class="footer-links-list">
             <li><a href="index.html">Ứng Dụng T-Flow iOS</a></li>
             <li><a href="user_dashboard.html">Cổng Khách Hàng (T-Flow ID)</a></li>
-            <li><a href="admin_dashboard.html">Cổng Quản Trị Admin CMS</a></li>
+            <li id="footerAdminCmsLink" style="display:none;"><a href="admin_dashboard.html">Cổng Quản Trị Admin CMS</a></li>
             <li><a href="javascript:void(0)" onclick="alert('Đang kết nối kho dữ liệu Firmware OTA...')">Cập Nhật Firmware OTA</a></li>
             <li><a href="user_dashboard.html">Tải Bảng Màu 3D LUT (.cube)</a></li>
           </ul>
@@ -944,6 +944,7 @@
     }
 
     function loadUserData() {
+      updatePortalAdminBanner();
       setTimeout(updatePortalAdminBanner, 50);
       currentUser = SmartGimbalCatalog.getCurrentUser();
       
@@ -1089,16 +1090,27 @@
       loginUserPortalWithGmail(email);
     }
 
-    function updatePortalAdminBanner() {
+        function updatePortalAdminBanner() {
       if (typeof SmartGimbalCatalog === 'undefined') return;
       const user = SmartGimbalCatalog.getCurrentUser();
+      const isAdmin = user && SmartGimbalCatalog.isUserAdmin(user);
+
+      // 1. Top Navbar Admin Button (ONLY FOR MASTER ADMIN)
+      const navAdmin = document.getElementById('navAdminCmsBtn');
+      if (navAdmin) {
+        navAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+      }
+
+      // 2. Footer Admin Link (ONLY FOR MASTER ADMIN)
+      const footerAdmin = document.getElementById('footerAdminCmsLink');
+      if (footerAdmin) {
+        footerAdmin.style.display = isAdmin ? 'list-item' : 'none';
+      }
+
+      // 3. Admin Banner (ONLY FOR MASTER ADMIN)
       const adminBanner = document.getElementById('portalAdminBanner');
       if (adminBanner) {
-        if (user && SmartGimbalCatalog.isUserAdmin(user)) {
-          adminBanner.style.display = 'flex';
-        } else {
-          adminBanner.style.display = 'none';
-        }
+        adminBanner.style.display = isAdmin ? 'flex' : 'none';
       }
     }
 
@@ -1166,17 +1178,27 @@
       loginUserPortalWithGmail(email);
     }
 
-    function updatePortalAdminBanner() {
+        function updatePortalAdminBanner() {
       if (typeof SmartGimbalCatalog === 'undefined') return;
       const user = SmartGimbalCatalog.getCurrentUser();
+      const isAdmin = user && SmartGimbalCatalog.isUserAdmin(user);
+
+      // 1. Top Navbar Admin Button (ONLY FOR MASTER ADMIN)
+      const navAdmin = document.getElementById('navAdminCmsBtn');
+      if (navAdmin) {
+        navAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
+      }
+
+      // 2. Footer Admin Link (ONLY FOR MASTER ADMIN)
+      const footerAdmin = document.getElementById('footerAdminCmsLink');
+      if (footerAdmin) {
+        footerAdmin.style.display = isAdmin ? 'list-item' : 'none';
+      }
+
+      // 3. Admin Banner (ONLY FOR MASTER ADMIN)
       const adminBanner = document.getElementById('portalAdminBanner');
       if (adminBanner) {
-        // ONLY SHOW ADMIN BANNER IF SIGNED IN AS ADMIN GMAIL
-        if (user && SmartGimbalCatalog.isUserAdmin(user)) {
-          adminBanner.style.display = 'flex';
-        } else {
-          adminBanner.style.display = 'none';
-        }
+        adminBanner.style.display = isAdmin ? 'flex' : 'none';
       }
     }
 
