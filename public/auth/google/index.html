@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng nhập – Tài khoản Google</title>
+  <link rel="icon" href="https://www.google.com/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #F8F9FA;
+      color: #1F1F1F;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 16px;
+    }
+    .google-card {
+      background: #FFFFFF;
+      border: 1px solid #DADCE0;
+      border-radius: 28px;
+      width: 100%;
+      max-width: 440px;
+      padding: 40px 36px 36px 36px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+    }
+    .google-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 500;
+      line-height: 1.33;
+      margin-bottom: 8px;
+      color: #1F1F1F;
+    }
+    .sub-text {
+      font-size: 14px;
+      color: #444746;
+      line-height: 1.4;
+      margin-bottom: 28px;
+    }
+    .sub-text strong {
+      color: #1F1F1F;
+    }
+    .input-group {
+      margin-bottom: 18px;
+      position: relative;
+    }
+    .input-label {
+      font-size: 12px;
+      color: #444746;
+      font-weight: 500;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .google-input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #747775;
+      border-radius: 4px;
+      font-size: 15px;
+      color: #1F1F1F;
+      background: transparent;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .google-input:focus {
+      border-color: #0B57D0;
+      border-width: 2px;
+      padding: 13px 15px;
+    }
+    .input-error-msg {
+      font-size: 12px;
+      color: #B3261E;
+      margin-top: 5px;
+      display: none;
+      align-items: center;
+      gap: 4px;
+    }
+    .toggle-pass-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px 0 24px 0;
+      font-size: 13.5px;
+      color: #444746;
+      cursor: pointer;
+    }
+    .toggle-pass-row input {
+      width: 16px;
+      height: 16px;
+      accent-color: #0B57D0;
+      cursor: pointer;
+    }
+    .disclaimer {
+      font-size: 12.5px;
+      color: #444746;
+      line-height: 1.5;
+      margin-bottom: 28px;
+    }
+    .disclaimer a {
+      color: #0B57D0;
+      text-decoration: none;
+    }
+    .btn-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .btn-create-acc {
+      background: none;
+      border: none;
+      color: #0B57D0;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 99px;
+      font-family: inherit;
+    }
+    .btn-create-acc:hover {
+      background: rgba(11, 87, 208, 0.08);
+    }
+    .btn-next {
+      background: #0B57D0;
+      color: #FFFFFF;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s ease;
+    }
+    .btn-next:hover {
+      background: #0842A0;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #FFF;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: none;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .footer-links {
+      display: flex;
+      justify-content: space-between;
+      max-width: 440px;
+      width: 100%;
+      margin: 16px auto 0 auto;
+      font-size: 12px;
+      color: #444746;
+      padding: 0 12px;
+    }
+    .footer-links a {
+      color: #444746;
+      text-decoration: none;
+      margin-left: 14px;
+    }
+    .footer-links a:hover {
+      color: #1F1F1F;
+    }
+  </style>
+</head>
+<body>
+
+  <div>
+    <div class="google-card">
+      <!-- GOOGLE SVG LOGO -->
+      <div class="google-logo">
+        <svg width="40" height="40" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          <path fill="none" d="M0 0h48v48H0z"/>
+        </svg>
+      </div>
+
+      <h1>Đăng nhập</h1>
+      <div class="sub-text">tiếp tục tới <strong>T-Flow Enterprise</strong></div>
+
+      <form id="googleAuthForm" onsubmit="handleGoogleSubmit(event)">
+        <!-- EMAIL FIELD -->
+        <div class="input-group">
+          <label class="input-label" for="googleEmail">Email hoặc số điện thoại</label>
+          <input type="email" id="googleEmail" class="google-input" placeholder="name@gmail.com" autofocus autocomplete="username" required>
+          <div class="input-error-msg" id="emailError">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#B3261E"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <span id="emailErrorText">Vui lòng nhập địa chỉ email Google hợp lệ.</span>
+          </div>
+        </div>
+
+        <!-- PASSWORD FIELD -->
+        <div class="input-group" id="passGroup">
+          <label class="input-label" for="googlePassword">Nhập mật khẩu của bạn</label>
+          <input type="password" id="googlePassword" class="google-input" placeholder="Mật khẩu" autocomplete="current-password" required>
+          <div class="input-error-msg" id="passError">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#B3261E"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            <span>Vui lòng nhập mật khẩu Google của bạn.</span>
+          </div>
+        </div>
+
+        <label class="toggle-pass-row">
+          <input type="checkbox" id="showPassCheckbox" onchange="togglePasswordVisibility()">
+          <span>Hiện mật khẩu</span>
+        </label>
+
+        <div class="disclaimer">
+          Để tiếp tục, Google sẽ xác thực danh tính và chia sẻ địa chỉ email cũng như ảnh hồ sơ của bạn với <strong>T-Flow Enterprise</strong>.
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn-create-acc" onclick="alert('Vui lòng tạo tài khoản tại accounts.google.com')">Tạo tài khoản</button>
+          <button type="submit" class="btn-next" id="btnNext">
+            <span class="spinner" id="btnSpinner"></span>
+            <span id="btnText">Tiếp theo</span>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="footer-links">
+      <div>Tiếng Việt</div>
+      <div>
+        <a href="#">Trợ giúp</a>
+        <a href="#">Bảo mật</a>
+        <a href="#">Điều khoản</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function togglePasswordVisibility() {
+      const chk = document.getElementById('showPassCheckbox');
+      const pass = document.getElementById('googlePassword');
+      pass.type = chk.checked ? 'text' : 'password';
+    }
+
+    function handleGoogleSubmit(e) {
+      e.preventDefault();
+      const emailInput = document.getElementById('googleEmail');
+      const passInput = document.getElementById('googlePassword');
+      const emailErr = document.getElementById('emailError');
+      const emailErrText = document.getElementById('emailErrorText');
+      const passErr = document.getElementById('passError');
+
+      emailErr.style.display = 'none';
+      passErr.style.display = 'none';
+
+      const email = emailInput.value.trim();
+      const pass = passInput.value;
+
+      if (!email || !email.includes('@')) {
+        emailErrText.textContent = 'Vui lòng nhập địa chỉ email Google hợp lệ.';
+        emailErr.style.display = 'flex';
+        emailInput.focus();
+        return;
+      }
+
+      if (!pass || pass.length < 6) {
+        passErr.style.display = 'flex';
+        passInput.focus();
+        return;
+      }
+
+      // Show Google loading spinner
+      const btn = document.getElementById('btnNext');
+      const spinner = document.getElementById('btnSpinner');
+      const btnText = document.getElementById('btnText');
+      btn.disabled = true;
+      spinner.style.display = 'inline-block';
+      btnText.textContent = 'Đang xác thực...';
+
+      setTimeout(() => {
+        // Derive display name from email (e.g. "thuynguyen2dk4" -> "Thuy Nguyen")
+        let displayName = email.split('@')[0];
+        if (email.toLowerCase().includes('thuynguyen')) {
+          displayName = 'Thuy Nguyen';
+        } else {
+          displayName = displayName.replace(/[._0-9]/g, ' ').trim();
+          displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
+        }
+
+        const authPayload = {
+          type: 'GOOGLE_OAUTH_SUCCESS',
+          user: {
+            email: email,
+            name: displayName,
+            avatar: email.charAt(0).toUpperCase(),
+            provider: 'google'
+          }
+        };
+
+        // Post message to opener window
+        if (window.opener && !window.opener.closed) {
+          window.opener.postMessage(authPayload, '*');
+          window.close();
+        } else {
+          // If opened directly without opener, save to localStorage and redirect
+          try {
+            localStorage.setItem('tflow_google_auth_redirect_user', JSON.stringify(authPayload.user));
+          } catch(err) {}
+          window.location.href = '/';
+        }
+      }, 750);
+    }
+  </script>
+</body>
+</html>

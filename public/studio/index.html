@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Gimbal S1 — Vibe Coding Live Studio (Code + Web + iPhone App + Supabase)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Command Bar */
+    .topbar {
+      height: 56px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      flex-shrink: 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #fff;
+    }
+    .brand-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      background: #ffffff;
+      color: #0d1117;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(46, 160, 67, 0.15);
+      border: 1px solid rgba(46, 160, 67, 0.4);
+      color: #3fb950;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11.5px;
+      font-weight: 600;
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #3fb950;
+      box-shadow: 0 0 6px #3fb950;
+    }
+
+    /* Mode Switcher */
+    .view-tabs {
+      display: flex;
+      gap: 6px;
+      background: #0d1117;
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid #30363d;
+    }
+    .v-tab {
+      background: transparent;
+      border: none;
+      color: #8b949e;
+      padding: 6px 13px;
+      border-radius: 7px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .v-tab:hover {
+      color: #fff;
+    }
+    .v-tab.active {
+      background: #238636;
+      color: #fff;
+    }
+
+    /* Right Actions */
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-qr {
+      background: #f0f6fc;
+      color: #0d1117;
+      border: none;
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-qr:hover {
+      background: #ffffff;
+    }
+    .btn-reload {
+      background: #21262d;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-reload:hover {
+      background: #30363d;
+      color: #fff;
+    }
+
+    /* Workspace Main Layout */
+    .workspace {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Left Pane: Live Code Inspector */
+    .code-pane {
+      width: 38%;
+      min-width: 360px;
+      background: #0d1117;
+      border-right: 1px solid #30363d;
+      display: flex;
+      flex-direction: column;
+      transition: width 0.25s ease;
+    }
+    .code-pane.collapsed {
+      width: 0;
+      min-width: 0;
+      overflow: hidden;
+      border-right: none;
+    }
+    .code-header {
+      height: 42px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      gap: 8px;
+      overflow-x: auto;
+    }
+    .file-tabs {
+      display: flex;
+      gap: 4px;
+    }
+    .f-tab {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      color: #8b949e;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .f-tab.active {
+      background: #1f6feb;
+      border-color: #1f6feb;
+      color: #fff;
+      font-weight: 600;
+    }
+    .code-toolbar {
+      height: 36px;
+      background: #0d1117;
+      border-bottom: 1px solid #21262d;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-size: 11.5px;
+      color: #8b949e;
+    }
+    .code-search {
+      background: #161b22;
+      border: 1px solid #30363d;
+      color: #e6edf3;
+      padding: 3px 8px;
+      border-radius: 5px;
+      font-size: 11.5px;
+      width: 180px;
+    }
+    .code-body {
+      flex: 1;
+      overflow: auto;
+      padding: 12px 0;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #e6edf3;
+    }
+    .code-line {
+      display: flex;
+      padding: 0 14px;
+    }
+    .code-line:hover {
+      background: rgba(110, 118, 129, 0.12);
+    }
+    .code-line.highlight {
+      background: rgba(210, 153, 34, 0.25);
+    }
+    .ln {
+      width: 44px;
+      color: #484f58;
+      text-align: right;
+      padding-right: 14px;
+      user-select: none;
+      flex-shrink: 0;
+    }
+    .lc {
+      white-space: pre;
+      color: #c9d1d9;
+    }
+
+    /* Right Pane: Live Interactive Preview */
+    .preview-pane {
+      flex: 1;
+      background: #010409;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .preview-bar {
+      height: 42px;
+      background: #161b22;
+      border-bottom: 1px solid #30363d;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      gap: 12px;
+    }
+    .url-box {
+      flex: 1;
+      max-width: 620px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 4px 12px;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 11.5px;
+      color: #58a6ff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .preview-stage {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+    .iframe-wrap {
+      flex: 1;
+      height: 100%;
+      border: none;
+      background: #fff;
+    }
+    .split-divider {
+      width: 2px;
+      background: #30363d;
+      display: none;
+    }
+    .phone-dock {
+      width: 420px;
+      height: 100%;
+      background: #090d13;
+      border-left: 1px solid #30363d;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .phone-dock.visible {
+      display: flex;
+    }
+    .phone-dock iframe {
+      width: 393px;
+      height: 820px;
+      max-height: calc(100vh - 130px);
+      border: none;
+      border-radius: 40px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 0 8px #21262d;
+      background: #000;
+    }
+
+    /* QR Modal for iPhone Installation */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .qr-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 20px;
+      max-width: 640px;
+      width: 100%;
+      padding: 28px;
+      color: #e6edf3;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.7);
+    }
+    .qr-grid {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 24px;
+      margin-top: 18px;
+      align-items: center;
+    }
+    .qr-box {
+      background: #fff;
+      padding: 14px;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .qr-box img {
+      width: 190px;
+      height: 190px;
+      display: block;
+    }
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .step-item {
+      background: #0d1117;
+      border: 1px solid #21262d;
+      padding: 10px 14px;
+      border-radius: 10px;
+    }
+    .step-item strong {
+      color: #58a6ff;
+      display: block;
+      margin-bottom: 3px;
+    }
+    .public-link-pill {
+      margin-top: 16px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      font-size: 12px;
+      color: #3fb950;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP COMMAND BAR -->
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-badge">S1</div>
+      <span>Smart Gimbal Vibe-Coding Studio</span>
+      <span class="status-pill">
+        <span class="status-dot"></span>
+        Supabase Cloud Connected (dlgkrwodxdsbbliwdnkg)
+      </span>
+    </div>
+
+    <!-- SCREEN SWITCHER -->
+    <div class="view-tabs">
+      
+      <button class="v-tab active" id="tabStore" onclick="setStudioMode('store')">Web Cửa Hàng</button>
+      <button class="v-tab" id="tabAdmin" onclick="setStudioMode('admin')">Web Admin CMS</button>
+      <button class="v-tab" id="tabUser" onclick="setStudioMode('user')">Cổng Khách Hàng</button>
+      <button class="v-tab" id="tabMobile" onclick="setStudioMode('mobile')">App Camera AI (iPhone)</button>
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="top-actions">
+      <button class="btn-reload" onclick="toggleCodePane()" id="btnToggleCode">Ẩn/Hiện Cửa Sổ Code</button>
+      <button class="btn-reload" onclick="reloadPreviews()">Làm Mới (Reload)</button>
+      <button class="btn-qr" onclick="openQrModal()">
+        <span>📱 Cài & Test App Trên iPhone Thật (HTTPS QR)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="workspace">
+    <!-- LEFT: LIVE CODE VIEWER -->
+    <div class="code-pane" id="codePane">
+      <div class="code-header">
+        <div class="file-tabs">
+          <button class="f-tab active" onclick="loadCodeFile('index.html', this)">web/index.html</button>
+          <button class="f-tab" onclick="loadCodeFile('admin_dashboard.html', this)">web/admin_dashboard.html</button>
+          <button class="f-tab" onclick="loadCodeFile('user_dashboard.html', this)">web/user_dashboard.html</button>
+          <button class="f-tab" onclick="loadCodeFile('mobile_app.html', this)">web/mobile_app.html</button>
+          <button class="f-tab" onclick="loadCodeFile('/shared/catalog_store.js', this)">shared/catalog_store.js</button>
+        </div>
+      </div>
+      <div class="code-toolbar">
+        <span id="codeFileInfo">Đang xem: web/index.html</span>
+        <input type="text" class="code-search" id="codeSearchInput" placeholder="Tìm trong code (Enter)..." onkeyup="searchInCode(event)">
+      </div>
+      <div class="code-body" id="codeContainer">
+        <!-- Loaded dynamically -->
+      </div>
+    </div>
+
+    <!-- RIGHT: LIVE INTERACTIVE WEB + MOBILE PREVIEW -->
+    <div class="preview-pane">
+      <div class="preview-bar">
+        <div style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; color:#8b949e;">
+          <span>Màn hình tương tác trực tiếp:</span>
+          <button class="btn-reload" style="padding:3px 9px;" onclick="setMainIframe('index.html')">Trang Chủ & Dải SP</button>
+          <button class="btn-reload" style="padding:3px 9px;" onclick="setMainIframe('admin_dashboard.html')">Admin CMS</button>
+          <button class="btn-reload" style="padding:3px 9px;" onclick="setMainIframe('user_dashboard.html')">Cổng Khách Hàng</button>
+        </div>
+        <div class="url-box">
+          <span id="currentPreviewUrl">https://t-flow.tech/web/index.html</span>
+          <a href="/" id="openNewTabLink" target="_blank" style="color:#8b949e; text-decoration:none; font-size:11px;">Mở toàn màn hình ↗</a>
+        </div>
+      </div>
+
+      <div class="preview-stage">
+        <iframe src="/" class="iframe-wrap" id="mainPreviewIframe"></iframe>
+        <div class="phone-dock" id="phoneDock">
+          <div style="font-size:11.5px; font-weight:600; color:#8b949e; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+            <span style="width:8px;height:8px;border-radius:50%;background:#3fb950;"></span>
+            <span>iPhone 16 Pro — Camera Cloud AI Simulator</span>
+          </div>
+          <iframe src="/app" id="mobilePreviewIframe" allow="camera; microphone; accelerometer; gyroscope"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: QR CODE FOR REAL IPHONE HTTPS TESTING -->
+  <div class="modal-backdrop" id="qrModal">
+    <div class="qr-card">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <h2 style="font-size:19px; font-weight:700; color:#fff;">Cài & Chạy Thử App Trực Tiếp Trên iPhone Của Anh</h2>
+          <p style="font-size:13px; color:#8b949e; margin-top:4px;">
+            Vì iPhone không dùng được <code>localhost</code> và Safari bắt buộc phải có chứng chỉ bảo mật <strong>HTTPS</strong> mới cho phép bật Camera thật, em đã dựng sẵn đường truyền <strong>Public HTTPS Tunnel</strong> nối thẳng vào máy tính của anh:
+          </p>
+        </div>
+        <button class="btn-reload" onclick="closeQrModal()">Đóng ✕</button>
+      </div>
+
+      <div class="qr-grid">
+        <div class="qr-box">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://t-flow.tech/web/mobile_app.html" alt="QR Code iPhone App">
+          <span style="color:#0d1117; font-size:11px; font-weight:700; margin-top:8px;">QUÉT BẰNG CAMERA IPHONE</span>
+        </div>
+
+        <div class="step-list">
+          <div class="step-item">
+            <strong>Bước 1: Mở Camera iPhone quét mã QR bên cạnh</strong>
+            Không cần chung mạng Wi-Fi (dùng 4G/5G hay Wi-Fi đều được). Nhấn vào thông báo hiện lên để mở trong trình duyệt <strong>Safari</strong>.
+          </div>
+          <div class="step-item">
+            <strong>Bước 2: Đưa App ra Màn hình chính như App Native (PWA)</strong>
+            Trên Safari iPhone, anh bấm nút <strong>Chia sẻ (Share ở thanh dưới cùng)</strong> &rarr; Chọn <strong>"Thêm vào MH chính" (Add to Home Screen)</strong> &rarr; Bấm <strong>Thêm</strong>. App <em>Smart Gimbal</em> sẽ nằm ngay trên màn hình chính iPhone của anh, mở lên full-screen không còn thanh địa chỉ web!
+          </div>
+          <div class="step-item">
+            <strong>Bước 3: Cấp quyền Camera & Test đồng bộ Admin Realtime</strong>
+            Bấm <em>Cho phép (Allow)</em> khi App hỏi quyền Camera. Khi anh gạt tắt/bật <em>Module 1: AI Vision</em> trên màn hình Admin máy tính, App trên tay anh sẽ khóa/mở khung xanh lá ngay tức thì qua Supabase!
+          </div>
+        </div>
+      </div>
+
+      <div class="public-link-pill">
+        <span>Link HTTPS cho iPhone: <strong>https://t-flow.tech/web/mobile_app.html</strong></span>
+        <button class="btn-reload" onclick="navigator.clipboard.writeText('https://t-flow.tech/web/mobile_app.html'); this.textContent='Đã chép!';">Copy Link</button>
+      </div>
+      <div class="public-link-pill" style="margin-top:8px;">
+        <span>Link HTTPS cho Web Cửa Hàng: <strong>https://t-flow.tech/web/index.html</strong></span>
+        <button class="btn-reload" onclick="navigator.clipboard.writeText('https://t-flow.tech/web/index.html'); this.textContent='Đã chép!';">Copy Link</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentCodeLines = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadCodeFile('index.html', document.querySelector('.f-tab'));
+    });
+
+    async function loadCodeFile(relPath, btnEl) {
+      if (btnEl) {
+        document.querySelectorAll('.f-tab').forEach(b => b.classList.remove('active'));
+        btnEl.classList.add('active');
+      }
+      document.getElementById('codeFileInfo').textContent = 'Đang xem: ' + relPath;
+      const container = document.getElementById('codeContainer');
+      container.innerHTML = '<div style="padding:16px; color:#8b949e;">Đang tải mã nguồn...</div>';
+
+      try {
+        const res = await fetch(relPath + '?t=' + Date.now());
+        const text = await res.text();
+        currentCodeLines = text.split(/\r?\n/);
+        renderCodeLines(currentCodeLines, '');
+      } catch (e) {
+        container.innerHTML = '<div style="padding:16px; color:#f85149;">Không thể tải file: ' + e.message + '</div>';
+      }
+    }
+
+    function renderCodeLines(lines, keyword) {
+      const container = document.getElementById('codeContainer');
+      const kw = (keyword || '').toLowerCase();
+      let html = '';
+      let firstMatchIdx = -1;
+
+      for (let i = 0; i < lines.length; i++) {
+        const raw = lines[i];
+        const escaped = raw
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+        const isMatch = kw && raw.toLowerCase().includes(kw);
+        if (isMatch && firstMatchIdx === -1) firstMatchIdx = i;
+
+        html += `<div class="code-line ${isMatch ? 'highlight' : ''}" id="cline_${i}">` +
+                `<span class="ln">${i + 1}</span>` +
+                `<span class="lc">${escaped || ' '}</span>` +
+                `</div>`;
+      }
+      container.innerHTML = html;
+
+      if (firstMatchIdx !== -1) {
+        const el = document.getElementById('cline_' + firstMatchIdx);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function searchInCode(e) {
+      const val = e.target.value.trim();
+      renderCodeLines(currentCodeLines, val);
+    }
+
+    function toggleCodePane() {
+      const pane = document.getElementById('codePane');
+      pane.classList.toggle('collapsed');
+    }
+
+    function setMainIframe(page) {
+      const iframe = document.getElementById('mainPreviewIframe');
+      iframe.src = page;
+      document.getElementById('currentPreviewUrl').textContent = 'https://t-flow.tech/web/' + page;
+      document.getElementById('openNewTabLink').href = page;
+
+      // Also sync code viewer to the selected page
+      const tabs = document.querySelectorAll('.f-tab');
+      tabs.forEach(t => {
+        if (t.textContent.includes(page)) {
+          loadCodeFile(page, t);
+        }
+      });
+    }
+
+    function setStudioMode(mode) {
+      document.querySelectorAll('.v-tab').forEach(b => b.classList.remove('active'));
+      const dock = document.getElementById('phoneDock');
+      const mainIframe = document.getElementById('mainPreviewIframe');
+
+      if (mode === 'split') {
+        document.getElementById('tabSplit').classList.add('active');
+        mainIframe.style.display = 'block';
+        dock.classList.add('visible');
+      } else if (mode === 'store') {
+        document.getElementById('tabStore').classList.add('active');
+        mainIframe.style.display = 'block';
+        dock.classList.remove('visible');
+        setMainIframe('index.html');
+      } else if (mode === 'admin') {
+        document.getElementById('tabAdmin').classList.add('active');
+        mainIframe.style.display = 'block';
+        dock.classList.remove('visible');
+        setMainIframe('admin_dashboard.html');
+      } else if (mode === 'user') {
+        document.getElementById('tabUser').classList.add('active');
+        mainIframe.style.display = 'block';
+        dock.classList.remove('visible');
+        setMainIframe('user_dashboard.html');
+      } else if (mode === 'mobile') {
+        document.getElementById('tabMobile').classList.add('active');
+        mainIframe.style.display = 'block';
+        dock.classList.remove('visible');
+        setMainIframe('mobile_app.html');
+      }
+    }
+
+    function reloadPreviews() {
+      const mainIframe = document.getElementById('mainPreviewIframe');
+      const mobIframe = document.getElementById('mobilePreviewIframe');
+      mainIframe.contentWindow.location.reload();
+      mobIframe.contentWindow.location.reload();
+    }
+
+    function openQrModal() {
+      document.getElementById('qrModal').classList.add('open');
+    }
+
+    function closeQrModal() {
+      document.getElementById('qrModal').classList.remove('open');
+    }
+  </script>
+</body>
+</html>

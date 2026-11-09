@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>T-Flow Pro — Camera AI Live Simulator (iOS App) (iOS App)</title>
+  
+  <!-- Apple Web App Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Smart Gimbal">
+  <meta name="theme-color" content="#000000">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="/shared/img/thumb_01.jpg">
+
+  <!-- Core Tokens & CSS -->
+  <link rel="stylesheet" href="/shared/tokens.css">
+  <link rel="stylesheet" href="/shared/camera.css">
+
+  <!-- Supabase JS Client for Realtime Cloud AI Sync -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/shared/catalog_store.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Container for Desktop Testing & Native iPhone */
+    #phoneContainer {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      max-width: 430px;
+      max-height: 932px;
+      background: #000;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (min-width: 600px) {
+      #phoneContainer {
+        border-radius: 48px;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 12px #1c1c1e, 0 0 0 14px #2c2c2e;
+        height: 852px;
+        width: 393px;
+      }
+    }
+
+    /* Video & Canvas Layers */
+    #cameraVideo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scaleX(1);
+      z-index: 1;
+    }
+
+    #cameraVideo.mirror {
+      transform: scaleX(-1);
+    }
+
+    #aiOverlayCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    /* Rule of Thirds Grid */
+    .viewfinder-grid {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, transparent calc(33.333% - .5px), rgba(255,255,255,.25) calc(33.333% - .5px), rgba(255,255,255,.25) calc(33.333% + .5px), transparent calc(33.333% + .5px), transparent calc(66.666% - .5px), rgba(255,255,255,.25) calc(66.666% - .5px), rgba(255,255,255,.25) calc(66.666% + .5px), transparent calc(66.666% + .5px)),
+        linear-gradient(180deg, transparent calc(33.333% - .5px), rgba(255,255,255,.25) calc(33.333% - .5px), rgba(255,255,255,.25) calc(33.333% + .5px), transparent calc(33.333% + .5px), transparent calc(66.666% - .5px), rgba(255,255,255,.25) calc(66.666% - .5px), rgba(255,255,255,.25) calc(66.666% + .5px), transparent calc(66.666% + .5px));
+      transition: opacity 0.3s;
+    }
+
+    /* Dynamic Island */
+    .dynamic-island {
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 124px;
+      height: 35px;
+      background: #000;
+      border-radius: 20px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+
+    .island-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #34C759;
+      box-shadow: 0 0 8px #34C759;
+    }
+
+    .island-dot.offline {
+      background: #FF3B30;
+      box-shadow: 0 0 8px #FF3B30;
+    }
+
+    /* Top HUD Bar */
+    .top-hud {
+      position: absolute;
+      top: 54px;
+      left: 16px;
+      right: 16px;
+      z-index: 40;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hud-pill {
+      background: rgba(18, 18, 20, 0.45);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border: 0.5px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #fff;
+    }
+
+    .hud-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: rgba(18, 18, 20, 0.45);
+      backdrop-filter: blur(25px);
+      border: 0.5px solid rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .hud-btn.active {
+      background: #E6A700;
+      color: #000;
+      border-color: #E6A700;
+    }
+
+    /* Cloud AI Alert Banner (Internet Required) */
+    .cloud-ai-banner {
+      position: absolute;
+      top: 98px;
+      left: 16px;
+      right: 16px;
+      z-index: 45;
+      background: rgba(255, 59, 48, 0.88);
+      backdrop-filter: blur(20px);
+      border-radius: 14px;
+      padding: 10px 14px;
+      display: none;
+      align-items: center;
+      gap: 10px;
+      font-size: 11.5px;
+      line-height: 1.35;
+      font-weight: 500;
+      box-shadow: 0 8px 24px rgba(255, 59, 48, 0.35);
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Telemetry HUD (Gimbal Motors & AI Tracking Offset) */
+    .telemetry-hud {
+      position: absolute;
+      top: 146px;
+      left: 16px;
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 10.5px;
+      color: rgba(255, 255, 255, 0.85);
+      background: rgba(0, 0, 0, 0.35);
+      padding: 8px 12px;
+      border-radius: 10px;
+      backdrop-filter: blur(10px);
+      border: 0.5px solid rgba(255,255,255,0.1);
+      pointer-events: none;
+    }
+
+    .telemetry-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .telemetry-val {
+      font-weight: 700;
+      color: #34C759;
+    }
+
+    /* Left Wheel: Manual Focus / Zoom */
+    .focus-wheel-container {
+      position: absolute;
+      left: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 35;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .focus-wheel {
+      width: 24px;
+      height: 140px;
+      background: rgba(30, 30, 35, 0.6);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 10px 0;
+      align-items: center;
+      cursor: ns-resize;
+    }
+
+    .wheel-tick {
+      width: 10px;
+      height: 1.5px;
+      background: rgba(255,255,255,0.4);
+    }
+
+    .wheel-tick.major {
+      width: 16px;
+      background: #E6A700;
+    }
+
+    .wheel-thumb {
+      position: absolute;
+      left: 2px;
+      right: 2px;
+      top: 50%;
+      height: 24px;
+      background: #E6A700;
+      border-radius: 6px;
+      transform: translateY(-50%);
+      box-shadow: 0 0 10px rgba(230, 167, 0, 0.6);
+    }
+
+    /* Bottom Control Dashboard */
+    .bottom-dashboard {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 40;
+      background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.6) 20%, rgba(0,0,0,0.92) 100%);
+      padding: 16px 20px 34px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    /* Camera Mode Scroller */
+    .mode-scroller {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      padding: 4px 10px;
+    }
+
+    .mode-scroller::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mode-item {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .mode-item.active {
+      color: #E6A700;
+      transform: scale(1.08);
+    }
+
+    /* Shutter & Tool Bar */
+    .shutter-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 10px;
+    }
+
+    .gallery-preview {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      border: 2px solid #fff;
+      overflow: hidden;
+      background: #222;
+      cursor: pointer;
+    }
+
+    .gallery-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .shutter-btn {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      border: 4px solid #fff;
+      padding: 4px;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s ease;
+    }
+
+    .shutter-btn:active {
+      transform: scale(0.92);
+    }
+
+    .shutter-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #FF3B30;
+      transition: all 0.2s;
+    }
+
+    .shutter-inner.photo {
+      background: #fff;
+    }
+
+    .shutter-inner.recording {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+    }
+
+    .flip-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(15px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #fff;
+      border: 0.5px solid rgba(255,255,255,0.2);
+    }
+
+    /* Gimbal Mode Selector Pills */
+    .gimbal-mode-bar {
+      display: flex;
+      gap: 8px;
+      background: rgba(20, 20, 22, 0.6);
+      backdrop-filter: blur(20px);
+      padding: 4px;
+      border-radius: 20px;
+      border: 0.5px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .gimbal-pill {
+      padding: 5px 12px;
+      border-radius: 16px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .gimbal-pill.active {
+      background: #fff;
+      color: #000;
+    }
+
+    /* Flash Overlay Animation */
+    #shutterFlash {
+      position: absolute;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 100;
+      transition: opacity 0.08s ease-out;
+    }
+
+    /* Desktop Preview Notice */
+    .desktop-notice {
+      position: absolute;
+      bottom: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      font-size: 12px;
+      color: #8E8E93;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  
+    /* IN-APP T-FLOW AI ASSISTANT SHEET */
+    .app-ai-sheet {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 75%;
+      background: rgba(28, 28, 30, 0.95);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      border-top: 1px solid rgba(255, 255, 255, 0.15);
+      z-index: 999;
+      display: none;
+      flex-direction: column;
+      box-shadow: 0 -12px 40px rgba(0,0,0,0.6);
+      animation: slideUpAppAi 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUpAppAi {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .app-ai-sheet-header {
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .app-ai-sheet-grabber {
+      width: 36px;
+      height: 4px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 99px;
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    .app-ai-sheet-body {
+      flex: 1;
+      padding: 14px 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 13px;
+    }
+    .app-ai-bubble {
+      padding: 10px 14px;
+      border-radius: 14px;
+      line-height: 1.5;
+      max-width: 85%;
+    }
+    .app-ai-bubble.bot {
+      background: rgba(44, 44, 46, 0.9);
+      color: #FFF;
+      align-self: flex-start;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .app-ai-bubble.user {
+      background: #0071E3;
+      color: #FFF;
+      align-self: flex-end;
+    }
+    .app-ai-action-btn {
+      display: inline-block;
+      margin-top: 8px;
+      margin-right: 6px;
+      padding: 6px 12px;
+      background: rgba(0,113,227,0.25);
+      border: 1px solid rgba(0,113,227,0.5);
+      color: #5AC8FA;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .app-ai-action-btn:hover {
+      background: #0071E3;
+      color: #FFF;
+    }
+    .app-ai-input-bar {
+      padding: 12px 14px;
+      background: rgba(20,20,22,0.9);
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      gap: 8px;
+    }
+    .app-ai-input {
+      flex: 1;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 99px;
+      padding: 8px 14px;
+      color: #FFF;
+      font-size: 13px;
+      outline: none;
+    }
+    .app-ai-send {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #0071E3;
+      color: #FFF;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+
+    /* Real AI Action Buttons & Parameter HUD Card in App */
+    .app-ai-preset-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin: 8px 0;
+      font-size: 11.5px;
+      color: #E5E5EA;
+    }
+    .app-ai-preset-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .app-ai-preset-row:last-child { border-bottom: none; }
+    .app-ai-preset-label { color: #8E8E93; font-weight: 600; }
+    .app-ai-preset-val { color: #34C759; font-weight: 700; font-family: monospace; }
+    .app-ai-exec-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, #0071E3, #005bb5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      color: #FFF;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(0, 113, 227, 0.4);
+      transition: all 0.2s ease;
+    }
+    .app-ai-exec-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 113, 227, 0.6);
+      background: #0077ED;
+    }
+    .app-camera-toast {
+      position: absolute;
+      top: 110px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(18, 18, 20, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(52, 199, 89, 0.5);
+      border-radius: 20px;
+      padding: 10px 18px;
+      color: #FFF;
+      font-size: 12px;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      z-index: 1000;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      animation: fadeInDown 0.25s ease;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translate(-50%, -10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+  
+    /* AI CLOUD TARGET SELECTOR & LENS CONTROLS */
+    .ai-target-control-bar {
+      position: absolute;
+      top: 68px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 6px 10px;
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .target-mode-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 99px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .target-mode-btn.active.human {
+      background: #34C759;
+      color: #000;
+      border-color: #34C759;
+      box-shadow: 0 0 10px rgba(52, 199, 89, 0.5);
+    }
+    .target-mode-btn.active.pet {
+      background: #AF52DE;
+      color: #FFF;
+      border-color: #AF52DE;
+      box-shadow: 0 0 10px rgba(175, 82, 222, 0.5);
+    }
+    .target-mode-btn.active.object {
+      background: #FF9500;
+      color: #000;
+      border-color: #FF9500;
+      box-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
+    }
+    .lens-ctrl-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .lens-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #FFF;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lens-btn.active {
+      background: #FFF;
+      color: #000;
+      border-color: #FFF;
+    }
+    .lens-btn.auto {
+      background: rgba(0, 113, 227, 0.4);
+      color: #5AC8FA;
+      border-color: #0071E3;
+    }
+    .lens-btn.auto.active {
+      background: #0071E3;
+      color: #FFF;
+      box-shadow: 0 0 8px rgba(0, 113, 227, 0.6);
+    }
+    .crowd-sim-btn {
+      position: absolute;
+      top: 114px;
+      left: 14px;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 99px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .crowd-sim-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .ai-wide-banner {
+      position: absolute;
+      top: 150px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 113, 227, 0.9);
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 99px;
+      z-index: 60;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 16px rgba(0, 113, 227, 0.5);
+      animation: pulseAlert 1.5s infinite;
+      white-space: nowrap;
+    }
+    @keyframes pulseAlert {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.04); }
+    }
+</style>
+</head>
+<body>
+
+  <div id="phoneContainer">
+    <!-- Shutter Flash Effect -->
+    <div id="shutterFlash"></div>
+    <div class="app-camera-toast" id="appCameraToast"><span>⚡</span><span id="appCameraToastText">Thông số đã được cập nhật</span></div>
+
+
+    <!-- Live Camera Video -->
+    <video id="cameraVideo" autoplay playsinline muted></video>
+
+    <!-- Canvas for Real-time AI Tracking & Hand Gesture Reticle -->
+    <canvas id="aiOverlayCanvas"></canvas>
+
+    <!-- Rule of Thirds Grid -->
+    <div class="viewfinder-grid" id="vfGrid"></div>
+
+    <!-- iPhone Dynamic Island -->
+    <div class="dynamic-island">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span class="island-dot" id="islandDot"></span>
+        <span id="islandStatus">ONLINE</span>
+      </div>
+      <div style="color: #34C759; font-size: 10px;" id="islandSpeed">5G 60FPS</div>
+    </div>
+
+    <!-- Top HUD Bar -->
+    <div class="top-hud">
+      <!-- Gimbal Connection Status Pill -->
+      <div class="hud-pill" id="gimbalStatusPill" onclick="toggleGimbalStatus()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="2.5"><path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+        <span id="gimbalName">T-FLOW PRO • 98%</span>
+      </div>
+
+      <!-- Cloud AI Tracking Mode Toggle -->
+      <div class="hud-pill" id="aiModePill" style="cursor: pointer;" onclick="toggleAiTracking()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M3 12h2m14 0h2M12 3v2m0 14v2"/></svg>
+        <span id="aiTrackingText">CLOUD AI: ON</span>
+      </div>
+
+      <!-- T-Flow In-App AI Assistant Pill -->
+      <div class="hud-pill" id="aiChatPill" style="cursor: pointer; background: rgba(0,113,227,0.35); border: 1px solid rgba(0,113,227,0.7);" onclick="toggleAppAiChat(true)">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="#0071E3"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        <span style="color:#FFF; font-weight:700;">T-FLOW AI</span>
+      </div>
+
+      <!-- Quick Switch Format (16:9 / 9:16) -->
+      <div class="hud-btn" onclick="toggleOrientation()" title="Xoay 16:9 Cinema / 9:16 Dọc">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 15l5-5 5 5"/></svg>
+      </div>
+
+      <!-- Settings / Admin Link -->
+      <div class="hud-btn" onclick="window.location.href='/admin'" title="Vào Trang Quản Trị Admin CMS">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+    </div>
+
+    <!-- Mandatory Internet Check Warning Banner -->
+    <div class="cloud-ai-banner" id="cloudAiBanner">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><path d="M1 1l22 22M16.72 11.06A10.94 10.94 0 0 1 19 12.55M5 12.55a10.94 10.94 0 0 1 5.17-2.39M10.71 5.05A16 16 0 0 1 22.58 9M1.42 9a15.91 15.91 0 0 1 4.7-2.88M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/></svg>
+      <div>
+        <strong style="display: block; font-size: 12px; margin-bottom: 2px;">MẤT KẾT NỐI INTERNET</strong>
+        Cloud AI Engine yêu cầu kết nối 4G/5G/Wi-Fi để xử lý bám nét và điều khiển FOC.
+      </div>
+    </div>
+
+    <!-- Admin Permission Disabled Banner -->
+    <div class="cloud-ai-banner" id="moduleLockedBanner" style="background: rgba(230, 167, 0, 0.95); color: #000;">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      <div>
+        <strong style="display: block; font-size: 12px; margin-bottom: 2px;">MÔ-ĐUN AI VISION ĐÃ KHÓA</strong>
+        Quản trị viên đã tạm khóa Mô-đun AI của tài khoản này trên Supabase Cloud.
+      </div>
+    </div>
+
+    <!-- Gimbal Motor & Cloud AI Telemetry HUD -->
+    <div class="telemetry-hud" id="telemetryHud">
+      <div class="telemetry-row"><span>CLOUD AI:</span><span class="telemetry-val" id="telCloudModel">YOLO11x (24ms)</span></div>
+      <div class="telemetry-row"><span>TARGET:</span><span class="telemetry-val" id="telTarget">FACE_01 [LOCK]</span></div>
+      <div class="telemetry-row"><span>YAW OFFSET:</span><span class="telemetry-val" id="telYaw">+4.2°</span></div>
+      <div class="telemetry-row"><span>PITCH OFFSET:</span><span class="telemetry-val" id="telPitch">-1.8°</span></div>
+      <div class="telemetry-row"><span>FOC PWM:</span><span class="telemetry-val" id="telFoc">1.45A @ 20kHz</span></div>
+    </div>
+
+    <!-- Virtual Focus Wheel -->
+    <div class="focus-wheel-container">
+      <div class="focus-wheel" id="focusWheel">
+        <div class="wheel-thumb" id="wheelThumb"></div>
+        <div class="wheel-tick major"></div>
+        <div class="wheel-tick"></div>
+        <div class="wheel-tick"></div>
+        <div class="wheel-tick major"></div>
+        <div class="wheel-tick"></div>
+        <div class="wheel-tick"></div>
+        <div class="wheel-tick major"></div>
+      </div>
+      <span style="writing-mode: vertical-rl; font-size: 9px; letter-spacing: 1px; color: rgba(255,255,255,0.4);">FOCUS</span>
+    </div>
+
+    <!-- Bottom Control Dashboard -->
+    <div class="bottom-dashboard">
+      <!-- Gimbal Mode Selector -->
+      <div class="gimbal-mode-bar">
+        <div class="gimbal-pill active" onclick="setGimbalMode(this, 'PAN FOLLOW')">PF (Pan Follow)</div>
+        <div class="gimbal-pill" onclick="setGimbalMode(this, 'FPV 3-AXIS')">FPV 3-Trục</div>
+        <div class="gimbal-pill" onclick="setGimbalMode(this, 'LOCK AXIS')">LOCK Khóa</div>
+        <div class="gimbal-pill" onclick="setGimbalMode(this, 'INCEPTION')">360° Inception</div>
+      </div>
+
+      <!-- Camera Mode Scroller -->
+      <div class="mode-scroller">
+        <div class="mode-item" onclick="setCamMode(this, 'TIMELAPSE')">TIMELAPSE</div>
+        <div class="mode-item" onclick="setCamMode(this, 'SLOW-MO')">SLOW-MO</div>
+        <div class="mode-item active" onclick="setCamMode(this, 'CINEMATIC VIDEO')">VIDEO 4K/60</div>
+        <div class="mode-item" onclick="setCamMode(this, 'PHOTO')">PHOTO</div>
+        <div class="mode-item" onclick="setCamMode(this, 'PORTRAIT')">CHÂN DUNG</div>
+        <div class="mode-item" onclick="setCamMode(this, 'PRO DIRECTOR')">PRO CINEMA</div>
+      </div>
+
+      <!-- Shutter & Controls Bar -->
+      <div class="shutter-bar">
+        <!-- Gallery Preview -->
+        <div class="gallery-preview" onclick="alert('Mở Thư Viện Media: Đã lưu 14 clip 4K ProRes')">
+          <img src="/shared/img/feed_portrait_dusk.jpg" alt="Preview">
+        </div>
+
+        <!-- Shutter Button -->
+        <button class="shutter-btn" id="shutterBtn" onclick="triggerShutter()">
+          <div class="shutter-inner" id="shutterInner"></div>
+        </button>
+
+        <!-- Flip Camera Button -->
+        <div class="flip-btn" onclick="flipCamera()" title="Đổi Camera Trước / Sau">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 10c0-4.42-3.58-8-8-8s-8 3.58-8 8c0 3.31 2.01 6.16 4.9 7.37L5 21h7v-7l-2.45 2.45A5.99 5.99 0 0 1 6 10c0-3.31 2.69-6 6-6s6 2.69 6 6c0 1.66-.67 3.16-1.76 4.24l1.42 1.42A7.96 7.96 0 0 0 20 10z"/></svg>
+        </div>
+      </div>
+    </div>
+  
+    <!-- T-FLOW IN-APP AI SHOOTING ASSISTANT SHEET -->
+    <div class="app-ai-sheet" id="appAiSheet">
+      <div class="app-ai-sheet-grabber"></div>
+      <div class="app-ai-sheet-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:24px; height:24px; border-radius:6px; background:#0071E3; display:flex; align-items:center; justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFF"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          </div>
+          <div>
+            <div style="font-size:13.5px; font-weight:800; color:#FFF;">T-Flow AI Camera Copilot</div>
+            <div style="font-size:10px; color:#8E8E93;">Trợ lý đạo diễn &amp; cân bằng trục thời gian thực</div>
+          </div>
+        </div>
+        <button style="background:none; border:none; color:#8E8E93; font-size:18px; cursor:pointer;" onclick="toggleAppAiChat(false)">&times;</button>
+      </div>
+
+      <div class="app-ai-sheet-body" id="appAiMessagesBody">
+        <div class="app-ai-bubble bot">
+          👋 Chào bạn! Tôi là <strong>T-Flow AI Camera Copilot</strong> (Google Cloud AI). Tôi hỗ trợ phân tích bối cảnh, tư vấn góc máy điện ảnh, gợi ý thông số camera và tự động thao tác cài đặt máy giúp bạn:
+          <br>
+          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">
+            <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Kỹ thuật quay cảnh hoàng hôn trên biển ngược sáng')">🌅 Hoàng Hôn Biển Vàng</button>
+            <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Quay thể thao xe chạy tốc độ cao hành động nhanh')">🏎️ Thể Thao Tốc Độ Cao</button>
+            <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Quay chân dung phỏng vấn xóa phông tự nhiên tôn da')">✨ Chân Dung Xóa Phông</button>
+            <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Gợi ý cách quay Cinematic Inception 360°')">🎬 Inception 360°</button>
+            <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Kiểm tra cân bằng tải và động cơ FOC 20kHz')">⚡ Cân Bằng FOC</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="app-ai-input-bar">
+        <input type="text" class="app-ai-input" id="appAiInputField" placeholder="Hỏi AI cách quay, góc lia gimbal..." onkeydown="if(event.key==='Enter') submitAppAiMessage()">
+        <button class="app-ai-send" onclick="submitAppAiMessage()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // 1. SUPABASE CLIENT & REALTIME LISTENER
+    const SUPABASE_URL = "https://dlgkrwodxdsbbliwdnkg.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZ2tyd29keGRzYmJsaXdkbmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxMjIwNjQsImV4cCI6MjEwOTY5ODA2NH0.Lg6C6MpLhX_CoKgWtl_nhWLGNw5NuYE9FZJoTxXnu6I";
+
+    let supabaseClient = null;
+    let currentUser = null;
+    let isAiVisionEnabledByAdmin = true;
+    let isAiActive = true;
+    let isOnline = navigator.onLine;
+
+    // 2. CAMERA STATE
+    let currentFacingMode = 'environment'; // 'user' or 'environment'
+    let isRecording = false;
+    let mediaStream = null;
+
+    // 3. AI TRACKING SIMULATOR (BOUNDING BOX & GESTURE)
+    let canvas, ctx;
+    let targetX = 0.5, targetY = 0.45;
+    let boxWidth = 0.32, boxHeight = 0.42;
+    let targetAngleYaw = 0, targetAnglePitch = 0;
+    let gestureDetected = "✋ BÀN TAY (KHÓA MỤC TIÊU)";
+    let animFrameId = null;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      initCanvas();
+      initNetworkMonitoring();
+      await initSupabaseRealtime();
+      await startCamera();
+      startAiTrackingLoop();
+    });
+
+    // 1. NETWORK MONITORING (BẮT BUỘC CÓ MẠNG ĐỂ CHẠY CLOUD AI)
+    function initNetworkMonitoring() {
+      const updateNetState = () => {
+        isOnline = navigator.onLine;
+        const banner = document.getElementById('cloudAiBanner');
+        const dot = document.getElementById('islandDot');
+        const status = document.getElementById('islandStatus');
+        const speed = document.getElementById('islandSpeed');
+
+        if (!isOnline) {
+          banner.style.display = 'flex';
+          dot.className = 'island-dot offline';
+          status.textContent = 'OFFLINE';
+          speed.textContent = 'NO CLOUD';
+          document.getElementById('telCloudModel').textContent = 'DISCONNECTED';
+          document.getElementById('telCloudModel').style.color = '#FF3B30';
+        } else {
+          banner.style.display = 'none';
+          dot.className = 'island-dot';
+          status.textContent = 'ONLINE';
+          speed.textContent = '5G 60FPS';
+          document.getElementById('telCloudModel').textContent = 'YOLO11x (24ms)';
+          document.getElementById('telCloudModel').style.color = '#34C759';
+        }
+      };
+
+      window.addEventListener('online', updateNetState);
+      window.addEventListener('offline', updateNetState);
+      updateNetState();
+    }
+
+    // 2. SUPABASE REALTIME INITIALIZATION
+    async function initSupabaseRealtime() {
+      if (typeof window.supabase !== 'undefined') {
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Fetch User 'usr-dung' as demo active user
+        try {
+          const { data, error } = await supabaseClient
+            .from('users')
+            .select('*')
+            .eq('id', 'usr-dung')
+            .single();
+
+          if (data) {
+            currentUser = data;
+            applyUserModules(data.modules);
+          }
+        } catch (e) {
+          console.warn('[Supabase] Failed to fetch user, falling back to local store:', e);
+        }
+
+        // Subscribe to real-time changes in users table
+        try {
+          supabaseClient
+            .channel('users-changes')
+            .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users' }, payload => {
+              if (payload.new && payload.new.id === 'usr-dung') {
+                console.log('[Supabase Realtime] User modules updated:', payload.new.modules);
+                applyUserModules(payload.new.modules);
+              }
+            })
+            .subscribe();
+        } catch (e) {
+          console.warn('[Supabase Realtime] Subscription error:', e);
+        }
+      }
+
+      // Also listen to local catalog sync event
+      window.addEventListener('smartgimbal:user_updated', (e) => {
+        if (e.detail && e.detail.modules) {
+          applyUserModules(e.detail.modules);
+        }
+      });
+    }
+
+    function applyUserModules(modules) {
+      if (!modules || !Array.isArray(modules)) return;
+      // Module 0: AI Vision Optical Tracking
+      isAiVisionEnabledByAdmin = Boolean(modules[0]);
+      const lockBanner = document.getElementById('moduleLockedBanner');
+      const aiPill = document.getElementById('aiModePill');
+
+      if (!isAiVisionEnabledByAdmin) {
+        lockBanner.style.display = 'flex';
+        aiPill.style.opacity = '0.5';
+        aiPill.style.pointerEvents = 'none';
+        document.getElementById('aiTrackingText').textContent = 'AI: KHÓA BỞI ADMIN';
+      } else {
+        lockBanner.style.display = 'none';
+        aiPill.style.opacity = '1';
+        aiPill.style.pointerEvents = 'auto';
+        document.getElementById('aiTrackingText').textContent = isAiActive ? 'CLOUD AI: ON' : 'CLOUD AI: OFF';
+      }
+    }
+
+    // 3. CAMERA SETUP
+    async function startCamera() {
+      const video = document.getElementById('cameraVideo');
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+      }
+
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: currentFacingMode,
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          },
+          audio: false
+        });
+        video.srcObject = mediaStream;
+        video.className = (currentFacingMode === 'user') ? 'mirror' : '';
+      } catch (err) {
+        console.warn('Real camera not accessible, running realistic synthetic simulation:', err);
+        // Fallback: draw video or realistic moving gradient
+      }
+    }
+
+    function flipCamera() {
+      currentFacingMode = (currentFacingMode === 'environment') ? 'user' : 'environment';
+      startCamera();
+    }
+
+    // 4. CANVAS & REAL-TIME AI TRACKING ENGINE (60 FPS)
+        // =========================================================================
+    // 7. MULTI-TARGET AI CLOUD FOCUS & AUTO ULTRA-WIDE LENS ENGINE
+    // =========================================================================
+    let currentAiTargetMode = 'human'; // 'human' | 'pet' | 'object'
+    let crowdSimulationCount = 1;      // 1 or 3
+    let currentCameraLens = '1x';       // '0.5x' | '1x'
+    let isAutoWideEnabled = true;
+    let customObjectCoords = null;      // { x, y }
+
+    function setAiTargetMode(mode) {
+      currentAiTargetMode = mode;
+      document.querySelectorAll('.target-mode-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(mode === 'human' ? 'btnTargetHuman' : (mode === 'pet' ? 'btnTargetPet' : 'btnTargetObject'));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const telTarget = document.getElementById('telTarget');
+      if (mode === 'human') {
+        if (telTarget) telTarget.textContent = crowdSimulationCount > 1 ? 'GROUP (3 NGƯỜI)' : 'HUMAN_HOST [LOCK]';
+        showAppCameraToast('👤 Đã chuyển sang: Bám nét Người & Khuôn mặt 120fps');
+      } else if (mode === 'pet') {
+        if (telTarget) telTarget.textContent = 'PET_DOG_01 [AGILE]';
+        showAppCameraToast('🐾 Đã chuyển sang: Bám nét Thú Cưng (FOC Gia Tốc 1.8x)');
+      } else if (mode === 'object') {
+        if (telTarget) telTarget.textContent = 'CUSTOM OBJECT [TAP TO LOCK]';
+        showAppCameraToast('🎯 Chạm vào bất kỳ đồ vật trên màn hình để Khóa Nét!');
+      }
+    }
+
+    function setCameraLens(lens, isAutoTriggered) {
+      currentCameraLens = lens;
+      document.querySelectorAll('.lens-btn:not(.auto)').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(lens === '0.5x' ? 'btnLens05' : 'btnLens1x');
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const img = document.querySelector('#phoneContainer img');
+      const banner = document.getElementById('aiWideBanner');
+      if (lens === '0.5x') {
+        if (img) img.style.transform = 'scale(0.85)';
+        if (img) img.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+        if (isAutoTriggered && banner) {
+          banner.style.display = 'flex';
+        }
+      } else {
+        if (img) img.style.transform = 'scale(1)';
+        if (banner) banner.style.display = 'none';
+      }
+    }
+
+    function toggleAutoWideMode() {
+      isAutoWideEnabled = !isAutoWideEnabled;
+      const btn = document.getElementById('btnLensAuto');
+      if (btn) btn.classList.toggle('active', isAutoWideEnabled);
+      showAppCameraToast(isAutoWideEnabled ? '⚡ Đã BẬT: Tự động chuyển cam góc rộng 0.5x khi đông người' : 'Đã TẮT tính năng tự động chuyển góc rộng');
+      if (isAutoWideEnabled && crowdSimulationCount > 1) {
+        setCameraLens('0.5x', true);
+      }
+    }
+
+    function toggleCrowdSimulation() {
+      crowdSimulationCount = crowdSimulationCount === 1 ? 3 : 1;
+      const textEl = document.getElementById('crowdSimText');
+      const iconEl = document.getElementById('crowdSimIcon');
+      const banner = document.getElementById('aiWideBanner');
+
+      if (crowdSimulationCount > 1) {
+        if (textEl) textEl.textContent = 'Về: 1 Người (Về 1x)';
+        if (iconEl) iconEl.textContent = '👤';
+        if (isAutoWideEnabled) {
+          setCameraLens('0.5x', true);
+          showAppCameraToast('⚡ AI Cloud: Phát hiện 3 người → Tự động bật Cam Góc Rộng 0.5x!');
+        }
+      } else {
+        if (textEl) textEl.textContent = 'Thử: 3 Người (Auto 0.5x)';
+        if (iconEl) iconEl.textContent = '👥';
+        if (isAutoWideEnabled) {
+          setCameraLens('1x', false);
+          showAppCameraToast('👤 Chỉ còn 1 người → AI tự động trở về Camera Chính 1x');
+        }
+      }
+    }
+
+    function handleViewfinderTap(e) {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : rect.width / 2);
+      const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : rect.height / 2);
+
+      const x = (clientX - rect.left) / rect.width;
+      const y = (clientY - rect.top) / rect.height;
+
+      customObjectCoords = { x: Math.max(0.1, Math.min(0.9, x)), y: Math.max(0.1, Math.min(0.9, y)) };
+      setAiTargetMode('object');
+      showAppCameraToast(`🎯 Đã khóa laser vật thể tại tọa độ (${(customObjectCoords.x*100).toFixed(0)}%, ${(customObjectCoords.y*100).toFixed(0)}%)!`);
+    }
+
+function initCanvas() {
+      canvas = document.getElementById('aiOverlayCanvas');
+      ctx = canvas.getContext('2d');
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+    }
+
+    function resizeCanvas() {
+      const rect = document.getElementById('phoneContainer').getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+        function startAiTrackingLoop() {
+      let t = 0;
+
+      // Attach tap to focus on canvas
+      canvas.addEventListener('click', handleViewfinderTap);
+      canvas.addEventListener('touchstart', (e) => {
+        handleViewfinderTap(e);
+      }, { passive: true });
+
+      function render() {
+        t += 0.03;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Only draw AI Reticle if Online AND Enabled by Admin AND User turned ON
+        if (isOnline && isAiVisionEnabledByAdmin && isAiActive) {
+          
+          // ===================================================================
+          // CASE 1: HUMAN TARGET MODE
+          // ===================================================================
+          if (currentAiTargetMode === 'human') {
+            if (crowdSimulationCount === 1) {
+              // Single host tracking
+              targetX = 0.5 + Math.sin(t * 0.8) * 0.14;
+              targetY = 0.42 + Math.cos(t * 0.6) * 0.08;
+              drawReticle(targetX, targetY, boxWidth, boxHeight, '#34C759', 'HUMAN_HOST • CLOUD FOCUS (99%)', '✋ CỬ CHỈ: ĐANG BÁM');
+              
+              targetAngleYaw = ((targetX - 0.5) * 60).toFixed(1);
+              targetAnglePitch = ((0.5 - targetY) * 45).toFixed(1);
+              document.getElementById('telYaw').textContent = (targetAngleYaw > 0 ? '+' : '') + targetAngleYaw + '°';
+              document.getElementById('telPitch').textContent = (targetAnglePitch > 0 ? '+' : '') + targetAnglePitch + '°';
+            } else {
+              // GROUP CROWD (3 PEOPLE) -> AUTO-WIDE ENGAGED
+              const p1X = 0.26 + Math.sin(t * 0.5) * 0.04;
+              const p1Y = 0.44 + Math.cos(t * 0.4) * 0.03;
+              const p2X = 0.50 + Math.sin(t * 0.7) * 0.05;
+              const p2Y = 0.40 + Math.cos(t * 0.5) * 0.04;
+              const p3X = 0.74 + Math.sin(t * 0.6) * 0.04;
+              const p3Y = 0.45 + Math.cos(t * 0.5) * 0.03;
+
+              drawReticle(p1X, p1Y, boxWidth * 0.75, boxHeight * 0.75, '#5AC8FA', 'HUMAN_01 • GROUP', null);
+              drawReticle(p2X, p2Y, boxWidth * 0.85, boxHeight * 0.85, '#34C759', 'HUMAN_02 • CHỦ THỂ', null);
+              drawReticle(p3X, p3Y, boxWidth * 0.75, boxHeight * 0.75, '#5AC8FA', 'HUMAN_03 • GROUP', null);
+
+              // Outer Group Centroid Enclosure (Dashed Gold Box)
+              ctx.strokeStyle = 'rgba(255, 214, 10, 0.85)';
+              ctx.lineWidth = 1.8;
+              ctx.setLineDash([6, 6]);
+              const gx = (p1X - 0.12) * canvas.width;
+              const gy = (p2Y - 0.16) * canvas.height;
+              const gw = (p3X - p1X + 0.24) * canvas.width;
+              const gh = 0.42 * canvas.height;
+              ctx.strokeRect(gx, gy, gw, gh);
+              ctx.setLineDash([]);
+
+              ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+              ctx.beginPath();
+              ctx.roundRect(gx, gy - 24, 210, 20, 6);
+              ctx.fill();
+              ctx.fillStyle = '#FFD60A';
+              ctx.font = 'bold 10px -apple-system, sans-serif';
+              ctx.fillText('⚡ 0.5x AUTO-WIDE • GROUP AUTO-FRAMING', gx + 8, gy - 10);
+
+              // Centroid Pan/Tilt
+              const centroidX = (p1X + p2X + p3X) / 3;
+              const centroidY = (p1Y + p2Y + p3Y) / 3;
+              targetAngleYaw = ((centroidX - 0.5) * 50).toFixed(1);
+              targetAnglePitch = ((0.5 - centroidY) * 35).toFixed(1);
+              document.getElementById('telYaw').textContent = (targetAngleYaw > 0 ? '+' : '') + targetAngleYaw + '°';
+              document.getElementById('telPitch').textContent = (targetAnglePitch > 0 ? '+' : '') + targetAnglePitch + '°';
+            }
+          }
+          // ===================================================================
+          // CASE 2: PET TARGET MODE (AGILE RAPID MOTION)
+          // ===================================================================
+          else if (currentAiTargetMode === 'pet') {
+            targetX = 0.5 + Math.sin(t * 1.5) * 0.24;
+            targetY = 0.58 + Math.abs(Math.sin(t * 2.0)) * -0.18;
+            drawReticle(targetX, targetY, boxWidth * 0.8, boxHeight * 0.65, '#AF52DE', '🐾 PET_DOG_01 • AGILE TRACK (98%)', '⚡ FOC GIA TỐC: 1.8X BOOST');
+
+            targetAngleYaw = ((targetX - 0.5) * 75).toFixed(1);
+            targetAnglePitch = ((0.5 - targetY) * 55).toFixed(1);
+            document.getElementById('telYaw').textContent = (targetAngleYaw > 0 ? '+' : '') + targetAngleYaw + '°';
+            document.getElementById('telPitch').textContent = (targetAnglePitch > 0 ? '+' : '') + targetAnglePitch + '°';
+            document.getElementById('telFoc').textContent = '2.15A @ 20kHz (PET BOOST)';
+          }
+          // ===================================================================
+          // CASE 3: CUSTOM OBJECT TARGET MODE (TAP-TO-TRACK LASER LOCK)
+          // ===================================================================
+          else if (currentAiTargetMode === 'object') {
+            const ox = customObjectCoords ? customObjectCoords.x : (0.5 + Math.sin(t * 0.4) * 0.08);
+            const oy = customObjectCoords ? customObjectCoords.y : (0.5 + Math.cos(t * 0.4) * 0.06);
+
+            drawReticle(ox, oy, boxWidth * 0.7, boxHeight * 0.7, '#FF9500', '🎯 OBJECT_CUSTOM • LASER LOCK (99%)', '📌 CHẠM MÀN HÌNH ĐỂ ĐỔI VẬT THỂ');
+
+            // Draw laser reticle circles
+            const ocx = ox * canvas.width;
+            const ocy = oy * canvas.height;
+            ctx.beginPath();
+            ctx.arc(ocx, ocy, 18 + Math.sin(t * 4) * 3, 0, Math.PI * 2);
+            ctx.strokeStyle = '#FF9500';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            targetAngleYaw = ((ox - 0.5) * 60).toFixed(1);
+            targetAnglePitch = ((0.5 - oy) * 45).toFixed(1);
+            document.getElementById('telYaw').textContent = (targetAngleYaw > 0 ? '+' : '') + targetAngleYaw + '°';
+            document.getElementById('telPitch').textContent = (targetAnglePitch > 0 ? '+' : '') + targetAnglePitch + '°';
+          }
+        }
+
+        animFrameId = requestAnimationFrame(render);
+      }
+
+      function drawReticle(normX, normY, normW, normH, color, labelText, hintText) {
+        const cx = normX * canvas.width;
+        const cy = normY * canvas.height;
+        const bw = normW * canvas.width;
+        const bh = normH * canvas.height;
+        const bx = cx - bw / 2;
+        const by = cy - bh / 2;
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 8;
+
+        const cornerLen = 18;
+        ctx.beginPath();
+        // Top Left
+        ctx.moveTo(bx, by + cornerLen); ctx.lineTo(bx, by); ctx.lineTo(bx + cornerLen, by);
+        // Top Right
+        ctx.moveTo(bx + bw - cornerLen, by); ctx.lineTo(bx + bw, by); ctx.lineTo(bx + bw, by + cornerLen);
+        // Bottom Left
+        ctx.moveTo(bx, by + bh - cornerLen); ctx.lineTo(bx, by + bh); ctx.lineTo(bx + cornerLen, by + bh);
+        // Bottom Right
+        ctx.moveTo(bx + bw - cornerLen, by + bh); ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw, by + bh - cornerLen);
+        ctx.stroke();
+
+        // Center crosshair dot
+        ctx.beginPath();
+        ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        // Label Badge
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+        ctx.beginPath();
+        ctx.roundRect(bx, by - 24, 185, 20, 6);
+        ctx.fill();
+
+        ctx.fillStyle = color;
+        ctx.font = 'bold 10px -apple-system, sans-serif';
+        ctx.fillText(labelText, bx + 8, by - 10);
+
+        // Optional Hint
+        if (hintText) {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          ctx.beginPath();
+          ctx.roundRect(bx, by + bh + 6, 175, 18, 5);
+          ctx.fill();
+
+          ctx.fillStyle = '#FFF';
+          ctx.font = 'bold 9px -apple-system, sans-serif';
+          ctx.fillText(hintText, bx + 8, by + bh + 18);
+        }
+      }
+
+      render();
+    }
+
+    // 5. USER CONTROLS
+    function toggleAiTracking() {
+      if (!isAiVisionEnabledByAdmin) return;
+      isAiActive = !isAiActive;
+      const text = document.getElementById('aiTrackingText');
+      text.textContent = isAiActive ? 'CLOUD AI: ON' : 'CLOUD AI: OFF';
+    }
+
+    function toggleOrientation() {
+      const container = document.getElementById('phoneContainer');
+      if (container.style.maxWidth === '852px') {
+        container.style.maxWidth = '430px';
+        container.style.height = '852px';
+        container.style.width = '393px';
+      } else {
+        container.style.maxWidth = '852px';
+        container.style.width = '852px';
+        container.style.height = '393px';
+      }
+      setTimeout(resizeCanvas, 50);
+    }
+
+    function triggerShutter() {
+      // White Flash
+      const flash = document.getElementById('shutterFlash');
+      flash.style.opacity = '0.9';
+      setTimeout(() => flash.style.opacity = '0', 80);
+
+      const inner = document.getElementById('shutterInner');
+      if (inner.classList.contains('recording')) {
+        inner.classList.remove('recording');
+        isRecording = false;
+        document.getElementById('islandStatus').textContent = 'SAVED';
+      } else {
+        inner.classList.add('recording');
+        isRecording = true;
+        document.getElementById('islandStatus').textContent = 'REC 4K';
+      }
+    }
+
+    function setCamMode(el, modeName) {
+      document.querySelectorAll('.mode-item').forEach(m => m.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function setGimbalMode(el, modeName) {
+      document.querySelectorAll('.gimbal-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('gimbalName').textContent = `S1 PRO • ${modeName}`;
+    }
+
+    function toggleGimbalStatus() {
+      alert("Thông số Gimbal T-Flow Pro:\n• Trục Pan: 360° vô cực\n• Trục Tilt: 270°\n• Trục Roll: 180°\n• Tần số FOC: 20kHz Pure FOC\n• Lực hút MagSafe: 45N (32 nam châm N52)\n• Nhiệt độ động cơ: 32.4°C\n• Firmware: v2.4.1 (Mới nhất)\n• Trợ lý AI: T-Flow Camera Copilot Active");
+    }
+
+    // =========================================================================
+    // 6. T-FLOW APP AI CREATIVE DIRECTOR & CAMERA COPILOT SCRIPT
+    // =========================================================================
+    let appAiHistory = [
+      {
+        sender: 'bot',
+        text: '👋 Chào anh! Em là **T-Flow AI Creative Director & Camera Copilot**.\n\nEm sẵn sàng hỗ trợ anh về kỹ thuật quay cinematic, căn chỉnh khung hình, phối màu Apple Log 3D LUT và **đặc biệt là tự động thiết lập các thông số camera & gimbal** tối ưu cho từng bối cảnh. Anh muốn em gợi ý bối cảnh nào ạ?',
+        actions: [
+          'Quay hoàng hôn bãi biển',
+          'Thể thao hành động tốc độ',
+          'Chân dung xóa phông điện ảnh',
+          'Hiệu ứng xoay Inception 360°'
+        ]
+      }
+    ];
+
+    function toggleAppAiChat(open) {
+      const sheet = document.getElementById('appAiSheet');
+      if (!sheet) return;
+      if (open) {
+        sheet.style.display = 'flex';
+        renderAppAiMessages();
+        setTimeout(() => {
+          const inp = document.getElementById('appAiInputField');
+          if (inp) inp.focus();
+        }, 150);
+      } else {
+        sheet.style.display = 'none';
+      }
+    }
+
+    function renderAppAiMessages() {
+      const container = document.getElementById('appAiMessagesBody');
+      if (!container) return;
+
+      let html = '';
+      appAiHistory.forEach((msg, idx) => {
+        const isBot = msg.sender === 'bot';
+        let formattedText = (msg.text || '')
+          .replace(/\n/g, '<br>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        let presetHtml = '';
+        if (msg.cameraPreset) {
+          const p = msg.cameraPreset;
+          presetHtml = `
+            <div class="app-ai-preset-card">
+              <div style="font-weight:800; color:#5AC8FA; margin-bottom:6px; font-size:12px;">⚙️ BỘ THÔNG SỐ ĐỀ XUẤT TỐI ƯU</div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Chế độ Camera:</span><span class="app-ai-preset-val">${p.mode}</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Độ phân giải & FPS:</span><span class="app-ai-preset-val">${p.resolution} @ ${p.fps}fps</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Màn trập (Shutter):</span><span class="app-ai-preset-val">${p.shutter}</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Độ nhạy sáng (ISO):</span><span class="app-ai-preset-val">ISO ${p.iso}</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Bù sáng (EV):</span><span class="app-ai-preset-val">${p.ev} EV</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">3D LUT Màu:</span><span class="app-ai-preset-val">${p.lut}</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Chế độ Gimbal:</span><span class="app-ai-preset-val">${p.gimbalMode}</span></div>
+            </div>
+          `;
+        }
+
+        let actionsHtml = '';
+        if (msg.actions && msg.actions.length > 0) {
+          actionsHtml = '<div style="margin-top:8px;">';
+          msg.actions.forEach(actText => {
+            actionsHtml += `<button class="app-ai-action-btn" onclick="sendAppAiPrompt('${actText}')">${actText}</button>`;
+          });
+          actionsHtml += '</div>';
+        }
+
+        let execBtnHtml = '';
+        if (msg.cameraPreset && !msg.executed) {
+          const presetStr = encodeURIComponent(JSON.stringify(msg.cameraPreset));
+          execBtnHtml = `
+            <button class="app-ai-exec-btn" onclick="executeAppAiPreset('${presetStr}', ${idx})">
+              <span>⚡</span> Có, Hãy Tự Động Thao Tác Giúp Anh
+            </button>
+          `;
+        } else if (msg.executed) {
+          execBtnHtml = `
+            <div style="margin-top:8px; padding:6px 12px; background:rgba(52,199,89,0.15); border:1px solid rgba(52,199,89,0.4); border-radius:8px; color:#34C759; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; gap:6px;">
+              ✓ Đã tự động áp dụng thông số thành công
+            </div>
+          `;
+        }
+
+        let escalationHtml = '';
+        if (msg.escalated) {
+          escalationHtml = `
+            <div style="margin-top:8px; padding:6px 10px; background:rgba(230,167,0,0.15); border:1px solid rgba(230,167,0,0.4); border-radius:8px; color:#F59E0B; font-weight:700; font-size:11.5px;">
+              ⚠️ Đã chuyển tiếp Master Admin Thủy Nguyễn duyệt
+            </div>
+          `;
+        }
+
+        html += `
+          <div class="app-ai-bubble ${isBot ? 'bot' : 'user'}">
+            ${formattedText}
+            ${presetHtml}
+            ${execBtnHtml}
+            ${escalationHtml}
+            ${actionsHtml}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function sendAppAiPrompt(text) {
+      processAppAiMessage(text);
+    }
+
+    function submitAppAiMessage() {
+      const input = document.getElementById('appAiInputField');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      processAppAiMessage(text);
+    }
+
+    async function processAppAiMessage(userText) {
+      appAiHistory.push({
+        sender: 'user',
+        text: userText
+      });
+      renderAppAiMessages();
+
+      const container = document.getElementById('appAiMessagesBody');
+      const typingEl = document.createElement('div');
+      typingEl.className = 'app-ai-bubble bot';
+      typingEl.id = 'appAiTyping';
+      typingEl.innerHTML = '<span style="color:#5AC8FA; font-weight:700;">⚡ Cloud AI đang phân tích bối cảnh & tối ưu thông số...</span>';
+      container.appendChild(typingEl);
+      container.scrollTop = container.scrollHeight;
+
+      try {
+        let aiRes = null;
+        if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.queryUnifiedCloudAi) {
+          aiRes = await SmartGimbalCatalog.queryUnifiedCloudAi({
+            prompt: userText,
+            mode: 'app',
+            context: {
+              currentMode: document.querySelector('.mode-item.active') ? document.querySelector('.mode-item.active').textContent.trim() : 'VIDEO',
+              currentGimbal: document.querySelector('.gimbal-pill.active') ? document.querySelector('.gimbal-pill.active').textContent.trim() : 'PF'
+            }
+          });
+        } else if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.processAppAiQuery) {
+          aiRes = await SmartGimbalCatalog.processAppAiQuery(userText);
+        } else {
+          aiRes = {
+            answer: 'Dạ em đã nhận được yêu cầu của anh. Em đề xuất dùng chế độ PRO CINEMA 4K 60fps để có chất lượng cao nhất.',
+            status: 'answered',
+            escalated: false,
+            cameraPreset: null
+          };
+        }
+
+        const el = document.getElementById('appAiTyping');
+        if (el) el.remove();
+
+        appAiHistory.push({
+          sender: 'bot',
+          text: aiRes.answer,
+          cameraPreset: aiRes.cameraPreset,
+          suggestAction: aiRes.suggestAction,
+          promptQuestion: aiRes.promptQuestion,
+          escalated: aiRes.escalated,
+          executed: false
+        });
+
+        renderAppAiMessages();
+      } catch (err) {
+        const el = document.getElementById('appAiTyping');
+        if (el) el.remove();
+        appAiHistory.push({
+          sender: 'bot',
+          text: 'Dạ kết nối mạng tạm thời gián đoạn. Anh có thể chọn preset mẫu bên dưới ạ!',
+          escalated: false,
+          executed: false
+        });
+        renderAppAiMessages();
+      }
+    }
+
+    // MANDATORY REAL ACTION EXECUTION:
+    // When user confirms "[⚡ Có, Hãy Tự Động Thao Tác Giúp Anh]", AI modifies phone controls directly!
+    function executeAppAiPreset(presetStr, msgIndex) {
+      try {
+        const preset = JSON.parse(decodeURIComponent(presetStr));
+
+        // 1. Mark as executed in chat history
+        if (typeof msgIndex === 'number' && appAiHistory[msgIndex]) {
+          appAiHistory[msgIndex].executed = true;
+          renderAppAiMessages();
+        }
+
+        // 2. ACTUALLY UPDATE CAMERA MODE
+        if (preset.mode) {
+          const modeItems = document.querySelectorAll('.mode-item');
+          modeItems.forEach(item => {
+            const txt = item.textContent.trim().toUpperCase();
+            if (txt.includes(preset.mode.toUpperCase()) || preset.mode.toUpperCase().includes(txt)) {
+              setCamMode(item, item.textContent);
+            }
+          });
+        }
+
+        // 3. ACTUALLY UPDATE GIMBAL MODE
+        if (preset.gimbalMode) {
+          const gimbalPills = document.querySelectorAll('.gimbal-pill');
+          gimbalPills.forEach(pill => {
+            const txt = pill.textContent.trim().toUpperCase();
+            if (preset.gimbalMode.toUpperCase().includes(txt) || txt.includes(preset.gimbalMode.toUpperCase().slice(0, 3))) {
+              setGimbalMode(pill, pill.textContent);
+            }
+          });
+        }
+
+        // 4. UPDATE DYNAMIC ISLAND
+        const islandDot = document.getElementById('islandDot');
+        if (islandDot) {
+          islandDot.style.background = '#34C759';
+          islandDot.style.boxShadow = '0 0 10px #34C759';
+        }
+        const islandStatus = document.getElementById('islandStatus');
+        if (islandStatus) {
+          islandStatus.textContent = '⚡ AI CONFIGURED';
+          islandStatus.style.color = '#34C759';
+        }
+        const islandSpeed = document.getElementById('islandSpeed');
+        if (islandSpeed) {
+          islandSpeed.textContent = `${preset.fps || 60}FPS • LOG LUT`;
+          islandSpeed.style.color = '#5AC8FA';
+        }
+
+        // 5. UPDATE TELEMETRY HUD IF ACTIVE
+        const telModel = document.getElementById('telCloudModel');
+        if (telModel) telModel.textContent = 'AI COPILOT PRO';
+        const telFoc = document.getElementById('telFoc');
+        if (telFoc) telFoc.textContent = '20kHz PURE FOC (ACTIVE)';
+
+        // 6. FLASH CAMERA SCREEN TO INDICATE HARDWARE APPLIED
+        const flash = document.getElementById('shutterFlash');
+        if (flash) {
+          flash.style.opacity = '0.7';
+          setTimeout(() => flash.style.opacity = '0', 100);
+        }
+
+        // 7. SHOW PROMINENT ON-SCREEN TOAST HUD
+        showAppCameraToast(`✅ AI Đã Tự Động Cài Đặt: ${preset.summary || preset.mode}`);
+
+        // 8. ADD CONFIRMATION BOT MESSAGE
+        setTimeout(() => {
+          appAiHistory.push({
+            sender: 'bot',
+            text: `✨ **Dạ em đã hoàn tất thao tác cài đặt xong toàn bộ thông số trên máy cho anh rồi ạ!**\n\n• Camera: **${preset.mode} (${preset.resolution} @ ${preset.fps}fps)**\n• Màn trập: **${preset.shutter}** | ISO: **${preset.iso}** | EV: **${preset.ev}**\n• Màu: **${preset.lut}**\n• Trục Gimbal: **${preset.gimbalMode}**\n\nChúc anh có những thước phim tuyệt đỉnh cùng T-Flow Pro!`,
+            actions: ['Đóng bảng chat để quay', 'Hỏi thêm góc quay khác']
+          });
+          renderAppAiMessages();
+        }, 300);
+
+        // 9. LOG ACTION TO CENTRAL CATALOG STORE
+        if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.logAiConversation) {
+          SmartGimbalCatalog.logAiConversation({
+            source: 'app',
+            query: 'Xác nhận áp dụng tự động preset: ' + preset.summary,
+            reply: 'Đã áp dụng thành công preset lên phần cứng camera & gimbal',
+            status: 'answered',
+            actionPayload: preset
+          });
+        }
+
+      } catch (err) {
+        console.error('Error executing AI preset:', err);
+      }
+    }
+
+    function showAppCameraToast(msg) {
+      const toast = document.getElementById('appCameraToast');
+      const text = document.getElementById('appCameraToastText');
+      if (!toast || !text) return;
+      text.textContent = msg;
+      toast.style.display = 'flex';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3500);
+    }
+
+  </script>
+</body>
+</html>

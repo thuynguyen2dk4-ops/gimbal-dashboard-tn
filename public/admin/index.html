@@ -1,0 +1,3905 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100' height='100' rx='26' fill='%231D1D1F'/%3E%3Cpath d='M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34' stroke='%23FFFFFF' stroke-width='12' stroke-linecap='round' fill='none'/%3E%3Cpath d='M 50 34 L 50 82' stroke='%23FFFFFF' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E">
+  
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T-FLOW — Trung Tâm Quản Trị Hệ Sinh Thái (Central Console &amp; Admin CMS)</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg: #F5F5F7;
+      --card-bg: #FFFFFF;
+      --border: rgba(0, 0, 0, 0.08);
+      --border-hover: rgba(0, 0, 0, 0.18);
+      --text-main: #1D1D1F;
+      --text-secondary: #6E6E73;
+      --text-muted: #86868B;
+      --accent: #1D1D1F;
+      --link: #0071E3;
+      --green: #28A745;
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+      --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+      --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.1);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      --font-mono: "JetBrains Mono", monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    a { color: inherit; text-decoration: none; }
+    button { font-family: inherit; }
+
+    /* Sticky Admin Header */
+    header {
+      height: 64px;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 36px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--text-main);
+      color: #FFF;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 14px;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-nav-link {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      padding: 7px 14px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: #FFFFFF;
+      transition: all 0.2s ease;
+    }
+    .btn-nav-link:hover {
+      color: var(--text-main);
+      border-color: var(--border-hover);
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 36px auto 80px;
+      padding: 0 24px;
+      flex: 1;
+      width: 100%;
+    }
+
+    /* KPI Summary Row */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 28px;
+    }
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .kpi-label {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+    }
+    .kpi-val {
+      font-size: 32px;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      letter-spacing: -0.02em;
+    }
+    .kpi-sub {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    /* Section Cards */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 32px;
+    }
+    .card-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .card-title {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .card-sub {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    /* Action Toolbars */
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 9px 18px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      gap: 6px;
+    }
+    .btn-dark { background: var(--text-main); color: #FFF; }
+    .btn-dark:hover { background: #000; }
+    .btn-outline { background: #FFF; border-color: var(--border); color: var(--text-main); }
+    .btn-outline:hover { background: var(--bg); border-color: var(--border-hover); }
+
+    /* GROUPS CRUD CARD GRID */
+    .groups-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 8px;
+    }
+    .group-item-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+    .group-item-card:hover {
+      background: #FFFFFF;
+      border-color: var(--border-hover);
+      box-shadow: var(--shadow-sm);
+    }
+    .group-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .group-card-name {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .group-prod-count {
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--text-main);
+      color: #FFF;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+    }
+    .group-card-desc {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+    .group-card-actions {
+      display: flex;
+      gap: 8px;
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+    }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+    .data-table th {
+      text-align: left;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 700;
+      padding: 12px 14px;
+      border-bottom: 1.5px solid var(--border);
+      background: var(--bg);
+    }
+    .data-table td {
+      padding: 16px 14px;
+      font-size: 13.5px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+    .data-table tr:hover td {
+      background: rgba(0, 0, 0, 0.015);
+    }
+
+    .prod-thumb-sm {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .prod-thumb-sm img {
+      max-width: 85%;
+      max-height: 85%;
+      object-fit: contain;
+    }
+    .badge-mvp {
+      background: var(--text-main);
+      color: #FFF;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-full);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    /* Filter Pills */
+    .filter-pills-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+    .pill-btn {
+      padding: 6px 16px;
+      border-radius: var(--radius-full);
+      border: 1px solid var(--border);
+      background: #FFFFFF;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .pill-btn.active {
+      background: var(--text-main);
+      color: #FFFFFF;
+      border-color: var(--text-main);
+    }
+
+    /* Modal Form (Publishing CMS Form) */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .modal-overlay.open {
+      display: flex;
+      animation: modalFade 0.25s var(--ease);
+    }
+    @keyframes modalFade {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-card-large {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      max-width: 860px;
+      width: 100%;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .modal-card-medium {
+      background: #FFFFFF;
+      border-radius: var(--radius-lg);
+      max-width: 600px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .modal-header {
+      height: 64px;
+      padding: 0 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .modal-header h3 { font-size: 18px; font-weight: 800; }
+    .modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px;
+    }
+    .modal-footer {
+      height: 70px;
+      padding: 0 32px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .form-section-title {
+      font-size: 14.5px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin: 24px 0 14px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .form-section-title:first-child { margin-top: 0; }
+    .form-row-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+    .form-row-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      font-family: inherit;
+      font-size: 13.5px;
+      background: #FFFFFF;
+      transition: border 0.15s ease;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--text-main);
+    }
+    textarea.form-control { resize: vertical; min-height: 70px; }
+
+    /* Media Gallery Previews */
+    .gallery-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .gallery-preview-item {
+      height: 80px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 4px;
+    }
+    .gallery-preview-item img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    /* Multi-Tier Item Box in Publishing Form */
+    .form-tier-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .form-tier-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .form-tier-name { font-size: 14px; font-weight: 700; }
+    .form-tier-price { font-size: 13px; font-family: var(--font-mono); font-weight: 700; color: var(--text-main); }
+    .form-tier-gift { font-size: 11.5px; color: var(--text-secondary); }
+
+    /* Module Permissions Drawer */
+    .drawer-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      z-index: 1100;
+      display: none;
+      align-items: center;
+      justify-content: flex-end;
+    }
+    .drawer-overlay.open { display: flex; }
+    .drawer-panel {
+      width: 480px;
+      max-width: 100%;
+      height: 100%;
+      background: #FFFFFF;
+      box-shadow: -10px 0 40px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      animation: drawerSlide 0.3s var(--ease);
+    }
+    @keyframes drawerSlide {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+    .drawer-header {
+      height: 64px;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px;
+    }
+    .drawer-footer {
+      height: 70px;
+      padding: 0 28px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    .module-toggle-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+    }
+    .switch input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #E5E5EA;
+      transition: .3s;
+      border-radius: 24px;
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    input:checked + .slider { background-color: var(--green); }
+    input:checked + .slider:before { transform: translateX(20px); }
+
+    /* ENTERPRISE 4-COLUMN FOOTER */
+    .enterprise-footer {
+      background: #111827;
+      color: #9CA3AF;
+      padding: 72px 0 36px 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin-top: auto;
+    }
+    .footer-grid-4col {
+      display: grid;
+      grid-template-columns: 1.4fr 0.9fr 0.9fr 1fr;
+      gap: 48px;
+      margin-bottom: 56px;
+    }
+    .footer-brand-title {
+      font-size: 17px;
+      font-weight: 800;
+      color: #FFFFFF;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+    .footer-col-desc {
+      font-size: 13px;
+      color: #9CA3AF;
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+    .footer-contact-info {
+      font-size: 12.5px;
+      color: #D1D5DB;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .footer-contact-info strong {
+      color: #FFFFFF;
+    }
+    .footer-col-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFFFFF;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 18px;
+    }
+    .footer-links-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .footer-links-list a {
+      color: #9CA3AF;
+      transition: color 0.15s ease;
+      font-size: 13px;
+    }
+    .footer-links-list a:hover {
+      color: #FFFFFF;
+    }
+    .footer-bottom-bar {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 12px;
+      color: #6B7280;
+    }
+    .footer-legal-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .footer-legal-links a {
+      color: #9CA3AF;
+      transition: color 0.15s ease;
+    }
+    .footer-legal-links a:hover {
+      color: #FFFFFF;
+    }
+
+    /* Toast */
+    .toast-msg {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(40px);
+      background: var(--text-main);
+      color: #FFF;
+      padding: 12px 24px;
+      border-radius: var(--radius-full);
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: var(--shadow-lg);
+      z-index: 1500;
+      opacity: 0;
+      transition: all 0.3s var(--ease);
+      pointer-events: none;
+    }
+    .toast-msg.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* AI Training Tabs & Badges */
+    .btn-tab-ai {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 10px 16px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-tab-ai.active {
+      color: #0071E3;
+      border-bottom-color: #0071E3;
+    }
+    .filter-pill-ai {
+      background: #F5F5F7;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-pill-ai.active {
+      background: #1D1D1F;
+      border-color: #1D1D1F;
+      color: #FFF;
+    }
+    .badge-source-web {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 113, 227, 0.1);
+      color: #0071E3;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-source-app {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(52, 199, 89, 0.12);
+      color: #248A3D;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-status-pending {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(230, 167, 0, 0.15);
+      color: #B45309;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-status-answered {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(52, 199, 89, 0.1);
+      color: #248A3D;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-status-trained {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(175, 82, 222, 0.12);
+      color: #8944AB;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .ai-pending-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(230, 167, 0, 0.35);
+      border-left: 5px solid #F59E0B;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+    }
+
+  
+    /* ==========================================================================
+       ENTERPRISE LEFT SIDEBAR LAYOUT
+       ========================================================================== */
+    body {
+      display: flex !important;
+      flex-direction: row !important;
+      min-height: 100vh;
+      background: #F8F9FA !important;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Fixed Left Sidebar */
+    .admin-sidebar {
+      width: 270px;
+      min-width: 270px;
+      background: #FFFFFF;
+      border-right: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 200;
+      box-shadow: 2px 0 16px rgba(0, 0, 0, 0.03);
+      user-select: none;
+    }
+
+    .admin-sidebar-header {
+      padding: 22px 20px 18px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #1D1D1F;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .admin-brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #1D1D1F;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .admin-brand-sub {
+      font-size: 11px;
+      color: #8E8E93;
+      font-weight: 600;
+    }
+
+    .badge-cms {
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(0, 113, 227, 0.1);
+      color: #0071E3;
+      padding: 3px 8px;
+      border-radius: 99px;
+    }
+
+    .admin-sidebar-user {
+      margin: 14px 14px 6px 14px;
+      padding: 10px 12px;
+      background: #F5F5F7;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1D1D1F;
+      color: #FFF;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .user-email-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1D1D1F;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role-badge {
+      font-size: 10.5px;
+      color: #0071E3;
+      font-weight: 600;
+    }
+
+    .admin-nav-group-title {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #8E8E93;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 16px 20px 6px 20px;
+    }
+
+    .admin-nav-menu {
+      list-style: none;
+      padding: 0 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .admin-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #48484A;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .admin-nav-item:hover {
+      background: #F5F5F7;
+      color: #1D1D1F;
+    }
+
+    .admin-nav-item.active {
+      background: #1D1D1F;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .admin-nav-item.highlight-ai {
+      background: linear-gradient(135deg, rgba(0, 113, 227, 0.1) 0%, rgba(52, 199, 89, 0.06) 100%);
+      color: #0071E3;
+      border: 1px solid rgba(0, 113, 227, 0.22);
+      font-weight: 700;
+    }
+
+    .admin-nav-item.highlight-ai:hover {
+      background: linear-gradient(135deg, rgba(0, 113, 227, 0.18) 0%, rgba(52, 199, 89, 0.12) 100%);
+    }
+
+    .admin-nav-item.highlight-ai.active {
+      background: #0071E3 !important;
+      color: #FFFFFF !important;
+      border-color: #0071E3 !important;
+      box-shadow: 0 4px 14px rgba(0, 113, 227, 0.35) !important;
+    }
+
+    .nav-badge-pill {
+      font-size: 11px;
+      font-weight: 800;
+      background: #FF3B30;
+      color: #FFF;
+      padding: 1px 7px;
+      border-radius: 99px;
+      margin-left: auto;
+    }
+
+    .nav-badge-pill.empty {
+      background: rgba(0, 0, 0, 0.08);
+      color: #8E8E93;
+    }
+
+    .admin-sidebar-footer {
+      margin-top: auto;
+      padding: 14px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #FAFAFA;
+    }
+
+    .sidebar-footer-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #6E6E73;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: #FFFFFF;
+      transition: all 0.18s ease;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .sidebar-footer-btn:hover {
+      background: #F5F5F7;
+      color: #1D1D1F;
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .sidebar-footer-btn.logout:hover {
+      background: #FFF0F0;
+      color: #FF3B30;
+      border-color: #FFCDD2;
+    }
+
+    /* Main Area Layout */
+    .admin-main-wrap {
+      margin-left: 270px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 100vh;
+      background: #F8F9FA;
+    }
+
+    .admin-topbar {
+      height: 64px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .admin-content-area {
+      padding: 24px 32px 60px 32px;
+      flex: 1;
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .admin-view-panel {
+      animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+  
+    /* ==========================================================================
+       MOBILE OFF-CANVAS SIDEBAR & RESPONSIVE ENGINE (ADMIN CMS)
+       ========================================================================== */
+    .btn-mobile-sidebar-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 9px;
+      background: #FFFFFF;
+      border: 1px solid rgba(0,0,0,0.12);
+      font-size: 18px;
+      cursor: pointer;
+      color: #1D1D1F;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .admin-sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 998;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    @media (max-width: 900px) {
+      .btn-mobile-sidebar-toggle {
+        display: inline-flex !important;
+      }
+      .admin-sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 280px !important;
+        min-width: 280px !important;
+        transform: translateX(-100%) !important;
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        z-index: 999 !important;
+        box-shadow: 12px 0 36px rgba(0,0,0,0.2) !important;
+      }
+      .admin-sidebar.open {
+        transform: translateX(0) !important;
+      }
+      .admin-sidebar-backdrop.active {
+        display: block !important;
+        opacity: 1 !important;
+      }
+      .admin-main-wrap {
+        margin-left: 0 !important;
+        width: 100% !important;
+        min-width: 0 !important;
+      }
+      .admin-topbar {
+        padding: 0 14px !important;
+        height: 56px !important;
+      }
+      #adminCurrentViewTitle {
+        font-size: 13.5px !important;
+        line-height: 1.25 !important;
+      }
+      .admin-topbar > div:last-child {
+        display: none !important; /* Hide secondary MVP name in topbar on phone */
+      }
+      .admin-content-area {
+        padding: 14px 12px 60px 12px !important;
+      }
+      .card {
+        padding: 18px 14px !important;
+        border-radius: 16px !important;
+      }
+      .admin-stats-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+      }
+      .admin-stat-card {
+        padding: 12px !important;
+      }
+      .admin-stat-num {
+        font-size: 24px !important;
+      }
+      /* Ensure tables scroll smoothly without blowing layout */
+      .table-responsive, .table-container, table {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+      }
+      .admin-nav-tabs, .ai-tabs-bar {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+        padding-bottom: 4px !important;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- ADMIN AUTH GATE -->
+<div id="adminAuthGate" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:linear-gradient(135deg, #F5F5F7 0%, #E5E5EA 100%); z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px; font-family:'Plus Jakarta Sans', -apple-system, sans-serif;">
+    <div style="background:#FFFFFF; border-radius:24px; padding:44px 40px; max-width:440px; width:100%; box-shadow:0 20px 48px rgba(0,0,0,0.12); border:1px solid rgba(0,0,0,0.08); text-align:center;">
+      
+      <!-- Brand Icon -->
+      <div style="width:54px; height:54px; background:#1D1D1F; color:#FFF; border-radius:14px; padding:10px; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.15); margin-bottom:20px;">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+          <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="currentColor" stroke-width="12" stroke-linecap="round" fill="none" />
+          <path d="M 50 34 L 50 82" stroke="currentColor" stroke-width="12" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <div style="font-size:24px; font-weight:800; letter-spacing:-0.03em; color:#1D1D1F; margin-bottom:6px;">t-flow console</div>
+      <div style="font-size:12px; font-weight:600; color:#86868B; margin-bottom:28px;">Trung Tâm Quản Trị Hệ Sinh Thái &amp; Danh Mục</div>
+
+      <div style="background:#F5F5F7; border-radius:14px; padding:18px; margin-bottom:24px; text-align:left;">
+        <div style="font-size:12px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:4px;">Phân Quyền Bằng Gmail</div>
+        <div style="font-size:13.5px; color:#1D1D1F; line-height:1.5;">Hệ thống xác thực tài khoản qua Google. Chỉ email <strong>thuynguyen2dk4@gmail.com</strong> được cấp quyền Master Admin vào console.</div>
+      </div>
+
+      <!-- 1-Click Google Admin Button -->
+      <button onclick="adminLoginWithOneClick('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; display:flex; align-items:center; justify-content:center; gap:12px; padding:14px 20px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14.5px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.15); transition:transform 0.2s, background 0.2s; margin-bottom:14px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" style="background:#FFF; border-radius:50%; padding:2px;"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+        Đăng nhập với thuynguyen2dk4@gmail.com
+      </button>
+
+      <!-- Custom Gmail input toggle -->
+      <div style="font-size:12.5px; color:#86868B; margin-bottom:14px;">- hoặc đăng nhập bằng tài khoản khác -</div>
+      
+      <div style="display:flex; gap:8px; margin-bottom:20px;">
+        <input type="email" id="customGmailInput" placeholder="nhap.email@gmail.com" style="flex:1; padding:10px 14px; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-family:inherit; outline:none;">
+        <button onclick="adminLoginWithCustomGmail()" style="padding:10px 16px; background:#F5F5F7; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;">Xác nhận</button>
+      </div>
+
+      <a href="/" style="font-size:13px; color:#6E6E73; text-decoration:none;">&larr; Quay lại Website Cửa Hàng</a>
+    </div>
+  </div>
+
+
+  <!-- ==========================================================================
+       LEFT SIDEBAR (THANH MENU BÊN TRÁI CHUẨN ENTERPRISE)
+       ========================================================================== -->
+  <div class="admin-sidebar-backdrop" id="adminSidebarBackdrop" onclick="toggleAdminSidebar(false)"></div>
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <div class="admin-brand">
+        <div class="admin-brand-icon" style="width:36px; height:36px; border-radius:10px; background:#1D1D1F; padding:7px; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+            <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" fill="none" />
+            <path d="M 50 34 L 50 82" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" />
+          </svg>
+        </div>
+        <div>
+          <div class="admin-brand-title">T-Flow Admin</div>
+          <div class="admin-brand-sub">Central Console &amp; CMS</div>
+        </div>
+      </div>
+      <span class="badge-cms">v2.4 Pro</span>
+    </div>
+
+    <!-- ADMIN IDENTITY CARD -->
+    <div class="admin-sidebar-user">
+      <div class="user-avatar-circle" id="adminSidebarAvatar">TN</div>
+      <div style="flex:1; min-width:0;">
+        <div class="user-email-text" id="adminDisplayEmail">thuynguyen2dk4@gmail.com</div>
+        <div class="user-role-badge">Master Admin &amp; Founder</div>
+        <div style="font-size:10px; color:#248A3D; font-weight:600; display:flex; align-items:center; gap:5px; margin-top:2px;">
+          <span style="width:6px; height:6px; border-radius:50%; background:#34C759; display:inline-block;"></span>
+          <span id="adminSessionStatusLabel">Phiên Hoạt Động (Live)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. AI GROUP -->
+    <div class="admin-nav-group-title">TRÍ TUỆ NHÂN TẠO</div>
+    <ul class="admin-nav-menu">
+      <li class="admin-nav-item highlight-ai active" id="menu-item-ai" onclick="switchAdminView('ai')">
+        <span style="font-size:16px;">⚡</span>
+        <span style="flex:1;">Huấn Luyện AI</span>
+        <span class="nav-badge-pill empty" id="sidebarPendingCount">0</span>
+      </li>
+    </ul>
+
+    <!-- 2. COMMERCE MANAGEMENT -->
+    <div class="admin-nav-group-title">QUẢN TRỊ KINH DOANH</div>
+    <ul class="admin-nav-menu">
+      <li class="admin-nav-item" id="menu-item-overview" onclick="switchAdminView('overview')">
+        <span style="font-size:15px;">📊</span>
+        <span>Tổng Quan KPI</span>
+      </li>
+      <li class="admin-nav-item" id="menu-item-groups" onclick="switchAdminView('groups')">
+        <span style="font-size:15px;">📁</span>
+        <span>Nhóm Hàng Hóa (Cấp 1)</span>
+      </li>
+      <li class="admin-nav-item" id="menu-item-products" onclick="switchAdminView('products')">
+        <span style="font-size:15px;">📦</span>
+        <span>Bài Đăng Sản Phẩm (Cấp 2)</span>
+      </li>
+      <li class="admin-nav-item" id="menu-item-users" onclick="switchAdminView('users')">
+        <span style="font-size:15px;">👥</span>
+        <span>Người Dùng &amp; 7 Module</span>
+      </li>
+      <li class="admin-nav-item" id="menu-item-reviews" onclick="switchAdminView('reviews')">
+        <span style="font-size:15px;">⭐</span>
+        <span>Đánh Giá Khách Hàng</span>
+      </li>
+    </ul>
+
+    <!-- 3. SYSTEM SETTINGS -->
+    <div class="admin-nav-group-title">HỆ THỐNG</div>
+    <ul class="admin-nav-menu">
+      <li class="admin-nav-item" id="menu-item-settings" onclick="switchAdminView('settings')">
+        <span style="font-size:15px;">⚙️</span>
+        <span>Cấu Hình API &amp; OAuth</span>
+      </li>
+    </ul>
+
+    <!-- SIDEBAR FOOTER -->
+    <div class="admin-sidebar-footer">
+      <a href="/" target="_blank" class="sidebar-footer-btn">
+        <span>🌐</span> Xem Web Bán Hàng
+      </a>
+      <a href="/account" target="_blank" class="sidebar-footer-btn">
+        <span>📱</span> Cổng Khách Hàng
+      </a>
+      <button onclick="handleAdminLogout()" class="sidebar-footer-btn logout" style="width:100%; border:none; text-align:left;">
+        <span>🚪</span> Đăng Xuất
+      </button>
+    </div>
+  </aside>
+
+  <!-- ==========================================================================
+       MAIN CONTENT WRAPPER
+       ========================================================================== -->
+  <div class="admin-main-wrap">
+    <!-- TOP BAR -->
+    <header class="admin-topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button type="button" class="btn-mobile-sidebar-toggle" onclick="toggleAdminSidebar(true)" aria-label="Mở Menu Admin">
+          <span>☰</span>
+        </button>
+        <h2 id="adminCurrentViewTitle" style="font-size:16px; font-weight:800; color:var(--text-main); margin:0;">
+          ⚡ Trung Tâm Huấn Luyện AI &amp; Quản Lý Hội Thoại
+        </h2>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div style="font-size:12.5px; color:var(--text-secondary); display:flex; align-items:center; gap:8px;">
+          <span>Sản Phẩm MVP:</span>
+          <b id="headerMvpName" style="color:var(--text-main);">T-Flow Pro</b>
+        </div>
+        <div style="font-size:11.5px; background:rgba(52,199,89,0.12); color:#248A3D; padding:4px 10px; border-radius:99px; font-weight:700; display:flex; align-items:center; gap:6px;">
+          <span style="width:6px; height:6px; border-radius:50%; background:#34C759;"></span>
+          Gemini 3.5 Cloud AI • Active
+        </div>
+      </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <main class="admin-content-area">
+
+      <!-- VIEW 1: HUẤN LUYỆN AI (view-ai) -->
+      <div id="view-ai" class="admin-view-panel">
+        <!-- 6. KHỐI TRUNG TÂM HUẤN LUYỆN AI & QUẢN LÝ HỘI THOẠI (AI TRAINING & MODERATION CENTER) -->
+    <div class="card" id="sectionAiTraining" style="margin-top:32px;">
+      <div class="card-title-row">
+        <div>
+          <div class="card-title" style="display:flex; align-items:center; gap:10px;">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:#0071E3; color:#FFF; font-size:14px;">⚡</span>
+            Trung Tâm Huấn Luyện AI &amp; Quản Lý Hội Thoại (AI Training Center)
+          </div>
+          <div class="card-sub">
+            Tổng hợp toàn bộ câu hỏi &amp; câu trả lời từ Web Bán Hàng và App Camera Copilot. Huấn luyện câu trả lời chuẩn xác cho các câu hỏi khó, bảo đảm AI không bao giờ trả lời bừa.
+          </div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-dark" onclick="openAddKnowledgeModal()">&#43; Huấn Luyện Tri Thức Mới</button>
+          <button class="btn btn-outline" onclick="clearAiLogsConfirm()">Xóa Lịch Sử Test</button>
+        </div>
+      </div>
+
+      <!-- AI STATS KPI MINI-ROW (3 SPECIALIZED DOMAINS) -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin:20px 0 24px 0;">
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
+          <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Tổng Hội Thoại</div>
+          <div style="font-size:22px; font-weight:800; color:var(--text-main); margin-top:4px;" id="aiKpiTotal">0</div>
+          <div style="font-size:10.5px; color:#8E8E93;">Tất cả 3 chuyên mục</div>
+        </div>
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
+          <div style="font-size:11px; font-weight:700; color:#0071E3; text-transform:uppercase;">🛍️ 1. Tư Vấn Bán Hàng</div>
+          <div style="font-size:22px; font-weight:800; color:#0071E3; margin-top:4px;" id="aiKpiSales">0</div>
+          <div style="font-size:10.5px; color:#8E8E93;">Báo giá 4 gói, MagSafe, BH</div>
+        </div>
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
+          <div style="font-size:11px; font-weight:700; color:#8944AB; text-transform:uppercase;">🎬 2. Quay Chụp &amp; Edit</div>
+          <div style="font-size:22px; font-weight:800; color:#8944AB; margin-top:4px;" id="aiKpiCreative">0</div>
+          <div style="font-size:10.5px; color:#8E8E93;">Góc máy, LUT, Dựng phim</div>
+        </div>
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
+          <div style="font-size:11px; font-weight:700; color:#248A3D; text-transform:uppercase;">🧠 3. Nhận Diện AI</div>
+          <div style="font-size:22px; font-weight:800; color:#248A3D; margin-top:4px;" id="aiKpiSmartVision">0</div>
+          <div style="font-size:10.5px; color:#8E8E93;">Bám nét, Thú cưng, Ultra-Wide</div>
+        </div>
+        <div style="background:rgba(230,167,0,0.08); border:1px solid rgba(230,167,0,0.3); border-radius:12px; padding:14px;">
+          <div style="font-size:11px; font-weight:700; color:#B45309; text-transform:uppercase;">⚠️ Chờ Admin Duyệt</div>
+          <div style="font-size:22px; font-weight:800; color:#B45309; margin-top:4px;" id="aiKpiPending">0</div>
+          <div style="font-size:10.5px; color:#B45309;">Câu hỏi khó cần training</div>
+        </div>
+      </div>
+
+      <!-- TABS NAVIGATION -->
+      <div style="display:flex; gap:12px; border-bottom:1px solid var(--border); margin-bottom:20px;">
+        <button class="btn-tab-ai active" id="tabBtnAiLogs" onclick="switchAiTab('logs')">
+          📋 Toàn Bộ Hội Thoại Web &amp; App (<span id="tabCountLogs">0</span>)
+        </button>
+        <button class="btn-tab-ai" id="tabBtnAiPending" onclick="switchAiTab('pending')">
+          ⚡ Hàng Đợi Chờ Duyệt &amp; Huấn Luyện (<span id="tabCountPending">0</span>)
+        </button>
+        <button class="btn-tab-ai" id="tabBtnAiKb" onclick="switchAiTab('kb')">
+          📚 Bộ Tri Thức Đã Huấn Luyện (<span id="tabCountKb">0</span>)
+        </button>
+        <button class="btn-tab-ai" id="tabBtnAiConfig" onclick="switchAiTab('config')">
+          ☁️ Cấu Hình Google Cloud AI (Gemini)
+        </button>
+      </div>
+
+      <!-- TAB 1 CONTENT: LOGS -->
+      <div id="aiTabContentLogs">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="filter-pill-ai active" onclick="filterAiLogs('all', this)">Tất Cả</button>
+            <button class="filter-pill-ai" onclick="filterAiLogs('sales', this)">🛍️ Tư Vấn Bán Hàng</button>
+            <button class="filter-pill-ai" onclick="filterAiLogs('creative', this)">🎬 Kỹ Thuật Quay &amp; Edit</button>
+            <button class="filter-pill-ai" onclick="filterAiLogs('smart_vision', this)">🧠 Nhận Diện AI Thông Minh</button>
+            <button class="filter-pill-ai" onclick="filterAiLogs('pending_approval', this)">⚠️ Chờ Duyệt</button>
+          </div>
+          <input type="text" id="aiLogsSearchInput" placeholder="Tìm kiếm câu hỏi / nội dung..." onkeyup="searchAiLogs(this.value)" style="padding:6px 12px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; width:240px; outline:none;">
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:11%;">Thời Gian</th>
+              <th style="width:11%;">Chuyên Mục</th>
+              <th style="width:13%;">Người Hỏi</th>
+              <th style="width:23%;">Câu Hỏi Khách Hàng</th>
+              <th style="width:25%;">Câu Trả Lời Của AI</th>
+              <th style="width:17%; text-align:right;">Trạng Thái &amp; Huấn Luyện</th>
+            </tr>
+          </thead>
+          <tbody id="aiLogsTableBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TAB 2 CONTENT: PENDING QUEUE (ADMIN TRAINING INTERFACE) -->
+      <div id="aiTabContentPending" style="display:none;">
+        <div style="margin-bottom:16px; font-size:13.5px; color:var(--text-secondary); line-height:1.5;">
+          Những câu hỏi người dùng hỏi mà AI nhận định là chuyên sâu hoặc chưa có dữ liệu chuẩn sẽ được chuyển về đây. Admin Thủy Nguyễn nhập câu trả lời chuẩn và bấm <strong>[Lưu &amp; Huấn Luyện AI]</strong>. Ngay lập tức, AI trên cả Web và App sẽ nắm bắt tri thức mới này để trả lời cho những khách hàng tiếp theo!
+        </div>
+        <div id="aiPendingCardsList">
+          <!-- Dynamically populated pending cards -->
+        </div>
+      </div>
+
+      <!-- TAB 3 CONTENT: VERIFIED KNOWLEDGE BASE -->
+      <div id="aiTabContentKb" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="filter-pill-ai active" onclick="filterAiKbTable('all', this)">Tất Cả Tri Thức</button>
+            <button class="filter-pill-ai" onclick="filterAiKbTable('sales', this)">🛍️ Tư Vấn Bán Hàng</button>
+            <button class="filter-pill-ai" onclick="filterAiKbTable('creative', this)">🎬 Quay Chụp &amp; Edit</button>
+            <button class="filter-pill-ai" onclick="filterAiKbTable('smart_vision', this)">🧠 Nhận Diện AI Thông Minh</button>
+          </div>
+          <button class="btn btn-dark" onclick="openAddKnowledgeModal()">&#43; Huấn Luyện Tri Thức Mới</button>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:18%;">Chủ Đề</th>
+              <th style="width:10%;">Nền Tảng</th>
+              <th style="width:22%;">Từ Khóa Nhận Diện</th>
+              <th style="width:38%;">Nội Dung Trả Lời / Thông Số</th>
+              <th style="width:12%; text-align:right;">Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="aiKbTableBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TAB 4 CONTENT: UNIFIED GOOGLE CLOUD AI CONFIGURATION -->
+      <div id="aiTabContentConfig" style="display:none;">
+        <div style="background:#FFFFFF; border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+          
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+            <div>
+              <div style="font-size:16px; font-weight:800; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+                <span style="font-size:20px;">☁️</span> Bộ Não AI Đám Mây Hợp Nhất (Google Gemini API)
+              </div>
+              <div style="font-size:12.5px; color:var(--text-secondary); margin-top:4px; max-width:640px; line-height:1.5;">
+                Toàn bộ luồng trò chuyện trên <strong>Web Bán Hàng</strong> và <strong>App Camera Copilot</strong> đều truy vấn tập trung về duy nhất một động cơ Google Cloud AI thông qua endpoint <code>/api/chat</code>. Mọi dữ liệu hỏi đáp đều được đồng bộ về Trung Tâm Huấn Luyện này.
+              </div>
+            </div>
+            <div id="cloudAiStatusBadge" style="padding:6px 14px; border-radius:99px; font-size:12px; font-weight:700; background:rgba(52,199,89,0.12); color:#248A3D; border:1px solid rgba(52,199,89,0.3); display:flex; align-items:center; gap:6px;">
+              <span style="width:7px; height:7px; border-radius:50%; background:#34C759;"></span>
+              Đang Hoạt Động (Cloud Ready)
+            </div>
+          </div>
+
+          <!-- GOOGLE OAUTH 2.0 (GIS) CLIENT ID CONFIG -->
+          <div style="background:#F0F7FF; border:1px solid #BAE6FD; border-radius:14px; padding:18px 20px; margin-bottom:20px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+              <div>
+                <div style="font-size:13.5px; font-weight:800; color:#0369A1; display:flex; align-items:center; gap:8px;">
+                  <span>🔐</span> Google OAuth 2.0 Client ID (Đăng Nhập Bằng Google Thật accounts.google.com)
+                </div>
+                <div style="font-size:11.5px; color:#0C4A6E; margin-top:3px;">
+                  Khi dán Client ID vào đây, nút "Đăng nhập Google" trên Web sẽ mở <strong>100% trang chính hãng của Google (accounts.google.com)</strong>.
+                </div>
+              </div>
+              <span style="font-size:10px; font-weight:700; background:#0284C7; color:#FFF; padding:2px 8px; border-radius:99px;">Google Identity Services</span>
+            </div>
+            
+            <div style="display:flex; gap:10px; margin-bottom:8px;">
+              <input type="text" id="googleOAuthClientIdInput" placeholder="Ví dụ: 123456789-abcdef.apps.googleusercontent.com" style="flex:1; padding:10px 14px; border:1px solid #7DD3FC; border-radius:10px; font-size:12.5px; font-family:monospace; outline:none; background:#FFF;">
+              <button class="btn btn-dark" onclick="saveGoogleOAuthClientIdUI()" style="white-space:nowrap; padding:10px 16px; font-size:12.5px;">
+                <span>💾</span> Lưu Client ID
+              </button>
+            </div>
+            <div style="font-size:11px; color:#0369A1; line-height:1.4;">
+              📌 <strong>Authorized JavaScript Origin cần khai báo trên Google Cloud Console:</strong> <code style="background:#E0F2FE; padding:2px 6px; border-radius:4px; font-weight:700;">https://t-flow.tech</code> &bull; <code style="background:#E0F2FE; padding:2px 6px; border-radius:4px; font-weight:700;">https://www.t-flow.tech</code>
+            </div>
+          </div>
+
+          <!-- CONFIG FIELDS GRID -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+            <!-- 1. Google Gemini API Key -->
+            <div>
+              <label style="display:block; font-size:12.5px; font-weight:700; color:var(--text-main); margin-bottom:6px;">
+                Google AI Studio API Key (Gemini)
+              </label>
+              <div style="position:relative; display:flex; align-items:center;">
+                <input type="password" id="cloudAiApiKeyInput" placeholder="Dán mã API Key dạng AIzaSy..." style="width:100%; padding:10px 40px 10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px; font-family:monospace; outline:none;">
+                <button type="button" onclick="toggleAiKeyVisibility()" style="position:absolute; right:10px; background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:14px;">👁️</button>
+              </div>
+              <div style="font-size:11px; color:var(--text-secondary); margin-top:5px;">
+                🔑 Khóa API được lưu an toàn trong trình duyệt quản trị và đồng bộ trực tiếp tới máy chủ <code>/api/chat</code>.
+              </div>
+            </div>
+
+            <!-- 2. AI Model Selection -->
+            <div>
+              <label style="display:block; font-size:12.5px; font-weight:700; color:var(--text-main); margin-bottom:6px;">
+                Model AI Vận Hành
+              </label>
+              <select id="cloudAiModelSelect" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px; outline:none; background:#FFF;">
+                <option value="gemini-3.5-flash" selected>Gemini 3.5 Flash (Khuyên dùng • Tốc độ siêu tốc &lt; 500ms • Quota tối ưu)</option>
+                <option value="gemini-3.8-flash">Gemini 3.8 Flash (Thế hệ mới nhất • Suy luận đa phương thức)</option>
+                <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (Siêu nhẹ • Tiết kiệm tài nguyên)</option>
+                <option value="gemini-flash-latest">Gemini Flash Latest (Tự động cập nhật phiên bản mới nhất)</option>
+              </select>
+              <div style="font-size:11px; color:var(--text-secondary); margin-top:5px;">
+                ⚡ Model Gemini Flash tối ưu hóa độ trễ phản hồi thời gian thực trên cả Web và App điện thoại.
+              </div>
+            </div>
+          </div>
+
+          <!-- ENDPOINT & ACTIONS -->
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:1px solid var(--border);">
+            <div style="font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:700; color:var(--text-main);">Endpoint Serverless:</span>
+              <span style="background:#F5F5F7; padding:3px 8px; border-radius:6px; font-family:monospace; font-size:11.5px; border:1px solid #E5E5EA;">POST /api/chat</span>
+              <span style="color:#34C759; font-weight:600;">✓ Vercel Edge Active</span>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-outline" id="btnTestCloudAi" onclick="testCloudAiConnectionUI()" style="display:flex; align-items:center; gap:6px;">
+                <span>⚡</span> Kiểm Tra Kết Nối Cloud AI
+              </button>
+              <button class="btn btn-dark" onclick="saveCloudAiConfigUI()" style="display:flex; align-items:center; gap:6px;">
+                <span>💾</span> Lưu Cấu Hình Cloud AI
+              </button>
+            </div>
+          </div>
+
+          <!-- TEST RESULT ALERT BOX -->
+          <div id="cloudAiTestResultBox" style="display:none; margin-top:16px; padding:12px 16px; border-radius:10px; font-size:12.5px; line-height:1.5;"></div>
+
+        </div>
+
+        <!-- VISUAL ECOSYSTEM ARCHITECTURE SHOWCASE -->
+        <div style="background:#F9F9FB; border:1px solid var(--border); border-radius:16px; padding:22px;">
+          <div style="font-size:14px; font-weight:800; color:var(--text-main); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <span>📐</span> Kiến Trúc Hợp Nhất 1 Cloud AI - 2 Persona Riêng Biệt
+          </div>
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <!-- Persona 1: Web -->
+            <div style="background:#FFF; border:1px solid #E5E5EA; border-radius:12px; padding:16px;">
+              <div style="font-weight:700; color:#0071E3; font-size:13.5px; margin-bottom:6px;">🌐 Persona 1: Web Sales &amp; Technical Consultant</div>
+              <ul style="font-size:12px; color:var(--text-secondary); line-height:1.6; padding-left:18px; margin:0;">
+                <li>Tự động tư vấn thông số kỹ thuật (động cơ Pure FOC 20kHz, MagSafe 45N N52, pin 18h).</li>
+                <li>Báo giá chuẩn xác 4 gói: Standard 2.49M, Creator 3.19M, Cinematic 3.99M, Master 5.49M.</li>
+                <li>Cam kết chính sách bảo hành 1 đổi 1 trong 12 tháng, 30 ngày dùng thử trả hàng miễn phí.</li>
+                <li>Đính kèm nút tắt chuyển trang PDP, giỏ hàng, bảng giá tức thì cho khách mua.</li>
+              </ul>
+            </div>
+
+            <!-- Persona 2: App -->
+            <div style="background:#FFF; border:1px solid #E5E5EA; border-radius:12px; padding:16px;">
+              <div style="font-weight:700; color:#248A3D; font-size:13.5px; margin-bottom:6px;">📱 Persona 2: App Camera Copilot &amp; Creative Director</div>
+              <ul style="font-size:12px; color:var(--text-secondary); line-height:1.6; padding-left:18px; margin:0;">
+                <li>Phân tích bối cảnh quay chụp (hoàng hôn, thể thao nhanh, chân dung xóa phông, đêm).</li>
+                <li>Đề xuất bộ thông số camera chuẩn điện ảnh (Mode, 4K/FPS, Shutter, ISO, EV, 3D LUT, Gimbal).</li>
+                <li><strong>Hỏi người dùng:</strong> <em>"Anh có muốn em tự thao tác cài đặt các thông số này không?"</em></li>
+                <li>Nút bấm xác nhận <strong>[⚡ Có, Hãy Tự Động Thao Tác Giúp Anh]</strong> can thiệp thẳng vào hệ thống máy ảnh.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style="margin-top:14px; padding:12px 14px; background:rgba(0,113,227,0.06); border:1px solid rgba(0,113,227,0.2); border-radius:10px; font-size:12px; color:#0071E3; line-height:1.5;">
+            <strong>🛡️ Cơ chế Chống Trả Lời Bừa (Zero Hallucination &amp; Escalation):</strong> Bất kỳ câu hỏi nào vượt quá phạm vi kiểm định đều được AI tự động đính kèm cờ chuyển tiếp về <strong>Hàng Đợi Chờ Duyệt (Pending Queue)</strong>. Admin Thủy Nguyễn nhập đáp án chuẩn và bấm <em>[Lưu &amp; Huấn Luyện]</em> để cập nhật ngay vào cơ sở tri thức cho toàn bộ hệ sinh thái!
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+</div>
+  </div>
+      </div>
+
+      <!-- VIEW 2: TỔNG QUAN KPI (view-overview) -->
+      <div id="view-overview" class="admin-view-panel" style="display:none;">
+        <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Nhóm Hàng Hóa (Cấp 1)</div>
+        <div class="kpi-val" id="kpiGroupsCount">3</div>
+        <div class="kpi-sub">Danh mục cấp cao nhất</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Bài Đăng Sản Phẩm (Cấp 2)</div>
+        <div class="kpi-val" id="kpiProductsCount">10</div>
+        <div class="kpi-sub">Đang mở bán trên web</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tổng Số Đơn Đã Bán</div>
+        <div class="kpi-val" id="kpiOrdersCount">5.180</div>
+        <div class="kpi-sub">Số đơn trên toàn hệ thống</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Sản Phẩm MVP Ghim Đầu</div>
+        <div class="kpi-val" id="kpiMvpName" style="font-size:22px;">T-Flow T-Flow Pro</div>
+        <div class="kpi-sub">Hiển thị đầu Trang Chủ</div>
+      </div>
+    </div>
+
+        <!-- QUICK SHORTCUTS -->
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin:24px 0;">
+          <div class="card" onclick="switchAdminView('ai')" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease; border:1px solid rgba(0,113,227,0.2); background:linear-gradient(135deg, #FFF 0%, rgba(0,113,227,0.03) 100%);">
+            <div style="font-size:28px; margin-bottom:8px;">⚡</div>
+            <div style="font-weight:800; font-size:14px; color:#0071E3;">Huấn Luyện AI</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Bộ não Gemini Cloud AI</div>
+          </div>
+          <div class="card" onclick="switchAdminView('groups'); openCreateGroupModal();" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease;">
+            <div style="font-size:28px; margin-bottom:8px;">📁</div>
+            <div style="font-weight:800; font-size:14px; color:var(--text-main);">Tạo Nhóm Hàng</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Cấu hình ngành hàng cấp 1</div>
+          </div>
+          <div class="card" onclick="switchAdminView('products'); openPublishProductModal();" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease;">
+            <div style="font-size:28px; margin-bottom:8px;">📦</div>
+            <div style="font-weight:800; font-size:14px; color:var(--text-main);">Đăng Sản Phẩm</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Đăng bán bài viết &amp; combo</div>
+          </div>
+          <div class="card" onclick="window.open('/', '_blank')" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease;">
+            <div style="font-size:28px; margin-bottom:8px;">🌐</div>
+            <div style="font-weight:800; font-size:14px; color:var(--text-main);">Xem Website</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Cửa hàng bán lẻ trực tuyến</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 3: NHÓM SẢN PHẨM (view-groups) -->
+      <div id="view-groups" class="admin-view-panel" style="display:none;">
+        <!-- 2. KHỐI QUẢN LÝ NHÓM SẢN PHẨM (DANH MỤC CẤP 1 - DYNAMIC GROUPS CRUD) -->
+    <div class="card">
+      <div class="card-title-row">
+        <div>
+          <div class="card-title">Quản Lý Nhóm Sản Phẩm (Danh Mục Cấp 1)</div>
+          <div class="card-sub">
+            Cấu hình các nhóm ngành hàng chính. Thêm, sửa, xóa nhóm tại đây sẽ tự động cập nhật ngay lập tức sang bộ lọc trên website bán hàng và form đăng bài sản phẩm.
+          </div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-dark" onclick="openCreateGroupModal()">&#43; Tạo Mới Nhóm Sản Phẩm</button>
+        </div>
+      </div>
+
+      <!-- Grid of Groups Cards -->
+      <div class="groups-grid" id="groupsListGrid">
+        <!-- Dynamically rendered from SmartGimbalCatalog.getGroups() -->
+      </div>
+    </div>
+      </div>
+
+      <!-- VIEW 4: BÀI ĐĂNG SẢN PHẨM (view-products) -->
+      <div id="view-products" class="admin-view-panel" style="display:none;">
+        <!-- 3. KHỐI QUẢN LÝ BÀI ĐĂNG SẢN PHẨM & PHÂN CẤP (CẤP 2 & CẤP 3) -->
+    <div class="card">
+      <div class="card-title-row">
+        <div>
+          <div class="card-title">Quản Lý Bài Đăng Sản Phẩm &amp; Phân Cấp (Cấp 2 &amp; Cấp 3)</div>
+          <div class="card-sub">Quản trị nội dung hiển thị, hình ảnh góc chụp, màu sắc, thông số kỹ thuật và các phân cấp giá bán (Bản Thường, Pro, Max...).</div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-dark" onclick="openPublishProductModal()">&#43; Đăng Bài Sản Phẩm Mới</button>
+          <button class="btn btn-outline" onclick="triggerImportProductsCSV()">Nhập Khẩu (Excel / CSV)</button>
+          <button class="btn btn-outline" onclick="exportProductsCSV()">Xuất Khẩu (Excel)</button>
+          <input type="file" id="csvFileInput" accept=".csv" style="display:none;" onchange="handleCSVFileSelect(this)">
+        </div>
+      </div>
+
+      <!-- Dynamic Filter Pills (Rendered from Groups) -->
+      <div class="filter-pills-row" id="adminFilterPills">
+        <!-- Dynamically rendered from SmartGimbalCatalog.getGroups() -->
+      </div>
+
+      <!-- Products Table -->
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:26%;">Sản Phẩm &amp; Tagline</th>
+            <th style="width:14%;">Nhóm Hàng</th>
+            <th style="width:15%;">Màu Sắc &amp; Trạng Thái</th>
+            <th style="width:13%;">Số Đơn Bán</th>
+            <th style="width:20%;">Phân Cấp &amp; Giá Bán</th>
+            <th style="width:12%; text-align:right;">Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody id="productsTableBody">
+          <!-- Dynamically populated from SmartGimbalCatalog.getProducts() -->
+        </tbody>
+      </table>
+    </div>
+      </div>
+
+      <!-- VIEW 5: NGƯỜI DÙNG & 7 MODULE (view-users) -->
+      <div id="view-users" class="admin-view-panel" style="display:none;">
+        <!-- 4. USERS MANAGEMENT & 7-MODULE PERMISSIONS -->
+    <div class="card">
+      <div class="card-title-row">
+        <div>
+          <div class="card-title">Cấp Quyền 7 Module Ứng Dụng Cho Người Dùng</div>
+          <div class="card-sub">Bật/tắt tức thời 7 tính năng chuyên sâu và đồng bộ trực tiếp tới Cổng Khách Hàng.</div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-outline" onclick="exportUsersCSV()">Xuất Khẩu Người Dùng (Excel)</button>
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Họ và Tên</th>
+            <th>Email &amp; Số Điện Thoại</th>
+            <th>Thiết Bị Liên Kết</th>
+            <th>Cấp Bậc Tài Khoản</th>
+            <th>Module Đang Bật</th>
+            <th style="text-align:right;">Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <!-- Dynamically populated from SmartGimbalCatalog.getUsers() -->
+        </tbody>
+      </table>
+    </div>
+      </div>
+
+      <!-- VIEW 6: ĐÁNH GIÁ KHÁCH HÀNG (view-reviews) -->
+      <div id="view-reviews" class="admin-view-panel" style="display:none;">
+        <!-- 5. KHỐI QUẢN LÝ ĐÁNH GIÁ & CẢM NHẬN KHÁCH HÀNG (REVIEWS MODERATION) -->
+    <div class="card" style="margin-top:32px;">
+      <div class="card-title-row">
+        <div>
+          <div class="card-title">Quản Lý Đánh Giá &amp; Cảm Nhận Khách Hàng (T-Flow Pro Reviews)</div>
+          <div class="card-sub">Duyệt, xem chi tiết và kiểm duyệt toàn bộ đánh giá do người dùng gửi từ website bán hàng.</div>
+        </div>
+        <div class="toolbar-actions">
+          <span style="font-size:12px; font-weight:700; background:rgba(0,113,227,0.1); color:#0071E3; padding:6px 14px; border-radius:99px;" id="adminReviewsCountBadge">Đang tải đánh giá...</span>
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:20%;">Người Đánh Giá</th>
+            <th style="width:12%;">Điểm Số</th>
+            <th style="width:18%;">Gói Sản Phẩm</th>
+            <th style="width:38%;">Tiêu Đề &amp; Nội Dung Đánh Giá</th>
+            <th style="width:12%; text-align:right;">Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody id="adminReviewsTableBody">
+          <!-- Dynamically populated via renderAdminReviewsTable() -->
+        </tbody>
+      </table>
+    </div>
+      </div>
+
+      <!-- VIEW 7: CÀI ĐẶT HỆ THỐNG (view-settings) -->
+      <div id="view-settings" class="admin-view-panel" style="display:none;">
+        <div class="card">
+          <div class="card-title-row">
+            <div>
+              <div class="card-title" style="display:flex; align-items:center; gap:10px;">
+                <span>⚙️</span> Cấu Hình Chìa Khóa Hệ Thống (Google Cloud AI &amp; OAuth 2.0)
+              </div>
+              <div class="card-sub">
+                Toàn bộ thông tin cấu hình được lưu tự động và bảo vệ tuyệt đối trong môi trường quản trị.
+              </div>
+            </div>
+            <div class="toolbar-actions">
+              <button class="btn btn-dark" onclick="saveCloudAiConfigUI()">💾 Lưu Toàn Bộ Cấu Hình</button>
+            </div>
+          </div>
+
+          <div style="background:#F0F7FF; border:1px solid #BAE6FD; border-radius:14px; padding:18px 20px; margin-bottom:20px;">
+            <div style="font-size:13.5px; font-weight:800; color:#0369A1; margin-bottom:4px;">
+              🔐 Google OAuth 2.0 Client ID
+            </div>
+            <div style="font-size:12px; color:#0C4A6E; margin-bottom:12px;">
+              Mã xác thực đăng nhập Google chính hãng liên kết tới Google Identity Services:
+            </div>
+            <div style="display:flex; gap:10px;">
+              <input type="text" id="googleOAuthClientIdInput2" readonly value="725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com" style="flex:1; padding:10px 14px; border:1px solid #7DD3FC; border-radius:10px; font-size:12.5px; font-family:monospace; background:#FFF;">
+              <button class="btn btn-outline" onclick="navigator.clipboard.writeText('725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com'); showNotification('✓ Đã copy Client ID!');">Copy</button>
+            </div>
+          </div>
+
+          <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:14px; padding:18px 20px;">
+            <div style="font-size:13.5px; font-weight:800; color:#15803D; margin-bottom:4px;">
+              🤖 Google Gemini Cloud AI
+            </div>
+            <div style="font-size:12px; color:#166534; margin-bottom:12px;">
+              Động cơ AI Đám Mây xử lý tư vấn bán hàng và đạo diễn quay chụp trên Mobile App:
+            </div>
+            <div style="display:flex; gap:10px;">
+              <input type="text" readonly value="AIzaSyDluWTvQMgGmw2yceO27urpn4UBOZ1LQF0" style="flex:1; padding:10px 14px; border:1px solid #86EFAC; border-radius:10px; font-size:12.5px; font-family:monospace; background:#FFF;">
+              <button class="btn btn-outline" onclick="switchAdminView('ai'); switchAiTab('config');">Quản Lý Tại Tab AI</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ==========================================================================
+       ALL MODALS AT ROOT LEVEL (TRÁNH LỖI OVERFLOW VÀ UNCLOSED TAGS)
+       ========================================================================== -->
+  <div class="modal-overlay" id="groupModal">
+    <div class="modal-card-medium">
+      <div class="modal-header">
+        <h3 id="groupModalTitle">Tạo Mới Nhóm Sản Phẩm</h3>
+        <button class="btn btn-outline" style="padding:4px 10px;" onclick="closeGroupModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="formGroupId">
+        <div class="form-group">
+          <label>Tên Nhóm Sản Phẩm</label>
+          <input type="text" class="form-control" id="formGroupName" placeholder="Ví dụ: Gimbal Điện Thoại, Camera Bỏ Túi...">
+        </div>
+        <div class="form-group">
+          <label>Mô Tả Ngắn Về Nhóm Hàng</label>
+          <textarea class="form-control" id="formGroupDesc" placeholder="Mô tả nhóm hàng hóa hiển thị cho khách hàng..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Badge Phân Loại (Tùy chọn)</label>
+          <input type="text" class="form-control" id="formGroupBadge" placeholder="Chủ Lực, Chuyên Nghiệp, Phổ Thông...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeGroupModal()">Hủy</button>
+        <button class="btn btn-dark" onclick="saveGroupSubmit()">Lưu Nhóm Sản Phẩm</button>
+      </div>
+  </div>
+  </div>
+  <div class="modal-overlay" id="productModal">
+    <div class="modal-card-large">
+      <div class="modal-header">
+        <h3 id="productModalTitle">Đăng Bài Sản Phẩm Mới</h3>
+        <button class="btn btn-outline" style="padding:4px 10px;" onclick="closeProductModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="formProdId">
+
+        <!-- Section 1: Identity -->
+        <div class="form-section-title">1. Thông Tin Định Danh Bài Đăng</div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Nhóm Hàng Hóa (Cấp 1)</label>
+            <select class="form-control" id="formProdGroup">
+              <!-- Dynamically populated from getGroups() -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Tên Sản Phẩm</label>
+            <input type="text" class="form-control" id="formProdName" placeholder="Ví dụ: T-Flow T-Flow Pro">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Câu Tagline / Slogan Ngắn</label>
+            <input type="text" class="form-control" id="formProdTagline" placeholder="Đưa thước phim di động lên tầm điện ảnh.">
+          </div>
+          <div class="form-group">
+            <label>Trạng Thái Mở Bán</label>
+            <select class="form-control" id="formProdStatus">
+              <option value="Đang Mở Bán">Đang Mở Bán</option>
+              <option value="Sắp Ra Mắt">Sắp Ra Mắt</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="display:flex; align-items:center; gap:8px;">
+          <input type="checkbox" id="formProdIsMvp" style="width:16px; height:16px; accent-color:var(--text-main);">
+          <label for="formProdIsMvp" style="margin-bottom:0; cursor:pointer;">Ghim làm Sản Phẩm Nổi Bật (MVP) trên Trang Chủ</label>
+        </div>
+
+        <!-- Section 2: Media Gallery -->
+        <div class="form-section-title">2. Bộ Hình Ảnh Bài Đăng (Media Gallery)</div>
+        <div class="form-group">
+          <label>Đường Dẫn Ảnh Đại Diện Chính (URL / Local Path)</label>
+          <input type="text" class="form-control" id="formProdImg" value="/shared/img/feed_portrait_dusk.jpg" oninput="updateMediaPreviews()">
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Ảnh Góc Chụp 1</label>
+            <input type="text" class="form-control" id="formProdGallery1" value="/shared/img/feed_portrait_dusk.jpg" oninput="updateMediaPreviews()">
+          </div>
+          <div class="form-group">
+            <label>Ảnh Góc Chụp 2</label>
+            <input type="text" class="form-control" id="formProdGallery2" value="/shared/img/feed_portrait_day.jpg" oninput="updateMediaPreviews()">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Ảnh Góc Chụp 3</label>
+            <input type="text" class="form-control" id="formProdGallery3" value="/shared/img/feed_person_portrait.jpg" oninput="updateMediaPreviews()">
+          </div>
+          <div class="form-group">
+            <label>Ảnh Góc Chụp 4</label>
+            <input type="text" class="form-control" id="formProdGallery4" value="/shared/img/feed_land_dusk.jpg" oninput="updateMediaPreviews()">
+          </div>
+        </div>
+        <div>
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">Khung Xem Trước Ảnh Bài Đăng:</label>
+          <div class="gallery-preview-grid">
+            <div class="gallery-preview-item"><img id="previewImg1" src="/shared/img/feed_portrait_dusk.jpg" alt="p1"></div>
+            <div class="gallery-preview-item"><img id="previewImg2" src="/shared/img/feed_portrait_day.jpg" alt="p2"></div>
+            <div class="gallery-preview-item"><img id="previewImg3" src="/shared/img/feed_person_portrait.jpg" alt="p3"></div>
+            <div class="gallery-preview-item"><img id="previewImg4" src="/shared/img/feed_land_dusk.jpg" alt="p4"></div>
+          </div>
+        </div>
+
+        <!-- Section 3: Colors -->
+        <div class="form-section-title">3. Tùy Chọn Màu Sắc Sản Phẩm</div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Tên Màu 1 + Mã Hex</label>
+            <input type="text" class="form-control" id="formColor1" value="Titanium Tự Nhiên (#D4D2CD)">
+          </div>
+          <div class="form-group">
+            <label>Tên Màu 2 + Mã Hex</label>
+            <input type="text" class="form-control" id="formColor2" value="Đen Không Gian (#2C2C2E)">
+          </div>
+        </div>
+
+        <!-- Section 4: What's in the Box -->
+        <div class="form-section-title">4. Trong Hộp Có Gì (What's in the Box)</div>
+        <div class="form-group">
+          <label>Danh Sách Phụ Kiện Đi Kèm (Mỗi món một dòng)</label>
+          <textarea class="form-control" id="formProdBox" rows="4">01 Thân máy T-Flow T-Flow Pro
+01 Ngàm hít từ tính MagSafe N52 Quick-Snap
+01 Chân đế Tripod Mini sợi Carbon CNC
+01 Cáp sạc nhanh USB-C to USB-C
+01 Túi nhung chống sốc bảo quản du lịch</textarea>
+        </div>
+
+        <!-- Section 5: Tech Specs -->
+        <div class="form-section-title">5. Bảng Thông Số Kỹ Thuật (Tech Specs)</div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Trọng Lượng Thân Máy</label>
+            <input type="text" class="form-control" id="formSpecWeight" value="480g">
+          </div>
+          <div class="form-group">
+            <label>Tải Trọng Tối Đa</label>
+            <input type="text" class="form-control" id="formSpecPayload" value="380g">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Thời Lượng Pin Hoạt Động</label>
+            <input type="text" class="form-control" id="formSpecBattery" value="18 giờ">
+          </div>
+          <div class="form-group">
+            <label>Chuẩn Kết Nối</label>
+            <input type="text" class="form-control" id="formSpecConnect" value="Bluetooth 5.3 Low Energy">
+          </div>
+        </div>
+
+        <!-- Section 6: Dynamic Multi-Tier Management -->
+        <div class="form-section-title">
+          <span>6. Cấu Hình Các Phân Cấp &amp; Giá Bán (Cấp 3)</span>
+          <span style="font-size:12px; font-weight:600; color:var(--link);" id="formTiersCountLabel">3 phân cấp</span>
+        </div>
+        <div id="formTiersList">
+          <!-- Dynamically populated list of tiers -->
+        </div>
+
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; margin-top:12px;">
+          <div style="font-size:13px; font-weight:700; margin-bottom:10px;">+ Thêm Phân Cấp Mới Cho Sản Phẩm Này:</div>
+          <div class="form-row-3">
+            <div>
+              <label style="font-size:11px; font-weight:700; color:var(--text-secondary);">Tên Phân Cấp</label>
+              <input type="text" class="form-control" id="newTierLabel" placeholder="VD: T-Flow Pro Max Creator">
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:700; color:var(--text-secondary);">Giá Bán (VNĐ)</label>
+              <input type="number" class="form-control" id="newTierPrice" placeholder="VD: 4390000">
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:700; color:var(--text-secondary);">Giá Gốc (VNĐ)</label>
+              <input type="number" class="form-control" id="newTierOldPrice" placeholder="VD: 5190000">
+            </div>
+          </div>
+          <div class="form-row-2" style="margin-bottom:8px;">
+            <div>
+              <label style="font-size:11px; font-weight:700; color:var(--text-secondary);">Quà Tặng Kèm</label>
+              <input type="text" class="form-control" id="newTierGift" placeholder="VD: Vali + 2 Mic Kép">
+            </div>
+            <div>
+              <label style="font-size:11px; font-weight:700; color:var(--text-secondary);">Thông Số Khác Biệt</label>
+              <input type="text" class="form-control" id="newTierSpecs" placeholder="VD: Creator Kit • Kèm Cảm Biến AI">
+            </div>
+          </div>
+          <button class="btn btn-dark" type="button" style="padding:6px 14px; font-size:12px;" onclick="addInlineTierToForm()">Thêm Phân Cấp Này</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeProductModal()">Hủy</button>
+        <button class="btn btn-dark" onclick="saveProductPublish()">Lưu &amp; Xuất Bản Bài Đăng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 3: QUẢN LÝ PHÂN CẤP NHANH CHO SẢN PHẨM (TIERS QUICK MODAL)
+       ========================================================================== -->
+  <div class="modal-overlay" id="tiersModal">
+    <div class="modal-card-medium">
+      <div class="modal-header">
+        <h3 id="tiersModalTitle">Quản Lý Phân Cấp Sản Phẩm</h3>
+        <button class="btn btn-outline" style="padding:4px 10px;" onclick="closeTiersModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="tierManageProdId">
+        <div style="font-size:13px; font-weight:700; margin-bottom:12px;">Danh Sách Các Phân Cấp Hiện Có:</div>
+        <div id="quickTiersListContainer">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; margin-top:20px;">
+          <div style="font-size:13px; font-weight:700; margin-bottom:10px;">+ Thêm Phân Cấp Mới:</div>
+          <div class="form-group">
+            <label>Tên Phân Cấp / Biến Thể</label>
+            <input type="text" class="form-control" id="quickTierName" placeholder="VD: T-Flow Pro Pro, S2 Ultra...">
+          </div>
+          <div class="form-row-2">
+            <div class="form-group">
+              <label>Giá Bán (VNĐ)</label>
+              <input type="number" class="form-control" id="quickTierPrice" placeholder="VD: 3690000">
+            </div>
+            <div class="form-group">
+              <label>Giá Gốc (VNĐ)</label>
+              <input type="number" class="form-control" id="quickTierOldPrice" placeholder="VD: 4390000">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Quà Tặng Kèm</label>
+            <input type="text" class="form-control" id="quickTierGift" placeholder="VD: 01 Micro Wireless 2.4GHz">
+          </div>
+          <div class="form-group">
+            <label>Thông Số Nổi Bật</label>
+            <input type="text" class="form-control" id="quickTierSpecs" placeholder="VD: Màn hình OLED • Focus Wheel">
+          </div>
+          <button class="btn btn-dark" style="width:100%; padding:9px 0;" onclick="submitQuickNewTier()">Lưu Phân Cấp</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeTiersModal()">Đóng</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       DRAWER: USER 7-MODULE PERMISSIONS
+       ========================================================================== -->
+  <div class="drawer-overlay" id="userDrawer" onclick="closeUserDrawer(event)">
+    <div class="drawer-panel" onclick="event.stopPropagation()">
+      <div class="drawer-header">
+        <div>
+          <h3 id="drawerUserName">Đặng Anh Dũng</h3>
+          <div style="font-size:12px; color:var(--text-secondary);" id="drawerUserEmail">user@tflow.tech</div>
+        </div>
+        <button class="btn btn-outline" style="padding:4px 10px;" onclick="closeUserDrawer()">&times;</button>
+      </div>
+      <div class="drawer-body">
+        <input type="hidden" id="drawerUserId">
+        <div style="margin-bottom:20px;">
+          <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">Gói Cấp Bậc Tài Khoản</label>
+          <select class="form-control" id="drawerUserTier">
+            <option value="Basic Creator">Basic Creator</option>
+            <option value="Pro Cinema">Pro Cinema</option>
+            <option value="Enterprise Studio">Enterprise Studio</option>
+          </select>
+        </div>
+
+        <div style="font-size:13px; font-weight:800; margin-bottom:12px;">7 Module Tính Năng Ứng Dụng:</div>
+
+        <div id="drawerModulesList">
+          <!-- Dynamically populated module toggles -->
+        </div>
+      </div>
+      <div class="drawer-footer">
+        <button class="btn btn-outline" onclick="closeUserDrawer()">Hủy</button>
+        <button class="btn btn-dark" onclick="saveUserModules()">Lưu Phân Quyền</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ENTERPRISE 4-COLUMN FOOTER (#111827) -->
+  
+  <!-- MODAL: ADD / EDIT AI KNOWLEDGE -->
+  <div class="modal-overlay" id="knowledgeModal">
+    <div class="modal-card" style="width:640px; max-width:92vw;">
+      <div class="modal-header">
+        <h3 id="knowledgeModalTitle">Huấn Luyện Tri Thức Mới Cho AI</h3>
+        <button class="btn btn-outline" style="padding:4px 10px;" onclick="closeKnowledgeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="formKbId">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Nền Tảng Áp Dụng</label>
+            <select class="form-control" id="formKbTarget">
+              <option value="sales">🛍️ 1. Tư Vấn Bán Hàng &amp; Chính Sách (Giá, 4 Gói Pro, Bảo Hành)</option>
+              <option value="creative">🎬 2. Tư Vấn Kỹ Thuật Quay Chụp &amp; Edit (Góc máy, FOC, 3D LUT, Dựng phim)</option>
+              <option value="smart_vision">🧠 3. Tính Năng Nhận Diện AI Thông Minh (Bám nét người/thú cưng/vật thể, Auto Ultra-Wide)</option>
+              <option value="all_domains">🌐 4. Áp Dụng Cho Cả 3 Chuyên Mục (Toàn Hệ Thống)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Chủ Đề Tri Thức</label>
+            <input type="text" class="form-control" id="formKbTopic" placeholder="Ví dụ: Quay cảnh tuyết rơi, Giá gói phụ kiện...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Từ Khóa Nhận Diện (Cách nhau bởi dấu phẩy)</label>
+          <input type="text" class="form-control" id="formKbKeywords" placeholder="tuyết, mùa đông, lạnh, trắng, phơi sáng...">
+        </div>
+        <div class="form-group">
+          <label>Nội Dung Giải Đáp Chuẩn Xác (Định Dạng Markdown)</label>
+          <textarea class="form-control" id="formKbAnswer" rows="5" placeholder="Nhập câu trả lời chính xác và đầy đủ mà AI sẽ nói với khách hàng..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeKnowledgeModal()">Hủy</button>
+        <button class="btn btn-dark" onclick="saveKnowledgeSubmit()">Lưu &amp; Huấn Luyện Ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN GÓP Ý & ĐỊNH HƯỚNG AI (DIRECTIVE & FEEDBACK LEARNING) -->
+  <div class="modal-overlay" id="adminCommentModal">
+    <div class="modal-card" style="width:720px; max-width:94vw; max-height:92vh; overflow-y:auto; border-radius:18px;">
+      <div class="modal-header" style="background:#F5F5F7; border-bottom:1px solid var(--border); padding:16px 20px;">
+        <div>
+          <div style="font-size:16px; font-weight:800; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:#0071E3; color:#FFF; font-size:14px;">💡</span>
+            Admin Góp Ý &amp; Định Hướng AI (Không Cần Viết Kịch Bản)
+          </div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+            Anh chỉ cần để lại nhận xét, góp ý ngắn hoặc lưu ý nghiệp vụ. AI sẽ tự động học hỏi định hướng này để tự biên soạn câu trả lời thông minh, tự nhiên theo đúng ý anh mà không bị rập khuôn kịch bản!
+          </div>
+        </div>
+        <button class="btn btn-outline" style="padding:4px 10px; border-radius:8px;" onclick="closeAdminCommentModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:20px;">
+        <input type="hidden" id="adminCommentConvId">
+        
+        <!-- CUSTOMER QUESTION CARD -->
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">❓ Câu Hỏi Của Khách Hàng:</span>
+            <span id="adminCommentCustomerMeta" style="font-size:11.5px; color:var(--text-secondary); font-weight:600;"></span>
+          </div>
+          <div id="adminCommentCustomerQuery" style="font-size:14.5px; font-weight:800; color:#1D1D1F; line-height:1.45;"></div>
+        </div>
+
+        <!-- PREVIOUS AI ANSWER -->
+        <div style="background:rgba(0,113,227,0.04); border:1px dashed rgba(0,113,227,0.25); border-radius:12px; padding:12px 14px; margin-bottom:16px;">
+          <div style="font-size:11px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:4px;">
+            🤖 Câu Trả Lời Tự Động Trước Đó Của AI (Cần Admin Góp Ý / Định Hướng Lại):
+          </div>
+          <div id="adminCommentPreviousReply" style="font-size:12.5px; color:var(--text-secondary); line-height:1.45; max-height:85px; overflow-y:auto;"></div>
+        </div>
+
+        <!-- CHUYÊN MỤC ÁP DỤNG -->
+        <div class="form-group" style="margin-bottom:14px;">
+          <label style="font-weight:700; font-size:12.5px;">Chuyên Mục Áp Dụng Chỉ Đạo</label>
+          <select class="form-control" id="adminCommentTarget">
+            <option value="sales">🛍️ 1. Tư Vấn Bán Hàng &amp; Chính Sách (Giá 4 Gói Pro, Bảo Hành 1 Đổi 1, MagSafe)</option>
+            <option value="creative">🎬 2. Tư Vấn Kỹ Thuật Quay Chụp &amp; Edit (Góc máy, FOC, 3D LUT, App T-Flow)</option>
+            <option value="smart_vision">🧠 3. Tính Năng Nhận Diện AI Thông Minh (Bám nét người/thú cưng/vật thể, 120fps)</option>
+            <option value="all_domains">🌐 4. Áp Dụng Cho Toàn Hệ Thống (Mọi Chuyên Mục)</option>
+          </select>
+        </div>
+
+        <!-- QUICK DIRECTIVE CHIPS (CLICK TO APPEND) -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">⚡ Gợi Ý Chỉ Đạo Nghiệp Vụ Nhanh (Click để tự điền lưu ý):</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Khách mới bắt đầu: Hướng dẫn họ chọn gói Standard 2.490k cho tiết kiệm, nhấn mạnh trong app có sẵn chuỗi video hướng dẫn chi tiết từng bước, giọng nhiệt tình, không chèo kéo gói đắt tiền')">💡 Người Mới: Ưu tiên gói Standard &amp; Video App</button>
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Nhấn mạnh ngàm hít nam châm MagSafe lực hút 2.8kg cực kỳ chắc chắn, chống rơi rớt tuyệt đối khi vận động mạnh')">🧲 Nhấn mạnh ngàm MagSafe 2.8kg</button>
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Nhắc cam kết bảo hành 1 đổi 1 trong 12 tháng chính hãng và dùng thử 30 ngày hoàn tiền 100% nếu không ưng ý')">🛡️ Nhắc Bảo Hành 1 Đổi 1 &amp; Dùng Thử</button>
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Nhấn mạnh công nghệ động cơ Pure FOC 20kHz không tiếng ồn, triệt tiêu rung giật chuẩn điện ảnh')">⚡ Nhấn mạnh động cơ Pure FOC 20kHz</button>
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Gợi ý khách tải App T-Flow để chỉnh Apple Log ProRes 4K và áp bảng màu 3D LUT chuyên nghiệp')">🎬 Nhắc tải App T-Flow &amp; 3D LUT</button>
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Giọng văn nhiệt tình, thân thiện, hỏi thêm khách đang dùng điện thoại gì để tư vấn phụ kiện phù hợp')">🤝 Thân thiện, hỏi dòng điện thoại của khách</button>
+          </div>
+        </div>
+
+        <!-- MAIN COMMENT / DIRECTIVE TEXTAREA -->
+        <div class="form-group" style="margin-bottom:8px;">
+          <label style="font-weight:700; font-size:12.5px; display:flex; justify-content:space-between; align-items:center;">
+            <span>📝 Góp Ý / Chỉ Đạo Của Admin Cho AI:</span>
+            <span style="font-weight:400; color:#0071E3; font-size:11.5px;">✓ Không cần viết kịch bản đầy đủ</span>
+          </label>
+          <textarea class="form-control" id="adminCommentOfficialAnswer" rows="5" placeholder="Nhập góp ý, nhận xét hoặc lưu ý nghiệp vụ của anh tại đây... Ví dụ: Khách này mới tập quay thì hướng dẫn họ lấy gói Standard 2.490k cho tiết kiệm, nhắc là trong app có sẵn video hướng dẫn chi tiết từng bước, giọng nhiệt tình, hỏi thêm khách dùng iPhone hay Android..."></textarea>
+        </div>
+        <div style="font-size:11.5px; color:#8E8E93; line-height:1.45; background:#F5F5F7; padding:8px 12px; border-radius:8px;">
+          🤖 <strong>Cơ chế tự học thông minh:</strong> AI (Google Gemini) sẽ ghi nhớ góp ý này của anh như một lưu ý nghiệp vụ cốt lõi để tự động sáng tạo câu trả lời linh hoạt, tự nhiên nhất cho các khách hàng tiếp theo mà không bao giờ bị rập khuôn kịch bản máy móc.
+        </div>
+      </div>
+      <div class="modal-footer" style="padding:14px 20px; background:#F5F5F7; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:11.5px; color:#8E8E93;">✓ Tự động nạp vào bộ nhớ định hướng AI Realtime</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" onclick="closeAdminCommentModal()">Hủy Bỏ</button>
+          <button class="btn btn-dark" onclick="submitAdminCommentTraining()" style="background:#0071E3; border-color:#0071E3; font-weight:700; padding:8px 18px;">
+            💾 Lưu Góp Ý &amp; Định Hướng AI
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-msg" id="toastMsg">Thao tác thành công</div>
+
+  <script src="/shared/catalog_store.js"></script>
+  <script>
+
+    // ==========================================================================
+    // MODERN SIDEBAR VIEW CONTROLLER
+    // ==========================================================================
+    
+    function toggleAdminSidebar(open) {
+      const sidebar = document.querySelector('.admin-sidebar');
+      const backdrop = document.getElementById('adminSidebarBackdrop');
+      if (!sidebar) return;
+      if (open) {
+        sidebar.classList.add('open');
+        if (backdrop) backdrop.classList.add('active');
+      } else {
+        sidebar.classList.remove('open');
+        if (backdrop) backdrop.classList.remove('active');
+      }
+    }
+
+    function switchAdminView(viewId) {
+      toggleAdminSidebar(false);
+      const views = ['ai', 'overview', 'groups', 'products', 'users', 'reviews', 'settings'];
+      if (!views.includes(viewId)) viewId = 'ai';
+
+      views.forEach(v => {
+        const el = document.getElementById('view-' + v);
+        if (el) el.style.display = (v === viewId) ? 'block' : 'none';
+        const menu = document.getElementById('menu-item-' + v);
+        if (menu) menu.classList.toggle('active', v === viewId);
+      });
+
+      const titles = {
+        ai: '⚡ Trung Tâm Huấn Luyện AI & Quản Lý Hội Thoại',
+        overview: '📊 Bảng Điều Khiển Tổng Quan',
+        groups: '📁 Quản Lý Nhóm Sản Phẩm (Danh Mục Cấp 1)',
+        products: '📦 Quản Lý Bài Đăng Sản Phẩm (Cấp 2)',
+        users: '👥 Cấp Quyền 7 Module Người Dùng',
+        reviews: '⭐ Quản Lý Đánh Giá & Cảm Nhận Khách Hàng',
+        settings: '⚙️ Cài Đặt Google Cloud AI & OAuth 2.0'
+      };
+
+      const titleEl = document.getElementById('adminCurrentViewTitle');
+      if (titleEl) titleEl.innerHTML = titles[viewId] || 'Quản Trị';
+
+      if (viewId === 'ai' && typeof initAiTrainingDashboard === 'function') {
+        initAiTrainingDashboard();
+      }
+
+      try {
+        history.replaceState(null, '', '#' + viewId);
+      } catch(e) {}
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    const MODULE_NAMES = [
+      "AI Vision Optical Tracking",
+      "Apple Log & ProRes 4K/60fps",
+      "Motionlapse Waypoint 5-Point",
+      "Multi-Cam Director Studio",
+      "3D LUT Real-time Preview",
+      "FOC Motor Micro-Tuning",
+      "500Hz Gyro Raw Telemetry"
+    ];
+
+    let currentCatalog = null;
+    let selectedTableFilter = 'all';
+
+    // Temporary storage for tiers in publishing form
+    let formTiersBuffer = [];
+
+    
+    // ==========================================================================
+    // ADMIN REVIEWS MODERATION ENGINE
+    // ==========================================================================
+    function renderAdminReviewsTable() {
+      const tbody = document.getElementById('adminReviewsTableBody');
+      const badge = document.getElementById('adminReviewsCountBadge');
+      if (!tbody || typeof SmartGimbalCatalog === 'undefined') return;
+
+      const reviews = SmartGimbalCatalog.getReviews() || [];
+      if (badge) badge.textContent = reviews.length + ' Đánh Giá Thực Tế';
+
+      if (reviews.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:32px; color:var(--text-secondary);">Chưa có đánh giá nào từ khách hàng.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      reviews.forEach(r => {
+        let starsStr = '';
+        for (let i = 0; i < 5; i++) {
+          starsStr += (i < r.rating) ? '★' : '☆';
+        }
+
+        html += `
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--text-main);">${r.author || 'Khách Hàng'}</div>
+              <div style="font-size:11.5px; color:var(--text-secondary);">${r.email || r.date || ''}</div>
+              ${r.verified ? '<span style="font-size:10px; font-weight:700; background:rgba(52,199,89,0.12); color:#28CD41; padding:1px 6px; border-radius:99px;">✓ Mua Chính Hãng</span>' : ''}
+            </td>
+            <td>
+              <span style="color:#FFB800; font-size:15px; font-weight:700;">${starsStr}</span>
+              <span style="font-size:12px; font-weight:700; margin-left:4px;">(${r.rating}/5)</span>
+            </td>
+            <td>
+              <span style="font-size:12px; font-weight:600; background:#F5F5F7; padding:4px 8px; border-radius:6px;">${r.package || 'T-Flow Pro'}</span>
+            </td>
+            <td>
+              <div style="font-weight:700; font-size:13px; color:var(--text-main); margin-bottom:3px;">${r.title || ''}</div>
+              <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.4;">"${r.comment || ''}"</div>
+              <div style="margin-top:4px; display:flex; gap:4px; flex-wrap:wrap;">
+                ${(r.tags || []).map(t => `<span style="font-size:10.5px; background:rgba(0,0,0,0.04); color:var(--text-secondary); padding:2px 6px; border-radius:4px;">#${t}</span>`).join('')}
+              </div>
+            </td>
+            <td style="text-align:right;">
+              <button onclick="handleDeleteReview('${r.id}')" style="background:none; border:1px solid #FF3B30; color:#FF3B30; padding:4px 10px; border-radius:6px; font-size:11.5px; font-weight:600; cursor:pointer;">
+                Xóa
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function handleDeleteReview(reviewId) {
+      if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này khỏi hệ thống?')) return;
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.deleteReview(reviewId);
+        renderAdminReviewsTable();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initAdmin();
+    });
+
+    function initAdmin() {
+      if (typeof SmartGimbalCatalog === 'undefined') {
+        console.error('SmartGimbalCatalog not loaded!');
+        return;
+      }
+      loadCatalog();
+      renderAll();
+
+      window.addEventListener(SmartGimbalCatalog.SYNC_EVENT, () => {
+        loadCatalog();
+        renderAll();
+      });
+
+      // Default or hash-based view
+      const curHash = (window.location.hash || '').replace('#', '');
+      if (curHash === 'overview' || curHash === 'groups' || curHash === 'products' || curHash === 'users' || curHash === 'reviews' || curHash === 'settings') {
+        switchAdminView(curHash);
+      } else {
+        switchAdminView('ai'); // Default directly to AI Training Center as requested!
+      }
+
+    }
+
+    function loadCatalog() {
+      currentCatalog = SmartGimbalCatalog.getCatalog();
+    }
+
+    function renderAll() {
+      renderStats();
+      renderGroupsManager();
+      renderFilterPills();
+      renderProductsTable();
+      renderUsersTable();
+    }
+
+    // 1. STATS
+    function renderStats() {
+      document.getElementById('kpiGroupsCount').textContent = currentCatalog.groups.length;
+      document.getElementById('kpiProductsCount').textContent = currentCatalog.products.length;
+
+      let totalOrders = 0;
+      currentCatalog.products.forEach(p => { totalOrders += (p.totalOrders || 0); });
+      document.getElementById('kpiOrdersCount').textContent = totalOrders.toLocaleString('vi-VN');
+
+      const mvp = SmartGimbalCatalog.getMvpProduct();
+      if (mvp) {
+        document.getElementById('headerMvpName').textContent = mvp.name;
+        document.getElementById('kpiMvpName').textContent = mvp.name;
+      }
+    }
+
+    // 2. KHỐI QUẢN LÝ NHÓM SẢN PHẨM (DYNAMIC GROUPS CRUD)
+    function renderGroupsManager() {
+      const container = document.getElementById('groupsListGrid');
+      container.innerHTML = '';
+
+      currentCatalog.groups.forEach(g => {
+        const prodCount = currentCatalog.products.filter(p => p.groupId === g.id).length;
+        const card = document.createElement('div');
+        card.className = 'group-item-card';
+        card.innerHTML = `
+          <div>
+            <div class="group-card-header">
+              <div class="group-card-name">${g.name}</div>
+              <span class="group-prod-count">${prodCount} sản phẩm</span>
+            </div>
+            <div class="group-card-desc">${g.desc || 'Chưa có mô tả'}</div>
+          </div>
+          <div class="group-card-actions">
+            <button class="btn btn-outline" style="flex:1; padding:5px 0; font-size:12px;" onclick="openEditGroupModal('${g.id}')">Sửa Tên Nhóm</button>
+            <button class="btn btn-outline" style="padding:5px 12px; font-size:12px; color:#DC3545;" onclick="confirmDeleteGroup('${g.id}')">Xóa</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function openCreateGroupModal() {
+      document.getElementById('groupModalTitle').textContent = 'Tạo Mới Nhóm Sản Phẩm';
+      document.getElementById('formGroupId').value = '';
+      document.getElementById('formGroupName').value = '';
+      document.getElementById('formGroupDesc').value = '';
+      document.getElementById('formGroupBadge').value = '';
+      document.getElementById('groupModal').classList.add('open');
+    }
+
+    function openEditGroupModal(groupId) {
+      const g = SmartGimbalCatalog.getGroup(groupId);
+      if (!g) return;
+      document.getElementById('groupModalTitle').textContent = `Chỉnh Sửa Nhóm: ${g.name}`;
+      document.getElementById('formGroupId').value = g.id;
+      document.getElementById('formGroupName').value = g.name;
+      document.getElementById('formGroupDesc').value = g.desc || '';
+      document.getElementById('formGroupBadge').value = g.badge || '';
+      document.getElementById('groupModal').classList.add('open');
+    }
+
+    function closeGroupModal() {
+      document.getElementById('groupModal').classList.remove('open');
+    }
+
+    function saveGroupSubmit() {
+      const gId = document.getElementById('formGroupId').value;
+      const name = document.getElementById('formGroupName').value.trim();
+      const desc = document.getElementById('formGroupDesc').value.trim();
+      const badge = document.getElementById('formGroupBadge').value.trim();
+
+      if (!name) {
+        alert('Vui lòng nhập Tên nhóm sản phẩm!');
+        return;
+      }
+
+      if (gId) {
+        SmartGimbalCatalog.updateGroup(gId, { name: name, desc: desc, badge: badge });
+        showToast(`Đã cập nhật nhóm [${name}]`);
+      } else {
+        SmartGimbalCatalog.addGroup({ name: name, desc: desc, badge: badge });
+        showToast(`Đã tạo mới nhóm [${name}]`);
+      }
+
+      closeGroupModal();
+      loadCatalog();
+      renderAll();
+    }
+
+    function confirmDeleteGroup(groupId) {
+      const g = SmartGimbalCatalog.getGroup(groupId);
+      if (!g) return;
+      if (confirm(`Bạn có chắc chắn muốn xóa nhóm [${g.name}]?\nCác sản phẩm trong nhóm này sẽ tự động chuyển sang nhóm mặc định.`)) {
+        SmartGimbalCatalog.deleteGroup(groupId);
+        loadCatalog();
+        renderAll();
+        showToast('Đã xóa nhóm sản phẩm');
+      }
+    }
+
+    // 3. DYNAMIC FILTER PILLS
+    function renderFilterPills() {
+      const container = document.getElementById('adminFilterPills');
+      container.innerHTML = '';
+
+      const allBtn = document.createElement('button');
+      allBtn.className = `pill-btn ${selectedTableFilter === 'all' ? 'active' : ''}`;
+      allBtn.textContent = `Tất Cả (${currentCatalog.products.length})`;
+      allBtn.onclick = () => filterAdminTable('all', allBtn);
+      container.appendChild(allBtn);
+
+      currentCatalog.groups.forEach(g => {
+        const count = currentCatalog.products.filter(p => p.groupId === g.id).length;
+        const btn = document.createElement('button');
+        btn.className = `pill-btn ${selectedTableFilter === g.id ? 'active' : ''}`;
+        btn.textContent = `${g.name} (${count})`;
+        btn.onclick = () => filterAdminTable(g.id, btn);
+        container.appendChild(btn);
+      });
+    }
+
+    function filterAdminTable(groupId, btn) {
+      selectedTableFilter = groupId;
+      document.querySelectorAll('#adminFilterPills .pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderProductsTable();
+    }
+
+    // 4. PRODUCTS TABLE & TIERS DISPLAY
+    function renderProductsTable() {
+      const tbody = document.getElementById('productsTableBody');
+      tbody.innerHTML = '';
+
+      let prods = currentCatalog.products;
+      if (selectedTableFilter !== 'all') {
+        prods = prods.filter(p => p.groupId === selectedTableFilter);
+      }
+
+      prods.forEach(p => {
+        const group = SmartGimbalCatalog.getGroup(p.groupId);
+        const groupName = group ? group.name : 'Gimbal';
+        const isMvp = (p.id === currentCatalog.mvpProductId);
+
+        // Colors
+        let colorsHtml = '<div style="display:flex; gap:6px; margin-bottom:4px;">';
+        if (p.colors && p.colors.length > 0) {
+          p.colors.forEach(c => {
+            colorsHtml += `<div style="width:14px; height:14px; border-radius:50%; background:${c.hex}; border:1px solid rgba(0,0,0,0.15);" title="${c.name}"></div>`;
+          });
+        }
+        colorsHtml += `</div><span style="font-size:12px; color:var(--text-secondary);">${p.status || 'Đang Mở Bán'}</span>`;
+
+        // Tiers column with "Quản Lý Phân Cấp" button
+        let tiersListHtml = '<div style="display:flex; flex-direction:column; gap:4px;">';
+        if (p.tiers && p.tiers.length > 0) {
+          p.tiers.forEach(t => {
+            tiersListHtml += `
+              <div style="font-size:12px; display:flex; justify-content:space-between; gap:10px;">
+                <span><b>${t.label}:</b></span>
+                <span style="font-family:var(--font-mono); font-weight:700;">${t.priceFormatted}</span>
+              </div>
+            `;
+          });
+        } else {
+          tiersListHtml += '<div style="font-size:12px; color:var(--text-muted);">Chưa có phân cấp</div>';
+        }
+        tiersListHtml += `
+          <button class="btn btn-outline" style="padding:3px 8px; font-size:11px; margin-top:4px;" onclick="openQuickTiersModal('${p.id}')">
+            Quản Lý Phân Cấp (${p.tiers ? p.tiers.length : 0})
+          </button>
+        </div>`;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div class="prod-thumb-sm">
+                <img src="${p.img || '/shared/img/feed_portrait_dusk.jpg'}" alt="${p.name}">
+              </div>
+              <div>
+                <div style="font-size:14.5px; font-weight:800;">${p.name}</div>
+                <div style="font-size:12px; color:var(--text-secondary);">${p.tagline || p.subtitle || ''}</div>
+                ${isMvp ? '<span class="badge-mvp">Sản Phẩm Nổi Bật (MVP)</span>' : ''}
+              </div>
+            </div>
+          </td>
+          <td><span style="font-size:12.5px; font-weight:700;">${groupName}</span></td>
+          <td>${colorsHtml}</td>
+          <td>
+            <div>
+              <b style="font-family:var(--font-mono); font-size:15px;">${(p.totalOrders || 0).toLocaleString('vi-VN')}</b> đơn
+              <div style="font-size:11.5px; color:var(--green); font-weight:600;">${p.orderGrowth || '+15%'}</div>
+            </div>
+          </td>
+          <td>${tiersListHtml}</td>
+          <td style="text-align:right;">
+            <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
+              ${!isMvp ? `<button class="btn btn-outline" style="padding:4px 10px; font-size:11.5px;" onclick="pinMvpProduct('${p.id}')">Ghim MVP</button>` : ''}
+              <button class="btn btn-outline" style="padding:4px 10px; font-size:11.5px;" onclick="editProduct('${p.id}')">Sửa Bài</button>
+              <button class="btn btn-outline" style="padding:4px 10px; font-size:11.5px; color:#DC3545;" onclick="deleteProduct('${p.id}')">Xóa</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function pinMvpProduct(productId) {
+      SmartGimbalCatalog.setMvpProduct(productId);
+      loadCatalog();
+      renderAll();
+      const mvp = SmartGimbalCatalog.getMvpProduct();
+      showToast(`Đã ghim [${mvp.name}] làm Sản Phẩm Nổi Bật đầu Trang Chủ`);
+    }
+
+    function deleteProduct(productId) {
+      const prod = SmartGimbalCatalog.getProduct(productId);
+      if (confirm(`Bạn có chắc chắn muốn xóa bài đăng [${prod ? prod.name : productId}]?`)) {
+        SmartGimbalCatalog.deleteProduct(productId);
+        loadCatalog();
+        renderAll();
+        showToast('Đã xóa bài đăng');
+      }
+    }
+
+    // 5. PRODUCT PUBLISHING MODAL (WITH MULTI-TIER MANAGEMENT)
+    function openPublishProductModal() {
+      document.getElementById('productModalTitle').textContent = 'Đăng Bài Sản Phẩm Mới';
+      document.getElementById('formProdId').value = '';
+      document.getElementById('formProdName').value = '';
+      document.getElementById('formProdTagline').value = '';
+      document.getElementById('formProdIsMvp').checked = false;
+      document.getElementById('formProdImg').value = '/shared/img/feed_portrait_dusk.jpg';
+
+      renderGroupSelectOptions('cat-phone');
+
+      formTiersBuffer = [
+        {
+          key: "standard",
+          label: "Bản Tiêu Chuẩn",
+          name: "Bản Tiêu Chuẩn",
+          price: 1990000,
+          priceFormatted: "1.990.000₫",
+          oldPriceFormatted: "2.490.000₫",
+          gift: "Phụ kiện tiêu chuẩn",
+          specs: "Thông số tiêu chuẩn",
+          highlights: ["Bảo hành chính hãng 12 tháng"]
+        }
+      ];
+      renderFormTiersList();
+
+      updateMediaPreviews();
+      document.getElementById('productModal').classList.add('open');
+    }
+
+    function editProduct(productId) {
+      const prod = SmartGimbalCatalog.getProduct(productId);
+      if (!prod) return;
+
+      document.getElementById('productModalTitle').textContent = `Chỉnh Sửa Bài Đăng: ${prod.name}`;
+      document.getElementById('formProdId').value = prod.id;
+      renderGroupSelectOptions(prod.groupId || 'cat-phone');
+      document.getElementById('formProdName').value = prod.name;
+      document.getElementById('formProdTagline').value = prod.tagline || prod.subtitle || '';
+      document.getElementById('formProdStatus').value = prod.status || 'Đang Mở Bán';
+      document.getElementById('formProdIsMvp').checked = (prod.id === currentCatalog.mvpProductId);
+      document.getElementById('formProdImg').value = prod.img || '/shared/img/feed_portrait_dusk.jpg';
+
+      if (prod.gallery && prod.gallery.length >= 4) {
+        document.getElementById('formProdGallery1').value = prod.gallery[0];
+        document.getElementById('formProdGallery2').value = prod.gallery[1];
+        document.getElementById('formProdGallery3').value = prod.gallery[2];
+        document.getElementById('formProdGallery4').value = prod.gallery[3];
+      }
+
+      if (prod.boxContents) {
+        document.getElementById('formProdBox').value = prod.boxContents.join('\n');
+      }
+
+      if (prod.specs) {
+        document.getElementById('formSpecWeight').value = prod.specs["Trọng lượng thân máy"] || prod.specs["Trọng lượng"] || "480g";
+        document.getElementById('formSpecPayload').value = prod.specs["Tải trọng tối đa"] || "380g";
+        document.getElementById('formSpecBattery').value = prod.specs["Thời lượng pin"] || "18 giờ";
+        document.getElementById('formSpecConnect').value = prod.specs["Chuẩn kết nối"] || "Bluetooth 5.3 Low Energy";
+      }
+
+      formTiersBuffer = JSON.parse(JSON.stringify(prod.tiers || []));
+      renderFormTiersList();
+
+      updateMediaPreviews();
+      document.getElementById('productModal').classList.add('open');
+    }
+
+    function renderGroupSelectOptions(selectedGroupId) {
+      const sel = document.getElementById('formProdGroup');
+      sel.innerHTML = '';
+      currentCatalog.groups.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g.id;
+        opt.textContent = g.name;
+        if (g.id === selectedGroupId) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    }
+
+    function renderFormTiersList() {
+      const container = document.getElementById('formTiersList');
+      container.innerHTML = '';
+      document.getElementById('formTiersCountLabel').textContent = `${formTiersBuffer.length} phân cấp`;
+
+      formTiersBuffer.forEach((t, idx) => {
+        const box = document.createElement('div');
+        box.className = 'form-tier-item';
+        box.innerHTML = `
+          <div class="form-tier-info">
+            <div class="form-tier-name">${t.label}</div>
+            <div class="form-tier-price">${t.priceFormatted || SmartGimbalCatalog.formatVND(t.price)} ${t.oldPriceFormatted ? `(Gốc: ${t.oldPriceFormatted})` : ''}</div>
+            <div class="form-tier-gift">Tặng: ${t.gift || 'Không có'} &bull; ${t.specs || ''}</div>
+          </div>
+          <div>
+            <button class="btn btn-outline" style="padding:4px 8px; font-size:11px; color:#DC3545;" onclick="removeInlineTier(${idx})">Xóa</button>
+          </div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    function addInlineTierToForm() {
+      const label = document.getElementById('newTierLabel').value.trim();
+      const price = parseInt(document.getElementById('newTierPrice').value, 10);
+      const oldPrice = parseInt(document.getElementById('newTierOldPrice').value, 10);
+      const gift = document.getElementById('newTierGift').value.trim();
+      const specs = document.getElementById('newTierSpecs').value.trim();
+
+      if (!label || !price) {
+        alert('Vui lòng nhập Tên phân cấp và Giá bán!');
+        return;
+      }
+
+      formTiersBuffer.push({
+        key: 'tier-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+        label: label,
+        name: label,
+        price: price,
+        priceFormatted: SmartGimbalCatalog.formatVND(price),
+        oldPriceFormatted: oldPrice ? SmartGimbalCatalog.formatVND(oldPrice) : '',
+        save: oldPrice && oldPrice > price ? `Tiết kiệm ${SmartGimbalCatalog.formatVND(oldPrice - price)}` : '',
+        gift: gift || 'Quà tặng chính hãng',
+        specs: specs || 'Thông số tiêu chuẩn',
+        highlights: [specs || 'Chất lượng hoàn thiện cao']
+      });
+
+      document.getElementById('newTierLabel').value = '';
+      document.getElementById('newTierPrice').value = '';
+      document.getElementById('newTierOldPrice').value = '';
+      document.getElementById('newTierGift').value = '';
+      document.getElementById('newTierSpecs').value = '';
+
+      renderFormTiersList();
+    }
+
+    function removeInlineTier(idx) {
+      formTiersBuffer.splice(idx, 1);
+      renderFormTiersList();
+    }
+
+    function closeProductModal() {
+      document.getElementById('productModal').classList.remove('open');
+    }
+
+    function updateMediaPreviews() {
+      const img1 = document.getElementById('formProdImg').value || '/shared/img/feed_portrait_dusk.jpg';
+      const img2 = document.getElementById('formProdGallery2').value || '/shared/img/feed_portrait_day.jpg';
+      const img3 = document.getElementById('formProdGallery3').value || '/shared/img/feed_person_portrait.jpg';
+      const img4 = document.getElementById('formProdGallery4').value || '/shared/img/feed_land_dusk.jpg';
+
+      document.getElementById('previewImg1').src = img1;
+      document.getElementById('previewImg2').src = img2;
+      document.getElementById('previewImg3').src = img3;
+      document.getElementById('previewImg4').src = img4;
+    }
+
+    function saveProductPublish() {
+      const prodId = document.getElementById('formProdId').value;
+      const name = document.getElementById('formProdName').value.trim();
+      const groupId = document.getElementById('formProdGroup').value;
+      const tagline = document.getElementById('formProdTagline').value.trim();
+      const status = document.getElementById('formProdStatus').value;
+      const isMvp = document.getElementById('formProdIsMvp').checked;
+      const mainImg = document.getElementById('formProdImg').value.trim();
+
+      if (!name) {
+        alert('Vui lòng nhập Tên sản phẩm!');
+        return;
+      }
+
+      if (formTiersBuffer.length === 0) {
+        alert('Vui lòng thêm ít nhất 1 phân cấp giá bán!');
+        return;
+      }
+
+      const gallery = [
+        document.getElementById('formProdGallery1').value.trim() || mainImg,
+        document.getElementById('formProdGallery2').value.trim() || mainImg,
+        document.getElementById('formProdGallery3').value.trim() || mainImg,
+        document.getElementById('formProdGallery4').value.trim() || mainImg
+      ];
+
+      const boxContents = document.getElementById('formProdBox').value.split('\n').filter(s => s.trim().length > 0);
+
+      const specs = {
+        "Trọng lượng thân máy": document.getElementById('formSpecWeight').value.trim(),
+        "Tải trọng tối đa": document.getElementById('formSpecPayload').value.trim(),
+        "Thời lượng pin": document.getElementById('formSpecBattery').value.trim(),
+        "Chuẩn kết nối": document.getElementById('formSpecConnect').value.trim()
+      };
+
+      if (prodId) {
+        SmartGimbalCatalog.updateProduct(prodId, {
+          name: name,
+          groupId: groupId,
+          tagline: tagline,
+          subtitle: tagline,
+          status: status,
+          img: mainImg,
+          gallery: gallery,
+          boxContents: boxContents,
+          specs: specs,
+          tiers: formTiersBuffer
+        });
+        if (isMvp) SmartGimbalCatalog.setMvpProduct(prodId);
+        showToast(`Đã cập nhật bài đăng [${name}]`);
+      } else {
+        const newProd = SmartGimbalCatalog.addProduct({
+          name: name,
+          groupId: groupId,
+          tagline: tagline,
+          subtitle: tagline,
+          status: status,
+          img: mainImg,
+          gallery: gallery,
+          boxContents: boxContents,
+          specs: specs,
+          colors: [
+            { id: "natural", name: "Titan Tự Nhiên", hex: "#D4D2CD" },
+            { id: "black", name: "Đen Không Gian", hex: "#1C1C1E" }
+          ],
+          tiers: formTiersBuffer
+        });
+        if (isMvp) SmartGimbalCatalog.setMvpProduct(newProd.id);
+        showToast(`Đã xuất bản bài đăng mới [${name}]`);
+      }
+
+      closeProductModal();
+      loadCatalog();
+      renderAll();
+    }
+
+    // 6. QUICK TIERS MANAGEMENT MODAL
+    function openQuickTiersModal(productId) {
+      const prod = SmartGimbalCatalog.getProduct(productId);
+      if (!prod) return;
+
+      document.getElementById('tierManageProdId').value = prod.id;
+      document.getElementById('tiersModalTitle').textContent = `Quản Lý Phân Cấp: ${prod.name}`;
+
+      renderQuickTiersList(prod);
+      document.getElementById('tiersModal').classList.add('open');
+    }
+
+    function renderQuickTiersList(prod) {
+      const container = document.getElementById('quickTiersListContainer');
+      container.innerHTML = '';
+
+      if (!prod.tiers || prod.tiers.length === 0) {
+        container.innerHTML = '<div style="padding:16px; text-align:center; color:var(--text-muted);">Chưa có phân cấp nào. Hãy thêm phân cấp bên dưới.</div>';
+        return;
+      }
+
+      prod.tiers.forEach(t => {
+        const item = document.createElement('div');
+        item.style.cssText = 'background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;';
+        item.innerHTML = `
+          <div>
+            <div style="font-size:14px; font-weight:700;">${t.label}</div>
+            <div style="font-size:13px; font-family:var(--font-mono); font-weight:700; color:var(--text-main);">${t.priceFormatted}</div>
+            <div style="font-size:11.5px; color:var(--text-secondary);">Tặng: ${t.gift || 'Không có'} &bull; ${t.specs || ''}</div>
+          </div>
+          <div>
+            <button class="btn btn-outline" style="padding:4px 8px; font-size:11.5px; color:#DC3545;" onclick="deleteQuickTier('${prod.id}', '${t.key}')">Xóa</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function submitQuickNewTier() {
+      const prodId = document.getElementById('tierManageProdId').value;
+      const name = document.getElementById('quickTierName').value.trim();
+      const price = parseInt(document.getElementById('quickTierPrice').value, 10);
+      const oldPrice = parseInt(document.getElementById('quickTierOldPrice').value, 10);
+      const gift = document.getElementById('quickTierGift').value.trim();
+      const specs = document.getElementById('quickTierSpecs').value.trim();
+
+      if (!name || !price) {
+        alert('Vui lòng nhập Tên phân cấp và Giá bán!');
+        return;
+      }
+
+      SmartGimbalCatalog.addTier(prodId, {
+        label: name,
+        name: name,
+        price: price,
+        priceFormatted: SmartGimbalCatalog.formatVND(price),
+        oldPriceFormatted: oldPrice ? SmartGimbalCatalog.formatVND(oldPrice) : '',
+        save: oldPrice && oldPrice > price ? `Tiết kiệm ${SmartGimbalCatalog.formatVND(oldPrice - price)}` : '',
+        gift: gift || 'Quà tặng chính hãng',
+        specs: specs || 'Thông số tiêu chuẩn',
+        highlights: [specs || 'Chất lượng cao']
+      });
+
+      document.getElementById('quickTierName').value = '';
+      document.getElementById('quickTierPrice').value = '';
+      document.getElementById('quickTierOldPrice').value = '';
+      document.getElementById('quickTierGift').value = '';
+      document.getElementById('quickTierSpecs').value = '';
+
+      loadCatalog();
+      renderAll();
+      const prod = SmartGimbalCatalog.getProduct(prodId);
+      renderQuickTiersList(prod);
+      showToast(`Đã thêm phân cấp [${name}]`);
+    }
+
+    function deleteQuickTier(productId, tierKey) {
+      if (confirm('Bạn có chắc chắn muốn xóa phân cấp này?')) {
+        SmartGimbalCatalog.deleteTier(productId, tierKey);
+        loadCatalog();
+        renderAll();
+        const prod = SmartGimbalCatalog.getProduct(productId);
+        renderQuickTiersList(prod);
+        showToast('Đã xóa phân cấp');
+      }
+    }
+
+    function closeTiersModal() {
+      document.getElementById('tiersModal').classList.remove('open');
+    }
+
+    // 7. USERS & 7-MODULE PERMISSIONS
+    function renderUsersTable() {
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = '';
+
+      const users = SmartGimbalCatalog.getUsers();
+      users.forEach(u => {
+        const activeCount = (u.modules || []).filter(Boolean).length;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><b style="font-size:14px;">${u.name}</b></td>
+          <td>
+            <div>${u.email}</div>
+            <div style="font-size:11.5px; color:var(--text-muted);">${u.phone || ''}</div>
+          </td>
+          <td>${u.device || 'T-Flow T-Flow Pro'}</td>
+          <td><span class="badge-mvp" style="background:#555;">${u.tier || 'Basic Creator'}</span></td>
+          <td><b>${activeCount}/7</b> module kích hoạt</td>
+          <td style="text-align:right;">
+            <button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="openUserDrawer('${u.id}')">Phân Quyền Module</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openUserDrawer(userId) {
+      const user = SmartGimbalCatalog.getUsers().find(u => u.id === userId);
+      if (!user) return;
+
+      document.getElementById('drawerUserId').value = user.id;
+      document.getElementById('drawerUserName').textContent = user.name;
+      document.getElementById('drawerUserEmail').textContent = `${user.email} &bull; ${user.device}`;
+      document.getElementById('drawerUserTier').value = user.tier || 'Basic Creator';
+
+      const container = document.getElementById('drawerModulesList');
+      container.innerHTML = '';
+
+      const mods = user.modules || [true, false, false, false, false, false, false];
+
+      MODULE_NAMES.forEach((mName, idx) => {
+        const isChecked = !!mods[idx];
+        const row = document.createElement('div');
+        row.className = 'module-toggle-item';
+        row.innerHTML = `
+          <div style="font-size:13.5px; font-weight:600;">${mName}</div>
+          <label class="switch">
+            <input type="checkbox" id="modToggle_${idx}" ${isChecked ? 'checked' : ''}>
+            <span class="slider"></span>
+          </label>
+        `;
+        container.appendChild(row);
+      });
+
+      document.getElementById('userDrawer').classList.add('open');
+    }
+
+    function closeUserDrawer(e) {
+      document.getElementById('userDrawer').classList.remove('open');
+    }
+
+    function saveUserModules() {
+      const userId = document.getElementById('drawerUserId').value;
+      const newTier = document.getElementById('drawerUserTier').value;
+
+      const newModules = [];
+      for (let i = 0; i < MODULE_NAMES.length; i++) {
+        const chk = document.getElementById(`modToggle_${i}`);
+        newModules.push(chk ? chk.checked : false);
+      }
+
+      SmartGimbalCatalog.updateUserProfile(userId, { tier: newTier, tierBadge: newTier + ' Tier' });
+      SmartGimbalCatalog.updateUserModules(userId, newModules);
+
+      closeUserDrawer();
+      renderUsersTable();
+      showToast('Đã lưu phân quyền 7 module & đồng bộ tới khách hàng');
+    }
+
+    // 8. EXCEL CSV IMPORT & EXPORT
+    function exportProductsCSV() {
+      const csv = SmartGimbalCatalog.exportProductsCSV();
+      downloadFile(csv, 'Danh_Sach_San_Pham_Smart_Gimbal.csv', 'text/csv;charset=utf-8;');
+      showToast('Đã xuất file Excel sản phẩm thành công');
+    }
+
+    function exportUsersCSV() {
+      const csv = SmartGimbalCatalog.exportUsersCSV();
+      downloadFile(csv, 'Danh_Sach_Nguoi_Dung_Module.csv', 'text/csv;charset=utf-8;');
+      showToast('Đã xuất file Excel người dùng thành công');
+    }
+
+    function triggerImportProductsCSV() {
+      document.getElementById('csvFileInput').click();
+    }
+
+    function handleCSVFileSelect(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const text = e.target.result;
+        const count = SmartGimbalCatalog.importProductsCSV(text);
+        showToast(`Đã nhập khẩu thành công ${count} sản phẩm từ file Excel`);
+        loadCatalog();
+        renderAll();
+      };
+      reader.readAsText(file, 'UTF-8');
+      input.value = '';
+    }
+
+    function downloadFile(content, fileName, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toastMsg');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => {
+        t.classList.remove('show');
+      }, 2500);
+    }
+  
+    // ==========================================================================
+    // GMAIL AUTHENTICATION & ACCESS CONTROL (ZERO PASSWORD)
+    // ==========================================================================
+    function checkAdminAccess() {
+      const gate = document.getElementById('adminAuthGate');
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+
+      const user = SmartGimbalCatalog.getCurrentUser();
+      if (user && SmartGimbalCatalog.isUserAdmin(user)) {
+        // Authenticated as Admin!
+        if (gate) gate.style.display = 'none';
+        const emailEl = document.getElementById('adminDisplayEmail');
+        if (emailEl) emailEl.textContent = user.email;
+        const avaEl = document.getElementById('adminSidebarAvatar');
+        if (avaEl) {
+          if (user.avatar && (user.avatar.startsWith('data:image') || user.avatar.startsWith('http'))) {
+            avaEl.innerHTML = `<img src="${user.avatar}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block;">`;
+          } else {
+            avaEl.textContent = user.avatar || 'TN';
+          }
+        }
+        const sess = SmartGimbalCatalog.getActiveSession();
+        const sessEl = document.getElementById('adminSessionStatusLabel');
+        if (sessEl) sessEl.textContent = '🟢 Đang hoạt động • Trực tuyến';
+      } else if (user) {
+        // Logged in as regular customer Gmail
+        if (gate) {
+          gate.style.display = 'flex';
+          gate.innerHTML = `
+            <div style="background:#FFFFFF; border-radius:24px; padding:44px 40px; max-width:440px; width:100%; box-shadow:0 20px 48px rgba(0,0,0,0.12); border:1px solid rgba(0,0,0,0.08); text-align:center;">
+              <div style="font-size:40px; margin-bottom:12px;">🚫</div>
+              <div style="font-size:22px; font-weight:800; color:#1D1D1F; margin-bottom:8px;">Quyền Truy Cập Bị Từ Chối</div>
+              <div style="font-size:14px; color:#6E6E73; line-height:1.6; margin-bottom:24px;">
+                Tài khoản <strong>${user.email}</strong> là tài khoản Khách Hàng, không có quyền truy cập Quản Trị Viên.<br><br>
+                Chỉ email <strong>thuynguyen2dk4@gmail.com</strong> mới có quyền quản trị T-Flow.
+              </div>
+              <button onclick="adminLoginWithOneClick('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; padding:14px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:12px;">
+                Chuyển sang tài khoản thuynguyen2dk4@gmail.com
+              </button>
+              <a href="/" style="font-size:13px; color:#0071E3; text-decoration:none;">&larr; Về trang chủ mua hàng</a>
+            </div>
+          `;
+        }
+      } else {
+        // Not logged in -> Show Google Sign-in screen
+        if (gate) gate.style.display = 'flex';
+      }
+    }
+
+    function adminLoginWithOneClick(email, name) {
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.loginWithGmail(email, name);
+      }
+      checkAdminAccess();
+    }
+
+    function adminLoginWithCustomGmail() {
+      const email = (document.getElementById('customGmailInput').value || '').trim();
+      if (!email || !email.includes('@')) {
+        alert('Vui lòng nhập địa chỉ email hợp lệ!');
+        return;
+      }
+      adminLoginWithOneClick(email);
+    }
+
+    function handleAdminLogout() {
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.logoutUser();
+      }
+      window.location.href = '/';
+    }
+
+    // Run check on load
+    
+    // ==========================================================================
+    // ADMIN REVIEWS MODERATION ENGINE
+    // ==========================================================================
+    function renderAdminReviewsTable() {
+      const tbody = document.getElementById('adminReviewsTableBody');
+      const badge = document.getElementById('adminReviewsCountBadge');
+      if (!tbody || typeof SmartGimbalCatalog === 'undefined') return;
+
+      const reviews = SmartGimbalCatalog.getReviews() || [];
+      if (badge) badge.textContent = reviews.length + ' Đánh Giá Thực Tế';
+
+      if (reviews.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:32px; color:var(--text-secondary);">Chưa có đánh giá nào từ khách hàng.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      reviews.forEach(r => {
+        let starsStr = '';
+        for (let i = 0; i < 5; i++) {
+          starsStr += (i < r.rating) ? '★' : '☆';
+        }
+
+        html += `
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--text-main);">${r.author || 'Khách Hàng'}</div>
+              <div style="font-size:11.5px; color:var(--text-secondary);">${r.email || r.date || ''}</div>
+              ${r.verified ? '<span style="font-size:10px; font-weight:700; background:rgba(52,199,89,0.12); color:#28CD41; padding:1px 6px; border-radius:99px;">✓ Mua Chính Hãng</span>' : ''}
+            </td>
+            <td>
+              <span style="color:#FFB800; font-size:15px; font-weight:700;">${starsStr}</span>
+              <span style="font-size:12px; font-weight:700; margin-left:4px;">(${r.rating}/5)</span>
+            </td>
+            <td>
+              <span style="font-size:12px; font-weight:600; background:#F5F5F7; padding:4px 8px; border-radius:6px;">${r.package || 'T-Flow Pro'}</span>
+            </td>
+            <td>
+              <div style="font-weight:700; font-size:13px; color:var(--text-main); margin-bottom:3px;">${r.title || ''}</div>
+              <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.4;">"${r.comment || ''}"</div>
+              <div style="margin-top:4px; display:flex; gap:4px; flex-wrap:wrap;">
+                ${(r.tags || []).map(t => `<span style="font-size:10.5px; background:rgba(0,0,0,0.04); color:var(--text-secondary); padding:2px 6px; border-radius:4px;">#${t}</span>`).join('')}
+              </div>
+            </td>
+            <td style="text-align:right;">
+              <button onclick="handleDeleteReview('${r.id}')" style="background:none; border:1px solid #FF3B30; color:#FF3B30; padding:4px 10px; border-radius:6px; font-size:11.5px; font-weight:600; cursor:pointer;">
+                Xóa
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function handleDeleteReview(reviewId) {
+      if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này khỏi hệ thống?')) return;
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.deleteReview(reviewId);
+        renderAdminReviewsTable();
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      checkAdminAccess();
+      initAiTrainingDashboard();
+    });
+
+
+    // ==========================================================================
+    // 6. AI TRAINING & MODERATION CENTER LOGIC
+    // ==========================================================================
+    let currentAiTab = 'logs';
+    let currentAiFilter = 'all';
+    let aiSearchTerm = '';
+
+    function initGoogleOAuthInput() {
+      const el = document.getElementById('googleOAuthClientIdInput');
+      if (!el || typeof SmartGimbalCatalog === 'undefined') return;
+      el.value = SmartGimbalCatalog.getGoogleOAuthClientId() || '';
+    }
+
+    function saveGoogleOAuthClientIdUI() {
+      const el = document.getElementById('googleOAuthClientIdInput');
+      if (!el || typeof SmartGimbalCatalog === 'undefined') return;
+      const val = (el.value || '').trim();
+      SmartGimbalCatalog.saveGoogleOAuthClientId(val);
+      showNotification('✓ Đã lưu Google OAuth Client ID thành công!');
+    }
+
+    function initAiTrainingDashboard() {
+      initGoogleOAuthInput();
+      updateAiStats();
+      renderAiLogsTable(currentAiFilter, aiSearchTerm);
+      renderAiPendingList();
+      renderAiKbTable();
+
+      // Listen for realtime AI events across tabs
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        window.addEventListener(SmartGimbalCatalog.AI_EVENT, () => {
+          updateAiStats();
+          renderAiLogsTable(currentAiFilter, aiSearchTerm);
+          renderAiPendingList();
+          renderAiKbTable();
+        });
+        window.addEventListener('storage', (e) => {
+          if (e.key === SmartGimbalCatalog.AI_CONVERSATIONS_KEY || e.key === SmartGimbalCatalog.AI_PENDING_KEY || e.key === SmartGimbalCatalog.AI_KB_KEY) {
+            updateAiStats();
+            renderAiLogsTable(currentAiFilter, aiSearchTerm);
+            renderAiPendingList();
+            renderAiKbTable();
+          }
+        });
+      }
+    }
+
+    let currentKbFilter = 'all';
+
+    function updateAiStats() {
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+      const convs = SmartGimbalCatalog.getAiConversations();
+      const pending = SmartGimbalCatalog.getPendingAiQuestions();
+      const kb = SmartGimbalCatalog.getAiKnowledgeBase();
+
+      const totalCount = convs.length;
+      const salesCount = convs.filter(c => c.source === 'sales' || c.source === 'web').length;
+      const creativeCount = convs.filter(c => c.source === 'creative' || c.source === 'app').length;
+      const visionCount = convs.filter(c => c.source === 'smart_vision').length;
+      const pendingCount = pending.filter(p => p.status === 'pending').length;
+
+      if (document.getElementById('aiKpiTotal')) document.getElementById('aiKpiTotal').textContent = totalCount;
+      if (document.getElementById('aiKpiSales')) document.getElementById('aiKpiSales').textContent = salesCount;
+      if (document.getElementById('aiKpiCreative')) document.getElementById('aiKpiCreative').textContent = creativeCount;
+      if (document.getElementById('aiKpiSmartVision')) document.getElementById('aiKpiSmartVision').textContent = visionCount;
+      if (document.getElementById('aiKpiWeb')) document.getElementById('aiKpiWeb').textContent = salesCount;
+      if (document.getElementById('aiKpiApp')) document.getElementById('aiKpiApp').textContent = creativeCount;
+      if (document.getElementById('aiKpiPending')) document.getElementById('aiKpiPending').textContent = pendingCount;
+
+      if (document.getElementById('tabCountLogs')) document.getElementById('tabCountLogs').textContent = totalCount;
+      if (document.getElementById('tabCountPending')) document.getElementById('tabCountPending').textContent = pendingCount;
+      if (document.getElementById('tabCountKb')) document.getElementById('tabCountKb').textContent = kb.length;
+
+      const sidebarPending = document.getElementById('sidebarPendingCount');
+      if (sidebarPending) {
+        sidebarPending.textContent = pendingCount;
+        sidebarPending.classList.toggle('empty', pendingCount === 0);
+      }
+    }
+
+    function switchAiTab(tabKey) {
+      currentAiTab = tabKey;
+      document.getElementById('tabBtnAiLogs').classList.toggle('active', tabKey === 'logs');
+      document.getElementById('tabBtnAiPending').classList.toggle('active', tabKey === 'pending');
+      document.getElementById('tabBtnAiKb').classList.toggle('active', tabKey === 'kb');
+      const cfgBtn = document.getElementById('tabBtnAiConfig');
+      if (cfgBtn) cfgBtn.classList.toggle('active', tabKey === 'config');
+
+      document.getElementById('aiTabContentLogs').style.display = tabKey === 'logs' ? 'block' : 'none';
+      document.getElementById('aiTabContentPending').style.display = tabKey === 'pending' ? 'block' : 'none';
+      document.getElementById('aiTabContentKb').style.display = tabKey === 'kb' ? 'block' : 'none';
+      const cfgContent = document.getElementById('aiTabContentConfig');
+      if (cfgContent) cfgContent.style.display = tabKey === 'config' ? 'block' : 'none';
+
+      if (tabKey === 'pending') renderAiPendingList();
+      if (tabKey === 'kb') renderAiKbTable();
+      if (tabKey === 'config') loadCloudAiConfigUI();
+    }
+
+    // --- CLOUD AI CONFIGURATION CONTROLLERS ---
+    function loadCloudAiConfigUI() {
+      if (typeof SmartGimbalCatalog === 'undefined' || !SmartGimbalCatalog.getCloudAiConfig) return;
+      const cfg = SmartGimbalCatalog.getCloudAiConfig();
+      const keyInput = document.getElementById('cloudAiApiKeyInput');
+      const modelSelect = document.getElementById('cloudAiModelSelect');
+      const badge = document.getElementById('cloudAiStatusBadge');
+
+      if (keyInput) keyInput.value = cfg.apiKey || '';
+      if (modelSelect && cfg.model) modelSelect.value = cfg.model;
+
+      if (badge) {
+        if (cfg.apiKey) {
+          badge.innerHTML = '<span style="width:7px; height:7px; border-radius:50%; background:#34C759;"></span> Đã Kết Nối Google AI (Key Sẵn Sàng)';
+          badge.style.background = 'rgba(52,199,89,0.12)';
+          badge.style.color = '#248A3D';
+          badge.style.borderColor = 'rgba(52,199,89,0.3)';
+        } else {
+          badge.innerHTML = '<span style="width:7px; height:7px; border-radius:50%; background:#F59E0B;"></span> Chế Độ Tri Thức Nội Bộ (Chưa Gắn Key)';
+          badge.style.background = 'rgba(245,158,11,0.12)';
+          badge.style.color = '#B45309';
+          badge.style.borderColor = 'rgba(245,158,11,0.3)';
+        }
+      }
+    }
+
+    function toggleAiKeyVisibility() {
+      const input = document.getElementById('cloudAiApiKeyInput');
+      if (!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function saveCloudAiConfigUI() {
+      if (typeof SmartGimbalCatalog === 'undefined' || !SmartGimbalCatalog.saveCloudAiConfig) return;
+      const keyInput = document.getElementById('cloudAiApiKeyInput');
+      const modelSelect = document.getElementById('cloudAiModelSelect');
+
+      const apiKey = keyInput ? keyInput.value.trim() : '';
+      const model = modelSelect ? modelSelect.value : 'gemini-3.5-flash';
+
+      SmartGimbalCatalog.saveCloudAiConfig({
+        apiKey: apiKey,
+        model: model
+      });
+
+      loadCloudAiConfigUI();
+
+      // Show toast
+      showNotification('✓ Đã lưu cấu hình Google Cloud AI thành công!');
+    }
+
+    async function testCloudAiConnectionUI() {
+      const btn = document.getElementById('btnTestCloudAi');
+      const resBox = document.getElementById('cloudAiTestResultBox');
+      const keyInput = document.getElementById('cloudAiApiKeyInput');
+      const modelSelect = document.getElementById('cloudAiModelSelect');
+
+      const apiKey = keyInput ? keyInput.value.trim() : '';
+      const model = modelSelect ? modelSelect.value : 'gemini-3.5-flash';
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span style="animation:spin 1s linear infinite;">⌛</span> Đang Ping Google Cloud AI...';
+      }
+
+      if (resBox) {
+        resBox.style.display = 'block';
+        resBox.style.background = 'rgba(0,113,227,0.06)';
+        resBox.style.border = '1px solid rgba(0,113,227,0.2)';
+        resBox.style.color = '#0071E3';
+        resBox.innerHTML = '⚡ Đang gửi gói tin kiểm tra tới endpoint /api/chat & Google Gemini REST API...';
+      }
+
+      try {
+        const testRes = await SmartGimbalCatalog.testCloudAiConnection(apiKey, model);
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>⚡</span> Kiểm Tra Kết Nối Cloud AI';
+        }
+
+        if (resBox) {
+          if (testRes.success) {
+            resBox.style.background = 'rgba(52,199,89,0.1)';
+            resBox.style.border = '1px solid rgba(52,199,89,0.3)';
+            resBox.style.color = '#248A3D';
+            resBox.innerHTML = `
+              <strong>✓ KẾT NỐI CLOUD AI THÀNH CÔNG!</strong><br>
+              • <strong>Động cơ:</strong> Google Gemini API (${testRes.model})<br>
+              • <strong>Độ trễ phản hồi (Latency):</strong> ${testRes.latencyMs}ms (Siêu tốc)<br>
+              • <strong>Nguồn xử lý:</strong> ${testRes.source}<br>
+              • <strong>Trạng thái:</strong> Toàn bộ Web Bán Hàng & App Camera Copilot đã sẵn sàng nhận lệnh!
+            `;
+          } else {
+            resBox.style.background = 'rgba(239,68,68,0.1)';
+            resBox.style.border = '1px solid rgba(239,68,68,0.3)';
+            resBox.style.color = '#DC2626';
+            resBox.innerHTML = `
+              <strong>⚠️ KIỂM TRA KẾT NỐI:</strong><br>
+              ${testRes.error || 'Chưa nhận được phản hồi từ serverless/Google API.'}<br>
+              <em>Lưu ý: Hệ thống đang tự động kích hoạt bộ tri thức kiểm định nội bộ để đảm bảo 100% thời gian hoạt động.</em>
+            `;
+          }
+        }
+      } catch (e) {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>⚡</span> Kiểm Tra Kết Nối Cloud AI';
+        }
+        if (resBox) {
+          resBox.style.background = 'rgba(239,68,68,0.1)';
+          resBox.style.border = '1px solid rgba(239,68,68,0.3)';
+          resBox.style.color = '#DC2626';
+          resBox.innerHTML = 'Lỗi kiểm tra: ' + e.message;
+        }
+      }
+    }
+
+    function filterAiLogs(filter, btn) {
+      currentAiFilter = filter;
+      document.querySelectorAll('.filter-pill-ai').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderAiLogsTable(currentAiFilter, aiSearchTerm);
+    }
+
+    function searchAiLogs(term) {
+      aiSearchTerm = (term || '').trim().toLowerCase();
+      renderAiLogsTable(currentAiFilter, aiSearchTerm);
+    }
+
+    function renderAiLogsTable(filter, search) {
+      const tbody = document.getElementById('aiLogsTableBody');
+      if (!tbody || typeof SmartGimbalCatalog === 'undefined') return;
+
+      let convs = SmartGimbalCatalog.getAiConversations();
+      if (filter === 'sales' || filter === 'web') convs = convs.filter(c => c.source === 'sales' || c.source === 'web');
+      else if (filter === 'creative' || filter === 'app') convs = convs.filter(c => c.source === 'creative' || c.source === 'app');
+      else if (filter === 'smart_vision') convs = convs.filter(c => c.source === 'smart_vision');
+      else if (filter === 'pending_approval') convs = convs.filter(c => c.status === 'pending_approval');
+
+      if (search) {
+        convs = convs.filter(c => 
+          (c.query && c.query.toLowerCase().includes(search)) ||
+          (c.reply && c.reply.toLowerCase().includes(search)) ||
+          (c.userEmail && c.userEmail.toLowerCase().includes(search))
+        );
+      }
+
+      if (convs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:36px; color:var(--text-secondary);">
+              Chưa có dữ liệu hội thoại nào phù hợp. Hãy thử đặt câu hỏi trên Web hoặc App để kiểm tra luồng Real-Time!
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      let html = '';
+      convs.forEach(c => {
+        const timeStr = c.timestamp ? new Date(c.timestamp).toLocaleString('vi-VN', { hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit' }) : '--';
+        let sourceBadge = '';
+        if (c.source === 'sales' || c.source === 'web') {
+          sourceBadge = '<span style="background:rgba(0,113,227,0.1); color:#0071E3; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🛍️ Bán Hàng</span>';
+        } else if (c.source === 'creative' || c.source === 'app') {
+          sourceBadge = '<span style="background:rgba(175,82,222,0.12); color:#8944AB; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🎬 Quay &amp; Edit</span>';
+        } else if (c.source === 'smart_vision') {
+          sourceBadge = '<span style="background:rgba(52,199,89,0.12); color:#248A3D; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🧠 Nhận Diện AI</span>';
+        } else {
+          sourceBadge = '<span style="background:rgba(255,149,0,0.12); color:#D97706; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🌐 Toàn Hệ Thống</span>';
+        }
+
+        let statusBadge = '<span class="badge-status-answered">✓ Đã Trả Lời</span>';
+        if (c.status === 'pending_approval') {
+          statusBadge = '<span class="badge-status-pending">⚠️ Chờ Duyệt</span>';
+        } else if (c.status === 'trained' || c.adminComment) {
+          statusBadge = '<span class="badge-status-trained">⚡ Đã Huấn Luyện</span>';
+        }
+
+        let adminCommentSnippet = '';
+        if (c.adminComment) {
+          adminCommentSnippet = `
+            <div style="margin-top:5px; padding:4px 8px; background:rgba(0,113,227,0.08); border-left:3px solid #0071E3; border-radius:4px; font-size:11px; color:#0071E3; font-weight:600; line-height:1.35;">
+              💡 <strong>Góp ý của Admin:</strong> "${(c.adminComment || '').replace(/\n/g, ' ').substring(0, 85)}..."
+            </div>
+          `;
+        }
+
+        html += `
+          <tr>
+            <td style="font-size:12px; font-family:monospace; color:var(--text-secondary);">${timeStr}</td>
+            <td>${sourceBadge}</td>
+            <td>
+              <div style="font-weight:700; font-size:12.5px;">${c.userName || 'Khách hàng'}</div>
+              <div style="font-size:11px; color:var(--text-secondary);">${c.userEmail || ''}</div>
+            </td>
+            <td>
+              <div style="font-weight:600; font-size:13px; color:var(--text-main); line-height:1.4;">${c.query || ''}</div>
+            </td>
+            <td>
+              <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.4; max-height:75px; overflow:hidden; text-overflow:ellipsis;">
+                ${(c.reply || '').replace(/\n/g, ' ')}
+              </div>
+              ${adminCommentSnippet}
+            </td>
+            <td style="text-align:right;">
+              <div>${statusBadge}</div>
+              <button class="btn btn-dark" onclick="openAdminCommentModal('${c.id}')" style="margin-top:6px; padding:4px 10px; font-size:11.5px; font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; background:#0071E3; border-color:#0071E3; color:#FFF; cursor:pointer; box-shadow:0 2px 6px rgba(0,113,227,0.25);">
+                <span>💡</span> ${c.adminComment ? 'Sửa Góp Ý AI' : 'Góp Ý Định Hướng AI'}
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function renderAiPendingList() {
+      const container = document.getElementById('aiPendingCardsList');
+      if (!container || typeof SmartGimbalCatalog === 'undefined') return;
+
+      const pending = SmartGimbalCatalog.getPendingAiQuestions().filter(p => p.status === 'pending');
+      if (pending.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:48px 20px; background:#F5F5F7; border-radius:14px; border:1px solid var(--border);">
+            <div style="font-size:36px; margin-bottom:10px;">🎉</div>
+            <div style="font-size:16px; font-weight:800; color:var(--text-main); margin-bottom:4px;">Không Có Câu Hỏi Nào Chờ Duyệt</div>
+            <div style="font-size:13px; color:var(--text-secondary);">AI đang hoạt động chuẩn xác và trả lời tốt toàn bộ thắc mắc của khách hàng.</div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      pending.forEach(item => {
+        const timeStr = item.timestamp ? new Date(item.timestamp).toLocaleString('vi-VN') : '--';
+        const sourceBadge = item.source === 'app' 
+          ? '<span class="badge-source-app">📱 App Camera Copilot</span>' 
+          : '<span class="badge-source-web">🌐 Web Bán Hàng</span>';
+
+        html += `
+          <div class="ai-pending-card" id="pending_card_${item.id}">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                ${sourceBadge}
+                <span style="font-size:12px; color:var(--text-secondary);">Thời gian: ${timeStr}</span>
+                <span style="font-size:12px; color:var(--text-secondary);">&bull; Người hỏi: <strong>${item.userName || item.userEmail}</strong></span>
+              </div>
+              <button onclick="handleIgnorePending('${item.id}')" style="background:none; border:none; font-size:12px; color:#FF3B30; font-weight:700; cursor:pointer;">
+                ✕ Bỏ qua câu hỏi này
+              </button>
+            </div>
+
+            <div style="background:#FFF9E6; border:1px solid rgba(230,167,0,0.3); border-radius:8px; padding:12px 16px; margin-bottom:14px;">
+              <div style="font-size:11px; font-weight:800; color:#B45309; text-transform:uppercase; margin-bottom:4px;">CÂU HỎI CẦN TRAINING:</div>
+              <div style="font-size:15px; font-weight:800; color:#1D1D1F;">"${item.query}"</div>
+              <div style="font-size:11.5px; color:#92400E; margin-top:4px;">Lý do chuyển tiếp: ${item.reason}</div>
+            </div>
+
+            <!-- TRAINING FORM -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
+              <div>
+                <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Từ Khóa Nhận Diện (Keywords)</label>
+                <input type="text" id="train_kw_${item.id}" class="form-control" placeholder="Ví dụ: chống rung, trời mưa, rơi vỡ, bảo hiểm..." value="${item.query.toLowerCase().replace(/[^a-zA-Z0-9À-ỹ ]/g, ' ').split(/\s+/).filter(w => w.length > 2).slice(0, 5).join(', ')}">
+              </div>
+              <div>
+                <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Chủ Đề Phân Loại</label>
+                <input type="text" id="train_topic_${item.id}" class="form-control" placeholder="Chủ đề giải đáp..." value="Giải đáp: ${item.query.substring(0, 35)}">
+              </div>
+            </div>
+
+            <div style="margin-bottom:14px;">
+              <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Câu Trả Lời Chuẩn Xác Cho AI Học (Admin Official Answer)</label>
+              <textarea id="train_ans_${item.id}" class="form-control" rows="3" placeholder="Nhập câu trả lời chính thức của Master Admin Thủy Nguyễn..."></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end;">
+              <button class="btn btn-dark" onclick="handleTrainPendingSubmit('${item.id}')" style="display:flex; align-items:center; gap:8px;">
+                <span>⚡</span> Lưu &amp; Huấn Luyện AI Ngay
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function handleTrainPendingSubmit(id) {
+      const ansEl = document.getElementById('train_ans_' + id);
+      const kwEl = document.getElementById('train_kw_' + id);
+      const topicEl = document.getElementById('train_topic_' + id);
+
+      if (!ansEl) return;
+      const ans = ansEl.value.trim();
+      if (!ans) {
+        alert('Vui lòng nhập câu trả lời chính thức để huấn luyện cho AI!');
+        ansEl.focus();
+        return;
+      }
+
+      const kw = kwEl ? kwEl.value.trim() : '';
+      const topic = topicEl ? topicEl.value.trim() : '';
+
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        const ok = SmartGimbalCatalog.approveAndTrainAiQuestion(id, ans, kw, topic);
+        if (ok) {
+          alert('🎉 Đã huấn luyện AI thành công! Kể từ bây giờ, khi khách hàng hỏi câu này trên Web hoặc App, AI sẽ lập tức trả lời theo câu trả lời chính thức của bạn.');
+          updateAiStats();
+          renderAiPendingList();
+          renderAiLogsTable(currentAiFilter, aiSearchTerm);
+          renderAiKbTable();
+        }
+      }
+    }
+
+    function handleIgnorePending(id) {
+      if (!confirm('Bạn có muốn bỏ qua câu hỏi này?')) return;
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.ignorePendingAiQuestion(id);
+        updateAiStats();
+        renderAiPendingList();
+      }
+    }
+
+    function filterAiKbTable(domain, btn) {
+      currentKbFilter = domain || 'all';
+      if (btn && btn.parentElement) {
+        btn.parentElement.querySelectorAll('.filter-pill-ai').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      renderAiKbTable();
+    }
+
+    function renderAiKbTable() {
+      const tbody = document.getElementById('aiKbTableBody');
+      if (!tbody || typeof SmartGimbalCatalog === 'undefined') return;
+
+      let kb = SmartGimbalCatalog.getAiKnowledgeBase();
+      if (currentKbFilter === 'sales') {
+        kb = kb.filter(k => k.target === 'sales' || k.target === 'web' || k.target === 'all_domains' || k.target === 'both');
+      } else if (currentKbFilter === 'creative') {
+        kb = kb.filter(k => k.target === 'creative' || k.target === 'app' || k.target === 'all_domains' || k.target === 'both');
+      } else if (currentKbFilter === 'smart_vision') {
+        kb = kb.filter(k => k.target === 'smart_vision' || k.target === 'all_domains' || k.target === 'both');
+      }
+
+      if (kb.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px;">Chưa có tri thức nào trong chuyên mục này.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      kb.forEach(item => {
+        let targetBadge = '';
+        if (item.target === 'sales' || item.target === 'web') {
+          targetBadge = '<span style="background:rgba(0,113,227,0.1); color:#0071E3; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🛍️ Bán Hàng</span>';
+        } else if (item.target === 'creative' || item.target === 'app') {
+          targetBadge = '<span style="background:rgba(175,82,222,0.12); color:#8944AB; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🎬 Quay &amp; Edit</span>';
+        } else if (item.target === 'smart_vision') {
+          targetBadge = '<span style="background:rgba(52,199,89,0.12); color:#248A3D; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🧠 Nhận Diện AI</span>';
+        } else {
+          targetBadge = '<span style="background:rgba(255,149,0,0.12); color:#D97706; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🌐 Toàn Hệ Thống</span>';
+        }
+
+        const kws = Array.isArray(item.keywords) ? item.keywords.join(', ') : (item.keywords || '');
+        const summary = (item.answer || '').substring(0, 110) + '...';
+
+        html += `
+          <tr>
+            <td>
+              <div style="font-weight:700; font-size:13px; color:var(--text-main);">${item.topic || 'Không tên'}</div>
+              ${item.isOfficial ? '<span style="font-size:10px; color:#34C759; font-weight:700;">✓ Tri Thức Chính Thức</span>' : '<span style="font-size:10px; color:#AF52DE; font-weight:700;">⚡ Đã Huấn Luyện</span>'}
+            </td>
+            <td>${targetBadge}</td>
+            <td style="font-size:12px; color:var(--text-secondary); line-height:1.4;">${kws}</td>
+            <td style="font-size:12px; color:var(--text-main); line-height:1.4;">${summary}</td>
+            <td style="text-align:right;">
+              <button onclick="handleDeleteKnowledge('${item.id}')" style="background:none; border:1px solid #FF3B30; color:#FF3B30; padding:4px 8px; border-radius:6px; font-size:11px; cursor:pointer;">
+                Xóa
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    // --- ADMIN COMMENT & AI TRAINING CONTROLLERS ---
+    const ADMIN_TRAINING_TEMPLATES = {
+      packages: "T-Flow Pro hiện đang mở bán chính thức với **4 gói cấu hình** chuyên nghiệp:\n\n" +
+                "• **Gói Standard (2.490.000đ)**: Thân gimbal T-Flow Pro Pure FOC, tripod mini kim loại, ngàm nam châm MagSafe N52 45N, cáp sạc USB-C và túi nhung cao cấp.\n" +
+                "• **Gói Creator Kit (3.190.000đ) - Bán chạy nhất ⭐**: Trọn bộ Standard + Đèn Fill Light MagSafe RGB 360 màu (CRI 96+) + Túi đeo chéo EVA chống sốc cao cấp.\n" +
+                "• **Gói Cinematic Pro (3.990.000đ)**: Trọn bộ Creator + Micro không dây kép 2.4GHz chống ồn AI + Bộ tạ đối trọng Pro cho iPhone Pro Max.\n" +
+                "• **Gói Master Edition (5.490.000đ)**: Toàn bộ hệ sinh thái phụ kiện cao cấp + Vali nhôm hàng không nguyên khối + Khóa học MasterClass quay dựng trọn đời.\n\n" +
+                "Anh/chị có muốn em hỗ trợ thêm gói nào vào giỏ hàng ngay bây giờ không ạ?",
+      warranty: "Chính sách hậu mãi của T-Flow Pro dẫn đầu thị trường:\n\n" +
+                "• **Bảo hành 1 đổi 1 trong 12 tháng** chính hãng nếu có lỗi từ nhà sản xuất.\n" +
+                "• **Dùng thử 30 ngày hoàn tiền 100%** nếu trải nghiệm không ưng ý, không cần giải thích lý do.\n" +
+                "• **Miễn phí vận chuyển toàn quốc (Freeship)**: Giao hỏa tốc 2 giờ nội thành Hà Nội & TP.HCM, 24-48 giờ toàn quốc, được kiểm tra hàng trước khi thanh toán.",
+      vision: "🧠 **Hệ Thống Trí Tuệ Nhân Tạo Thị Giác AI Vision của T-Flow Pro:**\n\n" +
+              "• **Bám nét người & mặt quang học 120fps**: Cảm biến độc lập quét 120 khung hình/giây, nhận diện khung xương Skeletal Mesh ngay cả khi quay lưng lại.\n" +
+              "• **Bám nét thú cưng (Pet Tracking)**: Bắt dính chuyển động nhanh và bất ngờ của chó, mèo.\n" +
+              "• **Khóa nét vật thể Bounding Box**: Chạm hoặc kéo ô vuông trên màn hình để khóa bất kỳ vật thể nào.\n" +
+              "• **Tự động chuyển camera góc rộng 0.5x Ultra-Wide**: Tự động kích hoạt khi nhận diện nhóm đông người ngoài rìa khung hình.\n" +
+              "• **Cử chỉ tay không chạm (Hand Gesture)**: ✋ Bắt đầu bám nét, ✌️ Chụp/quay, 🤙 Xoay ngang dọc.",
+      foc: "T-Flow Pro ứng dụng **công nghệ điều khiển vector Pure FOC 20kHz** tiên tiến nhất ngành:\n\n" +
+           "• **Tần số siêu âm 20kHz**: Triệt tiêu hoàn toàn tiếng rít motor, tĩnh âm 0dB giúp micro thu âm không bị lọt tạp âm.\n" +
+           "• **Tốc độ phản hồi < 1ms**: Vi xử lý ARM Cortex-M4 kép triệt tiêu 99.8% rung lắc.\n" +
+           "• **Ngàm nam châm MagSafe 45N**: Lực hút 32 lõi nam châm N52 chịu tải 2.8kg - 4.5kg, kèm chốt khóa cơ học kép Snap-Lock chống rơi tuyệt đối."
+    };
+
+    function openAdminCommentModal(convId) {
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+      const convs = SmartGimbalCatalog.getAiConversations();
+      const c = convs.find(item => item.id === convId);
+      if (!c) {
+        alert('Không tìm thấy dữ liệu hội thoại này.');
+        return;
+      }
+
+      document.getElementById('adminCommentConvId').value = c.id;
+      document.getElementById('adminCommentCustomerQuery').textContent = '"' + (c.query || '') + '"';
+      document.getElementById('adminCommentCustomerMeta').textContent = (c.userName || 'Khách hàng') + ' • ' + (c.userEmail || '') + ' • ' + (c.timestamp ? new Date(c.timestamp).toLocaleString('vi-VN') : '');
+      document.getElementById('adminCommentPreviousReply').textContent = c.reply || 'Chưa có câu trả lời.';
+
+      // Determine default target
+      let target = 'sales';
+      if (c.source === 'creative' || c.source === 'app') target = 'creative';
+      else if (c.source === 'smart_vision') target = 'smart_vision';
+      else target = 'sales';
+      document.getElementById('adminCommentTarget').value = target;
+
+      // Auto topic
+      document.getElementById('adminCommentTopic').value = 'Giải đáp: ' + (c.query || '').substring(0, 45);
+
+      // Auto keywords
+      const cleanQ = (c.query || '').toLowerCase().replace(/[^a-zA-Z0-9À-ỹ ]/g, ' ');
+      const words = cleanQ.split(/\s+/).filter(w => w.length > 2);
+      document.getElementById('adminCommentKeywords').value = words.join(', ');
+
+      // Only show previous admin comment if already entered, DO NOT fill the old AI text!
+      document.getElementById('adminCommentOfficialAnswer').value = c.adminComment || '';
+
+      document.getElementById('adminCommentModal').classList.add('open');
+    }
+
+    function closeAdminCommentModal() {
+      const modal = document.getElementById('adminCommentModal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    function appendAdminDirective(directiveText) {
+      const area = document.getElementById('adminCommentOfficialAnswer');
+      if (!area) return;
+      if (area.value.trim()) {
+        area.value += '\n- ' + directiveText;
+      } else {
+        area.value = directiveText;
+      }
+      area.focus();
+    }
+
+    function submitAdminCommentTraining() {
+      const convId = document.getElementById('adminCommentConvId').value;
+      const target = document.getElementById('adminCommentTarget').value;
+      const adminComment = document.getElementById('adminCommentOfficialAnswer').value.trim();
+
+      if (!adminComment) {
+        alert('Vui lòng nhập nhận xét hoặc góp ý của anh để định hướng AI!');
+        document.getElementById('adminCommentOfficialAnswer').focus();
+        return;
+      }
+
+      if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.trainConversationDirectly) {
+        SmartGimbalCatalog.trainConversationDirectly(convId, {
+          target: target,
+          adminComment: adminComment,
+          answer: adminComment
+        });
+
+        alert('🎉 ĐÃ HUẤN LUYỆN AI THÀNH CÔNG!\n\nCâu trả lời chuẩn của Admin đã được lưu vào Bộ Não AI. Từ bây giờ AI sẽ tự động trả lời câu hỏi này theo đúng chỉ dẫn của Admin Thủy Nguyễn.');
+        closeAdminCommentModal();
+        updateAiStats();
+        renderAiLogsTable(currentAiFilter, aiSearchTerm);
+        renderAiKbTable();
+      } else {
+        alert('Lỗi: Chưa tải được thư viện SmartGimbalCatalog.');
+      }
+    }
+
+    function openAddKnowledgeModal() {
+      document.getElementById('formKbId').value = '';
+      document.getElementById('formKbTopic').value = '';
+      document.getElementById('formKbKeywords').value = '';
+      document.getElementById('formKbAnswer').value = '';
+      document.getElementById('knowledgeModalTitle').textContent = 'Huấn Luyện Tri Thức Mới Cho AI';
+      document.getElementById('knowledgeModal').classList.add('open');
+    }
+
+    function closeKnowledgeModal() {
+      document.getElementById('knowledgeModal').classList.remove('open');
+    }
+
+    function saveKnowledgeSubmit() {
+      const topic = document.getElementById('formKbTopic').value.trim();
+      const target = document.getElementById('formKbTarget').value;
+      const keywords = document.getElementById('formKbKeywords').value.trim();
+      const answer = document.getElementById('formKbAnswer').value.trim();
+
+      if (!topic || !answer) {
+        alert('Vui lòng nhập đầy đủ Chủ đề và Nội dung giải đáp!');
+        return;
+      }
+
+      const kwList = keywords.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.addOrUpdateAiKnowledge({
+          topic: topic,
+          target: target,
+          keywords: kwList,
+          answer: answer,
+          isOfficial: true
+        });
+
+        alert('🎉 Đã thêm tri thức mới thành công! AI đã được huấn luyện với kiến thức này.');
+        closeKnowledgeModal();
+        updateAiStats();
+        renderAiKbTable();
+      }
+    }
+
+    function handleDeleteKnowledge(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa tri thức này khỏi bộ nhớ của AI?')) return;
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.deleteAiKnowledge(id);
+        updateAiStats();
+        renderAiKbTable();
+      }
+    }
+
+    function clearAiLogsConfirm() {
+      if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử test hội thoại?')) return;
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.clearAiLogs();
+        updateAiStats();
+        renderAiLogsTable(currentAiFilter, aiSearchTerm);
+      }
+    }
+
+  </script>
+</body>
+</html>
+
