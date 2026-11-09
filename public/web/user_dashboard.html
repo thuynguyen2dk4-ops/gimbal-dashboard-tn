@@ -592,38 +592,44 @@
         </p>
       </div>
 
-      <div class="auth-tabs">
+            <div class="auth-tabs">
         <button class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthTab('login')">Đăng Nhập</button>
         <button class="auth-tab-btn" id="tabBtnRegister" onclick="switchAuthTab('register')">Đăng Ký Tài Khoản</button>
       </div>
-
-      <!-- GMAIL LOGIN FORM (ZERO PASSWORD) -->
+      <!-- 1. FORM ĐĂNG NHẬP (CHUẨN HÓA BÌNH THƯỜNG + CƠ CHẾ GOOGLE) -->
       <div id="loginForm">
-        <div style="background:#F5F5F7; border-radius:14px; padding:16px; margin-bottom:18px; text-align:left;">
-          <div style="font-size:12px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:4px;">Đăng Nhập Bằng Gmail</div>
-          <div style="font-size:13px; color:#1D1D1F; line-height:1.5;">Hệ thống đồng bộ thiết bị qua tài khoản Google. Không cần nhập mật khẩu.</div>
+        <div class="form-group">
+          <label>Email Hoặc Số Điện Thoại</label>
+          <input type="text" class="form-control" id="loginEmail" placeholder="ví dụ: khachhang@gmail.com hoặc 0908888888">
+        </div>
+        <div class="form-group">
+          <label>Mật Khẩu</label>
+          <input type="password" class="form-control" id="loginPassword" placeholder="Nhập mật khẩu của bạn">
         </div>
 
-        <!-- 1-Click Admin Button -->
-        <button onclick="loginUserPortalWithGmail('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; display:flex; align-items:center; gap:12px; padding:12px 16px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:14px; text-align:left; box-shadow:0 4px 14px rgba(0,0,0,0.12);">
-          <svg width="20" height="20" viewBox="0 0 24 24" style="background:#FFF; border-radius:50%; padding:2px;"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-          <div style="flex:1;">
-            <div>Thuy Nguyen (Master Admin)</div>
-            <div style="font-size:11.5px; opacity:0.8; font-weight:400;">thuynguyen2dk4@gmail.com</div>
-          </div>
-          <span style="font-size:11px; background:rgba(0,113,227,0.2); color:#FFF; padding:2px 8px; border-radius:99px;">Admin</span>
+        <button class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:8px;" onclick="handleLoginSubmit()">Đăng Nhập Vào Cổng Khách Hàng</button>
+
+        <!-- DIVIDER HOẶC TIẾP TỤC VỚI GOOGLE -->
+        <div style="display:flex; align-items:center; gap:12px; margin:20px 0 16px 0;">
+          <div style="flex:1; height:1px; background:var(--border);"></div>
+          <span style="font-size:12px; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">hoặc tiếp tục với</span>
+          <div style="flex:1; height:1px; background:var(--border);"></div>
+        </div>
+
+        <!-- GOOGLE SIGN-IN BUTTONS -->
+        <button onclick="loginUserPortalWithGmail('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px 16px; background:#F5F5F7; border:1px solid #E5E5EA; border-radius:12px; font-size:13.5px; font-weight:700; color:#1D1D1F; cursor:pointer; margin-bottom:10px; transition:all 0.2s;">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+          Đăng nhập Google với thuynguyen2dk4@gmail.com
         </button>
 
-        <div style="font-size:12px; color:var(--text-secondary); text-align:center; margin-bottom:12px;">- hoặc đăng nhập bằng tài khoản Gmail khác để test -</div>
-
-        <div class="form-group" style="margin-bottom:12px;">
-          <input type="email" class="form-control" id="loginPortalEmail" placeholder="nhap.email.cua.ban@gmail.com" style="width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:10px; font-size:13.5px; font-family:inherit;">
+        <!-- Nhập Gmail khác nếu muốn -->
+        <div style="display:flex; gap:8px;">
+          <input type="email" class="form-control" id="loginPortalOtherEmail" placeholder="Nhập tài khoản Google (Gmail) khác..." style="font-size:12.5px; padding:8px 12px;">
+          <button class="btn btn-outline" style="font-size:12px; padding:8px 14px; white-space:nowrap;" onclick="handleOtherGoogleSubmit()">Đăng Nhập GG</button>
         </div>
-
-        <button class="btn btn-dark" style="width:100%; padding:12px 0;" onclick="handlePortalGmailSubmit()">Đăng Nhập Ngay</button>
       </div>
 
-      <!-- REGISTER FORM -->
+      <!-- 2. FORM ĐĂNG KÝ TÀI KHOẢN (CHUẨN HÓA BÌNH THƯỜNG) -->
       <div id="registerForm" style="display:none;">
         <div class="form-group">
           <label>Họ và Tên</label>
@@ -638,15 +644,18 @@
           <input type="tel" class="form-control" id="regPhone" placeholder="0918 888 999">
         </div>
         <div class="form-group">
+          <label>Mật Khẩu Khởi Tạo</label>
+          <input type="password" class="form-control" id="regPassword" placeholder="Tối thiểu 6 ký tự">
+        </div>
+        <div class="form-group">
           <label>Mã Serial Thiết Bị (Tùy Chọn)</label>
-          <input type="text" class="form-control" id="regSerial" placeholder="SG-S1-VN-2026-XXXX">
+          <input type="text" class="form-control" id="regSerial" placeholder="TF-G31-PRO-XXXX">
         </div>
 
         <button class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:12px;" onclick="handleRegisterSubmit()">Tạo Tài Khoản &amp; Đăng Nhập</button>
       </div>
     </div>
 
-    <!-- MAIN DASHBOARD CONTENT (SHOWN WHEN LOGGED IN) -->
     <div id="userDashboardMain" style="display:none;">
       <!-- 1. USER PROFILE CARD (APPLE HIG / IOS APP STYLE) -->
       <div class="card">
@@ -1097,7 +1106,85 @@
       }
     }
 
+    
     function handleLoginSubmit() {
+      const email = (document.getElementById('loginEmail').value || '').trim();
+      const pass = (document.getElementById('loginPassword').value || '').trim();
+      if (!email) {
+        alert('Vui lòng nhập Email hoặc Số điện thoại!');
+        return;
+      }
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        const res = SmartGimbalCatalog.loginUser(email, pass);
+        if (res.success) {
+          loadUserData();
+        } else {
+          alert(res.message);
+        }
+      }
+    }
+
+    function handleRegisterSubmit() {
+      const name = (document.getElementById('regName').value || '').trim();
+      const email = (document.getElementById('regEmail').value || '').trim();
+      const phone = (document.getElementById('regPhone').value || '').trim();
+      const pass = (document.getElementById('regPassword').value || '').trim();
+      const serial = (document.getElementById('regSerial').value || '').trim();
+
+      if (!name || !email) {
+        alert('Vui lòng điền đầy đủ Họ Tên và Email!');
+        return;
+      }
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        const res = SmartGimbalCatalog.registerUser({
+          name: name,
+          email: email,
+          phone: phone,
+          password: pass,
+          serial: serial
+        });
+        if (res.success) {
+          alert('Tạo tài khoản thành công!');
+          loadUserData();
+        } else {
+          alert(res.message);
+        }
+      }
+    }
+
+    function loginUserPortalWithGmail(email, name) {
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        const res = SmartGimbalCatalog.loginWithGmail(email, name);
+        if (res.success) {
+          loadUserData();
+        }
+      }
+    }
+
+    function handleOtherGoogleSubmit() {
+      const email = (document.getElementById('loginPortalOtherEmail').value || '').trim();
+      if (!email || !email.includes('@')) {
+        alert('Vui lòng nhập địa chỉ email Google hợp lệ!');
+        return;
+      }
+      loginUserPortalWithGmail(email);
+    }
+
+    function updatePortalAdminBanner() {
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+      const user = SmartGimbalCatalog.getCurrentUser();
+      const adminBanner = document.getElementById('portalAdminBanner');
+      if (adminBanner) {
+        // ONLY SHOW ADMIN BANNER IF SIGNED IN AS ADMIN GMAIL
+        if (user && SmartGimbalCatalog.isUserAdmin(user)) {
+          adminBanner.style.display = 'flex';
+        } else {
+          adminBanner.style.display = 'none';
+        }
+      }
+    }
+
+    function _old_handleLoginSubmit() {
       const email = document.getElementById('loginEmail').value.trim();
       const pass = document.getElementById('loginPassword').value;
       if (!email) {

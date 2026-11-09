@@ -2905,22 +2905,29 @@
     // ==========================================================================
     // DYNAMIC GOOGLE / GMAIL AUTHENTICATION & NAV RENDERING
     // ==========================================================================
+    
     function renderNavUserSection() {
       const container = document.getElementById('navUserSection');
       if (!container || typeof SmartGimbalCatalog === 'undefined') return;
 
       const user = SmartGimbalCatalog.getCurrentUser();
+
+      // CASE 1: NOT LOGGED IN -> NO ADMIN BUTTON!
       if (!user) {
         container.innerHTML = `
-          <button onclick="toggleGoogleAuthModal(true)" class="btn-nav-link" style="display:flex; align-items:center; gap:6px; background:#F5F5F7; padding:6px 14px; border-radius:99px; border:1px solid var(--border); font-size:13px; font-weight:600; cursor:pointer;">
+          <button onclick="toggleAuthModal(true)" class="btn-nav-link" style="display:flex; align-items:center; gap:6px; background:#F5F5F7; padding:6px 14px; border-radius:99px; border:1px solid var(--border); font-size:13px; font-weight:600; cursor:pointer;">
             <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-            Đăng Nhập Gmail
+            Đăng Nhập
           </button>
         `;
-      } else if (SmartGimbalCatalog.isUserAdmin(user)) {
-        // Master Admin User
+      } 
+      // CASE 2: LOGGED IN WITH THUY NGUYEN (MASTER ADMIN) -> HIỆN NÚT ADMIN CMS!
+      else if (SmartGimbalCatalog.isUserAdmin(user)) {
         container.innerHTML = `
-          <a href="admin_dashboard.html" class="btn-nav-link" style="color:#0071E3; font-weight:700;">Admin CMS</a>
+          <!-- HIỆN NÚT ADMIN KHI ĐĂNG NHẬP BẰNG GOOGLE CỦA ANH -->
+          <a href="admin_dashboard.html" class="btn-nav-link" style="color:#FFF; background:#1D1D1F; padding:6px 14px; border-radius:99px; font-weight:700; font-size:12.5px; text-decoration:none; display:flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+            <span>⚙️ Admin CMS</span>
+          </a>
           <a href="user_dashboard.html" class="btn-nav-link" style="color:var(--text-secondary);">Cổng Khách Hàng</a>
           <div style="display:flex; align-items:center; gap:8px; background:#F5F5F7; padding:4px 12px; border-radius:99px; border:1px solid var(--border);">
             <div style="width:22px; height:22px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center;">TN</div>
@@ -2929,8 +2936,9 @@
             <button onclick="handleStoreLogout()" style="background:none; border:none; font-size:11px; color:#FF3B30; font-weight:600; cursor:pointer;">Đăng Xuất</button>
           </div>
         `;
-      } else {
-        // Customer User
+      } 
+      // CASE 3: LOGGED IN AS REGULAR CUSTOMER -> KHÔNG HIỆN NÚT ADMIN CMS!
+      else {
         container.innerHTML = `
           <a href="user_dashboard.html" class="btn-nav-link" style="color:var(--text-secondary);">Cổng Khách Hàng</a>
           <div style="display:flex; align-items:center; gap:8px; background:#F5F5F7; padding:4px 12px; border-radius:99px; border:1px solid var(--border);">
@@ -2965,6 +2973,92 @@
       const email = (document.getElementById('storeCustomEmailInput').value || '').trim();
       if (!email || !email.includes('@')) {
         alert('Vui lòng nhập địa chỉ email hợp lệ!');
+        return;
+      }
+      loginStoreWithGmail(email);
+    }
+
+    
+    function toggleAuthModal(open) {
+      const modal = document.getElementById('authModal');
+      const overlay = document.getElementById('authModalOverlay');
+      if (modal && overlay) {
+        modal.style.display = open ? 'block' : 'none';
+        overlay.classList.toggle('open', open);
+      }
+    }
+    // backward compat
+    function toggleGoogleAuthModal(open) { toggleAuthModal(open); }
+
+    function switchModalAuthTab(tab) {
+      const isLogin = (tab === 'login');
+      document.getElementById('modalLoginForm').style.display = isLogin ? 'block' : 'none';
+      document.getElementById('modalRegisterForm').style.display = isLogin ? 'none' : 'block';
+      document.getElementById('modalTabBtnLogin').style.color = isLogin ? '#1D1D1F' : '#86868B';
+      document.getElementById('modalTabBtnLogin').style.borderBottomColor = isLogin ? '#1D1D1F' : 'transparent';
+      document.getElementById('modalTabBtnRegister').style.color = isLogin ? '#86868B' : '#1D1D1F';
+      document.getElementById('modalTabBtnRegister').style.borderBottomColor = isLogin ? 'transparent' : '#1D1D1F';
+    }
+
+    function handleModalLoginSubmit() {
+      const email = (document.getElementById('modalLoginEmail').value || '').trim();
+      const pass = (document.getElementById('modalLoginPassword').value || '').trim();
+      if (!email) {
+        alert('Vui lòng nhập Email hoặc Số điện thoại!');
+        return;
+      }
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        const res = SmartGimbalCatalog.loginUser(email, pass);
+        if (res.success) {
+          toggleAuthModal(false);
+          renderNavUserSection();
+          alert('Đăng nhập thành công!');
+        } else {
+          alert(res.message);
+        }
+      }
+    }
+
+    function handleModalRegisterSubmit() {
+      const name = (document.getElementById('modalRegName').value || '').trim();
+      const email = (document.getElementById('modalRegEmail').value || '').trim();
+      const phone = (document.getElementById('modalRegPhone').value || '').trim();
+      const pass = (document.getElementById('modalRegPassword').value || '').trim();
+
+      if (!name || !email) {
+        alert('Vui lòng nhập Họ Tên và Email!');
+        return;
+      }
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        const res = SmartGimbalCatalog.registerUser({
+          name: name,
+          email: email,
+          phone: phone,
+          password: pass
+        });
+        if (res.success) {
+          toggleAuthModal(false);
+          renderNavUserSection();
+          alert('Tạo tài khoản thành công!');
+        } else {
+          alert(res.message);
+        }
+      }
+    }
+
+    function loginStoreWithGmail(email, name) {
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.loginWithGmail(email, name);
+      }
+      toggleAuthModal(false);
+      renderNavUserSection();
+      alert('Đăng nhập Google thành công với: ' + email);
+    }
+
+    function loginModalWithOtherGmail() {
+      const email = (document.getElementById('modalOtherGmailInput').value || '').trim();
+      if (!email || !email.includes('@')) {
+        alert('Vui lòng nhập email hợp lệ!');
         return;
       }
       loginStoreWithGmail(email);
@@ -3194,6 +3288,923 @@
           <div class="store-card-img-wrap">
             <img src="${p.img || '../shared/img/feed_portrait_dusk.jpg'}" alt="${p.name}">
           </div>
+          <div>
+            <div class="store-card-tag">${groupName}</div>
+            <div class="store-card-title">${p.name}</div>
+            <div class="store-card-sub">${p.tagline || p.subtitle || ''}</div>
+            <div class="store-card-colors">${colorsHtml}</div>
+          </div>
+          <div class="store-card-bottom">
+            <div class="store-price-text">${priceDisplay}</div>
+            <div class="store-action-link">Xem Chi Tiết &rarr;</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderCatalogFilterChips() {
+      const container = document.getElementById('catalogFilterChips');
+      if (!container || typeof SmartGimbalCatalog === 'undefined') return;
+      const groups = SmartGimbalCatalog.getGroups();
+
+      // Validate selectedCatalogFilter
+      if (selectedCatalogFilter !== 'all' && !groups.some(g => g.id === selectedCatalogFilter)) {
+        selectedCatalogFilter = 'all';
+      }
+
+      let html = `<button class="filter-chip ${selectedCatalogFilter === 'all' ? 'active' : ''}" onclick="filterCatalog('all', this)">Tất Cả Sản Phẩm</button>`;
+      groups.forEach(g => {
+        const isActive = selectedCatalogFilter === g.id ? 'active' : '';
+        const safeName = (g.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        html += `<button class="filter-chip ${isActive}" onclick="filterCatalog('${g.id}', this)">${safeName}</button>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function filterCatalog(groupId, btn) {
+      selectedCatalogFilter = groupId;
+      renderCatalogFilterChips();
+      renderCatalogGrid();
+    }
+
+    // ==========================================================================
+    // 4. DEEP APPLE STORE-STYLE PRODUCT DETAIL PAGE (REQUIREMENT 2)
+    // ==========================================================================
+    function openProductDetail(productId, shouldScroll = true) {
+      const prod = SmartGimbalCatalog.getProduct(productId) || SmartGimbalCatalog.getMvpProduct();
+      if (!prod) return;
+
+      currentDetailProduct = prod;
+      currentDetailTierKey = (prod.tiers && prod.tiers[0]) ? (prod.tiers[0].key || prod.tiers[0].id) : 'tier-pro-std';
+      currentDetailColorId = (prod.colors && prod.colors[0]) ? prod.colors[0].id : 'carbon-black';
+
+      // Heading info
+      const elBreadcrumb = document.getElementById('detailBreadcrumbName');
+      if (elBreadcrumb) elBreadcrumb.textContent = prod.name;
+      const elTitle = document.getElementById('detailTitle');
+      if (elTitle) elTitle.textContent = prod.name;
+      const elTagline = document.getElementById('detailTagline');
+      if (elTagline) elTagline.textContent = prod.tagline || prod.subtitle || '';
+      const elShortDesc = document.getElementById('detailShortDesc');
+      if (elShortDesc) elShortDesc.textContent = prod.subtitle || '';
+
+      const group = SmartGimbalCatalog.getGroup(prod.groupId);
+      const elCatTag = document.getElementById('detailCategoryTag');
+      if (elCatTag) elCatTag.textContent = group ? group.name : 'Gimbal Cầm Tay';
+
+      // Gallery main image
+      const elMainImg = document.getElementById('detailMainImg');
+      if (elMainImg) elMainImg.src = prod.img || '../shared/img/feed_portrait_dusk.jpg';
+
+      // Thumbnails (4 photos)
+      const thumbsContainer = document.getElementById('detailThumbsRow');
+      if (thumbsContainer) {
+        thumbsContainer.innerHTML = '';
+        const gallery = (prod.gallery && prod.gallery.length > 0) ? prod.gallery : [prod.img || '../shared/img/feed_portrait_dusk.jpg'];
+        gallery.forEach((imgSrc, idx) => {
+          const thumb = document.createElement('div');
+          thumb.className = `thumb-item ${idx === 0 ? 'active' : ''}`;
+          thumb.innerHTML = `<img src="${imgSrc}" alt="thumb">`;
+          thumb.onclick = () => {
+            if (elMainImg) elMainImg.src = imgSrc;
+            document.querySelectorAll('.thumb-item').forEach(t => t.classList.remove('active'));
+            thumb.classList.add('active');
+          };
+          thumbsContainer.appendChild(thumb);
+        });
+      }
+
+      // Step 1: Tier Selector Cards
+      const tierContainer = document.getElementById('detailTierCards');
+      if (tierContainer) {
+        tierContainer.innerHTML = '';
+        if (prod.tiers && prod.tiers.length > 0) {
+          prod.tiers.forEach(t => {
+            const tKey = t.key || t.id;
+            const tLabel = t.label || t.name;
+            const tPrice = t.priceFormatted || (t.price ? t.price.toLocaleString('vi-VN') + '₫' : '2.890.000₫');
+            const tSpecDesc = t.specs || (t.highlights && t.highlights[0]) || t.desc || 'Phiên bản chính hãng';
+
+            const card = document.createElement('div');
+            card.className = `tier-select-card ${tKey === currentDetailTierKey ? 'active' : ''}`;
+            card.onclick = () => selectDetailTier(tKey);
+            card.innerHTML = `
+              <div>
+                <div class="tier-card-label">${tLabel}</div>
+                <div class="tier-card-diff">${tSpecDesc}</div>
+              </div>
+              <div class="tier-card-price">${tPrice}</div>
+            `;
+            tierContainer.appendChild(card);
+          });
+        }
+      }
+
+      // Step 2: Color selector
+      const colorContainer = document.getElementById('detailColorList');
+      if (colorContainer) {
+        colorContainer.innerHTML = '';
+        if (prod.colors && prod.colors.length > 0) {
+          prod.colors.forEach((c, idx) => {
+            const btn = document.createElement('div');
+            btn.className = `color-swatch-btn ${c.id === currentDetailColorId ? 'active' : ''}`;
+            btn.style.backgroundColor = c.hex;
+            btn.title = c.name;
+            btn.onclick = () => selectDetailColor(c.id);
+            colorContainer.appendChild(btn);
+          });
+          const activeColor = prod.colors.find(c => c.id === currentDetailColorId) || prod.colors[0];
+          const elColorName = document.getElementById('detailSelectedColorName');
+          if (elColorName) elColorName.textContent = activeColor.name;
+        }
+      }
+
+      updateDetailPriceBox();
+
+      // Deep Tab 1: Overview (3 highlights)
+      const overviewContainer = document.getElementById('detailOverviewContainer');
+      if (overviewContainer) {
+        overviewContainer.innerHTML = '';
+        if (prod.overview && prod.overview.length > 0) {
+          prod.overview.forEach((h, idx) => {
+            const row = document.createElement('div');
+            row.className = `overview-row ${idx % 2 === 1 ? 'reverse' : ''}`;
+            row.innerHTML = `
+              <div class="overview-text-box">
+                <div class="tag-clean">Điểm Nhấn 0${idx + 1}</div>
+                <h3>${h.title}</h3>
+                <p>${h.desc}</p>
+              </div>
+              <div class="overview-img-box">
+                <img src="${h.img || prod.img}" alt="${h.title}">
+              </div>
+            `;
+            overviewContainer.appendChild(row);
+          });
+        }
+      }
+
+      // Deep Tab 2: What's in the Box
+      const boxContainer = document.getElementById('detailBoxGrid');
+      if (boxContainer) {
+        boxContainer.innerHTML = '';
+        if (prod.boxContents && prod.boxContents.length > 0) {
+          prod.boxContents.forEach(item => {
+            const itemText = (typeof item === 'object') ? `${item.name} (${item.qty})` : item;
+            const boxItem = document.createElement('div');
+            boxItem.className = 'box-item-card';
+            boxItem.innerHTML = `<div class="box-bullet"></div><div>${itemText}</div>`;
+            boxContainer.appendChild(boxItem);
+          });
+        }
+      }
+
+      // Deep Tab 3: Specs Table
+      const specsTable = document.getElementById('detailSpecsTable');
+      if (specsTable) {
+        specsTable.innerHTML = '';
+        if (prod.specs && typeof prod.specs === 'object') {
+          if (Array.isArray(prod.specs)) {
+            prod.specs.forEach(s => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `<td>${s.label}</td><td>${s.val}</td>`;
+              specsTable.appendChild(tr);
+            });
+          } else {
+            Object.entries(prod.specs).forEach(([k, v]) => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `<td>${k}</td><td>${v}</td>`;
+              specsTable.appendChild(tr);
+            });
+          }
+        }
+      }
+
+      // Deep Tab 4: Warranty
+      const elWarranty = document.getElementById('detailWarrantyText');
+      if (elWarranty && prod.warranty) {
+        elWarranty.textContent = prod.warranty;
+      }
+
+      // Sticky buy bar setup
+      const stickyImg = document.getElementById('stickyBarImg');
+      if (stickyImg) stickyImg.src = prod.img || '../shared/img/feed_portrait_dusk.jpg';
+      const stickyTitle = document.getElementById('stickyBarTitle');
+      if (stickyTitle) stickyTitle.textContent = prod.name;
+
+      // Switch view smoothly!
+      switchView('detail');
+      if (shouldScroll) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function selectDetailTier(tierKey) {
+      currentDetailTierKey = tierKey;
+      document.querySelectorAll('#detailTierCards .tier-select-card').forEach((card, idx) => {
+        card.classList.toggle('active', currentDetailProduct.tiers[idx].key === tierKey);
+      });
+      updateDetailPriceBox();
+    }
+
+    function selectDetailColor(colorId) {
+      currentDetailColorId = colorId;
+      document.querySelectorAll('#detailColorList .color-swatch-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', currentDetailProduct.colors[idx].id === colorId);
+      });
+      const c = currentDetailProduct.colors.find(cl => cl.id === colorId);
+      if (c) {
+        document.getElementById('detailSelectedColorName').textContent = c.name;
+      }
+    }
+
+    function updateDetailPriceBox() {
+      if (!currentDetailProduct || !currentDetailProduct.tiers) return;
+      const tier = currentDetailProduct.tiers.find(t => t.key === currentDetailTierKey) || currentDetailProduct.tiers[0];
+      if (tier) {
+        document.getElementById('detailCurrentPrice').textContent = tier.priceFormatted;
+        document.getElementById('detailOldPrice').textContent = tier.oldPriceFormatted || '';
+        document.getElementById('detailGiftTag').textContent = `Tặng kèm: ${tier.gift || 'Phụ kiện chính hãng'}`;
+        document.getElementById('stickyBarPrice').textContent = tier.priceFormatted;
+      }
+    }
+
+    function switchDetailTab(tabKey, btn) {
+      document.querySelectorAll('.deep-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      document.getElementById('deepTabOverview').style.display = tabKey === 'overview' ? 'block' : 'none';
+      document.getElementById('deepTabBox').style.display = tabKey === 'box' ? 'block' : 'none';
+      document.getElementById('deepTabSpecs').style.display = tabKey === 'specs' ? 'block' : 'none';
+      document.getElementById('deepTabWarranty').style.display = tabKey === 'warranty' ? 'block' : 'none';
+    }
+
+    function addCurrentDetailToCart() {
+      if (!currentDetailProduct) return;
+      SmartGimbalCatalog.addToCart({
+        productId: currentDetailProduct.id,
+        tierKey: currentDetailTierKey,
+        colorId: currentDetailColorId,
+        quantity: 1
+      });
+      showToast(`Đã thêm ${currentDetailProduct.name} vào giỏ hàng`);
+    }
+
+    function buyNowCurrentDetail() {
+      addCurrentDetailToCart();
+      openCartDrawer();
+    }
+
+    // Sticky buy bar show/hide
+    function handleStickyBuyBar() {
+      const detailView = document.getElementById('viewProductDetail');
+      const stickyBar = document.getElementById('stickyBuyBar');
+      if (!detailView || !stickyBar) return;
+
+      if (detailView.classList.contains('active') && window.scrollY > 480) {
+        stickyBar.classList.add('visible');
+      } else {
+        stickyBar.classList.remove('visible');
+      }
+    }
+
+    // ==========================================================================
+    // 5. SHOPPING CART & CHECKOUT (REQUIREMENT 3)
+    // ==========================================================================
+    function updateNavCartCount() {
+      const count = SmartGimbalCatalog.getCartCount();
+      const badge = document.getElementById('navCartCount');
+      if (badge) badge.textContent = count;
+    }
+
+    function openCartDrawer() {
+      renderCartDrawer();
+      document.getElementById('cartOverlay').classList.add('open');
+    }
+
+    function closeCartDrawer(e) {
+      document.getElementById('cartOverlay').classList.remove('open');
+    }
+
+    function renderCartDrawer() {
+      const container = document.getElementById('cartItemList');
+      const cart = SmartGimbalCatalog.getCart();
+
+      if (!cart || cart.length === 0) {
+        container.innerHTML = `
+          <div class="cart-empty-msg">
+            <div style="font-size:32px; margin-bottom:12px;">&bull;</div>
+            <p>Túi hàng của bạn đang trống</p>
+            <button class="btn-dark" style="margin-top:20px; padding:10px 20px; font-size:13px;" onclick="closeCartDrawer(); switchView('catalog');">Khám Phá Dải Sản Phẩm</button>
+          </div>
+        `;
+        document.getElementById('cartSubtotal').textContent = '0₫';
+        document.getElementById('cartGrandTotal').textContent = '0₫';
+        return;
+      }
+
+      container.innerHTML = '';
+      cart.forEach(item => {
+        const row = document.createElement('div');
+        row.className = 'cart-item-row';
+        row.innerHTML = `
+          <div class="cart-item-thumb">
+            <img src="${item.img || '../shared/img/feed_portrait_dusk.jpg'}" alt="${item.productName}">
+          </div>
+          <div class="cart-item-details">
+            <div class="cart-item-title">${item.productName}</div>
+            <div class="cart-item-meta">${item.tierLabel} &bull; ${item.colorName}</div>
+            <div class="cart-item-bottom">
+              <div class="cart-qty-ctrl">
+                <button class="cart-qty-btn" onclick="adjustCartQty('${item.cartId}', -1)">&minus;</button>
+                <span class="cart-qty-val">${item.quantity}</span>
+                <button class="cart-qty-btn" onclick="adjustCartQty('${item.cartId}', 1)">&#43;</button>
+              </div>
+              <div style="display:flex; align-items:center;">
+                <span class="cart-item-price">${SmartGimbalCatalog.formatVND(item.price * item.quantity)}</span>
+                <span class="cart-item-del" onclick="removeCartItem('${item.cartId}')">Xóa</span>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(row);
+      });
+
+      const total = SmartGimbalCatalog.getCartTotal();
+      document.getElementById('cartSubtotal').textContent = SmartGimbalCatalog.formatVND(total);
+      document.getElementById('cartGrandTotal').textContent = SmartGimbalCatalog.formatVND(total);
+    }
+
+    function adjustCartQty(cartId, delta) {
+      SmartGimbalCatalog.updateCartQty(cartId, delta);
+    }
+
+    function removeCartItem(cartId) {
+      SmartGimbalCatalog.removeFromCart(cartId);
+    }
+
+    // Checkout Modal
+    function openCheckoutModal() {
+      const cart = SmartGimbalCatalog.getCart();
+      if (!cart || cart.length === 0) {
+        showToast('Túi hàng trống, vui lòng chọn sản phẩm');
+        return;
+      }
+      closeCartDrawer();
+      const total = SmartGimbalCatalog.getCartTotal();
+      document.getElementById('checkoutTotalVal').textContent = SmartGimbalCatalog.formatVND(total);
+
+      // Pre-fill user data if logged in
+      const curUser = SmartGimbalCatalog.getCurrentUser();
+      if (curUser) {
+        document.getElementById('orderCustName').value = curUser.name || '';
+        document.getElementById('orderCustPhone').value = curUser.phone || '';
+      }
+
+      document.getElementById('checkoutModal').classList.add('open');
+    }
+
+    function closeCheckoutModal() {
+      document.getElementById('checkoutModal').classList.remove('open');
+    }
+
+    function submitOrder() {
+      const name = document.getElementById('orderCustName').value.trim();
+      const phone = document.getElementById('orderCustPhone').value.trim();
+      const addr = document.getElementById('orderCustAddress').value.trim();
+      const payment = document.getElementById('orderPaymentMethod').value;
+
+      if (!name || !phone || !addr) {
+        alert('Vui lòng điền đầy đủ Họ tên, Số điện thoại và Địa chỉ giao hàng!');
+        return;
+      }
+
+      const cart = SmartGimbalCatalog.getCart();
+      const total = SmartGimbalCatalog.getCartTotal();
+      const curUser = SmartGimbalCatalog.getCurrentUser();
+
+      const order = SmartGimbalCatalog.createOrder({
+        userId: curUser ? curUser.id : 'guest',
+        customerName: name,
+        phone: phone,
+        address: addr,
+        paymentMethod: payment,
+        items: cart,
+        total: total,
+        totalFormatted: SmartGimbalCatalog.formatVND(total)
+      });
+
+      closeCheckoutModal();
+      showToast(`Đặt hàng thành công! Mã đơn: ${order.orderId}`);
+
+      setTimeout(() => {
+        alert(`Chúc mừng ${name}! Đơn hàng ${order.orderId} đã được tạo thành công.\nTổng thanh toán: ${order.totalFormatted}.\nBạn có thể vào Cổng Khách Hàng để theo dõi tiến độ giao hàng.`);
+      }, 400);
+    }
+
+    // FAQ Toggle
+    function toggleFaq(btn) {
+      const item = btn.parentElement;
+      item.classList.toggle('open');
+    }
+
+    // Toast
+    
+    // ==========================================================================
+    // USER REVIEWS ENGINE (SUBMISSION & DYNAMIC RENDERING)
+    // ==========================================================================
+    let currentReviewFilter = 'all';
+
+    function renderReviewsList(filter) {
+      if (filter) currentReviewFilter = filter;
+      const container = document.getElementById('reviewsListContainer');
+      if (!container || typeof SmartGimbalCatalog === 'undefined') return;
+
+      const reviews = SmartGimbalCatalog.getReviews() || [];
+
+      // Update total count in scorecard
+      const totalEl = document.getElementById('scorecardTotalCount');
+      if (totalEl) totalEl.textContent = 'Dựa trên ' + reviews.length + ' đánh giá thực tế đã xác thực';
+
+      const countAllEl = document.getElementById('countFilterAll');
+      if (countAllEl) countAllEl.textContent = reviews.length;
+
+      // Filter reviews
+      let filtered = reviews;
+      if (currentReviewFilter === '5') {
+        filtered = reviews.filter(r => r.rating === 5);
+      } else if (currentReviewFilter === '4') {
+        filtered = reviews.filter(r => r.rating === 4);
+      } else if (currentReviewFilter === 'verified') {
+        filtered = reviews.filter(r => r.verified === true);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column:1/-1; text-align:center; padding:48px; background:var(--bg-alt); border-radius:20px; color:var(--text-secondary);">
+            <div style="font-size:32px; margin-bottom:8px;">📝</div>
+            <div style="font-size:16px; font-weight:700; color:var(--text-main);">Chưa có đánh giá nào cho bộ lọc này</div>
+            <div style="font-size:13px; margin-top:4px;">Hãy là người đầu tiên chia sẻ cảm nhận trải nghiệm T-Flow Pro!</div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      filtered.forEach(r => {
+        let starsSvg = '';
+        for (let i = 0; i < 5; i++) {
+          const fill = (i < r.rating) ? '#FFB800' : '#D2D2D7';
+          starsSvg += `<svg width="15" height="15" viewBox="0 0 24 24" fill="${fill}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+        }
+
+        let tagsHtml = '';
+        (r.tags || []).forEach(t => {
+          tagsHtml += `<span class="rev-tag-badge">#${t}</span>`;
+        });
+
+        const recentBadge = r.isRecent ? `<span style="font-size:10px; font-weight:700; background:#34C759; color:#FFF; padding:2px 8px; border-radius:99px; margin-left:6px;">Mới</span>` : '';
+
+        html += `
+          <div class="review-card-modern">
+            <div>
+              <div class="rev-card-header">
+                <div class="rev-card-author-info">
+                  <div class="rev-card-avatar">${r.avatar || 'T'}</div>
+                  <div>
+                    <div class="rev-card-name">
+                      ${r.author}
+                      ${r.verified ? '<span class="rev-card-verified-badge">✓ Đã Mua Hàng</span>' : ''}
+                      ${recentBadge}
+                    </div>
+                    <div class="rev-card-role">${r.role || r.package || 'Khách Hàng T-Flow Pro'}</div>
+                  </div>
+                </div>
+                <div class="rev-card-date">${r.date || ''}</div>
+              </div>
+
+              <div class="rev-card-stars">
+                ${starsSvg}
+              </div>
+
+              <div class="rev-card-title">${r.title || 'Đánh giá T-Flow Pro'}</div>
+              <p class="rev-card-quote">"${r.comment || ''}"</p>
+            </div>
+
+            <div class="rev-card-tags">
+              ${tagsHtml}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function filterReviews(type, btn) {
+      document.querySelectorAll('.review-filter-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderReviewsList(type);
+    }
+
+    function toggleReviewForm(open) {
+      const formCard = document.getElementById('reviewFormCard');
+      if (!formCard) return;
+
+      if (open) {
+        formCard.style.display = 'block';
+
+        const user = (typeof SmartGimbalCatalog !== 'undefined') ? SmartGimbalCatalog.getCurrentUser() : null;
+        const identityBox = document.getElementById('reviewUserIdentityBox');
+        const guestFields = document.getElementById('reviewGuestFields');
+        const nameEl = document.getElementById('reviewUserDisplayName');
+        const emailBadge = document.getElementById('reviewUserEmailBadge');
+        const avatarEl = document.getElementById('reviewAvatarInitial');
+
+        if (user && user.email) {
+          if (identityBox) identityBox.style.display = 'flex';
+          if (guestFields) guestFields.style.display = 'none';
+          if (nameEl) nameEl.textContent = user.name || user.email;
+          if (emailBadge) emailBadge.textContent = user.email + (SmartGimbalCatalog.isUserAdmin(user) ? ' (Master Admin)' : ' (Thành Viên)');
+          if (avatarEl) avatarEl.textContent = (user.name || user.email).charAt(0).toUpperCase();
+        } else {
+          if (identityBox) identityBox.style.display = 'none';
+          if (guestFields) guestFields.style.display = 'grid';
+        }
+
+        formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        formCard.style.display = 'none';
+      }
+    }
+
+    function setReviewRating(stars) {
+      document.getElementById('reviewRatingInput').value = stars;
+      const btns = document.querySelectorAll('.star-pick-btn');
+      btns.forEach(b => {
+        const r = parseInt(b.getAttribute('data-rating'));
+        b.classList.toggle('active', r <= stars);
+      });
+
+      const labelEl = document.getElementById('ratingTextLabel');
+      if (labelEl) {
+        const labels = {
+          5: '⭐⭐⭐⭐⭐ Xuất sắc (Cực kỳ hài lòng)',
+          4: '⭐⭐⭐⭐☆ Rất tốt (Hài lòng)',
+          3: '⭐⭐⭐☆☆ Bình thường',
+          2: '⭐⭐☆☆☆ Chưa hài lòng',
+          1: '⭐☆☆☆☆ Cần cải thiện'
+        };
+        labelEl.textContent = labels[stars] || (stars + ' Sao');
+      }
+    }
+
+    function toggleReviewTag(btn) {
+      btn.classList.toggle('active');
+    }
+
+    function submitUserReview(e) {
+      e.preventDefault();
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+
+      const user = SmartGimbalCatalog.getCurrentUser();
+      let authorName = '';
+      let authorEmail = '';
+
+      if (user && user.email) {
+        authorName = user.name || user.email.split('@')[0];
+        authorEmail = user.email;
+      } else {
+        authorName = (document.getElementById('reviewAuthorName').value || '').trim();
+        authorEmail = (document.getElementById('reviewAuthorEmail').value || '').trim();
+        if (!authorName) {
+          alert('Vui lòng nhập Họ và Tên của bạn!');
+          document.getElementById('reviewAuthorName').focus();
+          return;
+        }
+        if (!authorEmail || !authorEmail.includes('@')) {
+          alert('Vui lòng nhập địa chỉ Email Google (Gmail) hợp lệ!');
+          document.getElementById('reviewAuthorEmail').focus();
+          return;
+        }
+      }
+
+      const rating = parseInt(document.getElementById('reviewRatingInput').value) || 5;
+      const pkg = document.getElementById('reviewProductPackage').value;
+      const title = (document.getElementById('reviewHeadline').value || '').trim();
+      const comment = (document.getElementById('reviewContent').value || '').trim();
+
+      if (!title) {
+        alert('Vui lòng nhập tiêu đề cho đánh giá!');
+        document.getElementById('reviewHeadline').focus();
+        return;
+      }
+      if (comment.length < 15) {
+        alert('Nội dung đánh giá cần tối thiểu 15 ký tự để người đọc có thông tin hữu ích nhất!');
+        document.getElementById('reviewContent').focus();
+        return;
+      }
+
+      const activeTags = [];
+      document.querySelectorAll('#reviewTagChipsPicker .tag-chip-btn.active').forEach(b => {
+        activeTags.push(b.textContent.trim());
+      });
+
+      const res = SmartGimbalCatalog.addReview({
+        author: authorName,
+        email: authorEmail,
+        rating: rating,
+        package: pkg,
+        title: title,
+        comment: comment,
+        tags: activeTags,
+        role: 'Khách Hàng Sở Hữu ' + pkg.replace('T-Flow Pro - ', '')
+      });
+
+      if (res.success) {
+        alert('🎉 Cảm ơn bạn! Đánh giá trải nghiệm T-Flow Pro đã được đăng tải thành công.');
+        document.getElementById('tflowReviewForm').reset();
+        setReviewRating(5);
+        toggleReviewForm(false);
+        renderReviewsList('all');
+      } else {
+        alert(res.message || 'Có lỗi xảy ra khi lưu đánh giá.');
+      }
+    }
+
+    // ==========================================================================
+    // T-FLOW AI CONVERSATIONAL ASSISTANT ENGINE
+    // ==========================================================================
+    let aiChatHistory = [
+      {
+        sender: 'bot',
+        text: 'Xin chào! Tôi là **T-Flow AI Assistant** – trợ lý thông minh của **Công ty TNHH Công nghệ T-Flow Việt Nam**.\n\nTôi sẵn sàng tư vấn cho bạn về **T-Flow Pro** (thuật toán Pure FOC 20kHz, ngàm MagSafe 2.8kg, vòng xoay Focus wheel), các kỹ thuật quay điện ảnh (Apple Log, Inception 360°) hoặc chính sách bảo hành chính hãng. Bạn cần hỗ trợ gì hôm nay?',
+        actions: [
+          { label: 'Xem Chi Tiết T-Flow Pro', action: "switchView('detail'); toggleTflowAiChat(false);" },
+          { label: 'Chọn Mua Các Gói', action: "switchView('catalog'); toggleTflowAiChat(false);" }
+        ]
+      }
+    ];
+
+    function toggleTflowAiChat(open) {
+      const drawer = document.getElementById('tflowAiDrawer');
+      const fab = document.getElementById('tflowAiFab');
+      if (!drawer) return;
+
+      if (open) {
+        drawer.style.display = 'flex';
+        if (fab) fab.style.display = 'none';
+        renderAiMessages();
+        setTimeout(() => {
+          const input = document.getElementById('aiUserMessageInput');
+          if (input) input.focus();
+        }, 100);
+      } else {
+        drawer.style.display = 'none';
+        if (fab) fab.style.display = 'flex';
+      }
+    }
+
+    function renderAiMessages() {
+      const container = document.getElementById('aiMessagesContainer');
+      if (!container) return;
+
+      const user = (typeof SmartGimbalCatalog !== 'undefined') ? SmartGimbalCatalog.getCurrentUser() : null;
+      const userInitial = user ? (user.name || user.email).charAt(0).toUpperCase() : 'U';
+
+      let html = '';
+      aiChatHistory.forEach(msg => {
+        const isBot = msg.sender === 'bot';
+        let formattedText = msg.text
+          .replace(/\n/g, '<br>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        let actionsHtml = '';
+        if (msg.actions && msg.actions.length > 0) {
+          actionsHtml = '<div class="ai-action-btn-row">';
+          msg.actions.forEach(act => {
+            actionsHtml += `<button class="ai-action-btn" onclick="${act.action}">${act.label}</button>`;
+          });
+          actionsHtml += '</div>';
+        }
+
+        html += `
+          <div class="ai-msg-row ${isBot ? 'bot' : 'user'}">
+            <div class="ai-msg-avatar">${isBot ? 'TF' : userInitial}</div>
+            <div class="ai-msg-bubble">
+              ${formattedText}
+              ${actionsHtml}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function sendQuickPrompt(promptText) {
+      const input = document.getElementById('aiUserMessageInput');
+      if (input) {
+        input.value = promptText;
+        processAiMessage(promptText);
+        input.value = '';
+      }
+    }
+
+    function handleAiUserSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('aiUserMessageInput');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      processAiMessage(text);
+    }
+
+    function processAiMessage(userText) {
+      aiChatHistory.push({
+        sender: 'user',
+        text: userText
+      });
+      renderAiMessages();
+
+      const container = document.getElementById('aiMessagesContainer');
+      const typingEl = document.createElement('div');
+      typingEl.className = 'ai-msg-row bot';
+      typingEl.id = 'aiTypingRow';
+      typingEl.innerHTML = `
+        <div class="ai-msg-avatar">TF</div>
+        <div class="ai-typing-indicator">
+          <span class="ai-typing-dot"></span>
+          <span class="ai-typing-dot"></span>
+          <span class="ai-typing-dot"></span>
+        </div>
+      `;
+      container.appendChild(typingEl);
+      container.scrollTop = container.scrollHeight;
+
+      setTimeout(() => {
+        const typing = document.getElementById('aiTypingRow');
+        if (typing) typing.remove();
+
+        const botReply = generateTFlowAiReply(userText);
+        aiChatHistory.push(botReply);
+        renderAiMessages();
+      }, 600);
+    }
+
+    function generateTFlowAiReply(query) {
+      const q = query.toLowerCase();
+
+      if (q.includes('giá') || q.includes('gói') || q.includes('bán') || q.includes('mua') || q.includes('kit') || q.includes('creator') || q.includes('master')) {
+        return {
+          sender: 'bot',
+          text: '**T-Flow Pro (TF-G31-PRO)** hiện đang mở bán chính hãng với 3 gói cấu hình thương mại:\n\n• **Standard Kit (2.890.000₫):** Gimbal 3 trục carbon, cáp sạc nhanh Type-C, chân tripod mini và vòng từ tính phụ trợ.\n• **Creator Kit (3.490.000₫ - Bán chạy nhất):** Tích hợp thêm Đèn trợ sáng từ tính T-Flow Glow và Vòng xoay lấy nét Focus Wheel.\n• **Cinematic Master (4.290.000₫):** Trọn bộ Full Option vali chống sốc cao cấp, mô-đun AI Tracking T-Flow Eye và bộ 3D LUT điện ảnh bản quyền.',
+          actions: [
+            { label: 'Xem Chi Tiết T-Flow Pro', action: "switchView('detail'); toggleTflowAiChat(false);" },
+            { label: 'Chọn Mua Creator Kit', action: "switchView('catalog'); toggleTflowAiChat(false);" }
+          ]
+        };
+      }
+
+      if (q.includes('magsafe') || q.includes('hít') || q.includes('nam châm') || q.includes('lực') || q.includes('rơi')) {
+        return {
+          sender: 'bot',
+          text: 'Ngàm **MagSafe trên T-Flow Pro** sử dụng hệ thống nam châm đất hiếm **Neodymium N52 phân bố đa cực**, cho lực hút đạt **2.8kg** (gấp 10 lần trọng lượng iPhone 16 Pro Max).\n\n• **Thao tác 1 giây:** Tháo và gắn điện thoại tức thời mà không cần căn chỉnh lại trục motor.\n• **Tương thích:** iPhone 12 trở lên có MagSafe nguyên bản. Các máy Android hoặc ốp lưng thông thường có thể dán vòng từ tính siêu mỏng tặng kèm trong hộp.',
+          actions: [
+            { label: 'Xem Thông Số MagSafe', action: "switchView('detail'); toggleTflowAiChat(false);" }
+          ]
+        };
+      }
+
+      if (q.includes('foc') || q.includes('động cơ') || q.includes('motor') || q.includes('rung') || q.includes('jitter')) {
+        return {
+          sender: 'bot',
+          text: '**Thuật toán Pure FOC 20kHz (Field Oriented Control)** là trái tim công nghệ của T-Flow:\n\n• **Tần số chuyển mạch 20kHz:** Nằm ngoài ngưỡng nghe của tai người, động cơ vận hành hoàn toàn êm ái, không phát ra tiếng rít cơ học.\n• **Zero Micro-Jitter:** Triệt tiêu hoàn toàn rung giật vi mô khi di chuyển trên địa hình gồ ghề.\n• **Tải trọng cực đại 450g:** Dễ dàng cân mọi cấu hình điện thoại gắn thêm ống kính anamorphic hoặc micro thu âm.',
+          actions: [
+            { label: 'Xem Chi Tiết Động Cơ', action: "switchView('detail'); toggleTflowAiChat(false);" }
+          ]
+        };
+      }
+
+      if (q.includes('apple log') || q.includes('log') || q.includes('focus') || q.includes('lấy nét') || q.includes('bánh xe') || q.includes('quay')) {
+        return {
+          sender: 'bot',
+          text: '**Tính năng quay phim điện ảnh trên T-Flow Pro:**\n\n• **Vòng xoay Focus Wheel:** Trang bị cảm biến từ tính với lực cản đầm tay, hỗ trợ chuyển nét mượt mà (Rack Focus) và zoom quang học vô cấp.\n• **Hỗ trợ Apple Log 4K/60fps:** Ứng dụng T-Flow Cam cho phép bật chế độ Apple Log nguyên bản, hiển thị Waveform, False Color và áp dụng 3D LUT trực tiếp trên màn hình xem trước.',
+          actions: [
+            { label: 'Mở Ứng Dụng T-Flow Cam', action: "window.open('mobile_app.html', '_blank')" }
+          ]
+        };
+      }
+
+      if (q.includes('pin') || q.includes('battery') || q.includes('sạc') || q.includes('thời lượng') || q.includes('18h')) {
+        return {
+          sender: 'bot',
+          text: '**Hệ thống Nguồn & Pin T-Flow Pro:**\n\n• **Thời lượng hoạt động:** Lên tới **18 giờ liên tục** nhờ cell pin Lithium cao cấp 5000mAh tích hợp mạch BMS thông minh.\n• **Sạc nhanh hai chiều:** Hỗ trợ sạc nhanh Type-C PD 18W (sạc đầy trong 1h45p).\n• **Sạc ngược (Power Bank):** Cho phép sạc trực tiếp cho iPhone trong lúc đang quay phim dài hoặc livestream.',
+          actions: [
+            { label: 'Xem Bảng Thông Số Kỹ Thuật', action: "switchView('detail'); toggleTflowAiChat(false);" }
+          ]
+        };
+      }
+
+      if (q.includes('bảo hành') || q.includes('đổi trả') || q.includes('công ty') || q.includes('địa chỉ') || q.includes('admin') || q.includes('thủy')) {
+        return {
+          sender: 'bot',
+          text: '**Chính Sách Bảo Hành Chính Hãng T-Flow Tech:**\n\n• **1 Đổi 1 Trong 24 Giờ:** Nếu phát sinh lỗi bo mạch hoặc cơ khí từ nhà sản xuất trong suốt 12 tháng.\n• **Nhà phát triển:** Công ty TNHH Công nghệ T-Flow Việt Nam (T-Flow Tech Co., Ltd.).\n• **Master Admin:** Kỹ sư Thủy Nguyễn (`thuynguyen2dk4@gmail.com`).\n• **Hotline hỗ trợ:** 1900 8888 (8:00 - 21:00 hàng ngày).',
+          actions: [
+            { label: 'Vào Cổng Khách Hàng', action: "window.location.href='user_dashboard.html'" }
+          ]
+        };
+      }
+
+      return {
+        sender: 'bot',
+        text: 'Cảm ơn câu hỏi của bạn! T-Flow Pro là dòng gimbal 3 trục cao cấp chuyên nghiệp:\n\n• **Tải trọng 450g** cân mọi dòng iPhone & Smartphone.\n• **Thuật toán Pure FOC 20kHz** triệt tiêu hoàn toàn rung giật.\n• **Ngàm MagSafe 2.8kg** tháo lắp 1 giây.\n• **Thời lượng pin 18h** có sạc ngược.\n\nBạn muốn tìm hiểu thêm về gói sản phẩm nào hay cần hỗ trợ kỹ thuật cân trục?',
+        actions: [
+          { label: 'Xem 3 Gói T-Flow Pro', action: "switchView('catalog'); toggleTflowAiChat(false);" },
+          { label: 'Hướng Dẫn Kỹ Thuật', action: "switchView('reviews'); toggleTflowAiChat(false);" }
+        ]
+      };
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toastMsg');
+      if (!t) return;
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => {
+        t.classList.remove('show');
+      }, 2500);
+    }
+  </script>
+
+  
+  <!-- AUTHENTICATION MODAL (STANDARD LOGIN / REGISTER + GOOGLE SIGN-IN) -->
+  <div class="cart-drawer-overlay" id="authModalOverlay" onclick="toggleAuthModal(false)"></div>
+  <div id="authModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:420px; max-width:92vw; background:#FFF; border-radius:24px; padding:32px 28px; box-shadow:0 24px 64px rgba(0,0,0,0.18); border:1px solid rgba(0,0,0,0.08); z-index:99999; font-family:'Plus Jakarta Sans', sans-serif;">
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div style="display:flex; gap:16px;">
+        <button id="modalTabBtnLogin" onclick="switchModalAuthTab('login')" style="background:none; border:none; font-size:16px; font-weight:800; color:#1D1D1F; cursor:pointer; padding-bottom:4px; border-bottom:2px solid #1D1D1F;">Đăng Nhập</button>
+        <button id="modalTabBtnRegister" onclick="switchModalAuthTab('register')" style="background:none; border:none; font-size:16px; font-weight:700; color:#86868B; cursor:pointer; padding-bottom:4px; border-bottom:2px solid transparent;">Đăng Ký</button>
+      </div>
+      <button onclick="toggleAuthModal(false)" style="background:#F5F5F7; border:none; width:28px; height:28px; border-radius:50%; font-size:16px; cursor:pointer; color:#86868B;">&times;</button>
+    </div>
+
+    <!-- 1. MODAL LOGIN TAB -->
+    <div id="modalLoginForm">
+      <div style="margin-bottom:12px;">
+        <label style="font-size:12px; font-weight:700; color:#1D1D1F; display:block; margin-bottom:4px;">Email hoặc Số điện thoại</label>
+        <input type="text" id="modalLoginEmail" placeholder="email@gmail.com" style="width:100%; padding:10px 14px; border:1px solid #D2D2D7; border-radius:10px; font-size:13.5px; font-family:inherit; outline:none;">
+      </div>
+      <div style="margin-bottom:16px;">
+        <label style="font-size:12px; font-weight:700; color:#1D1D1F; display:block; margin-bottom:4px;">Mật khẩu</label>
+        <input type="password" id="modalLoginPassword" placeholder="Nhập mật khẩu" style="width:100%; padding:10px 14px; border:1px solid #D2D2D7; border-radius:10px; font-size:13.5px; font-family:inherit; outline:none;">
+      </div>
+      <button onclick="handleModalLoginSubmit()" style="width:100%; padding:11px; background:#1D1D1F; color:#FFF; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer;">Đăng Nhập</button>
+
+      <!-- DIVIDER -->
+      <div style="display:flex; align-items:center; gap:10px; margin:18px 0 14px 0;">
+        <div style="flex:1; height:1px; background:#E5E5EA;"></div>
+        <span style="font-size:11.5px; color:#86868B; text-transform:uppercase; font-weight:600;">hoặc tiếp tục với</span>
+        <div style="flex:1; height:1px; background:#E5E5EA;"></div>
+      </div>
+
+      <!-- GOOGLE SIGN-IN BUTTON (1-CHẠM TIỆN LỢI CHO ADMIN) -->
+      <button onclick="loginStoreWithGmail('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:10px 14px; background:#F5F5F7; border:1px solid #E5E5EA; border-radius:10px; cursor:pointer; font-size:13px; font-weight:700; color:#1D1D1F;">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+        Đăng nhập Google với thuynguyen2dk4@gmail.com
+      </button>
+
+      <div style="margin-top:10px; display:flex; gap:6px;">
+        <input type="email" id="modalOtherGmailInput" placeholder="Nhập tài khoản Gmail khác..." style="flex:1; padding:7px 10px; border:1px solid #D2D2D7; border-radius:8px; font-size:12px; outline:none;">
+        <button onclick="loginModalWithOtherGmail()" style="padding:7px 12px; background:#F5F5F7; border:1px solid #D2D2D7; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer;">Đăng Nhập GG</button>
+      </div>
+    </div>
+
+    <!-- 2. MODAL REGISTER TAB -->
+    <div id="modalRegisterForm" style="display:none;">
+      <div style="margin-bottom:10px;">
+        <label style="font-size:12px; font-weight:700; color:#1D1D1F; display:block; margin-bottom:4px;">Họ và Tên</label>
+        <input type="text" id="modalRegName" placeholder="Lê Minh Hoàng" style="width:100%; padding:9px 12px; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-family:inherit; outline:none;">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:12px; font-weight:700; color:#1D1D1F; display:block; margin-bottom:4px;">Địa chỉ Email</label>
+        <input type="email" id="modalRegEmail" placeholder="hoang.film@gmail.com" style="width:100%; padding:9px 12px; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-family:inherit; outline:none;">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:12px; font-weight:700; color:#1D1D1F; display:block; margin-bottom:4px;">Số Điện Thoại</label>
+        <input type="tel" id="modalRegPhone" placeholder="0918 888 999" style="width:100%; padding:9px 12px; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-family:inherit; outline:none;">
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px; font-weight:700; color:#1D1D1F; display:block; margin-bottom:4px;">Mật Khẩu</label>
+        <input type="password" id="modalRegPassword" placeholder="Tối thiểu 6 ký tự" style="width:100%; padding:9px 12px; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-family:inherit; outline:none;">
+      </div>
+      <button onclick="handleModalRegisterSubmit()" style="width:100%; padding:11px; background:#1D1D1F; color:#FFF; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer;">Đăng Ký Tài Khoản</button>
+    </div>
+  </div>
           <div>
             <div class="store-card-tag">${groupName}</div>
             <div class="store-card-title">${p.name}</div>
