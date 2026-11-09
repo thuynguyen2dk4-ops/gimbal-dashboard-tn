@@ -2183,9 +2183,9 @@
 
       <!-- Dynamic User / Admin Chip -->
       <div id="navUserSection" style="display:flex; align-items:center; gap:8px;">
-        <button onclick="toggleGoogleAuthModal(true)" class="btn-nav-link" style="display:flex; align-items:center; gap:6px; background:#F5F5F7; padding:6px 14px; border-radius:99px; border:1px solid var(--border); font-size:13px; font-weight:600; cursor:pointer;">
+        <button onclick="toggleAuthModal(true)" class="btn-nav-link" style="display:flex; align-items:center; gap:8px; background:#F5F5F7; padding:7px 16px; border-radius:99px; border:1px solid var(--border); font-size:13px; font-weight:600; cursor:pointer;">
           <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-          Đăng Nhập Gmail
+          Đăng Nhập
         </button>
       </div>
 
@@ -2620,10 +2620,10 @@
             <!-- 2. USER IDENTITY INFO (AUTO-FILLED IF SIGNED IN, OR INPUT IF GUEST) -->
             <div id="reviewUserIdentityBox" style="background:#F5F5F7; border-radius:12px; padding:12px 16px; margin-bottom:16px; display:none; align-items:center; justify-content:space-between;">
               <div style="display:flex; align-items:center; gap:10px;">
-                <div style="width:30px; height:30px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;" id="reviewAvatarInitial">TN</div>
+                <div style="width:30px; height:30px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;" id="reviewAvatarInitial">U</div>
                 <div>
-                  <div style="font-size:13px; font-weight:700; color:var(--text-main);" id="reviewUserDisplayName">Thuy Nguyen</div>
-                  <div style="font-size:11.5px; color:var(--text-secondary);" id="reviewUserEmailBadge">thuynguyen2dk4@gmail.com</div>
+                  <div style="font-size:13px; font-weight:700; color:var(--text-main);" id="reviewUserDisplayName">Khách hàng</div>
+                  <div style="font-size:11.5px; color:var(--text-secondary);" id="reviewUserEmailBadge"></div>
                 </div>
               </div>
               <span style="font-size:10.5px; font-weight:700; background:rgba(52,199,89,0.15); color:#28CD41; padding:2px 8px; border-radius:99px;">✓ Tài khoản đã xác thực</span>
@@ -4082,16 +4082,11 @@
         <div style="flex:1; height:1px; background:#E5E5EA;"></div>
       </div>
 
-      <!-- GOOGLE SIGN-IN BUTTON (1-CHẠM TIỆN LỢI CHO ADMIN) -->
-      <button onclick="loginStoreWithGmail('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:10px 14px; background:#F5F5F7; border:1px solid #E5E5EA; border-radius:10px; cursor:pointer; font-size:13px; font-weight:700; color:#1D1D1F;">
+      <!-- REAL GOOGLE OAUTH SIGN-IN BUTTON (OPENS GOOGLE ACCOUNTS POPUP) -->
+      <button type="button" onclick="loginWithGoogleOAuth()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px 16px; background:#FFFFFF; border:1px solid #747775; border-radius:10px; cursor:pointer; font-size:13.5px; font-weight:600; color:#1F1F1F; box-shadow:0 1px 2px rgba(0,0,0,0.06); transition:background 0.2s;">
         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-        Đăng nhập Google với thuynguyen2dk4@gmail.com
+        Đăng nhập bằng tài khoản Google
       </button>
-
-      <div style="margin-top:10px; display:flex; gap:6px;">
-        <input type="email" id="modalOtherGmailInput" placeholder="Nhập tài khoản Gmail khác..." style="flex:1; padding:7px 10px; border:1px solid #D2D2D7; border-radius:8px; font-size:12px; outline:none;">
-        <button onclick="loginModalWithOtherGmail()" style="padding:7px 12px; background:#F5F5F7; border:1px solid #D2D2D7; border-radius:8px; font-size:12px; font-weight:600; cursor:pointer;">Đăng Nhập GG</button>
-      </div>
     </div>
 
     <!-- 2. MODAL REGISTER TAB -->
@@ -4115,41 +4110,6 @@
       <button onclick="handleModalRegisterSubmit()" style="width:100%; padding:11px; background:#1D1D1F; color:#FFF; border:none; border-radius:10px; font-size:14px; font-weight:700; cursor:pointer;">Đăng Ký Tài Khoản</button>
     </div>
   </div>
-
-  <!-- GOOGLE LOGIN MODAL -->
-  <div class="cart-drawer-overlay" id="googleAuthOverlay" onclick="toggleGoogleAuthModal(false)"></div>
-  <div id="googleAuthModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:400px; max-width:90vw; background:#FFF; border-radius:24px; padding:36px; box-shadow:0 20px 48px rgba(0,0,0,0.18); border:1px solid rgba(0,0,0,0.08); z-index:9999; font-family:'Plus Jakarta Sans', sans-serif; text-align:center;">
-    
-    <div style="width:44px; height:44px; background:#1D1D1F; color:#FFF; border-radius:12px; padding:8px; display:inline-flex; align-items:center; justify-content:center; margin-bottom:16px;">
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
-        <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="currentColor" stroke-width="12" stroke-linecap="round" fill="none" />
-        <path d="M 50 34 L 50 82" stroke="currentColor" stroke-width="12" stroke-linecap="round" />
-      </svg>
-    </div>
-
-    <div style="font-size:20px; font-weight:800; letter-spacing:-0.02em; margin-bottom:6px;">Đăng Nhập Tài Khoản Google</div>
-    <div style="font-size:13px; color:#86868B; line-height:1.5; margin-bottom:24px;">Chọn tài khoản Gmail để đồng bộ thiết bị hoặc truy cập Quản trị viên.</div>
-
-    <!-- 1-Click Master Admin -->
-    <button onclick="loginStoreWithGmail('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; display:flex; align-items:center; gap:12px; padding:12px 16px; background:#F5F5F7; border:1px solid #E5E5EA; border-radius:14px; cursor:pointer; margin-bottom:12px; text-align:left; transition:background 0.2s;">
-      <div style="width:36px; height:36px; border-radius:50%; background:#1D1D1F; color:#FFF; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center;">TN</div>
-      <div style="flex:1;">
-        <div style="font-size:14px; font-weight:700; color:#1D1D1F;">Thuy Nguyen</div>
-        <div style="font-size:12px; color:#6E6E73;">thuynguyen2dk4@gmail.com</div>
-      </div>
-      <span style="font-size:11px; font-weight:700; background:rgba(0,113,227,0.1); color:#0071E3; padding:2px 8px; border-radius:99px;">Admin</span>
-    </button>
-
-    <!-- Custom Gmail Option -->
-    <div style="margin:16px 0 12px 0; font-size:12px; color:#86868B;">- hoặc nhập tài khoản Gmail khác -</div>
-    <div style="display:flex; gap:8px; margin-bottom:20px;">
-      <input type="email" id="storeCustomEmailInput" placeholder="khachhang@gmail.com" style="flex:1; padding:10px 14px; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-family:inherit; outline:none;">
-      <button onclick="loginStoreWithCustomEmail()" style="padding:10px 16px; background:#1D1D1F; color:#FFF; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;">Đăng Nhập</button>
-    </div>
-
-    <button onclick="toggleGoogleAuthModal(false)" style="background:none; border:none; font-size:13px; color:#86868B; cursor:pointer;">Đóng cửa sổ</button>
-  </div>
-
 
   <!-- T-FLOW AI ASSISTANT FLOATING CHATBOT WIDGET -->
   <div class="tflow-ai-fab" id="tflowAiFab" onclick="toggleTflowAiChat(true)">

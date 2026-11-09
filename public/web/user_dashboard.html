@@ -616,17 +616,11 @@
           <div style="flex:1; height:1px; background:var(--border);"></div>
         </div>
 
-        <!-- GOOGLE SIGN-IN BUTTONS -->
-        <button onclick="loginUserPortalWithGmail('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px 16px; background:#F5F5F7; border:1px solid #E5E5EA; border-radius:12px; font-size:13.5px; font-weight:700; color:#1D1D1F; cursor:pointer; margin-bottom:10px; transition:all 0.2s;">
+        <!-- REAL GOOGLE OAUTH SIGN-IN BUTTON -->
+        <button type="button" onclick="loginWithGoogleOAuth()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:12px 16px; background:#FFFFFF; border:1px solid #747775; border-radius:12px; font-size:14px; font-weight:600; color:#1F1F1F; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.06); transition:background 0.2s;">
           <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-          Đăng nhập Google với thuynguyen2dk4@gmail.com
+          Đăng nhập bằng tài khoản Google
         </button>
-
-        <!-- Nhập Gmail khác nếu muốn -->
-        <div style="display:flex; gap:8px;">
-          <input type="email" class="form-control" id="loginPortalOtherEmail" placeholder="Nhập tài khoản Google (Gmail) khác..." style="font-size:12.5px; padding:8px 12px;">
-          <button class="btn btn-outline" style="font-size:12px; padding:8px 14px; white-space:nowrap;" onclick="handleOtherGoogleSubmit()">Đăng Nhập GG</button>
-        </div>
       </div>
 
       <!-- 2. FORM ĐĂNG KÝ TÀI KHOẢN (CHUẨN HÓA BÌNH THƯỜNG) -->
@@ -1237,6 +1231,34 @@
         loadUserData();
       }
     }
-  </script>
+  
+    function loginWithGoogleOAuth() {
+      const width = 480;
+      const height = 620;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+
+      const popup = window.open(
+        'google_auth.html',
+        'GoogleAccountsOAuth',
+        `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
+      );
+
+      if (popup && popup.focus) {
+        popup.focus();
+      }
+    }
+
+    window.addEventListener('message', function(event) {
+      if (event.data && event.data.type === 'GOOGLE_OAUTH_SUCCESS') {
+        const googleUser = event.data.user;
+        if (googleUser && googleUser.email && typeof SmartGimbalCatalog !== 'undefined') {
+          SmartGimbalCatalog.loginWithGmail(googleUser.email, googleUser.name);
+          checkUserAuth();
+        }
+      }
+    });
+
+</script>
 </body>
 </html>
