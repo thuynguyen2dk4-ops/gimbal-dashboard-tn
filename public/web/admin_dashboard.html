@@ -2044,17 +2044,17 @@
     </div>
   </div>
 
-  <!-- MODAL: ADMIN COMMENT & TRAIN AI DIRECTLY ON CUSTOMER QUESTION -->
+  <!-- MODAL: ADMIN GÓP Ý & ĐỊNH HƯỚNG AI (DIRECTIVE & FEEDBACK LEARNING) -->
   <div class="modal-overlay" id="adminCommentModal">
-    <div class="modal-card" style="width:720px; max-width:94vw; max-height:90vh; overflow-y:auto; border-radius:18px;">
+    <div class="modal-card" style="width:720px; max-width:94vw; max-height:92vh; overflow-y:auto; border-radius:18px;">
       <div class="modal-header" style="background:#F5F5F7; border-bottom:1px solid var(--border); padding:16px 20px;">
         <div>
           <div style="font-size:16px; font-weight:800; color:var(--text-main); display:flex; align-items:center; gap:8px;">
-            <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:#0071E3; color:#FFF; font-size:14px;">💬</span>
-            Admin Huấn Luyện AI Cho Câu Hỏi Của Khách
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:#0071E3; color:#FFF; font-size:14px;">💡</span>
+            Admin Góp Ý &amp; Định Hướng AI (Không Cần Viết Kịch Bản)
           </div>
           <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
-            Nhập câu trả lời chuẩn xác. Ngay sau khi lưu, AI trên toàn hệ thống (Web &amp; App) sẽ học và trả lời chuẩn xác câu hỏi này cho các khách hàng tiếp theo!
+            Anh chỉ cần để lại nhận xét, góp ý ngắn hoặc lưu ý nghiệp vụ. AI sẽ tự động học hỏi định hướng này để tự biên soạn câu trả lời thông minh, tự nhiên theo đúng ý anh mà không bị rập khuôn kịch bản!
           </div>
         </div>
         <button class="btn btn-outline" style="padding:4px 10px; border-radius:8px;" onclick="closeAdminCommentModal()">&times;</button>
@@ -2063,7 +2063,7 @@
         <input type="hidden" id="adminCommentConvId">
         
         <!-- CUSTOMER QUESTION CARD -->
-        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:16px;">
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:14px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
             <span style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">❓ Câu Hỏi Của Khách Hàng:</span>
             <span id="adminCommentCustomerMeta" style="font-size:11.5px; color:var(--text-secondary); font-weight:600;"></span>
@@ -2071,61 +2071,56 @@
           <div id="adminCommentCustomerQuery" style="font-size:14.5px; font-weight:800; color:#1D1D1F; line-height:1.45;"></div>
         </div>
 
-        <!-- PREVIOUS AI ANSWER (FOR COMPARISON) -->
-        <div style="background:rgba(0,113,227,0.04); border:1px dashed rgba(0,113,227,0.25); border-radius:12px; padding:12px 14px; margin-bottom:18px;">
+        <!-- PREVIOUS AI ANSWER -->
+        <div style="background:rgba(0,113,227,0.04); border:1px dashed rgba(0,113,227,0.25); border-radius:12px; padding:12px 14px; margin-bottom:16px;">
           <div style="font-size:11px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:4px;">
-            🤖 Câu Trả Lời Tự Động Trước Đó Của AI (Cần Admin Đính Chính / Huấn Luyện):
+            🤖 Câu Trả Lời Tự Động Trước Đó Của AI (Cần Admin Góp Ý / Định Hướng Lại):
           </div>
           <div id="adminCommentPreviousReply" style="font-size:12.5px; color:var(--text-secondary); line-height:1.45; max-height:85px; overflow-y:auto;"></div>
         </div>
 
-        <!-- TRAINING FORM -->
-        <div class="form-row-2">
-          <div class="form-group">
-            <label style="font-weight:700; font-size:12.5px;">Chuyên Mục Áp Dụng Cho AI</label>
-            <select class="form-control" id="adminCommentTarget">
-              <option value="sales">🛍️ 1. Tư Vấn Bán Hàng &amp; Chính Sách (Giá, 4 Gói Pro, Bảo Hành)</option>
-              <option value="creative">🎬 2. Tư Vấn Kỹ Thuật Quay Chụp &amp; Edit (Góc máy, FOC, 3D LUT, Dựng phim)</option>
-              <option value="smart_vision">🧠 3. Tính Năng Nhận Diện AI Thông Minh (Bám nét người/thú cưng/vật thể, Auto Ultra-Wide)</option>
-              <option value="all_domains">🌐 4. Áp Dụng Cho Cả 3 Chuyên Mục (Toàn Hệ Thống)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label style="font-weight:700; font-size:12.5px;">Chủ Đề Tri Thức</label>
-            <input type="text" class="form-control" id="adminCommentTopic" placeholder="Ví dụ: Danh mục sản phẩm hiện có, Bảng giá 4 gói...">
-          </div>
+        <!-- CHUYÊN MỤC ÁP DỤNG -->
+        <div class="form-group" style="margin-bottom:14px;">
+          <label style="font-weight:700; font-size:12.5px;">Chuyên Mục Áp Dụng Chỉ Đạo</label>
+          <select class="form-control" id="adminCommentTarget">
+            <option value="sales">🛍️ 1. Tư Vấn Bán Hàng &amp; Chính Sách (Giá 4 Gói Pro, Bảo Hành 1 Đổi 1, MagSafe)</option>
+            <option value="creative">🎬 2. Tư Vấn Kỹ Thuật Quay Chụp &amp; Edit (Góc máy, FOC, 3D LUT, App T-Flow)</option>
+            <option value="smart_vision">🧠 3. Tính Năng Nhận Diện AI Thông Minh (Bám nét người/thú cưng/vật thể, 120fps)</option>
+            <option value="all_domains">🌐 4. Áp Dụng Cho Toàn Hệ Thống (Mọi Chuyên Mục)</option>
+          </select>
         </div>
 
-        <div class="form-group">
-          <label style="font-weight:700; font-size:12.5px;">Từ Khóa Nhận Diện AI (Phân tách bởi dấu phẩy)</label>
-          <input type="text" class="form-control" id="adminCommentKeywords" placeholder="sản phẩm, có những, bán gì, danh mục, combo, phiên bản...">
-        </div>
-
-        <!-- QUICK INSERT TEMPLATES -->
-        <div style="margin-bottom:12px;">
-          <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">⚡ Gợi Ý Mẫu Nhanh (Click để tự điền nội dung chuẩn của xưởng R&amp;D):</div>
+        <!-- QUICK DIRECTIVE CHIPS (CLICK TO APPEND) -->
+        <div style="margin-bottom:14px;">
+          <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">⚡ Gợi Ý Chỉ Đạo Nghiệp Vụ Nhanh (Click để tự điền lưu ý):</div>
           <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button type="button" class="btn btn-outline" style="padding:4px 10px; font-size:11px; border-radius:6px;" onclick="insertAdminCommentTemplate('packages')">📦 Mẫu 4 Gói Sản Phẩm T-Flow Pro</button>
-            <button type="button" class="btn btn-outline" style="padding:4px 10px; font-size:11px; border-radius:6px;" onclick="insertAdminCommentTemplate('warranty')">🛡️ Mẫu Bảo Hành 1 Đổi 1 &amp; Ship</button>
-            <button type="button" class="btn btn-outline" style="padding:4px 10px; font-size:11px; border-radius:6px;" onclick="insertAdminCommentTemplate('vision')">🧠 Mẫu Cụm Camera AI &amp; Bám Nét</button>
-            <button type="button" class="btn btn-outline" style="padding:4px 10px; font-size:11px; border-radius:6px;" onclick="insertAdminCommentTemplate('foc')">⚡ Mẫu Động Cơ FOC 20kHz &amp; MagSafe</button>
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Khách mới bắt đầu: Hướng dẫn họ chọn gói Standard 2.490k cho tiết kiệm, nhấn mạnh trong app có sẵn chuỗi video hướng dẫn chi tiết từng bước, giọng nhiệt tình, không chèo kéo gói đắt tiền')">💡 Người Mới: Ưu tiên gói Standard &amp; Video App</button>
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Nhấn mạnh ngàm hít nam châm MagSafe lực hút 2.8kg cực kỳ chắc chắn, chống rơi rớt tuyệt đối khi vận động mạnh')">🧲 Nhấn mạnh ngàm MagSafe 2.8kg</button>
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Nhắc cam kết bảo hành 1 đổi 1 trong 12 tháng chính hãng và dùng thử 30 ngày hoàn tiền 100% nếu không ưng ý')">🛡️ Nhắc Bảo Hành 1 Đổi 1 &amp; Dùng Thử</button>
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Nhấn mạnh công nghệ động cơ Pure FOC 20kHz không tiếng ồn, triệt tiêu rung giật chuẩn điện ảnh')">⚡ Nhấn mạnh động cơ Pure FOC 20kHz</button>
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Gợi ý khách tải App T-Flow để chỉnh Apple Log ProRes 4K và áp bảng màu 3D LUT chuyên nghiệp')">🎬 Nhắc tải App T-Flow &amp; 3D LUT</button>
+            <button type="button" class="btn btn-outline" style="padding:5px 11px; font-size:11.5px; border-radius:99px;" onclick="appendAdminDirective('Giọng văn nhiệt tình, thân thiện, hỏi thêm khách đang dùng điện thoại gì để tư vấn phụ kiện phù hợp')">🤝 Thân thiện, hỏi dòng điện thoại của khách</button>
           </div>
         </div>
 
-        <div class="form-group">
-          <label style="font-weight:700; font-size:12.5px; display:flex; justify-content:space-between;">
-            <span>Nội Dung Giải Đáp Chuẩn Xác Của Admin (Huấn Luyện AI)</span>
-            <span style="font-weight:400; color:#8E8E93; font-size:11.5px;">Hỗ trợ Markdown (**in đậm**, bullet points)</span>
+        <!-- MAIN COMMENT / DIRECTIVE TEXTAREA -->
+        <div class="form-group" style="margin-bottom:8px;">
+          <label style="font-weight:700; font-size:12.5px; display:flex; justify-content:space-between; align-items:center;">
+            <span>📝 Góp Ý / Chỉ Đạo Của Admin Cho AI:</span>
+            <span style="font-weight:400; color:#0071E3; font-size:11.5px;">✓ Không cần viết kịch bản đầy đủ</span>
           </label>
-          <textarea class="form-control" id="adminCommentOfficialAnswer" rows="6" placeholder="Nhập câu trả lời chính thức của Admin Thủy Nguyễn. AI sẽ học nội dung này và trả lời chính xác cho mọi khách hàng hỏi câu hỏi tương tự..."></textarea>
+          <textarea class="form-control" id="adminCommentOfficialAnswer" rows="5" placeholder="Nhập góp ý, nhận xét hoặc lưu ý nghiệp vụ của anh tại đây... Ví dụ: Khách này mới tập quay thì hướng dẫn họ lấy gói Standard 2.490k cho tiết kiệm, nhắc là trong app có sẵn video hướng dẫn chi tiết từng bước, giọng nhiệt tình, hỏi thêm khách dùng iPhone hay Android..."></textarea>
+        </div>
+        <div style="font-size:11.5px; color:#8E8E93; line-height:1.45; background:#F5F5F7; padding:8px 12px; border-radius:8px;">
+          🤖 <strong>Cơ chế tự học thông minh:</strong> AI (Google Gemini) sẽ ghi nhớ góp ý này của anh như một lưu ý nghiệp vụ cốt lõi để tự động sáng tạo câu trả lời linh hoạt, tự nhiên nhất cho các khách hàng tiếp theo mà không bao giờ bị rập khuôn kịch bản máy móc.
         </div>
       </div>
       <div class="modal-footer" style="padding:14px 20px; background:#F5F5F7; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:11.5px; color:#8E8E93;">✓ Tự động đồng bộ Realtime sang Website và Mobile App</span>
+        <span style="font-size:11.5px; color:#8E8E93;">✓ Tự động nạp vào bộ nhớ định hướng AI Realtime</span>
         <div style="display:flex; gap:10px;">
           <button class="btn btn-outline" onclick="closeAdminCommentModal()">Hủy Bỏ</button>
           <button class="btn btn-dark" onclick="submitAdminCommentTraining()" style="background:#0071E3; border-color:#0071E3; font-weight:700; padding:8px 18px;">
-            💾 Lưu &amp; Huấn Luyện AI Ngay
+            💾 Lưu Góp Ý &amp; Định Hướng AI
           </button>
         </div>
       </div>
@@ -3404,8 +3399,8 @@
         let adminCommentSnippet = '';
         if (c.adminComment) {
           adminCommentSnippet = `
-            <div style="margin-top:5px; padding:4px 8px; background:rgba(52,199,89,0.1); border-left:3px solid #34C759; border-radius:4px; font-size:11px; color:#248A3D; font-weight:600; line-height:1.35;">
-              ⚡ <strong>Admin đã sửa:</strong> ${(c.adminComment || '').replace(/\n/g, ' ').substring(0, 75)}...
+            <div style="margin-top:5px; padding:4px 8px; background:rgba(0,113,227,0.08); border-left:3px solid #0071E3; border-radius:4px; font-size:11px; color:#0071E3; font-weight:600; line-height:1.35;">
+              💡 <strong>Góp ý của Admin:</strong> "${(c.adminComment || '').replace(/\n/g, ' ').substring(0, 85)}..."
             </div>
           `;
         }
@@ -3430,7 +3425,7 @@
             <td style="text-align:right;">
               <div>${statusBadge}</div>
               <button class="btn btn-dark" onclick="openAdminCommentModal('${c.id}')" style="margin-top:6px; padding:4px 10px; font-size:11.5px; font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; background:#0071E3; border-color:#0071E3; color:#FFF; cursor:pointer; box-shadow:0 2px 6px rgba(0,113,227,0.25);">
-                <span>💬</span> ${c.status === 'trained' || c.adminComment ? 'Sửa Lời Huấn Luyện' : 'Comment &amp; Train AI'}
+                <span>💡</span> ${c.adminComment ? 'Sửa Góp Ý AI' : 'Góp Ý Định Hướng AI'}
               </button>
             </td>
           </tr>
@@ -3665,8 +3660,8 @@
       const words = cleanQ.split(/\s+/).filter(w => w.length > 2);
       document.getElementById('adminCommentKeywords').value = words.join(', ');
 
-      // Pre-fill answer: if already trained, show adminComment; otherwise show current reply for admin to edit
-      document.getElementById('adminCommentOfficialAnswer').value = c.adminComment || c.reply || '';
+      // Only show previous admin comment if already entered, DO NOT fill the old AI text!
+      document.getElementById('adminCommentOfficialAnswer').value = c.adminComment || '';
 
       document.getElementById('adminCommentModal').classList.add('open');
     }
@@ -3676,52 +3671,33 @@
       if (modal) modal.classList.remove('open');
     }
 
-    function insertAdminCommentTemplate(tplKey) {
-      const tpl = ADMIN_TRAINING_TEMPLATES[tplKey];
-      if (!tpl) return;
+    function appendAdminDirective(directiveText) {
       const area = document.getElementById('adminCommentOfficialAnswer');
-      if (area) {
-        area.value = tpl;
-        area.focus();
+      if (!area) return;
+      if (area.value.trim()) {
+        area.value += '\n- ' + directiveText;
+      } else {
+        area.value = directiveText;
       }
-      if (tplKey === 'packages') {
-        document.getElementById('adminCommentTarget').value = 'sales';
-        document.getElementById('adminCommentTopic').value = 'Bảng giá và các gói sản phẩm T-Flow Pro';
-        document.getElementById('adminCommentKeywords').value = 'sản phẩm, hiện có, bán gì, có những, gói, combo, giá, bao nhiêu';
-      } else if (tplKey === 'warranty') {
-        document.getElementById('adminCommentTarget').value = 'sales';
-        document.getElementById('adminCommentTopic').value = 'Chính sách bảo hành 1 đổi 1 và dùng thử';
-        document.getElementById('adminCommentKeywords').value = 'bảo hành, đổi trả, dùng thử, ship, vận chuyển, hỏa tốc';
-      } else if (tplKey === 'vision') {
-        document.getElementById('adminCommentTarget').value = 'smart_vision';
-        document.getElementById('adminCommentTopic').value = 'Tính năng nhận diện AI thông minh 120fps';
-        document.getElementById('adminCommentKeywords').value = 'nhận diện, bám nét, thú cưng, góc rộng, tracking, cử chỉ';
-      } else if (tplKey === 'foc') {
-        document.getElementById('adminCommentTarget').value = 'creative';
-        document.getElementById('adminCommentTopic').value = 'Động cơ Pure FOC 20kHz và ngàm MagSafe 45N';
-        document.getElementById('adminCommentKeywords').value = 'động cơ, foc, 20khz, magsafe, nam châm, chống rung';
-      }
+      area.focus();
     }
 
     function submitAdminCommentTraining() {
       const convId = document.getElementById('adminCommentConvId').value;
-      const topic = document.getElementById('adminCommentTopic').value.trim();
       const target = document.getElementById('adminCommentTarget').value;
-      const keywords = document.getElementById('adminCommentKeywords').value.trim();
-      const answer = document.getElementById('adminCommentOfficialAnswer').value.trim();
+      const adminComment = document.getElementById('adminCommentOfficialAnswer').value.trim();
 
-      if (!topic || !answer) {
-        alert('Vui lòng nhập đầy đủ Chủ đề và Nội dung câu trả lời chuẩn xác!');
+      if (!adminComment) {
+        alert('Vui lòng nhập nhận xét hoặc góp ý của anh để định hướng AI!');
+        document.getElementById('adminCommentOfficialAnswer').focus();
         return;
       }
 
       if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.trainConversationDirectly) {
         SmartGimbalCatalog.trainConversationDirectly(convId, {
-          topic: topic,
           target: target,
-          keywords: keywords,
-          answer: answer,
-          adminComment: answer
+          adminComment: adminComment,
+          answer: adminComment
         });
 
         alert('🎉 ĐÃ HUẤN LUYỆN AI THÀNH CÔNG!\n\nCâu trả lời chuẩn của Admin đã được lưu vào Bộ Não AI. Từ bây giờ AI sẽ tự động trả lời câu hỏi này theo đúng chỉ dẫn của Admin Thủy Nguyễn.');

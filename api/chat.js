@@ -132,6 +132,17 @@ export default async function handler(req, res) {
     } else {
       systemPrompt = SALES_SYSTEM_PROMPT;
     }
+
+    // DYNAMICALLY INJECT ADMIN THUY NGUYEN'S COMMENTS & DIRECTIVES
+    if (Array.isArray(context?.adminDirectives) && context.adminDirectives.length > 0) {
+      systemPrompt += `\n\n--- LƯU Ý & CHỈ ĐẠO NGHIỆP VỤ TỪ MASTER ADMIN THỦY NGUYỄN ---
+Dưới đây là các góp ý và chỉ đạo nghiệp vụ quan trọng từ Master Admin Thủy Nguyễn cho các tình huống tư vấn:
+${context.adminDirectives.map((d, i) => `${i + 1}. [Chuyên mục: ${d.target || 'Tất cả'}] Tình huống/Câu hỏi: "${d.queryPattern || 'Tư vấn'}" -> CHỈ ĐẠO CỦA ADMIN: "${d.directive}"`).join('\n')}
+
+QUY TẮC PHẢN HỒI QUAN TRỌNG:
+- TUYỆT ĐỐI KHÔNG đọc nguyên văn câu chữ của kịch bản một cách thô cứng hoặc rập khuôn.
+- Hãy TỰ NHIÊN kết hợp các góp ý và chỉ đạo của Admin vào câu trả lời để tư vấn thông minh, linh hoạt, cá nhân hóa cho từng khách hàng!`;
+    }
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(effectiveKey)}`;
 
     const geminiPayload = {

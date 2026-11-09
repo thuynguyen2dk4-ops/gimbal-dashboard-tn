@@ -2456,6 +2456,34 @@
     var history = params.history || [];
     var context = params.context || {};
 
+    // Gather active Admin Directives & Comments
+    try {
+      var allDirectives = [];
+      var convList = getAiConversations() || [];
+      convList.forEach(function(c) {
+        if (c.adminComment) {
+          allDirectives.push({
+            queryPattern: c.query,
+            target: c.source || 'sales',
+            directive: c.adminComment
+          });
+        }
+      });
+      var kbList = getAiKnowledge() || [];
+      kbList.forEach(function(k) {
+        if (k.adminComment || k.directive) {
+          allDirectives.push({
+            queryPattern: k.queryPattern || k.topic,
+            target: k.target || 'sales',
+            directive: k.adminComment || k.directive
+          });
+        }
+      });
+      if (allDirectives.length > 0) {
+        context.adminDirectives = allDirectives.slice(-8);
+      }
+    } catch(e) {}
+
     var currentUserObj = getCurrentUser();
     var email = currentUserObj ? currentUserObj.email : (mode === 'creative' ? 'Người dùng App T-Flow' : 'Khách vãng lai');
     var name = currentUserObj ? currentUserObj.name : (mode === 'creative' ? 'Nhà sáng tạo' : 'Quý khách');
