@@ -3174,7 +3174,10 @@
     // ==========================================================================
     // 1. VIEW SWITCHER (MULTI-VIEW ISOLATION)
     // ==========================================================================
+    let currentView = 'home';
+
     function switchView(viewName) {
+      currentView = viewName;
       const views = {
         'home': document.getElementById('viewHome'),
         'catalog': document.getElementById('viewCatalog'),
@@ -3975,6 +3978,21 @@
       }
     }
 
+    // ==========================================================================
+    // T-FLOW AI CONSULTANT CHATBOT (100% UNIFIED CLOUD ENGINE)
+    // ==========================================================================
+    let aiChatHistory = [
+      {
+        sender: 'bot',
+        text: '👋 Xin chào quý khách! Em là **T-Flow AI Consultant** — Trợ lý ảo Đám Mây hỗ trợ tư vấn 24/7.\n\nEm sẵn sàng giải đáp ngay mọi thông tin:\n• Báo giá chính hãng của **4 gói T-Flow Pro**\n• Động cơ **Pure FOC 20kHz** & ngàm nam châm **MagSafe 45N N52**\n• Chính sách **Bảo hành 1 đổi 1 trong 12 tháng** và **30 ngày dùng thử miễn phí**.\n\nAnh/chị đang quan tâm đến gói thiết bị nào ạ?',
+        actions: [
+          { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' },
+          { label: '⚡ Tìm Hiểu Động Cơ FOC', action: "sendQuickPrompt('Thuật toán Pure FOC 20kHz khác gì gimbal thường?')" },
+          { label: '🛡️ Chính Sách Bảo Hành', action: "sendQuickPrompt('Chính sách bảo hành 1 đổi 1 trong 24 giờ')" }
+        ]
+      }
+    ];
+
     function toggleTflowAiChat(open) {
       const drawer = document.getElementById('tflowAiDrawer');
       const fab = document.getElementById('tflowAiFab');
@@ -3987,7 +4005,7 @@
         setTimeout(() => {
           const input = document.getElementById('aiUserMessageInput');
           if (input) input.focus();
-        }, 100);
+        }, 120);
       } else {
         drawer.style.display = 'none';
         if (fab) fab.style.display = 'flex';
@@ -3997,6 +4015,19 @@
     function renderAiMessages() {
       const container = document.getElementById('aiMessagesContainer');
       if (!container) return;
+
+      if (!Array.isArray(aiChatHistory) || aiChatHistory.length === 0) {
+        aiChatHistory = [
+          {
+            sender: 'bot',
+            text: '👋 Xin chào quý khách! Em là **T-Flow AI Consultant**. Em có thể hỗ trợ gì cho anh/chị hôm nay ạ?',
+            actions: [
+              { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' },
+              { label: '⚡ Xem Chi Tiết Kỹ Thuật', view: 'detail' }
+            ]
+          }
+        ];
+      }
 
       const user = (typeof SmartGimbalCatalog !== 'undefined') ? SmartGimbalCatalog.getCurrentUser() : null;
       const userInitial = user ? (user.name || user.email).charAt(0).toUpperCase() : 'U';
@@ -4040,11 +4071,15 @@
     }
 
     function sendQuickPrompt(promptText) {
+      const drawer = document.getElementById('tflowAiDrawer');
+      if (drawer && drawer.style.display !== 'flex') {
+        toggleTflowAiChat(true);
+      }
       processAiMessage(promptText);
     }
 
     function handleAiUserSubmit(e) {
-      e.preventDefault();
+      if (e && e.preventDefault) e.preventDefault();
       const input = document.getElementById('aiUserMessageInput');
       if (!input) return;
       const text = input.value.trim();
@@ -4054,6 +4089,7 @@
     }
 
     async function processAiMessage(userText) {
+      if (!Array.isArray(aiChatHistory)) aiChatHistory = [];
       aiChatHistory.push({
         sender: 'user',
         text: userText
@@ -4077,21 +4113,34 @@
 
       try {
         let aiResult = null;
+        const curV = typeof currentView !== 'undefined' ? currentView : 'home';
+
         if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.queryUnifiedCloudAi) {
           aiResult = await SmartGimbalCatalog.queryUnifiedCloudAi({
             prompt: userText,
             mode: 'web',
-            context: { currentView: currentView }
+            history: aiChatHistory,
+            context: { currentView: curV }
           });
         } else if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.processWebAiQuery) {
-          aiResult = await SmartGimbalCatalog.processWebAiQuery(userText, { currentView: currentView });
+          aiResult = await SmartGimbalCatalog.processWebAiQuery(userText, { currentView: curV });
         } else {
-          aiResult = {
-            answer: 'Cảm ơn câu hỏi của bạn về T-Flow Pro. Vui lòng liên hệ hotline 1900 8899 để được hỗ trợ tức thời.',
-            status: 'answered',
-            escalated: false,
-            actions: [{ label: 'Xem Bảng Giá', action: "switchView('catalog'); toggleTflowAiChat(false);" }]
-          };
+          // Direct fallback to serverless /api/chat
+          const res = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              prompt: userText,
+              mode: 'web',
+              history: aiChatHistory,
+              context: { currentView: curV }
+            })
+          });
+          if (res.ok) {
+            aiResult = await res.json();
+          } else {
+            throw new Error('API response status ' + res.status);
+          }
         }
 
         const el = document.getElementById('aiTypingBubble');
@@ -4114,14 +4163,15 @@
 
         renderAiMessages();
       } catch (err) {
+        console.error('AI chat error:', err);
         const el = document.getElementById('aiTypingBubble');
         if (el) el.remove();
         aiChatHistory.push({
           sender: 'bot',
-          text: 'Dạ kết nối mạng tạm thời bị gián đoạn. Anh có thể xem nhanh bảng giá hoặc thông số kỹ thuật bên dưới ạ!',
+          text: 'Dạ em chào anh/chị ạ! Hiện T-Flow Pro có 4 gói chính hãng: Standard (2.490.000₫), Creator Kit (3.190.000₫), Cinematic Pro (3.990.000₫), Master Edition (5.490.000₫). Anh/chị bấm vào các nút bên dưới để xem chi tiết ngay nhé!',
           actions: [
-            { label: 'Xem Bảng Giá 4 Gói', action: "switchView('catalog'); toggleTflowAiChat(false);" },
-            { label: 'Xem Chi Tiết Kỹ Thuật', action: "switchView('detail'); toggleTflowAiChat(false);" }
+            { label: '📦 Xem Bảng Giá 4 Gói', action: "switchView('catalog'); toggleTflowAiChat(false);" },
+            { label: '⚡ Xem Chi Tiết Kỹ Thuật', action: "switchView('detail'); toggleTflowAiChat(false);" }
           ]
         });
         renderAiMessages();
