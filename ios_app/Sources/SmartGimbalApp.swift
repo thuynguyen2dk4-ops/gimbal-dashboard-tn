@@ -3,6 +3,59 @@ import AVFoundation
 import Vision
 import CoreBluetooth
 
+// MARK: - =====================================================================
+// T-FLOW BRAND LOGO VECTOR (NATIVE SWIFTUI)
+// =====================================================================
+struct TFlowBrandLogo: View {
+    var size: CGFloat = 28
+    var strokeColor: Color = .white
+    var bgColor: Color = .black
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: size * 0.26)
+                .fill(bgColor)
+                .overlay(
+                    RoundedRectangle(cornerRadius: size * 0.26)
+                        .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                )
+
+            Canvas { context, sz in
+                let scale = sz.width / 100.0
+                var path = Path()
+
+                // Wave curve
+                path.move(to: CGPoint(x: 16 * scale, y: 34 * scale))
+                path.addCurve(
+                    to: CGPoint(x: 50 * scale, y: 34 * scale),
+                    control1: CGPoint(x: 26 * scale, y: 21 * scale),
+                    control2: CGPoint(x: 39 * scale, y: 21 * scale)
+                )
+                path.addCurve(
+                    to: CGPoint(x: 84 * scale, y: 34 * scale),
+                    control1: CGPoint(x: 61 * scale, y: 47 * scale),
+                    control2: CGPoint(x: 74 * scale, y: 47 * scale)
+                )
+
+                // Vertical stem
+                path.move(to: CGPoint(x: 50 * scale, y: 34 * scale))
+                path.addLine(to: CGPoint(x: 50 * scale, y: 82 * scale))
+
+                context.stroke(
+                    path,
+                    with: .color(strokeColor),
+                    style: StrokeStyle(lineWidth: 12 * scale, lineCap: .round, lineJoin: .round)
+                )
+            }
+            .padding(size * 0.16)
+        }
+        .frame(width: size, height: size)
+    }
+}
+
+// MARK: - =====================================================================
+// APP ENTRY POINT
+// =====================================================================
 @main
 struct SmartGimbalApp: App {
     @StateObject private var store = SupabaseModuleStore()
@@ -18,15 +71,17 @@ struct SmartGimbalApp: App {
     }
 }
 
-// MARK: - 1. SUPABASE CLOUD AI & 7-MODULE REALTIME STORE
+// MARK: - =====================================================================
+// 1. SUPABASE CLOUD AI & 7-MODULE REALTIME STORE
+// =====================================================================
 @MainActor
 final class SupabaseModuleStore: ObservableObject {
     private let supabaseUrl = "https://dlgkrwodxdsbbliwdnkg.supabase.co"
     private let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZ2tyd29keGRzYmJsaXdkbmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxMjIwNjQsImV4cCI6MjEwOTY5ODA2NH0.Lg6C6MpLhX_CoKgWtl_nhWLGNw5NuYE9FZJoTxXnu6I"
 
-    @Published var userName: String = "Thủy Nguyễn"
-    @Published var userTier: String = "Master Admin"
-    @Published var deviceName: String = "T-Flow Pro S1 Titanium"
+    @Published var userName: String = "Đặng Anh Dũng"
+    @Published var userTier: String = "Pro Cinema Tier"
+    @Published var deviceName: String = "Smart Gimbal S1 Titanium"
     @Published var modules: [Bool] = [true, true, true, true, true, true, true]
     @Published var isOnline: Bool = true
     @Published var lastSyncText: String = "Đã đồng bộ T-Flow Cloud"
@@ -73,7 +128,9 @@ final class SupabaseModuleStore: ObservableObject {
     }
 }
 
-// MARK: - 2. COREBLUETOOTH BLE 5.3 GIMBAL CONTROLLER (50Hz)
+// MARK: - =====================================================================
+// 2. COREBLUETOOTH BLE 5.3 GIMBAL CONTROLLER (50Hz)
+// =====================================================================
 @MainActor
 final class BLEGimbalManager: NSObject, ObservableObject, CBCentralManagerDelegate {
     @Published var isConnected: Bool = true
@@ -81,6 +138,12 @@ final class BLEGimbalManager: NSObject, ObservableObject, CBCentralManagerDelega
     @Published var batteryLevel: Int = 94
     @Published var yawOffset: Double = 0.0
     @Published var pitchOffset: Double = 0.0
+
+    // Realtime angle telemetry
+    @Published var rollAngle: Double = 0.02
+    @Published var pitchAngle: Double = 12.4
+    @Published var panAngle: Double = 359.8
+    @Published var joystickSensitivity: Double = 0.65
 
     private var central: CBCentralManager?
 
@@ -90,18 +153,36 @@ final class BLEGimbalManager: NSObject, ObservableObject, CBCentralManagerDelega
     }
 
     nonisolated func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        // Ready for S1 BLE peripheral scan
+        // BLE ready
     }
 
     func sendTrackingError(dx: Double, dy: Double) {
         yawOffset = (dx * 45.0)
         pitchOffset = (-dy * 35.0)
+        panAngle = (359.8 + yawOffset).truncatingRemainder(dividingBy: 360.0)
+        pitchAngle = 12.4 + pitchOffset
+    }
+
+    func autoCalibrateMotors() {
+        rollAngle = 0.0
+        pitchAngle = 0.0
+        panAngle = 0.0
     }
 }
 
-// MARK: - 3. MAIN SHELL (CAMERA STUDIO + DEVICE HUB + PROFILE)
+// MARK: - =====================================================================
+// 3. MAIN NAVIGATION SHELL (FIGMA APPLE HIG TAB BAR)
+// =====================================================================
 struct MainTabShellView: View {
     @State private var selectedTab: Int = 0
+
+    init() {
+        let appearance = UITabBarAppearance()
+        appearance.configureWithDefaultBackground()
+        appearance.backgroundColor = UIColor(red: 0.06, green: 0.06, blue: 0.08, alpha: 0.95)
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
+    }
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -123,17 +204,19 @@ struct MainTabShellView: View {
                 }
                 .tag(2)
 
-            UserProfileModuleView()
+            UserProfilePermissionsView()
                 .tabItem {
                     Label("Tài Khoản", systemImage: "person.crop.circle")
                 }
                 .tag(3)
         }
-        .tint(Color(red: 0.90, green: 0.65, blue: 0.0))
+        .tint(Color(red: 0.98, green: 0.72, blue: 0.10)) // Apple Amber Gold Accent
     }
 }
 
-// MARK: - 4. NATIVE AVFOUNDATION CAMERA + APPLE VISION AI TRACKING VIEW
+// MARK: - =====================================================================
+// 4. SCREEN 01: 98% CLEAR VIEWFINDER WITH APPLE FROSTED GLASS HUD
+// =====================================================================
 struct CameraStudioNativeView: View {
     @EnvironmentObject var store: SupabaseModuleStore
     @EnvironmentObject var ble: BLEGimbalManager
@@ -141,15 +224,18 @@ struct CameraStudioNativeView: View {
     @State private var isAiActive: Bool = true
     @State private var isRecording: Bool = false
     @State private var selectedCamMode: String = "VIDEO 4K/60"
-    @State private var faceBox: CGRect = CGRect(x: 0.34, y: 0.28, width: 0.32, height: 0.36)
+    @State private var selectedAspectRatio: String = "16:9"
+    @State private var showAspectPicker: Bool = false
+    @State private var faceBox: CGRect = CGRect(x: 0.35, y: 0.30, width: 0.30, height: 0.34)
 
+    let aspectRatios = ["16:9", "9:16", "2.39:1", "4:3", "1:1"]
     let gimbalModes = ["PF", "FPV", "LOCK", "360°"]
     let camModes = ["TIMELAPSE", "SLOW-MO", "VIDEO 4K/60", "PHOTO", "PRO CINEMA"]
 
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                // Live Native Camera Layer
+                // Live AVFoundation Camera Preview
                 NativeCameraPreviewRepresentable(onFaceDetected: { normalizedRect in
                     if let rect = normalizedRect {
                         withAnimation(.linear(duration: 0.08)) {
@@ -162,45 +248,62 @@ struct CameraStudioNativeView: View {
                 })
                 .ignoresSafeArea()
 
-                // Rule of Thirds Grid
+                // Minimalist Rule of Thirds Grid (Ultra Subtle 12% Opacity)
                 RuleOfThirdsGridView()
                     .ignoresSafeArea()
 
-                // AI Bounding Box Reticle (Only if Online + Admin Module 0 Enabled + User Toggled ON)
+                // MINIMALIST CINEMATIC AI TARGET RETICLE (Figma Screen 04 Specs: Titanium White, No Neon Borders)
                 if store.isOnline && store.isAiVisionAllowed && isAiActive {
                     let bx = faceBox.minX * geo.size.width
                     let by = faceBox.minY * geo.size.height
                     let bw = faceBox.width * geo.size.width
                     let bh = faceBox.height * geo.size.height
 
-                    ZStack(alignment: .topLeading) {
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.green, lineWidth: 2.5)
-                            .frame(width: bw, height: bh)
-                            .shadow(color: .green.opacity(0.6), radius: 8)
+                    ZStack {
+                        // 4 Sleek Corner Brackets
+                        CinematicReticleShape()
+                            .stroke(Color.white.opacity(0.85), lineWidth: 1.8)
+                            .frame(width: max(bw, 70), height: max(bh, 70))
+                            .shadow(color: Color.black.opacity(0.6), radius: 4)
 
-                        Text("CLOUD AI • LOCK 60FPS")
-                            .font(.system(size: 10, weight: .bold, design: .monospaced))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.black.opacity(0.75))
-                            .foregroundColor(.green)
-                            .clipShape(Capsule())
-                            .offset(y: -26)
+                        // Center Focus Dot
+                        Circle()
+                            .fill(Color(red: 0.98, green: 0.72, blue: 0.10))
+                            .frame(width: 4, height: 4)
+
+                        // Subtle Lock Pill
+                        HStack(spacing: 4) {
+                            Circle().fill(Color.green).frame(width: 5, height: 5)
+                            Text("AI LOCK 60FPS")
+                                .font(.system(size: 9, weight: .bold, design: .monospaced))
+                                .foregroundColor(.white)
+                        }
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Capsule())
+                        .offset(y: -(bh / 2 + 18))
                     }
                     .position(x: bx + bw / 2, y: by + bh / 2)
+                    .animation(.spring(response: 0.2, dampingFraction: 0.8), value: faceBox)
                 }
 
-                // HUD Overlay Controls
-                VStack(spacing: 10) {
-                    // Top Bar
+                // ERGONOMIC VIEW HUD OVERLAY (98% Clear Viewport)
+                VStack(spacing: 0) {
+                    // TOP BAR: Logo, Battery, Aspect Ratio & 4K/60 Indicator
                     HStack(spacing: 8) {
-                        HStack(spacing: 5) {
+                        // Logo & Battery Pill
+                        HStack(spacing: 6) {
+                            TFlowBrandLogo(size: 18)
+                            Text("S1 PRO")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(.white)
                             Circle()
-                                .fill(store.isOnline ? Color.green : Color.red)
-                                .frame(width: 7, height: 7)
-                            Text("S1 PRO • \(ble.batteryLevel)%")
-                                .font(.system(size: 11, weight: .semibold))
+                                .fill(Color.green)
+                                .frame(width: 5, height: 5)
+                            Text("\(ble.batteryLevel)%")
+                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                .foregroundColor(.white.opacity(0.85))
                         }
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
@@ -209,131 +312,209 @@ struct CameraStudioNativeView: View {
 
                         Spacer()
 
-                        Button(action: { isAiActive.toggle() }) {
-                            HStack(spacing: 5) {
-                                Image(systemName: "viewfinder")
-                                Text(store.isAiVisionAllowed ? (isAiActive ? "CLOUD AI: ON" : "CLOUD AI: OFF") : "AI: KHÓA BỞI ADMIN")
+                        // Aspect Ratio Picker Button
+                        Button(action: { showAspectPicker.toggle() }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "aspectratio")
+                                    .font(.system(size: 11, weight: .bold))
+                                Text(selectedAspectRatio)
+                                    .font(.system(size: 11, weight: .bold, design: .monospaced))
                             }
-                            .font(.system(size: 11, weight: .bold))
-                            .padding(.horizontal, 12)
+                            .padding(.horizontal, 10)
                             .padding(.vertical, 6)
-                            .background(store.isAiVisionAllowed && isAiActive ? Color.green.opacity(0.85) : Color.black.opacity(0.6))
-                            .foregroundColor(store.isAiVisionAllowed && isAiActive ? .black : .white)
+                            .background(.ultraThinMaterial)
+                            .foregroundColor(.white)
                             .clipShape(Capsule())
                         }
-                        .disabled(!store.isAiVisionAllowed)
+
+                        // 4K60 / ProRes Pill
+                        Text("4K • 60")
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            .foregroundColor(Color(red: 0.98, green: 0.72, blue: 0.10))
+                            .padding(.horizontal, 9)
+                            .padding(.vertical, 6)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Capsule())
+
+                        // AI Vision Toggle
+                        Button(action: { withAnimation { isAiActive.toggle() } }) {
+                            Image(systemName: isAiActive ? "viewfinder" : "viewfinder.circle")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(isAiActive ? .white : .white.opacity(0.4))
+                                .padding(8)
+                                .background(.ultraThinMaterial)
+                                .clipShape(Circle())
+                        }
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 8)
-
-                    // Warning Banner if Offline
-                    if !store.isOnline {
-                        HStack(spacing: 8) {
-                            Image(systemName: "wifi.slash")
-                            Text("MẤT KẾT NỐI MẠNG: Cloud AI Engine yêu cầu kết nối 4G/5G/Wi-Fi.")
-                                .font(.system(size: 11, weight: .medium))
-                        }
-                        .padding(10)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.red.opacity(0.9))
-                        .cornerRadius(12)
-                        .padding(.horizontal, 16)
-                    }
-
-                    // Warning Banner if Locked by Admin on Supabase
-                    if !store.isAiVisionAllowed {
-                        HStack(spacing: 8) {
-                            Image(systemName: "lock.fill")
-                            Text("MÔ-ĐUN AI ĐÃ KHÓA: Quản trị viên đã tắt quyền AI của tài khoản này trên Supabase.")
-                                .font(.system(size: 11, weight: .semibold))
-                        }
-                        .padding(10)
-                        .frame(maxWidth: .infinity)
-                        .background(Color.yellow.opacity(0.92))
-                        .foregroundColor(.black)
-                        .cornerRadius(12)
-                        .padding(.horizontal, 16)
-                    }
-
-                    // Telemetry Box
-                    HStack {
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text("CLOUD MODEL: YOLO11x (22ms)")
-                            Text(String(format: "FOC YAW: %+.1f° | PITCH: %+.1f°", ble.yawOffset, ble.pitchOffset))
-                            Text("PWM: 1.42A @ 20kHz")
-                        }
-                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                        .foregroundColor(.green)
-                        .padding(8)
-                        .background(Color.black.opacity(0.45))
-                        .cornerRadius(8)
-                        Spacer()
-                    }
-                    .padding(.horizontal, 16)
+                    .padding(.top, 12)
 
                     Spacer()
 
-                    // Gimbal Mode Bar
-                    HStack(spacing: 8) {
-                        ForEach(gimbalModes, id: \.self) { mode in
-                            Button(action: { ble.gimbalMode = mode }) {
-                                Text(mode)
-                                    .font(.system(size: 11, weight: .bold))
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(ble.gimbalMode == mode ? Color.white : Color.clear)
-                                    .foregroundColor(ble.gimbalMode == mode ? .black : .white)
-                                    .clipShape(Capsule())
+                    // BOTTOM CONTROLS CLUSTER (Ergonomic Thumb Access)
+                    VStack(spacing: 14) {
+                        // Gimbal Mode Switcher (PF | FPV | LOCK | 360°)
+                        HStack(spacing: 4) {
+                            ForEach(gimbalModes, id: \.self) { mode in
+                                Button(action: {
+                                    withAnimation(.easeInOut(duration: 0.15)) {
+                                        ble.gimbalMode = mode
+                                    }
+                                }) {
+                                    Text(mode)
+                                        .font(.system(size: 11.5, weight: .bold, design: .rounded))
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 6)
+                                        .background(ble.gimbalMode == mode ? Color.white : Color.clear)
+                                        .foregroundColor(ble.gimbalMode == mode ? .black : .white.opacity(0.8))
+                                        .clipShape(Capsule())
+                                }
                             }
                         }
-                    }
-                    .padding(4)
-                    .background(.ultraThinMaterial)
-                    .clipShape(Capsule())
+                        .padding(3)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Capsule())
 
-                    // Camera Mode Bar
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 20) {
+                        // Camera Mode Carousel
+                        HStack(spacing: 16) {
                             ForEach(camModes, id: \.self) { m in
-                                Text(m)
-                                    .font(.system(size: 12, weight: .bold))
-                                    .foregroundColor(selectedCamMode == m ? .yellow : .white.opacity(0.6))
-                                    .onTapGesture { selectedCamMode = m }
+                                Button(action: { selectedCamMode = m }) {
+                                    Text(m)
+                                        .font(.system(size: 11.5, weight: selectedCamMode == m ? .bold : .medium))
+                                        .foregroundColor(selectedCamMode == m ? Color(red: 0.98, green: 0.72, blue: 0.10) : .white.opacity(0.6))
+                                }
                             }
                         }
-                        .padding(.horizontal, 24)
-                    }
 
-                    // Shutter Row
-                    HStack {
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.white.opacity(0.2))
-                            .frame(width: 46, height: 46)
-                        Spacer()
-                        Button(action: { isRecording.toggle() }) {
-                            ZStack {
+                        // Shutter & Utility Buttons
+                        HStack(spacing: 36) {
+                            // Left: Gallery Thumbnail
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.white.opacity(0.15))
+                                .overlay(
+                                    Image(systemName: "photo.on.rectangle.angled")
+                                        .foregroundColor(.white.opacity(0.8))
+                                )
+                                .frame(width: 44, height: 44)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                )
+
+                            // Center: Shutter Button
+                            Button(action: {
+                                withAnimation(.spring()) {
+                                    isRecording.toggle()
+                                }
+                            }) {
+                                ZStack {
+                                    Circle()
+                                        .stroke(Color.white, lineWidth: 3.5)
+                                        .frame(width: 72, height: 72)
+
+                                    if isRecording {
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .fill(Color.red)
+                                            .frame(width: 28, height: 28)
+                                    } else {
+                                        Circle()
+                                            .fill(selectedCamMode.contains("VIDEO") ? Color.red : Color.white)
+                                            .frame(width: 58, height: 58)
+                                    }
+                                }
+                            }
+
+                            // Right: Flip Camera
+                            Button(action: {}) {
                                 Circle()
-                                    .stroke(Color.white, lineWidth: 4)
-                                    .frame(width: 72, height: 72)
-                                RoundedRectangle(cornerRadius: isRecording ? 8 : 30)
-                                    .fill(Color.red)
-                                    .frame(width: isRecording ? 28 : 58, height: isRecording ? 28 : 58)
+                                    .fill(Color.white.opacity(0.15))
+                                    .frame(width: 44, height: 44)
+                                    .overlay(
+                                        Image(systemName: "arrow.triangle.2.circlepath.camera")
+                                            .font(.system(size: 18, weight: .semibold))
+                                            .foregroundColor(.white)
+                                    )
+                                    .overlay(
+                                        Circle().stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                    )
                             }
                         }
-                        Spacer()
-                        Circle()
-                            .fill(Color.white.opacity(0.2))
-                            .frame(width: 46, height: 46)
-                            .overlay(Image(systemName: "arrow.triangle.2.circlepath.camera"))
                     }
-                    .padding(.horizontal, 32)
-                    .padding(.bottom, 12)
+                    .padding(.bottom, 20)
+                }
+
+                // Aspect Ratio Modal Sheet
+                if showAspectPicker {
+                    Color.black.opacity(0.4)
+                        .ignoresSafeArea()
+                        .onTapGesture { showAspectPicker = false }
+
+                    VStack(spacing: 12) {
+                        Text("CHỌN TỈ LỆ KHUNG HÌNH ĐIỆN ẢNH")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.white.opacity(0.6))
+
+                        HStack(spacing: 10) {
+                            ForEach(aspectRatios, id: \.self) { ar in
+                                Button(action: {
+                                    selectedAspectRatio = ar
+                                    showAspectPicker = false
+                                }) {
+                                    VStack(spacing: 4) {
+                                        Text(ar)
+                                            .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                    }
+                                    .padding(.vertical, 12)
+                                    .padding(.horizontal, 14)
+                                    .background(selectedAspectRatio == ar ? Color.white : Color.white.opacity(0.12))
+                                    .foregroundColor(selectedAspectRatio == ar ? .black : .white)
+                                    .cornerRadius(10)
+                                }
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .background(Color(red: 0.12, green: 0.12, blue: 0.14))
+                    .cornerRadius(20)
+                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.15), lineWidth: 1))
+                    .padding(24)
                 }
             }
         }
     }
 }
 
+// Reticle Corner Brackets Shape
+struct CinematicReticleShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let len: CGFloat = 14
+
+        // Top-Left
+        path.move(to: CGPoint(x: rect.minX, y: rect.minY + len))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.minX + len, y: rect.minY))
+
+        // Top-Right
+        path.move(to: CGPoint(x: rect.maxX - len, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY + len))
+
+        // Bottom-Right
+        path.move(to: CGPoint(x: rect.maxX, y: rect.maxY - len))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.maxX - len, y: rect.maxY))
+
+        // Bottom-Left
+        path.move(to: CGPoint(x: rect.minX + len, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY - len))
+
+        return path
+    }
+}
+
+// Rule of Thirds
 struct RuleOfThirdsGridView: View {
     var body: some View {
         GeometryReader { geo in
@@ -344,35 +525,476 @@ struct RuleOfThirdsGridView: View {
                 path.addLine(to: CGPoint(x: w / 3, y: h))
                 path.move(to: CGPoint(x: 2 * w / 3, y: 0))
                 path.addLine(to: CGPoint(x: 2 * w / 3, y: h))
+
                 path.move(to: CGPoint(x: 0, y: h / 3))
                 path.addLine(to: CGPoint(x: w, y: h / 3))
                 path.move(to: CGPoint(x: 0, y: 2 * h / 3))
                 path.addLine(to: CGPoint(x: w, y: 2 * h / 3))
             }
-            .stroke(Color.white.opacity(0.22), lineWidth: 0.5)
+            .stroke(Color.white.opacity(0.12), lineWidth: 0.6)
         }
-        .allowsHitTesting(false)
     }
 }
 
-// MARK: - 5. AVFOUNDATION + APPLE VISION CAMERA CONTROLLER
+// MARK: - =====================================================================
+// 5. SCREEN 02: T-FLOW PRO DEVICE HUB (FIGMA SCREEN 07 SPECS)
+// =====================================================================
+struct GimbalDeviceHubView: View {
+    @EnvironmentObject var ble: BLEGimbalManager
+    @State private var isCalibrating: Bool = false
+
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // HERO HARDWARE CARD
+                    VStack(alignment: .leading, spacing: 14) {
+                        HStack(alignment: .top) {
+                            VStack(alignment: .leading, spacing: 4) {
+                                HStack(spacing: 8) {
+                                    TFlowBrandLogo(size: 26)
+                                    Text("T-Flow Pro S1")
+                                        .font(.system(size: 20, weight: .bold))
+                                }
+                                Text("Titanium Aerospace Edition • BLE 5.3")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.6))
+                            }
+                            Spacer()
+                            HStack(spacing: 5) {
+                                Circle().fill(Color.green).frame(width: 7, height: 7)
+                                Text("50Hz FOC Synced")
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundColor(.green)
+                            }
+                            .padding(.horizontal, 9)
+                            .padding(.vertical, 5)
+                            .background(Color.green.opacity(0.12))
+                            .clipShape(Capsule())
+                        }
+
+                        Divider().background(Color.white.opacity(0.1))
+
+                        HStack(spacing: 24) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("PIN 4500mAh").font(.system(size: 10, weight: .bold)).foregroundColor(.white.opacity(0.5))
+                                Text("\(ble.batteryLevel)%").font(.system(size: 18, weight: .bold, design: .monospaced)).foregroundColor(.white)
+                            }
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("XUNG ĐIỀU KHIỂN").font(.system(size: 10, weight: .bold)).foregroundColor(.white.opacity(0.5))
+                                Text("20 kHz").font(.system(size: 18, weight: .bold, design: .monospaced)).foregroundColor(.green)
+                            }
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("FIRMWARE").font(.system(size: 10, weight: .bold)).foregroundColor(.white.opacity(0.5))
+                                Text("v2.4.1").font(.system(size: 18, weight: .bold, design: .monospaced)).foregroundColor(.white)
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .background(Color(red: 0.11, green: 0.11, blue: 0.13))
+                    .cornerRadius(20)
+                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.12), lineWidth: 1))
+
+                    // 3-AXIS REALTIME FOC ANGLE GAUGES (Pan, Tilt, Roll)
+                    VStack(alignment: .leading, spacing: 14) {
+                        Text("GÓC QUAY 3 TRỤC THỜI GIAN THỰC (50Hz IMU)")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.white.opacity(0.6))
+
+                        HStack(spacing: 12) {
+                            AxisAngleCard(axis: "ROLL", angle: String(format: "%.2f°", ble.rollAngle), status: "Chuẩn Cân", color: .green)
+                            AxisAngleCard(axis: "TILT", angle: String(format: "%+.1f°", ble.pitchAngle), status: "Góc Chụp", color: Color(red: 0.98, green: 0.72, blue: 0.10))
+                            AxisAngleCard(axis: "PAN", angle: String(format: "%.1f°", ble.panAngle), status: "Quay 360°", color: .cyan)
+                        }
+                    }
+
+                    // CALIBRATION & JOYSTICK TUNING
+                    VStack(alignment: .leading, spacing: 16) {
+                        Text("HIỆU CHUẨN ĐỘNG CƠ & CẦN ĐIỀU KHIỂN")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.white.opacity(0.6))
+
+                        Button(action: {
+                            isCalibrating = true
+                            ble.autoCalibrateMotors()
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                                isCalibrating = false
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: isCalibrating ? "arrow.triangle.2.circlepath" : "scope")
+                                    .rotationEffect(.degrees(isCalibrating ? 360 : 0))
+                                    .animation(isCalibrating ? .linear(duration: 1).repeatForever(autoreverses: false) : .default, value: isCalibrating)
+                                Text(isCalibrating ? "Đang Cân Bằng Trọng Tâm Motor..." : "Tự Động Cân Bằng Trọng Tâm (CoG)")
+                                    .font(.system(size: 14, weight: .bold))
+                                Spacer()
+                            }
+                            .padding(16)
+                            .background(Color.white.opacity(0.08))
+                            .foregroundColor(.white)
+                            .cornerRadius(14)
+                        }
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text("Độ Nhạy Cần Joystick")
+                                    .font(.system(size: 13, weight: .semibold))
+                                Spacer()
+                                Text(ble.joystickSensitivity > 0.7 ? "Thể Thao" : "Điện Ảnh Mượt")
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundColor(Color(red: 0.98, green: 0.72, blue: 0.10))
+                            }
+                            Slider(value: $ble.joystickSensitivity, in: 0.1...1.0)
+                                .tint(Color(red: 0.98, green: 0.72, blue: 0.10))
+                        }
+                        .padding(16)
+                        .background(Color.white.opacity(0.05))
+                        .cornerRadius(14)
+                    }
+                }
+                .padding(16)
+            }
+            .background(Color.black.ignoresSafeArea())
+            .navigationTitle("Thiết Bị T-Flow Pro")
+            .navigationBarTitleDisplayMode(.large)
+        }
+    }
+}
+
+struct AxisAngleCard: View {
+    let axis: String
+    let angle: String
+    let status: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 8) {
+            Text(axis)
+                .font(.system(size: 11, weight: .bold))
+                .foregroundColor(.white.opacity(0.6))
+
+            Text(angle)
+                .font(.system(size: 16, weight: .bold, design: .monospaced))
+                .foregroundColor(color)
+
+            Text(status)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundColor(.white.opacity(0.5))
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 16)
+        .background(Color(red: 0.11, green: 0.11, blue: 0.13))
+        .cornerRadius(14)
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.08), lineWidth: 1))
+    }
+}
+
+// MARK: - =====================================================================
+// 6. SCREEN 03: T-FLOW BOT COPILOT (MONOCHROME BRANDING)
+// =====================================================================
+struct TFlowAIChatAssistantView: View {
+    @State private var messages: [ChatMessage] = [
+        ChatMessage(
+            isBot: true,
+            text: "Xin chào! Em là T-Flow Bot — trợ lý thông minh đồng bộ Cloud trên ứng dụng T-Flow Cam.\n\nEm sẵn sàng giải đáp kỹ thuật cân trục Pure FOC 20kHz, góc quay Inception 360°, thiết lập Apple Log 4K/60fps và đồng bộ dữ liệu thời gian thực từ Admin CMS."
+        )
+    ]
+    @State private var inputText: String = ""
+
+    let quickPrompts = [
+        "Quay Inception 360°",
+        "Cài đặt Apple Log 4K/60",
+        "Hiệu chuẩn động cơ FOC",
+        "Áp bảng màu 3D LUT"
+    ]
+
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 0) {
+                // Quick Chips
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(quickPrompts, id: \.self) { p in
+                            Button(action: { sendUserText(p) }) {
+                                Text(p)
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 7)
+                                    .background(Color.white.opacity(0.1))
+                                    .foregroundColor(.white)
+                                    .clipShape(Capsule())
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                }
+                .background(Color(red: 0.08, green: 0.08, blue: 0.10))
+
+                // Chat Stream
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(messages) { msg in
+                                HStack(alignment: .top, spacing: 10) {
+                                    if msg.isBot {
+                                        TFlowBrandLogo(size: 28)
+                                    } else {
+                                        Spacer()
+                                    }
+
+                                    VStack(alignment: msg.isBot ? .leading : .trailing, spacing: 4) {
+                                        Text(msg.text)
+                                            .font(.system(size: 14, weight: .regular))
+                                            .padding(14)
+                                            .background(msg.isBot ? Color(red: 0.14, green: 0.14, blue: 0.16) : Color(red: 0.0, green: 0.44, blue: 0.89))
+                                            .foregroundColor(.white)
+                                            .cornerRadius(16)
+
+                                        Text(msg.isBot ? "T-Flow Bot" : "Bạn")
+                                            .font(.system(size: 10))
+                                            .foregroundColor(.white.opacity(0.4))
+                                    }
+
+                                    if !msg.isBot {
+                                        Circle()
+                                            .fill(Color.white.opacity(0.2))
+                                            .frame(width: 28, height: 28)
+                                            .overlay(Text("U").font(.system(size: 12, weight: .bold)))
+                                    } else {
+                                        Spacer()
+                                    }
+                                }
+                            }
+                        }
+                        .padding(16)
+                    }
+                }
+
+                // Input Bar
+                HStack(spacing: 10) {
+                    TextField("Hỏi T-Flow Bot về kỹ thuật quay, FOC...", text: $inputText)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 11)
+                        .background(Color(red: 0.14, green: 0.14, blue: 0.16))
+                        .cornerRadius(20)
+                        .foregroundColor(.white)
+
+                    Button(action: {
+                        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !text.isEmpty {
+                            sendUserText(text)
+                            inputText = ""
+                        }
+                    }) {
+                        Image(systemName: "arrow.up")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(width: 38, height: 38)
+                            .background(Color(red: 0.0, green: 0.48, blue: 0.95))
+                            .clipShape(Circle())
+                    }
+                }
+                .padding(12)
+                .background(Color(red: 0.07, green: 0.07, blue: 0.09))
+            }
+            .background(Color.black.ignoresSafeArea())
+            .navigationTitle("T-Flow Bot")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+
+    private func sendUserText(_ text: String) {
+        messages.append(ChatMessage(isBot: false, text: text))
+
+        // Bot responds with tailored camera knowledge
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            let answer: String
+            if text.contains("Inception") || text.contains("360") {
+                answer = "🔄 **Chế độ Inception 360°:** Động cơ Roll sẽ xoay vô hạn 360 độ theo thời gian thực. Bấm phím trigger 3 lần trên báng tay cầm để kích hoạt ngay lập tức!"
+            } else if text.contains("Log") || text.contains("Apple") {
+                answer = "🎬 **Cài đặt Apple Log:** Đã kích hoạt không gian màu Log Rec.709 trên iPhone 15/16 Pro. Tốc độ ghi 220Mbps ProRes 4K/60fps sẵn sàng ghi thẳng vào ổ SSD Type-C."
+            } else if text.contains("FOC") || text.contains("động cơ") {
+                answer = "⚡ **Thuật toán Pure FOC 20kHz:** Bộ vi điều khiển 32-bit tính toán vector dòng điện 20.000 lần mỗi giây, triệt tiêu vi rung giật hoàn toàn không tiếng ồn."
+            } else {
+                answer = "Dạ, em đã ghi nhận câu hỏi của anh: \"\(text)\". Em đang liên kết với bộ não tri thức T-Flow Cloud để phản hồi anh chi tiết nhất ạ!"
+            }
+            messages.append(ChatMessage(isBot: true, text: answer))
+        }
+    }
+}
+
+struct ChatMessage: Identifiable {
+    let id = UUID()
+    let isBot: Bool
+    let text: String
+}
+
+// MARK: - =====================================================================
+// 7. SCREEN 04: PROFILE & 7-MODULE INSET GROUPED (FIGMA SCREEN 09 SPECS)
+// =====================================================================
+struct UserProfilePermissionsView: View {
+    @EnvironmentObject var store: SupabaseModuleStore
+
+    let moduleTitles = [
+        ("AI Vision Optical Tracking", "camera.metering.spot", "Đã Mở Khóa"),
+        ("Apple Log & ProRes 4K/60fps", "film.stack", "Đã Mở Khóa"),
+        ("Motionlapse Waypoint 5-Point", "point.topleft.down.curvedto.point.bottomright.up", "Đã Mở Khóa"),
+        ("Multi-Cam Director Studio", "rectangle.split.2x2", "Đã Mở Khóa"),
+        ("3D LUT Real-time Preview", "slider.horizontal.3", "Đã Mở Khóa"),
+        ("FOC Motor Micro-Tuning", "waveform.path.ecg", "Đã Mở Khóa"),
+        ("500Hz Gyro Raw Telemetry", "location.north.circle", "Đã Mở Khóa")
+    ]
+
+    var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 20) {
+                    // TITANIUM VIP MEMBERSHIP CARD (Brushed Titanium Gradient)
+                    VStack(alignment: .leading, spacing: 14) {
+                        HStack(alignment: .top) {
+                            HStack(spacing: 10) {
+                                TFlowBrandLogo(size: 32)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(store.userName)
+                                        .font(.system(size: 18, weight: .bold))
+                                        .foregroundColor(.white)
+                                    Text(store.userTier)
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundColor(Color(red: 0.98, green: 0.72, blue: 0.10))
+                                }
+                            }
+                            Spacer()
+                            Text("VIP LIFETIME")
+                                .font(.system(size: 10, weight: .black))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.white.opacity(0.15))
+                                .foregroundColor(.white)
+                                .cornerRadius(6)
+                        }
+
+                        Divider().background(Color.white.opacity(0.12))
+
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("THIẾT BỊ ĐĂNG KÝ").font(.system(size: 9.5, weight: .bold)).foregroundColor(.white.opacity(0.5))
+                                Text(store.deviceName).font(.system(size: 13, weight: .semibold)).foregroundColor(.white)
+                            }
+                            Spacer()
+                            HStack(spacing: 5) {
+                                Circle().fill(store.isOnline ? Color.green : Color.red).frame(width: 6, height: 6)
+                                Text(store.isOnline ? "Supabase Live" : "Offline")
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundColor(store.isOnline ? .green : .red)
+                            }
+                        }
+                    }
+                    .padding(20)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(red: 0.15, green: 0.15, blue: 0.18), Color(red: 0.08, green: 0.08, blue: 0.10)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .cornerRadius(20)
+                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.16), lineWidth: 1))
+                    .shadow(color: Color.black.opacity(0.5), radius: 10, y: 4)
+
+                    // 7-MODULE INSET GROUPED LIST
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("TRẠNG THÁI 7 MODULE ĐỒNG BỘ TỪ WEB ADMIN CMS")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.white.opacity(0.6))
+                            .padding(.horizontal, 4)
+
+                        VStack(spacing: 0) {
+                            ForEach(0..<moduleTitles.count, id: \.self) { idx in
+                                let item = moduleTitles[idx]
+                                let isEnabled = store.modules.indices.contains(idx) ? store.modules[idx] : true
+
+                                HStack(spacing: 12) {
+                                    Image(systemName: item.1)
+                                        .font(.system(size: 15))
+                                        .foregroundColor(Color(red: 0.98, green: 0.72, blue: 0.10))
+                                        .frame(width: 24)
+
+                                    VStack(alignment: .leading, spacing: 1) {
+                                        Text("\(idx + 1). \(item.0)")
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white)
+                                    }
+
+                                    Spacer()
+
+                                    Text(isEnabled ? "ĐÃ MỞ KHÓA" : "ĐÃ KHÓA")
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundColor(isEnabled ? .green : .red)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 3)
+                                        .background((isEnabled ? Color.green : Color.red).opacity(0.12))
+                                        .clipShape(Capsule())
+                                }
+                                .padding(.vertical, 13)
+                                .padding(.horizontal, 16)
+
+                                if idx < moduleTitles.count - 1 {
+                                    Divider()
+                                        .background(Color.white.opacity(0.08))
+                                        .padding(.leading, 52)
+                                }
+                            }
+                        }
+                        .background(Color(red: 0.11, green: 0.11, blue: 0.13))
+                        .cornerRadius(16)
+                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.08), lineWidth: 1))
+                    }
+
+                    // SYSTEM INFO & LOGOUT
+                    VStack(spacing: 12) {
+                        HStack {
+                            Text("Phiên bản ứng dụng")
+                                .font(.system(size: 13))
+                                .foregroundColor(.white.opacity(0.6))
+                            Spacer()
+                            Text("v2.4.1 (Build 241 Pro)")
+                                .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                                .foregroundColor(.white)
+                        }
+                        .padding(14)
+                        .background(Color(red: 0.11, green: 0.11, blue: 0.13))
+                        .cornerRadius(12)
+                    }
+                }
+                .padding(16)
+            }
+            .background(Color.black.ignoresSafeArea())
+            .navigationTitle("Hồ Sơ & Phân Quyền")
+            .navigationBarTitleDisplayMode(.large)
+        }
+    }
+}
+
+// MARK: - =====================================================================
+// 8. AVFOUNDATION LIVE CAMERA CAPTURE PREVIEW CONTROLLER
+// =====================================================================
 struct NativeCameraPreviewRepresentable: UIViewControllerRepresentable {
     var onFaceDetected: (CGRect?) -> Void
 
-    func makeUIViewController(context: Context) -> NativeCameraVC {
-        let vc = NativeCameraVC()
+    func makeUIViewController(context: Context) -> CameraViewController {
+        let vc = CameraViewController()
         vc.onFaceDetected = onFaceDetected
         return vc
     }
 
-    func updateUIViewController(_ uiViewController: NativeCameraVC, context: Context) {}
+    func updateUIViewController(_ uiViewController: CameraViewController, context: Context) {}
 }
 
-final class NativeCameraVC: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
+final class CameraViewController: UIViewController, AVCaptureVideoDataOutputSampleBufferDelegate {
     var onFaceDetected: ((CGRect?) -> Void)?
-    private let session = AVCaptureSession()
+    private let captureSession = AVCaptureSession()
     private var previewLayer: AVCaptureVideoPreviewLayer?
-    private let videoQueue = DispatchQueue(label: "com.smartgimbal.visionQueue")
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -386,298 +1008,64 @@ final class NativeCameraVC: UIViewController, AVCaptureVideoDataOutputSampleBuff
     }
 
     private func setupCamera() {
-        session.beginConfiguration()
-        session.sessionPreset = .high
-        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-              let input = try? AVCaptureDeviceInput(device: device),
-              session.canAddInput(input) else {
-            session.commitConfiguration()
+        captureSession.beginConfiguration()
+        if captureSession.canSetSessionPreset(.hd3840x2160) {
+            captureSession.sessionPreset = .hd3840x2160
+        } else {
+            captureSession.sessionPreset = .high
+        }
+
+        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
+              let videoInput = try? AVCaptureDeviceInput(device: videoDevice),
+              captureSession.canAddInput(videoInput) else {
+            captureSession.commitConfiguration()
             return
         }
-        session.addInput(input)
+        captureSession.addInput(videoInput)
 
-        let output = AVCaptureVideoDataOutput()
-        output.setSampleBufferDelegate(self, queue: videoQueue)
-        if session.canAddOutput(output) {
-            session.addOutput(output)
+        let videoOutput = AVCaptureVideoDataOutput()
+        videoOutput.alwaysDiscardsLateVideoFrames = true
+        videoOutput.setSampleBufferDelegate(self, queue: DispatchQueue(label: "camera.frame.processing"))
+        if captureSession.canAddOutput(videoOutput) {
+            captureSession.addOutput(videoOutput)
         }
-        session.commitConfiguration()
 
-        let layer = AVCaptureVideoPreviewLayer(session: session)
+        captureSession.commitConfiguration()
+
+        let layer = AVCaptureVideoPreviewLayer(session: captureSession)
         layer.videoGravity = .resizeAspectFill
         layer.frame = view.bounds
         view.layer.addSublayer(layer)
-        previewLayer = layer
+        self.previewLayer = layer
 
-        videoQueue.async { [weak self] in
-            self?.session.startRunning()
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            self?.captureSession.startRunning()
         }
     }
 
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
-        let req = VNDetectFaceRectanglesRequest { [weak self] request, _ in
-            if let face = (request.results as? [VNFaceObservation])?.first {
-                let b = face.boundingBox
-                let converted = CGRect(x: b.minX, y: 1.0 - b.maxY, width: b.width, height: b.height)
-                DispatchQueue.main.async {
-                    self?.onFaceDetected?(converted)
-                }
+
+        let request = VNDetectFaceRectanglesRequest { [weak self] req, err in
+            guard let results = req.results as? [VNFaceObservation], let firstFace = results.first else {
+                DispatchQueue.main.async { self?.onFaceDetected?(nil) }
+                return
+            }
+
+            let box = firstFace.boundingBox
+            let normalized = CGRect(
+                x: 1.0 - box.maxX,
+                y: 1.0 - box.maxY,
+                width: box.width,
+                height: box.height
+            )
+
+            DispatchQueue.main.async {
+                self?.onFaceDetected?(normalized)
             }
         }
-        try? VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .right, options: [:]).perform([req])
-    }
-}
 
-// MARK: - 6. DEVICE HUB & USER MODULE PERMISSIONS VIEWS
-struct GimbalDeviceHubView: View {
-    @EnvironmentObject var ble: BLEGimbalManager
-    var body: some View {
-        NavigationStack {
-            List {
-                Section("Trạng Thái Phần Cứng BLE 5.3") {
-                    HStack { Text("Thiết bị"); Spacer(); Text("T-Flow Pro S1 Titanium").foregroundColor(.secondary) }
-                    HStack { Text("Tần số xung FOC"); Spacer(); Text("20 kHz Sine-Wave").foregroundColor(.green) }
-                    HStack { Text("Dung lượng Pin"); Spacer(); Text("\(ble.batteryLevel)% (4500mAh)").foregroundColor(.green) }
-                    HStack { Text("Firmware"); Spacer(); Text("v2.4.1 (Mới nhất)").foregroundColor(.secondary) }
-                }
-            }
-            .navigationTitle("Thiết Bị T-Flow Pro")
-        }
-    }
-}
-
-struct UserProfileModuleView: View {
-    @EnvironmentObject var store: SupabaseModuleStore
-    let moduleNames = [
-        "1. AI Vision Optical Tracking",
-        "2. Apple Log & ProRes 4K/60fps",
-        "3. Motionlapse Waypoint 5-Point",
-        "4. Multi-Cam Director Studio",
-        "5. 3D LUT Real-time Preview",
-        "6. FOC Motor Micro-Tuning",
-        "7. 500Hz Gyro Raw Telemetry"
-    ]
-
-    var body: some View {
-        NavigationStack {
-            List {
-                Section("Tài Khoản Đồng Bộ Supabase Cloud") {
-                    HStack { Text("Khách hàng"); Spacer(); Text(store.userName).bold() }
-                    HStack { Text("Hạng thẻ"); Spacer(); Text(store.userTier).foregroundColor(.yellow) }
-                    HStack { Text("Thiết bị đăng ký"); Spacer(); Text(store.deviceName).foregroundColor(.secondary) }
-                }
-                Section("Trạng Thái 7 Module (Đồng Bộ Từ Web Admin CMS)") {
-                    ForEach(0..<7, id: \.self) { idx in
-                        HStack {
-                            Text(moduleNames[idx])
-                                .font(.system(size: 14))
-                            Spacer()
-                            let enabled = store.modules.indices.contains(idx) ? store.modules[idx] : false
-                            Text(enabled ? "ĐÃ MỞ KHÓA" : "ĐÃ KHÓA")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(enabled ? .green : .red)
-                        }
-                    }
-                }
-            }
-            .navigationTitle("Hồ Sơ & Phân Quyền")
-        }
-    }
-}
-
-
-// MARK: - 7. T-FLOW AI NATIVE CHATBOT ASSISTANT VIEW
-struct AppChatMessage: Identifiable {
-    let id = UUID()
-    let text: String
-    let isUser: Bool
-    let timestamp: String
-}
-
-struct TFlowAIChatAssistantView: View {
-    @EnvironmentObject var store: SupabaseModuleStore
-    @State private var messages: [AppChatMessage] = [
-        AppChatMessage(
-            text: "Xin chào Thủy Nguyễn! Tôi là T-Flow Bot – trợ lý thông minh đồng bộ Cloud trên ứng dụng T-Flow Cam. Tôi sẵn sàng giải đáp kỹ thuật cân trục FOC 20kHz, góc quay Inception 360°, thiết lập Apple Log 4K/60fps và hỗ trợ theo kịch bản huấn luyện thời gian thực từ Admin CMS.",
-            isUser: false,
-            timestamp: "Vừa xong"
-        )
-    ]
-    @State private var inputText: String = ""
-    @State private var isThinking: Bool = false
-
-    let suggestions = [
-        "Quay Inception 360°",
-        "Cài đặt Apple Log 4K/60",
-        "Hiệu chuẩn Pure FOC 20kHz",
-        "Tư vấn người mới bắt đầu",
-        "Pin & Sạc ngược MagSafe"
-    ]
-
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                // Quick suggestions bar
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(suggestions, id: \.self) { item in
-                            Button(action: { sendMessage(item) }) {
-                                Text(item)
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
-                                    .background(Color(white: 0.15))
-                                    .foregroundColor(.white)
-                                    .cornerRadius(14)
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                }
-                .background(Color(white: 0.08))
-
-                // Chat Messages ScrollView
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        LazyVStack(spacing: 14) {
-                            ForEach(messages) { msg in
-                                HStack {
-                                    if msg.isUser { Spacer() }
-                                    VStack(alignment: msg.isUser ? .trailing : .leading, spacing: 4) {
-                                        Text(msg.text)
-                                            .font(.system(size: 14))
-                                            .foregroundColor(.white)
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 10)
-                                            .background(msg.isUser ? Color.blue : Color(white: 0.18))
-                                            .cornerRadius(16)
-
-                                        Text(msg.timestamp)
-                                            .font(.system(size: 10))
-                                            .foregroundColor(.gray)
-                                            .padding(.horizontal, 4)
-                                    }
-                                    if !msg.isUser { Spacer() }
-                                }
-                                .id(msg.id)
-                            }
-
-                            if isThinking {
-                                HStack {
-                                    HStack(spacing: 4) {
-                                        Circle().fill(Color.gray).frame(width: 6, height: 6)
-                                        Circle().fill(Color.gray).frame(width: 6, height: 6)
-                                        Circle().fill(Color.gray).frame(width: 6, height: 6)
-                                    }
-                                    .padding(12)
-                                    .background(Color(white: 0.18))
-                                    .cornerRadius(16)
-                                    Spacer()
-                                }
-                            }
-                        }
-                        .padding(16)
-                    }
-                    .onChange(of: messages.count) { _ in
-                        if let last = messages.last {
-                            withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
-                        }
-                    }
-                }
-
-                // Input Bar
-                HStack(spacing: 10) {
-                    TextField("Hỏi T-Flow Bot về kỹ thuật quay, FOC...", text: $inputText)
-                        .padding(10)
-                        .background(Color(white: 0.15))
-                        .cornerRadius(20)
-                        .foregroundColor(.white)
-
-                    Button(action: {
-                        let t = inputText.trimmingCharacters(in: .whitespaces)
-                        if !t.isEmpty {
-                            sendMessage(t)
-                            inputText = ""
-                        }
-                    }) {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.system(size: 30))
-                            .foregroundColor(.blue)
-                    }
-                    .disabled(inputText.trimmingCharacters(in: .whitespaces).isEmpty)
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(Color(white: 0.08))
-            }
-            .background(Color.black.ignoresSafeArea())
-            .navigationTitle("T-Flow Bot")
-            .navigationBarTitleDisplayMode(.inline)
-        }
-    }
-
-    private func sendMessage(_ text: String) {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        let timeStr = formatter.string(from: Date())
-
-        messages.append(AppChatMessage(text: text, isUser: true, timestamp: timeStr))
-        isThinking = true
-
-        Task {
-            let cloudReply = await fetchCloudAIReply(for: text)
-            await MainActor.run {
-                isThinking = false
-                messages.append(AppChatMessage(text: cloudReply, isUser: false, timestamp: timeStr))
-            }
-        }
-    }
-
-    private func fetchCloudAIReply(for query: String) async -> String {
-        guard let url = URL(string: "https://t-flow-tech.vercel.app/api/chat") else {
-            return generateReply(for: query)
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.timeoutInterval = 7.0
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let payload: [String: Any] = [
-            "query": query,
-            "source": "ios_native_app",
-            "context": [
-                "userName": store.userName,
-                "userTier": store.userTier,
-                "deviceName": store.deviceName
-            ]
-        ]
-
-        do {
-            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
-            let (data, resp) = try await URLSession.shared.data(for: request)
-            if let http = resp as? HTTPURLResponse, http.statusCode == 200,
-               let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
-               let reply = json["reply"] as? String, !reply.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                return reply
-            }
-        } catch {
-            // Fallback to embedded edge rules on network loss
-        }
-        return generateReply(for: query)
-    }
-
-    private func generateReply(for query: String) -> String {
-        let q = query.lowercased()
-        if q.contains("inception") || q.contains("360") {
-            return "Để kích hoạt Inception 360° (Vortex Mode): Giữ gimbal nằm ngang song song mặt đất, bấm đúp cò Trigger sau tay cầm. Động cơ Roll sẽ xoay tròn vô tận 360 độ trong khi bạn tiến bước về phía trước."
-        } else if q.contains("log") || q.contains("apple log") {
-            return "Chế độ Apple Log 4K/60fps: Chuyển tab Camera sang PRO CINEMA. Ứng dụng T-Flow Cam sẽ khóa dải động 10-bit ProRes Log và áp dụng 3D LUT REC.709 xem trước thời gian thực."
-        } else if q.contains("foc") || q.contains("cân") || q.contains("imu") {
-            return "Hiệu chuẩn IMU & FOC: Đặt gimbal trên mặt bàn phẳng tĩnh 5 giây, nhấn 'Hiệu chuẩn IMU'. Thuật toán Pure FOC 20kHz sẽ tự động bù sai số góc nghiêng về 0.01 độ."
-        } else {
-            return "T-Flow Bot đã ghi nhận câu hỏi. Để có cảnh quay chuyển động mượt mà nhất, hãy kết hợp động cơ FOC 20kHz cùng bước chân Ninja Walk và ngàm MagSafe cố định tâm tải trọng 450g!"
-        }
+        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .right, options: [:])
+        try? handler.perform([request])
     }
 }

@@ -13,7 +13,7 @@ targets:
     info:
       path: Sources/Info.plist
       properties:
-        CFBundleDisplayName: "Smart Gimbal S1"
+        CFBundleDisplayName: "T-Flow Pro"
         CFBundleShortVersionString: "2.4.1"
         CFBundleVersion: "241"
         LSRequiresIPhoneOS: true

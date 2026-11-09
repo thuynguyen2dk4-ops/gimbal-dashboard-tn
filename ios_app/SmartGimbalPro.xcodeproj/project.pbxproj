@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA11002029B7F10000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA11002129B7F10000000001 /* Assets.xcassets */; };
 		AA11000129B7F10000000001 /* SmartGimbalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11000229B7F10000000001 /* SmartGimbalApp.swift */; };
 		AA11000329B7F10000000001 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA11000429B7F10000000001 /* Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AA11002129B7F10000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA11000529B7F10000000001 /* SmartGimbalPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartGimbalPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA11000229B7F10000000001 /* SmartGimbalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGimbalApp.swift; sourceTree = "<group>"; };
 		AA11000429B7F10000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -39,6 +41,7 @@
 		AA11000829B7F10000000001 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				AA11002129B7F10000000001 /* Assets.xcassets */,
 				AA11000229B7F10000000001 /* SmartGimbalApp.swift */,
 				AA11000429B7F10000000001 /* Info.plist */,
 			);
@@ -111,6 +114,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA11002029B7F10000000001 /* Assets.xcassets in Resources */,
 				AA11000329B7F10000000001 /* Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
