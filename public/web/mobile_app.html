@@ -641,7 +641,134 @@
       to { opacity: 1; transform: translate(-50%, 0); }
     }
 
-  </style>
+  
+    /* AI CLOUD TARGET SELECTOR & LENS CONTROLS */
+    .ai-target-control-bar {
+      position: absolute;
+      top: 68px;
+      left: 14px;
+      right: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 6px 10px;
+      border-radius: 99px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .target-mode-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 99px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+    .target-mode-btn.active.human {
+      background: #34C759;
+      color: #000;
+      border-color: #34C759;
+      box-shadow: 0 0 10px rgba(52, 199, 89, 0.5);
+    }
+    .target-mode-btn.active.pet {
+      background: #AF52DE;
+      color: #FFF;
+      border-color: #AF52DE;
+      box-shadow: 0 0 10px rgba(175, 82, 222, 0.5);
+    }
+    .target-mode-btn.active.object {
+      background: #FF9500;
+      color: #000;
+      border-color: #FF9500;
+      box-shadow: 0 0 10px rgba(255, 149, 0, 0.5);
+    }
+    .lens-ctrl-wrap {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: auto;
+    }
+    .lens-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #FFF;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 99px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .lens-btn.active {
+      background: #FFF;
+      color: #000;
+      border-color: #FFF;
+    }
+    .lens-btn.auto {
+      background: rgba(0, 113, 227, 0.4);
+      color: #5AC8FA;
+      border-color: #0071E3;
+    }
+    .lens-btn.auto.active {
+      background: #0071E3;
+      color: #FFF;
+      box-shadow: 0 0 8px rgba(0, 113, 227, 0.6);
+    }
+    .crowd-sim-btn {
+      position: absolute;
+      top: 114px;
+      left: 14px;
+      z-index: 50;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 99px;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .crowd-sim-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .ai-wide-banner {
+      position: absolute;
+      top: 150px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 113, 227, 0.9);
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 99px;
+      z-index: 60;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 16px rgba(0, 113, 227, 0.5);
+      animation: pulseAlert 1.5s infinite;
+      white-space: nowrap;
+    }
+    @keyframes pulseAlert {
+      0%, 100% { transform: translateX(-50%) scale(1); }
+      50% { transform: translateX(-50%) scale(1.04); }
+    }
+</style>
 </head>
 <body>
 
@@ -979,7 +1106,102 @@
     }
 
     // 4. CANVAS & REAL-TIME AI TRACKING ENGINE (60 FPS)
-    function initCanvas() {
+        // =========================================================================
+    // 7. MULTI-TARGET AI CLOUD FOCUS & AUTO ULTRA-WIDE LENS ENGINE
+    // =========================================================================
+    let currentAiTargetMode = 'human'; // 'human' | 'pet' | 'object'
+    let crowdSimulationCount = 1;      // 1 or 3
+    let currentCameraLens = '1x';       // '0.5x' | '1x'
+    let isAutoWideEnabled = true;
+    let customObjectCoords = null;      // { x, y }
+
+    function setAiTargetMode(mode) {
+      currentAiTargetMode = mode;
+      document.querySelectorAll('.target-mode-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(mode === 'human' ? 'btnTargetHuman' : (mode === 'pet' ? 'btnTargetPet' : 'btnTargetObject'));
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const telTarget = document.getElementById('telTarget');
+      if (mode === 'human') {
+        if (telTarget) telTarget.textContent = crowdSimulationCount > 1 ? 'GROUP (3 NGƯỜI)' : 'HUMAN_HOST [LOCK]';
+        showAppCameraToast('👤 Đã chuyển sang: Bám nét Người & Khuôn mặt 120fps');
+      } else if (mode === 'pet') {
+        if (telTarget) telTarget.textContent = 'PET_DOG_01 [AGILE]';
+        showAppCameraToast('🐾 Đã chuyển sang: Bám nét Thú Cưng (FOC Gia Tốc 1.8x)');
+      } else if (mode === 'object') {
+        if (telTarget) telTarget.textContent = 'CUSTOM OBJECT [TAP TO LOCK]';
+        showAppCameraToast('🎯 Chạm vào bất kỳ đồ vật trên màn hình để Khóa Nét!');
+      }
+    }
+
+    function setCameraLens(lens, isAutoTriggered) {
+      currentCameraLens = lens;
+      document.querySelectorAll('.lens-btn:not(.auto)').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(lens === '0.5x' ? 'btnLens05' : 'btnLens1x');
+      if (activeBtn) activeBtn.classList.add('active');
+
+      const img = document.querySelector('#phoneContainer img');
+      const banner = document.getElementById('aiWideBanner');
+      if (lens === '0.5x') {
+        if (img) img.style.transform = 'scale(0.85)';
+        if (img) img.style.transition = 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+        if (isAutoTriggered && banner) {
+          banner.style.display = 'flex';
+        }
+      } else {
+        if (img) img.style.transform = 'scale(1)';
+        if (banner) banner.style.display = 'none';
+      }
+    }
+
+    function toggleAutoWideMode() {
+      isAutoWideEnabled = !isAutoWideEnabled;
+      const btn = document.getElementById('btnLensAuto');
+      if (btn) btn.classList.toggle('active', isAutoWideEnabled);
+      showAppCameraToast(isAutoWideEnabled ? '⚡ Đã BẬT: Tự động chuyển cam góc rộng 0.5x khi đông người' : 'Đã TẮT tính năng tự động chuyển góc rộng');
+      if (isAutoWideEnabled && crowdSimulationCount > 1) {
+        setCameraLens('0.5x', true);
+      }
+    }
+
+    function toggleCrowdSimulation() {
+      crowdSimulationCount = crowdSimulationCount === 1 ? 3 : 1;
+      const textEl = document.getElementById('crowdSimText');
+      const iconEl = document.getElementById('crowdSimIcon');
+      const banner = document.getElementById('aiWideBanner');
+
+      if (crowdSimulationCount > 1) {
+        if (textEl) textEl.textContent = 'Về: 1 Người (Về 1x)';
+        if (iconEl) iconEl.textContent = '👤';
+        if (isAutoWideEnabled) {
+          setCameraLens('0.5x', true);
+          showAppCameraToast('⚡ AI Cloud: Phát hiện 3 người → Tự động bật Cam Góc Rộng 0.5x!');
+        }
+      } else {
+        if (textEl) textEl.textContent = 'Thử: 3 Người (Auto 0.5x)';
+        if (iconEl) iconEl.textContent = '👥';
+        if (isAutoWideEnabled) {
+          setCameraLens('1x', false);
+          showAppCameraToast('👤 Chỉ còn 1 người → AI tự động trở về Camera Chính 1x');
+        }
+      }
+    }
+
+    function handleViewfinderTap(e) {
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : rect.width / 2);
+      const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : rect.height / 2);
+
+      const x = (clientX - rect.left) / rect.width;
+      const y = (clientY - rect.top) / rect.height;
+
+      customObjectCoords = { x: Math.max(0.1, Math.min(0.9, x)), y: Math.max(0.1, Math.min(0.9, y)) };
+      setAiTargetMode('object');
+      showAppCameraToast(`🎯 Đã khóa laser vật thể tại tọa độ (${(customObjectCoords.x*100).toFixed(0)}%, ${(customObjectCoords.y*100).toFixed(0)}%)!`);
+    }
+
+function initCanvas() {
       canvas = document.getElementById('aiOverlayCanvas');
       ctx = canvas.getContext('2d');
       resizeCanvas();
@@ -992,8 +1214,14 @@
       canvas.height = rect.height;
     }
 
-    function startAiTrackingLoop() {
+        function startAiTrackingLoop() {
       let t = 0;
+
+      // Attach tap to focus on canvas
+      canvas.addEventListener('click', handleViewfinderTap);
+      canvas.addEventListener('touchstart', (e) => {
+        handleViewfinderTap(e);
+      }, { passive: true });
 
       function render() {
         t += 0.03;
@@ -1001,84 +1229,157 @@
 
         // Only draw AI Reticle if Online AND Enabled by Admin AND User turned ON
         if (isOnline && isAiVisionEnabledByAdmin && isAiActive) {
-          // Simulate smooth human movement in viewfinder
-          targetX = 0.5 + Math.sin(t * 0.8) * 0.14;
-          targetY = 0.42 + Math.cos(t * 0.6) * 0.08;
+          
+          // ===================================================================
+          // CASE 1: HUMAN TARGET MODE
+          // ===================================================================
+          if (currentAiTargetMode === 'human') {
+            if (crowdSimulationCount === 1) {
+              // Single host tracking
+              targetX = 0.5 + Math.sin(t * 0.8) * 0.14;
+              targetY = 0.42 + Math.cos(t * 0.6) * 0.08;
+              drawReticle(targetX, targetY, boxWidth, boxHeight, '#34C759', 'HUMAN_HOST • CLOUD FOCUS (99%)', '✋ CỬ CHỈ: ĐANG BÁM');
+              
+              targetAngleYaw = ((targetX - 0.5) * 60).toFixed(1);
+              targetAnglePitch = ((0.5 - targetY) * 45).toFixed(1);
+              document.getElementById('telYaw').textContent = (targetAngleYaw > 0 ? '+' : '') + targetAngleYaw + '°';
+              document.getElementById('telPitch').textContent = (targetAnglePitch > 0 ? '+' : '') + targetAnglePitch + '°';
+            } else {
+              // GROUP CROWD (3 PEOPLE) -> AUTO-WIDE ENGAGED
+              const p1X = 0.26 + Math.sin(t * 0.5) * 0.04;
+              const p1Y = 0.44 + Math.cos(t * 0.4) * 0.03;
+              const p2X = 0.50 + Math.sin(t * 0.7) * 0.05;
+              const p2Y = 0.40 + Math.cos(t * 0.5) * 0.04;
+              const p3X = 0.74 + Math.sin(t * 0.6) * 0.04;
+              const p3Y = 0.45 + Math.cos(t * 0.5) * 0.03;
 
-          const cx = targetX * canvas.width;
-          const cy = targetY * canvas.height;
-          const bw = boxWidth * canvas.width;
-          const bh = boxHeight * canvas.height;
-          const bx = cx - bw / 2;
-          const by = cy - bh / 2;
+              drawReticle(p1X, p1Y, boxWidth * 0.75, boxHeight * 0.75, '#5AC8FA', 'HUMAN_01 • GROUP', null);
+              drawReticle(p2X, p2Y, boxWidth * 0.85, boxHeight * 0.85, '#34C759', 'HUMAN_02 • CHỦ THỂ', null);
+              drawReticle(p3X, p3Y, boxWidth * 0.75, boxHeight * 0.75, '#5AC8FA', 'HUMAN_03 • GROUP', null);
 
-          // Calculate Gimbal Motor Offsets
-          targetAngleYaw = ((targetX - 0.5) * 60).toFixed(1);
-          targetAnglePitch = ((0.5 - targetY) * 45).toFixed(1);
+              // Outer Group Centroid Enclosure (Dashed Gold Box)
+              ctx.strokeStyle = 'rgba(255, 214, 10, 0.85)';
+              ctx.lineWidth = 1.8;
+              ctx.setLineDash([6, 6]);
+              const gx = (p1X - 0.12) * canvas.width;
+              const gy = (p2Y - 0.16) * canvas.height;
+              const gw = (p3X - p1X + 0.24) * canvas.width;
+              const gh = 0.42 * canvas.height;
+              ctx.strokeRect(gx, gy, gw, gh);
+              ctx.setLineDash([]);
 
-          // Update Telemetry HUD
-          document.getElementById('telYaw').textContent = (targetAngleYaw > 0 ? '+' : '') + targetAngleYaw + '°';
-          document.getElementById('telPitch').textContent = (targetAnglePitch > 0 ? '+' : '') + targetAnglePitch + '°';
+              ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+              ctx.beginPath();
+              ctx.roundRect(gx, gy - 24, 210, 20, 6);
+              ctx.fill();
+              ctx.fillStyle = '#FFD60A';
+              ctx.font = 'bold 10px -apple-system, sans-serif';
+              ctx.fillText('⚡ 0.5x AUTO-WIDE • GROUP AUTO-FRAMING', gx + 8, gy - 10);
 
-          // Draw Apple HIG Green Bounding Box Reticle
-          ctx.strokeStyle = '#34C759';
-          ctx.lineWidth = 2.5;
-          ctx.shadowColor = 'rgba(52, 199, 89, 0.6)';
-          ctx.shadowBlur = 10;
+              // Centroid Pan/Tilt
+              const centroidX = (p1X + p2X + p3X) / 3;
+              const centroidY = (p1Y + p2Y + p3Y) / 3;
+              targetAngleYaw = ((centroidX - 0.5) * 50).toFixed(1);
+              targetAnglePitch = ((0.5 - centroidY) * 35).toFixed(1);
+              document.getElementById('telYaw').textContent = (targetAngleYaw > 0 ? '+' : '') + targetAngleYaw + '°';
+              document.getElementById('telPitch').textContent = (targetAnglePitch > 0 ? '+' : '') + targetAnglePitch + '°';
+            }
+          }
+          // ===================================================================
+          // CASE 2: PET TARGET MODE (AGILE RAPID MOTION)
+          // ===================================================================
+          else if (currentAiTargetMode === 'pet') {
+            targetX = 0.5 + Math.sin(t * 1.5) * 0.24;
+            targetY = 0.58 + Math.abs(Math.sin(t * 2.0)) * -0.18;
+            drawReticle(targetX, targetY, boxWidth * 0.8, boxHeight * 0.65, '#AF52DE', '🐾 PET_DOG_01 • AGILE TRACK (98%)', '⚡ FOC GIA TỐC: 1.8X BOOST');
 
-          // Corner brackets [  ]
-          const cornerLen = 22;
-          ctx.beginPath();
-          // Top Left
-          ctx.moveTo(bx, by + cornerLen);
-          ctx.lineTo(bx, by);
-          ctx.lineTo(bx + cornerLen, by);
+            targetAngleYaw = ((targetX - 0.5) * 75).toFixed(1);
+            targetAnglePitch = ((0.5 - targetY) * 55).toFixed(1);
+            document.getElementById('telYaw').textContent = (targetAngleYaw > 0 ? '+' : '') + targetAngleYaw + '°';
+            document.getElementById('telPitch').textContent = (targetAnglePitch > 0 ? '+' : '') + targetAnglePitch + '°';
+            document.getElementById('telFoc').textContent = '2.15A @ 20kHz (PET BOOST)';
+          }
+          // ===================================================================
+          // CASE 3: CUSTOM OBJECT TARGET MODE (TAP-TO-TRACK LASER LOCK)
+          // ===================================================================
+          else if (currentAiTargetMode === 'object') {
+            const ox = customObjectCoords ? customObjectCoords.x : (0.5 + Math.sin(t * 0.4) * 0.08);
+            const oy = customObjectCoords ? customObjectCoords.y : (0.5 + Math.cos(t * 0.4) * 0.06);
 
-          // Top Right
-          ctx.moveTo(bx + bw - cornerLen, by);
-          ctx.lineTo(bx + bw, by);
-          ctx.lineTo(bx + bw, by + cornerLen);
+            drawReticle(ox, oy, boxWidth * 0.7, boxHeight * 0.7, '#FF9500', '🎯 OBJECT_CUSTOM • LASER LOCK (99%)', '📌 CHẠM MÀN HÌNH ĐỂ ĐỔI VẬT THỂ');
 
-          // Bottom Left
-          ctx.moveTo(bx, by + bh - cornerLen);
-          ctx.lineTo(bx, by + bh);
-          ctx.lineTo(bx + cornerLen, by + bh);
+            // Draw laser reticle circles
+            const ocx = ox * canvas.width;
+            const ocy = oy * canvas.height;
+            ctx.beginPath();
+            ctx.arc(ocx, ocy, 18 + Math.sin(t * 4) * 3, 0, Math.PI * 2);
+            ctx.strokeStyle = '#FF9500';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
 
-          // Bottom Right
-          ctx.moveTo(bx + bw - cornerLen, by + bh);
-          ctx.lineTo(bx + bw, by + bh);
-          ctx.lineTo(bx + bw, by + bh - cornerLen);
-          ctx.stroke();
-
-          // Center crosshair
-          ctx.beginPath();
-          ctx.arc(cx, cy, 4, 0, Math.PI * 2);
-          ctx.fillStyle = '#34C759';
-          ctx.fill();
-
-          // Label: Target ID & Gesture
-          ctx.shadowBlur = 0;
-          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-          ctx.beginPath();
-          ctx.roundRect(bx, by - 26, 170, 22, 6);
-          ctx.fill();
-
-          ctx.fillStyle = '#34C759';
-          ctx.font = 'bold 11px -apple-system, BlinkMacSystemFont, sans-serif';
-          ctx.fillText(`FACE_01 • CLOUD TRACK (99%)`, bx + 8, by - 11);
-
-          // Gesture hint badge below target
-          ctx.fillStyle = 'rgba(230, 167, 0, 0.85)';
-          ctx.beginPath();
-          ctx.roundRect(bx, by + bh + 8, 140, 20, 6);
-          ctx.fill();
-
-          ctx.fillStyle = '#000';
-          ctx.font = 'bold 10px -apple-system, BlinkMacSystemFont, sans-serif';
-          ctx.fillText(`✋ CỬ CHỈ: ĐANG BÁM`, bx + 8, by + bh + 22);
+            targetAngleYaw = ((ox - 0.5) * 60).toFixed(1);
+            targetAnglePitch = ((0.5 - oy) * 45).toFixed(1);
+            document.getElementById('telYaw').textContent = (targetAngleYaw > 0 ? '+' : '') + targetAngleYaw + '°';
+            document.getElementById('telPitch').textContent = (targetAnglePitch > 0 ? '+' : '') + targetAnglePitch + '°';
+          }
         }
 
         animFrameId = requestAnimationFrame(render);
+      }
+
+      function drawReticle(normX, normY, normW, normH, color, labelText, hintText) {
+        const cx = normX * canvas.width;
+        const cy = normY * canvas.height;
+        const bw = normW * canvas.width;
+        const bh = normH * canvas.height;
+        const bx = cx - bw / 2;
+        const by = cy - bh / 2;
+
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 8;
+
+        const cornerLen = 18;
+        ctx.beginPath();
+        // Top Left
+        ctx.moveTo(bx, by + cornerLen); ctx.lineTo(bx, by); ctx.lineTo(bx + cornerLen, by);
+        // Top Right
+        ctx.moveTo(bx + bw - cornerLen, by); ctx.lineTo(bx + bw, by); ctx.lineTo(bx + bw, by + cornerLen);
+        // Bottom Left
+        ctx.moveTo(bx, by + bh - cornerLen); ctx.lineTo(bx, by + bh); ctx.lineTo(bx + cornerLen, by + bh);
+        // Bottom Right
+        ctx.moveTo(bx + bw - cornerLen, by + bh); ctx.lineTo(bx + bw, by + bh); ctx.lineTo(bx + bw, by + bh - cornerLen);
+        ctx.stroke();
+
+        // Center crosshair dot
+        ctx.beginPath();
+        ctx.arc(cx, cy, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = color;
+        ctx.fill();
+
+        // Label Badge
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+        ctx.beginPath();
+        ctx.roundRect(bx, by - 24, 185, 20, 6);
+        ctx.fill();
+
+        ctx.fillStyle = color;
+        ctx.font = 'bold 10px -apple-system, sans-serif';
+        ctx.fillText(labelText, bx + 8, by - 10);
+
+        // Optional Hint
+        if (hintText) {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+          ctx.beginPath();
+          ctx.roundRect(bx, by + bh + 6, 175, 18, 5);
+          ctx.fill();
+
+          ctx.fillStyle = '#FFF';
+          ctx.font = 'bold 9px -apple-system, sans-serif';
+          ctx.fillText(hintText, bx + 8, by + bh + 18);
+        }
       }
 
       render();
