@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-signin-client_id" content="725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <title>Cổng Khách Hàng — T-Flow ID &amp; Quản Lý Thiết Bị</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1233,6 +1235,48 @@
     }
   
     function loginWithGoogleOAuth() {
+      const clientId = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getGoogleOAuthClientId)
+        ? SmartGimbalCatalog.getGoogleOAuthClientId()
+        : (localStorage.getItem('tflow_google_oauth_client_id') || '725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com');
+
+      if (clientId && typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
+        try {
+          const client = google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: 'email profile openid',
+            callback: (tokenResponse) => {
+              if (tokenResponse && tokenResponse.access_token) {
+                fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                  headers: { 'Authorization': `Bearer ${tokenResponse.access_token}` }
+                })
+                .then(res => res.json())
+                .then(profile => {
+                  if (profile && profile.email) {
+                    SmartGimbalCatalog.loginWithGmail(profile.email, profile.name || profile.email);
+                    checkUserAuth();
+                    if (typeof showNotification === 'function') {
+                      showNotification('✓ Đăng nhập Google thành công (' + profile.email + ')');
+                    }
+                  }
+                })
+                .catch(err => {
+                  console.error('Fetch Google profile error:', err);
+                  openSimulatedGoogleOAuth();
+                });
+              }
+            }
+          });
+          client.requestAccessToken();
+          return;
+        } catch(e) {
+          console.warn('Google Identity Services client error, falling back:', e);
+        }
+      }
+
+      openSimulatedGoogleOAuth();
+    }
+
+    function openSimulatedGoogleOAuth() {
       const width = 480;
       const height = 620;
       const left = window.screenX + (window.outerWidth - width) / 2;

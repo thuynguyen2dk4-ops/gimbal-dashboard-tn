@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-signin-client_id" content="725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com">
   <title>t-flow — mượt mà từng khoảnh khắc | T-Flow Pro Flagship</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2947,7 +2948,7 @@
     function loginWithGoogleOAuth() {
       const clientId = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getGoogleOAuthClientId)
         ? SmartGimbalCatalog.getGoogleOAuthClientId()
-        : (localStorage.getItem('tflow_google_oauth_client_id') || '');
+        : (localStorage.getItem('tflow_google_oauth_client_id') || '725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com');
 
       // CASE 1: REAL GOOGLE OAUTH 2.0 (Triggered when Google Client ID is configured in Admin CMS)
       if (clientId && typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {

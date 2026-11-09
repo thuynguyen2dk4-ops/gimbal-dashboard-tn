@@ -1724,11 +1724,15 @@
   // =========================================================================
   // --- GOOGLE OAUTH 2.0 CLIENT CONFIGURATION ---
   // =========================================================================
+  var DEFAULT_GOOGLE_OAUTH_CLIENT_ID = '725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com';
   var GOOGLE_OAUTH_CLIENT_ID_KEY = 'tflow_google_oauth_client_id';
 
   function getGoogleOAuthClientId() {
-    if (typeof localStorage === 'undefined') return '';
-    return localStorage.getItem(GOOGLE_OAUTH_CLIENT_ID_KEY) || '';
+    if (typeof localStorage !== 'undefined') {
+      var custom = localStorage.getItem(GOOGLE_OAUTH_CLIENT_ID_KEY);
+      if (custom && custom.trim()) return custom.trim();
+    }
+    return DEFAULT_GOOGLE_OAUTH_CLIENT_ID;
   }
 
   function saveGoogleOAuthClientId(clientId) {
@@ -2177,6 +2181,7 @@
     processAppSmartFallback: processAppSmartFallback,
     processWebAiQuery: processWebAiQuery,
     processAppAiQuery: processAppAiQuery,
+    DEFAULT_GOOGLE_OAUTH_CLIENT_ID: DEFAULT_GOOGLE_OAUTH_CLIENT_ID,
     GOOGLE_OAUTH_CLIENT_ID_KEY: GOOGLE_OAUTH_CLIENT_ID_KEY,
     getGoogleOAuthClientId: getGoogleOAuthClientId,
     saveGoogleOAuthClientId: saveGoogleOAuthClientId
