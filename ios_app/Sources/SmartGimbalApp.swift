@@ -636,7 +636,7 @@ struct TFlowAIChatAssistantView: View {
     }
 
     private func fetchCloudAIReply(for query: String) async -> String {
-        guard let url = URL(string: "https://t-flow-pro.vercel.app/api/chat") else {
+        guard let url = URL(string: "https://t-flow-tech.vercel.app/api/chat") else {
             return generateReply(for: query)
         }
         var request = URLRequest(url: url)
