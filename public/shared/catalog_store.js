@@ -769,6 +769,61 @@
   }
 
   // ==========================================================================
+  // 5.5 COOKIE MANAGEMENT & PERSISTENT SESSION ENGINE
+  // ==========================================================================
+  function setCookie(name, value, days) {
+    if (typeof document === 'undefined') return;
+    days = days || 30;
+    var d = new Date();
+    d.setTime(d.getTime() + (days * 24 * 60 * 60 * 1000));
+    var expires = "expires=" + d.toUTCString();
+    var valStr = (typeof value === 'object') ? JSON.stringify(value) : String(value);
+    document.cookie = name + "=" + encodeURIComponent(valStr) + ";" + expires + ";path=/;SameSite=Lax";
+  }
+
+  function getCookie(name) {
+    if (typeof document === 'undefined') return null;
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+      var c = ca[i];
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) {
+        var raw = c.substring(nameEQ.length, c.length);
+        try {
+          var decoded = decodeURIComponent(raw);
+          try {
+            return JSON.parse(decoded);
+          } catch(e) {
+            return decoded;
+          }
+        } catch(e) {
+          return raw;
+        }
+      }
+    }
+    return null;
+  }
+
+  function deleteCookie(name) {
+    if (typeof document === 'undefined') return;
+    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax";
+  }
+
+  function getCookieConsent() {
+    return getCookie('tflow_cookie_consent') || (typeof localStorage !== 'undefined' ? localStorage.getItem('tflow_cookie_consent') : null);
+  }
+
+  function setCookieConsent(accepted) {
+    var val = accepted ? 'accepted' : 'declined';
+    setCookie('tflow_cookie_consent', val, 365);
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('tflow_cookie_consent', val);
+    }
+    return val;
+  }
+
+  // ==========================================================================
   // 6. USER AUTHENTICATION & ACCESS CONTROL (DUAL MODE: STANDARD + GOOGLE)
   // ==========================================================================
   function isUserAdmin(user) {
@@ -782,14 +837,30 @@
   }
 
   function getCurrentUser() {
-    if (typeof localStorage === 'undefined') return null;
+    var user = null;
     try {
-      var raw = localStorage.getItem(CURRENT_USER_KEY);
-      if (!raw) return null;
-      return JSON.parse(raw);
-    } catch (e) {
-      return null;
+      user = getCookie('tflow_user_session') || getCookie('tflow_user');
+    } catch(e) {}
+
+    if (!user && typeof localStorage !== 'undefined') {
+      try {
+        var raw = localStorage.getItem(CURRENT_USER_KEY);
+        if (raw) user = JSON.parse(raw);
+      } catch (e) {}
     }
+
+    if (user) {
+      try {
+        setCookie('tflow_user_session', user, 30);
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+      setCookie('tflow_user_session', user, 30);
+      setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
+        }
+      } catch(e) {}
+    }
+
+    return user;
   }
 
   // 6.1 Standard Email & Password Login
@@ -817,6 +888,8 @@
     var isAdmin = isUserAdmin(found);
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(found));
+      setCookie('tflow_user_session', found, 30);
+      setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
     }
     if (typeof sessionStorage !== 'undefined') {
       if (isAdmin) {
@@ -873,6 +946,8 @@
 
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(newUser));
+      setCookie('tflow_user_session', newUser, 30);
+      setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
     }
     if (typeof sessionStorage !== 'undefined') {
       if (isAdmin) {
@@ -929,6 +1004,8 @@
 
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+      setCookie('tflow_user_session', user, 30);
+      setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
     }
     if (typeof sessionStorage !== 'undefined') {
       if (isAdmin) {
@@ -947,6 +1024,9 @@
   }
 
   function logoutUser() {
+    deleteCookie('tflow_user_session');
+    deleteCookie('tflow_user');
+    deleteCookie('tflow_auth_token');
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem(CURRENT_USER_KEY);
     }
@@ -2194,6 +2274,11 @@
     DEFAULT_GOOGLE_OAUTH_CLIENT_ID: DEFAULT_GOOGLE_OAUTH_CLIENT_ID,
     GOOGLE_OAUTH_CLIENT_ID_KEY: GOOGLE_OAUTH_CLIENT_ID_KEY,
     getGoogleOAuthClientId: getGoogleOAuthClientId,
-    saveGoogleOAuthClientId: saveGoogleOAuthClientId
+    saveGoogleOAuthClientId: saveGoogleOAuthClientId,
+    setCookie: setCookie,
+    getCookie: getCookie,
+    deleteCookie: deleteCookie,
+    getCookieConsent: getCookieConsent,
+    setCookieConsent: setCookieConsent
   };
 }));

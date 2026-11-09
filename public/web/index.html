@@ -2945,6 +2945,87 @@
     // ==========================================================================
     // AUTHENTIC GOOGLE OAUTH POPUP FLOW
     // ==========================================================================
+    
+    // ==========================================================================
+    // COOKIE CONSENT & PERSISTENCE CONTROLLERS
+    // ==========================================================================
+    function initCookieBanner() {
+      if (typeof SmartGimbalCatalog === 'undefined' || !SmartGimbalCatalog.getCookieConsent) return;
+      const consent = SmartGimbalCatalog.getCookieConsent();
+      const banner = document.getElementById('tflowCookieBanner');
+      if (banner && !consent) {
+        setTimeout(() => { banner.style.display = 'block'; }, 1000);
+      }
+    }
+
+    function acceptCookieConsent(all) {
+      if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.setCookieConsent) {
+        SmartGimbalCatalog.setCookieConsent(all);
+      }
+      dismissCookieBanner();
+      showToast('✓ Đã kích hoạt Cookie bảo mật phiên đăng nhập 30 ngày');
+    }
+
+    function dismissCookieBanner() {
+      const banner = document.getElementById('tflowCookieBanner');
+      if (banner) banner.style.display = 'none';
+    }
+
+    // ==========================================================================
+    // GOOGLE ONE TAP (IN-PAGE SEAMLESS SIGN-IN WITHOUT JUMPING TABS)
+    // ==========================================================================
+    function decodeGoogleJwt(token) {
+      try {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      } catch(e) {
+        return null;
+      }
+    }
+
+    function initGoogleOneTap() {
+      const clientId = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getGoogleOAuthClientId)
+        ? SmartGimbalCatalog.getGoogleOAuthClientId()
+        : '725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com';
+
+      if (!clientId || typeof google === 'undefined' || !google.accounts || !google.accounts.id) return;
+
+      try {
+        google.accounts.id.initialize({
+          client_id: clientId,
+          callback: (response) => {
+            if (response && response.credential) {
+              const payload = decodeGoogleJwt(response.credential);
+              if (payload && payload.email) {
+                SmartGimbalCatalog.loginWithGmail(payload.email, payload.name || payload.email);
+                toggleAuthModal(false);
+                renderNavUserSection();
+                renderReviewsList();
+      initCookieBanner();
+      setTimeout(initGoogleOneTap, 800);
+                showToast('✓ Đăng nhập Google thành công (' + payload.email + ')');
+              }
+            }
+          },
+          auto_select: false,
+          cancel_on_tap_outside: true
+        });
+
+        // Prompt One Tap if user not logged in
+        if (typeof SmartGimbalCatalog !== 'undefined' && !SmartGimbalCatalog.getCurrentUser()) {
+          setTimeout(() => {
+            google.accounts.id.prompt();
+          }, 1500);
+        }
+      } catch(e) {
+        console.warn('Google One Tap init error:', e);
+      }
+    }
+
     function loginWithGoogleOAuth() {
       const clientId = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getGoogleOAuthClientId)
         ? SmartGimbalCatalog.getGoogleOAuthClientId()
@@ -4381,6 +4462,36 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
       </button>
     </form>
+  </div>
+
+
+  <!-- ==========================================================================
+       FLOATING APPLE-STYLE COOKIE CONSENT & SESSION BANNER
+       ========================================================================== -->
+  <div id="tflowCookieBanner" style="display:none; position:fixed; bottom:20px; left:50%; transform:translateX(-50%); width:calc(100% - 32px); max-width:680px; background:rgba(29,29,31,0.94); backdrop-filter:blur(24px); -webkit-backdrop-filter:blur(24px); border-radius:18px; padding:18px 22px; color:#FFF; box-shadow:0 16px 40px rgba(0,0,0,0.3); z-index:99999; border:1px solid rgba(255,255,255,0.14);">
+    <div style="display:flex; align-items:flex-start; gap:14px;">
+      <div style="font-size:24px; line-height:1; flex-shrink:0;">🍪</div>
+      <div style="flex:1;">
+        <div style="font-size:13.5px; font-weight:700; margin-bottom:4px; letter-spacing:-0.01em;">
+          Thông Báo Cookie &amp; Duy Trì Phiên Đăng Nhập
+        </div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.8); line-height:1.45; margin-bottom:14px;">
+          T-Flow sử dụng Cookie (30 ngày) để duy trì phiên đăng nhập an toàn, lưu giỏ hàng và đồng bộ 7 module tính năng bản quyền gimbal theo tiêu chuẩn GDPR &amp; ePrivacy.
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+          <button type="button" onclick="acceptCookieConsent(true)" style="background:#FFF; color:#1D1D1F; border:none; padding:8px 18px; border-radius:99px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s ease;">
+            Chấp Nhận Toàn Bộ
+          </button>
+          <button type="button" onclick="acceptCookieConsent(false)" style="background:rgba(255,255,255,0.14); color:#FFF; border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:99px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s ease;">
+            Chỉ Cookie Thiết Yếu
+          </button>
+          <span style="font-size:11px; color:rgba(255,255,255,0.5); margin-left:auto;">
+            Bảo mật AES-256 &bull; SameSite=Lax
+          </span>
+        </div>
+      </div>
+      <button type="button" onclick="dismissCookieBanner()" style="background:none; border:none; color:rgba(255,255,255,0.6); font-size:18px; cursor:pointer; line-height:1; padding:2px 6px;">&times;</button>
+    </div>
   </div>
 
 </body>
