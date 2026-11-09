@@ -2089,20 +2089,7 @@
 
     // Init on DOM ready
     
-    // Admin CMS Permission Check on Nav Click
-    function handleAdminNavClick() {
-      if (sessionStorage.getItem('TFLOW_ADMIN_AUTH') === 'true') {
-        window.location.href = 'admin_dashboard.html';
-      } else {
-        const pwd = prompt('KHÓA BẢO MẬT QUẢN TRỊ VIÊN T-FLOW\nVui lòng nhập mật khẩu Quản Trị Viên (Mặc định: tflow2026 hoặc 8888):');
-        if (pwd === 'tflow2026' || pwd === '8888') {
-          sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
-          window.location.href = 'admin_dashboard.html';
-        } else if (pwd !== null) {
-          alert('Mật khẩu không chính xác! Chỉ tài khoản Quản Trị Viên mới có quyền truy cập.');
-        }
-      }
-    }
+
 
     
     // ==========================================================================

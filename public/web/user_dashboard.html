@@ -597,31 +597,30 @@
         <button class="auth-tab-btn" id="tabBtnRegister" onclick="switchAuthTab('register')">Đăng Ký Tài Khoản</button>
       </div>
 
-      <!-- LOGIN FORM -->
+      <!-- GMAIL LOGIN FORM (ZERO PASSWORD) -->
       <div id="loginForm">
-        <div class="form-group">
-          <label>Email Hoặc Số Điện Thoại</label>
-          <input type="text" class="form-control" id="loginEmail" placeholder="dung.travel@gmail.com">
-        </div>
-        <div class="form-group">
-          <label>Mật Khẩu</label>
-          <input type="password" class="form-control" id="loginPassword" value="123456" placeholder="Nhập mật khẩu">
+        <div style="background:#F5F5F7; border-radius:14px; padding:16px; margin-bottom:18px; text-align:left;">
+          <div style="font-size:12px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:4px;">Đăng Nhập Bằng Gmail</div>
+          <div style="font-size:13px; color:#1D1D1F; line-height:1.5;">Hệ thống đồng bộ thiết bị qua tài khoản Google. Không cần nhập mật khẩu.</div>
         </div>
 
-        <button class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:12px;" onclick="handleLoginSubmit()">Đăng Nhập Vào Cổng Khách Hàng</button>
-
-        <!-- 1-Click Demo Accounts for easy testing -->
-        <div class="demo-accounts-box">
-          <div style="font-size:12px; font-weight:700; color:var(--text-secondary); text-align:center;">Đăng Nhập Nhanh Tài Khoản Mẫu (1-Chạm):</div>
-          <div class="demo-btn-row">
-            <button class="demo-account-chip" onclick="quickLoginDemo('dung.travel@gmail.com')">
-              Đặng Anh Dũng<br><span style="font-size:11px; opacity:0.8;">Pro Cinema Tier</span>
-            </button>
-            <button class="demo-account-chip" onclick="quickLoginDemo('minh.vlog@gmail.com')">
-              Nguyễn Văn Minh<br><span style="font-size:11px; opacity:0.8;">Basic Creator Tier</span>
-            </button>
+        <!-- 1-Click Admin Button -->
+        <button onclick="loginUserPortalWithGmail('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; display:flex; align-items:center; gap:12px; padding:12px 16px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:14px; text-align:left; box-shadow:0 4px 14px rgba(0,0,0,0.12);">
+          <svg width="20" height="20" viewBox="0 0 24 24" style="background:#FFF; border-radius:50%; padding:2px;"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+          <div style="flex:1;">
+            <div>Thuy Nguyen (Master Admin)</div>
+            <div style="font-size:11.5px; opacity:0.8; font-weight:400;">thuynguyen2dk4@gmail.com</div>
           </div>
+          <span style="font-size:11px; background:rgba(0,113,227,0.2); color:#FFF; padding:2px 8px; border-radius:99px;">Admin</span>
+        </button>
+
+        <div style="font-size:12px; color:var(--text-secondary); text-align:center; margin-bottom:12px;">- hoặc đăng nhập bằng tài khoản Gmail khác để test -</div>
+
+        <div class="form-group" style="margin-bottom:12px;">
+          <input type="email" class="form-control" id="loginPortalEmail" placeholder="nhap.email.cua.ban@gmail.com" style="width:100%; padding:10px 14px; border:1px solid var(--border); border-radius:10px; font-size:13.5px; font-family:inherit;">
         </div>
+
+        <button class="btn btn-dark" style="width:100%; padding:12px 0;" onclick="handlePortalGmailSubmit()">Đăng Nhập Ngay</button>
       </div>
 
       <!-- REGISTER FORM -->
@@ -940,6 +939,7 @@
     }
 
     function loadUserData() {
+      setTimeout(updatePortalAdminBanner, 50);
       currentUser = SmartGimbalCatalog.getCurrentUser();
       
       const authGate = document.getElementById('authGateSection');
@@ -1061,6 +1061,40 @@
       document.getElementById('tabBtnRegister').classList.toggle('active', tab === 'register');
       document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
       document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+    }
+
+    
+    function loginUserPortalWithGmail(email, name) {
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        const res = SmartGimbalCatalog.loginWithGmail(email, name);
+        if (res.success) {
+          loadUserData();
+          // Check if admin, show admin banner
+          updatePortalAdminBanner();
+        }
+      }
+    }
+
+    function handlePortalGmailSubmit() {
+      const email = (document.getElementById('loginPortalEmail').value || '').trim();
+      if (!email || !email.includes('@')) {
+        alert('Vui lòng nhập email hợp lệ!');
+        return;
+      }
+      loginUserPortalWithGmail(email);
+    }
+
+    function updatePortalAdminBanner() {
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+      const user = SmartGimbalCatalog.getCurrentUser();
+      const adminBanner = document.getElementById('portalAdminBanner');
+      if (adminBanner) {
+        if (user && SmartGimbalCatalog.isUserAdmin(user)) {
+          adminBanner.style.display = 'flex';
+        } else {
+          adminBanner.style.display = 'none';
+        }
+      }
     }
 
     function handleLoginSubmit() {
