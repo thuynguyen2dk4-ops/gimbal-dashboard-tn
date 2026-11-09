@@ -785,12 +785,288 @@
       box-shadow: 0 4px 16px rgba(0,0,0,0.03);
     }
 
+  
+    /* ==========================================================================
+       ENTERPRISE LEFT SIDEBAR LAYOUT
+       ========================================================================== */
+    body {
+      display: flex !important;
+      flex-direction: row !important;
+      min-height: 100vh;
+      background: #F8F9FA !important;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Fixed Left Sidebar */
+    .admin-sidebar {
+      width: 270px;
+      min-width: 270px;
+      background: #FFFFFF;
+      border-right: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 200;
+      box-shadow: 2px 0 16px rgba(0, 0, 0, 0.03);
+      user-select: none;
+    }
+
+    .admin-sidebar-header {
+      padding: 22px 20px 18px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .admin-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .admin-brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #1D1D1F;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .admin-brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #1D1D1F;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .admin-brand-sub {
+      font-size: 11px;
+      color: #8E8E93;
+      font-weight: 600;
+    }
+
+    .badge-cms {
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(0, 113, 227, 0.1);
+      color: #0071E3;
+      padding: 3px 8px;
+      border-radius: 99px;
+    }
+
+    .admin-sidebar-user {
+      margin: 14px 14px 6px 14px;
+      padding: 10px 12px;
+      background: #F5F5F7;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #1D1D1F;
+      color: #FFF;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .user-email-text {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1D1D1F;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-role-badge {
+      font-size: 10.5px;
+      color: #0071E3;
+      font-weight: 600;
+    }
+
+    .admin-nav-group-title {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #8E8E93;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 16px 20px 6px 20px;
+    }
+
+    .admin-nav-menu {
+      list-style: none;
+      padding: 0 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .admin-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #48484A;
+      cursor: pointer;
+      transition: all 0.16s ease;
+    }
+
+    .admin-nav-item:hover {
+      background: #F5F5F7;
+      color: #1D1D1F;
+    }
+
+    .admin-nav-item.active {
+      background: #1D1D1F;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .admin-nav-item.highlight-ai {
+      background: linear-gradient(135deg, rgba(0, 113, 227, 0.1) 0%, rgba(52, 199, 89, 0.06) 100%);
+      color: #0071E3;
+      border: 1px solid rgba(0, 113, 227, 0.22);
+      font-weight: 700;
+    }
+
+    .admin-nav-item.highlight-ai:hover {
+      background: linear-gradient(135deg, rgba(0, 113, 227, 0.18) 0%, rgba(52, 199, 89, 0.12) 100%);
+    }
+
+    .admin-nav-item.highlight-ai.active {
+      background: #0071E3 !important;
+      color: #FFFFFF !important;
+      border-color: #0071E3 !important;
+      box-shadow: 0 4px 14px rgba(0, 113, 227, 0.35) !important;
+    }
+
+    .nav-badge-pill {
+      font-size: 11px;
+      font-weight: 800;
+      background: #FF3B30;
+      color: #FFF;
+      padding: 1px 7px;
+      border-radius: 99px;
+      margin-left: auto;
+    }
+
+    .nav-badge-pill.empty {
+      background: rgba(0, 0, 0, 0.08);
+      color: #8E8E93;
+    }
+
+    .admin-sidebar-footer {
+      margin-top: auto;
+      padding: 14px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: #FAFAFA;
+    }
+
+    .sidebar-footer-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 9px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #6E6E73;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      background: #FFFFFF;
+      transition: all 0.18s ease;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .sidebar-footer-btn:hover {
+      background: #F5F5F7;
+      color: #1D1D1F;
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    .sidebar-footer-btn.logout:hover {
+      background: #FFF0F0;
+      color: #FF3B30;
+      border-color: #FFCDD2;
+    }
+
+    /* Main Area Layout */
+    .admin-main-wrap {
+      margin-left: 270px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 100vh;
+      background: #F8F9FA;
+    }
+
+    .admin-topbar {
+      height: 64px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .admin-content-area {
+      padding: 24px 32px 60px 32px;
+      flex: 1;
+      max-width: 1440px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    .admin-view-panel {
+      animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
   </style>
 </head>
 <body>
 
-  <!-- GMAIL ADMIN AUTHENTICATION GATE (ZERO PASSWORD) -->
-  <div id="adminAuthGate" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:linear-gradient(135deg, #F5F5F7 0%, #E5E5EA 100%); z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px; font-family:'Plus Jakarta Sans', -apple-system, sans-serif;">
+  <!-- ADMIN AUTH GATE -->
+<div id="adminAuthGate" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:linear-gradient(135deg, #F5F5F7 0%, #E5E5EA 100%); z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px; font-family:'Plus Jakarta Sans', -apple-system, sans-serif;">
     <div style="background:#FFFFFF; border-radius:24px; padding:44px 40px; max-width:440px; width:100%; box-shadow:0 20px 48px rgba(0,0,0,0.12); border:1px solid rgba(0,0,0,0.08); text-align:center;">
       
       <!-- Brand Icon -->
@@ -828,204 +1104,118 @@
   </div>
 
 
-  <!-- ADMIN HEADER -->
-  <header>
-    <div class="brand">
-      <div class="brand-mark">A</div>
-      <span>T-Flow Admin CMS &mdash; Quản Trị Đăng Bài &amp; Danh Mục</span>
-    </div>
-    <div class="nav-actions">
-      <div style="font-size:12.5px; color:var(--text-secondary); display:flex; align-items:center; gap:8px;">
-        <span>Sản Phẩm MVP Ghim Đầu:</span>
-        <b id="headerMvpName" style="color:var(--text-main);">T-Flow T-Flow Pro</b>
-      </div>
-      
-      <!-- LOGGED IN ADMIN GMAIL BADGE -->
-      <div id="adminUserBadge" style="display:flex; align-items:center; gap:10px; background:#F5F5F7; padding:4px 12px; border-radius:99px; border:1px solid var(--border);">
-        <div style="width:24px; height:24px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;">TN</div>
-        <span style="font-size:12.5px; font-weight:600; color:#1D1D1F;" id="adminDisplayEmail">thuynguyen2dk4@gmail.com</span>
-        <span style="font-size:10px; font-weight:700; background:rgba(0,113,227,0.1); color:#0071E3; padding:2px 8px; border-radius:99px;">Master Admin</span>
-        <button onclick="handleAdminLogout()" style="background:none; border:none; font-size:11.5px; color:#FF3B30; font-weight:600; cursor:pointer; margin-left:4px;">Đăng Xuất</button>
-      </div>
-
-      <a href="#sectionAiTraining" class="btn-nav-link" style="background:rgba(0,113,227,0.1); color:#0071E3; font-weight:700;">⚡ Huấn Luyện AI</a>
-      <a href="index.html" class="btn-nav-link" target="_blank">Xem Website Bán Hàng</a>
-      <a href="user_dashboard.html" class="btn-nav-link" target="_blank">Cổng Khách Hàng</a>
-    </div>
-  </header>
-
-  <div class="container">
-    <!-- 1. KPI SUMMARY -->
-    <div class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-label">Nhóm Hàng Hóa (Cấp 1)</div>
-        <div class="kpi-val" id="kpiGroupsCount">3</div>
-        <div class="kpi-sub">Danh mục cấp cao nhất</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Bài Đăng Sản Phẩm (Cấp 2)</div>
-        <div class="kpi-val" id="kpiProductsCount">10</div>
-        <div class="kpi-sub">Đang mở bán trên web</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Tổng Số Đơn Đã Bán</div>
-        <div class="kpi-val" id="kpiOrdersCount">5.180</div>
-        <div class="kpi-sub">Số đơn trên toàn hệ thống</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Sản Phẩm MVP Ghim Đầu</div>
-        <div class="kpi-val" id="kpiMvpName" style="font-size:22px;">T-Flow T-Flow Pro</div>
-        <div class="kpi-sub">Hiển thị đầu Trang Chủ</div>
-      </div>
-    </div>
-
-    <!-- 2. KHỐI QUẢN LÝ NHÓM SẢN PHẨM (DANH MỤC CẤP 1 - DYNAMIC GROUPS CRUD) -->
-    <div class="card">
-      <div class="card-title-row">
+  <!-- ==========================================================================
+       LEFT SIDEBAR (THANH MENU BÊN TRÁI CHUẨN ENTERPRISE)
+       ========================================================================== -->
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <div class="admin-brand">
+        <div class="admin-brand-icon">A</div>
         <div>
-          <div class="card-title">Quản Lý Nhóm Sản Phẩm (Danh Mục Cấp 1)</div>
-          <div class="card-sub">
-            Cấu hình các nhóm ngành hàng chính. Thêm, sửa, xóa nhóm tại đây sẽ tự động cập nhật ngay lập tức sang bộ lọc trên website bán hàng và form đăng bài sản phẩm.
-          </div>
-        </div>
-        <div class="toolbar-actions">
-          <button class="btn btn-dark" onclick="openCreateGroupModal()">&#43; Tạo Mới Nhóm Sản Phẩm</button>
+          <div class="admin-brand-title">T-Flow Admin</div>
+          <div class="admin-brand-sub">Central Console &amp; CMS</div>
         </div>
       </div>
+      <span class="badge-cms">v2.4 Pro</span>
+    </div>
 
-      <!-- Grid of Groups Cards -->
-      <div class="groups-grid" id="groupsListGrid">
-        <!-- Dynamically rendered from SmartGimbalCatalog.getGroups() -->
+    <!-- ADMIN IDENTITY CARD -->
+    <div class="admin-sidebar-user">
+      <div class="user-avatar-circle">TN</div>
+      <div style="flex:1; min-width:0;">
+        <div class="user-email-text" id="adminDisplayEmail">thuynguyen2dk4@gmail.com</div>
+        <div class="user-role-badge">Master Admin &amp; Founder</div>
       </div>
     </div>
 
-    <!-- 3. KHỐI QUẢN LÝ BÀI ĐĂNG SẢN PHẨM & PHÂN CẤP (CẤP 2 & CẤP 3) -->
-    <div class="card">
-      <div class="card-title-row">
-        <div>
-          <div class="card-title">Quản Lý Bài Đăng Sản Phẩm &amp; Phân Cấp (Cấp 2 &amp; Cấp 3)</div>
-          <div class="card-sub">Quản trị nội dung hiển thị, hình ảnh góc chụp, màu sắc, thông số kỹ thuật và các phân cấp giá bán (Bản Thường, Pro, Max...).</div>
-        </div>
-        <div class="toolbar-actions">
-          <button class="btn btn-dark" onclick="openPublishProductModal()">&#43; Đăng Bài Sản Phẩm Mới</button>
-          <button class="btn btn-outline" onclick="triggerImportProductsCSV()">Nhập Khẩu (Excel / CSV)</button>
-          <button class="btn btn-outline" onclick="exportProductsCSV()">Xuất Khẩu (Excel)</button>
-          <input type="file" id="csvFileInput" accept=".csv" style="display:none;" onchange="handleCSVFileSelect(this)">
-        </div>
-      </div>
+    <!-- 1. AI GROUP -->
+    <div class="admin-nav-group-title">TRÍ TUỆ NHÂN TẠO</div>
+    <ul class="admin-nav-menu">
+      <li class="admin-nav-item highlight-ai active" id="menu-item-ai" onclick="switchAdminView('ai')">
+        <span style="font-size:16px;">⚡</span>
+        <span style="flex:1;">Huấn Luyện AI</span>
+        <span class="nav-badge-pill empty" id="sidebarPendingCount">0</span>
+      </li>
+    </ul>
 
-      <!-- Dynamic Filter Pills (Rendered from Groups) -->
-      <div class="filter-pills-row" id="adminFilterPills">
-        <!-- Dynamically rendered from SmartGimbalCatalog.getGroups() -->
-      </div>
+    <!-- 2. COMMERCE MANAGEMENT -->
+    <div class="admin-nav-group-title">QUẢN TRỊ KINH DOANH</div>
+    <ul class="admin-nav-menu">
+      <li class="admin-nav-item" id="menu-item-overview" onclick="switchAdminView('overview')">
+        <span style="font-size:15px;">📊</span>
+        <span>Tổng Quan KPI</span>
+      </li>
+      <li class="admin-nav-item" id="menu-item-groups" onclick="switchAdminView('groups')">
+        <span style="font-size:15px;">📁</span>
+        <span>Nhóm Hàng Hóa (Cấp 1)</span>
+      </li>
+      <li class="admin-nav-item" id="menu-item-products" onclick="switchAdminView('products')">
+        <span style="font-size:15px;">📦</span>
+        <span>Bài Đăng Sản Phẩm (Cấp 2)</span>
+      </li>
+      <li class="admin-nav-item" id="menu-item-users" onclick="switchAdminView('users')">
+        <span style="font-size:15px;">👥</span>
+        <span>Người Dùng &amp; 7 Module</span>
+      </li>
+      <li class="admin-nav-item" id="menu-item-reviews" onclick="switchAdminView('reviews')">
+        <span style="font-size:15px;">⭐</span>
+        <span>Đánh Giá Khách Hàng</span>
+      </li>
+    </ul>
 
-      <!-- Products Table -->
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th style="width:26%;">Sản Phẩm &amp; Tagline</th>
-            <th style="width:14%;">Nhóm Hàng</th>
-            <th style="width:15%;">Màu Sắc &amp; Trạng Thái</th>
-            <th style="width:13%;">Số Đơn Bán</th>
-            <th style="width:20%;">Phân Cấp &amp; Giá Bán</th>
-            <th style="width:12%; text-align:right;">Thao Tác</th>
-          </tr>
-        </thead>
-        <tbody id="productsTableBody">
-          <!-- Dynamically populated from SmartGimbalCatalog.getProducts() -->
-        </tbody>
-      </table>
+    <!-- 3. SYSTEM SETTINGS -->
+    <div class="admin-nav-group-title">HỆ THỐNG</div>
+    <ul class="admin-nav-menu">
+      <li class="admin-nav-item" id="menu-item-settings" onclick="switchAdminView('settings')">
+        <span style="font-size:15px;">⚙️</span>
+        <span>Cấu Hình API &amp; OAuth</span>
+      </li>
+    </ul>
+
+    <!-- SIDEBAR FOOTER -->
+    <div class="admin-sidebar-footer">
+      <a href="index.html" target="_blank" class="sidebar-footer-btn">
+        <span>🌐</span> Xem Web Bán Hàng
+      </a>
+      <a href="user_dashboard.html" target="_blank" class="sidebar-footer-btn">
+        <span>📱</span> Cổng Khách Hàng
+      </a>
+      <button onclick="handleAdminLogout()" class="sidebar-footer-btn logout" style="width:100%; border:none; text-align:left;">
+        <span>🚪</span> Đăng Xuất
+      </button>
     </div>
-
-    <!-- 4. USERS MANAGEMENT & 7-MODULE PERMISSIONS -->
-    <div class="card">
-      <div class="card-title-row">
-        <div>
-          <div class="card-title">Cấp Quyền 7 Module Ứng Dụng Cho Người Dùng</div>
-          <div class="card-sub">Bật/tắt tức thời 7 tính năng chuyên sâu và đồng bộ trực tiếp tới Cổng Khách Hàng.</div>
-        </div>
-        <div class="toolbar-actions">
-          <button class="btn btn-outline" onclick="exportUsersCSV()">Xuất Khẩu Người Dùng (Excel)</button>
-        </div>
-      </div>
-
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th>Họ và Tên</th>
-            <th>Email &amp; Số Điện Thoại</th>
-            <th>Thiết Bị Liên Kết</th>
-            <th>Cấp Bậc Tài Khoản</th>
-            <th>Module Đang Bật</th>
-            <th style="text-align:right;">Thao Tác</th>
-          </tr>
-        </thead>
-        <tbody id="usersTableBody">
-          <!-- Dynamically populated from SmartGimbalCatalog.getUsers() -->
-        </tbody>
-      </table>
-    </div>
-  </div>
+  </aside>
 
   <!-- ==========================================================================
-       MODAL 1: TẠO / SỬA NHÓM SẢN PHẨM (GROUP MODAL)
+       MAIN CONTENT WRAPPER
        ========================================================================== -->
-  <div class="modal-overlay" id="groupModal">
-    <div class="modal-card-medium">
-      <div class="modal-header">
-        <h3 id="groupModalTitle">Tạo Mới Nhóm Sản Phẩm</h3>
-        <button class="btn btn-outline" style="padding:4px 10px;" onclick="closeGroupModal()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <input type="hidden" id="formGroupId">
-        <div class="form-group">
-          <label>Tên Nhóm Sản Phẩm</label>
-          <input type="text" class="form-control" id="formGroupName" placeholder="Ví dụ: Gimbal Điện Thoại, Camera Bỏ Túi...">
-        </div>
-        <div class="form-group">
-          <label>Mô Tả Ngắn Về Nhóm Hàng</label>
-          <textarea class="form-control" id="formGroupDesc" placeholder="Mô tả nhóm hàng hóa hiển thị cho khách hàng..."></textarea>
-        </div>
-        <div class="form-group">
-          <label>Badge Phân Loại (Tùy chọn)</label>
-          <input type="text" class="form-control" id="formGroupBadge" placeholder="Chủ Lực, Chuyên Nghiệp, Phổ Thông...">
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-outline" onclick="closeGroupModal()">Hủy</button>
-        <button class="btn btn-dark" onclick="saveGroupSubmit()">Lưu Nhóm Sản Phẩm</button>
-      </div>
-    
-
-    <!-- 5. KHỐI QUẢN LÝ ĐÁNH GIÁ & CẢM NHẬN KHÁCH HÀNG (REVIEWS MODERATION) -->
-    <div class="card" style="margin-top:32px;">
-      <div class="card-title-row">
-        <div>
-          <div class="card-title">Quản Lý Đánh Giá &amp; Cảm Nhận Khách Hàng (T-Flow Pro Reviews)</div>
-          <div class="card-sub">Duyệt, xem chi tiết và kiểm duyệt toàn bộ đánh giá do người dùng gửi từ website bán hàng.</div>
-        </div>
-        <div class="toolbar-actions">
-          <span style="font-size:12px; font-weight:700; background:rgba(0,113,227,0.1); color:#0071E3; padding:6px 14px; border-radius:99px;" id="adminReviewsCountBadge">Đang tải đánh giá...</span>
-        </div>
+  <div class="admin-main-wrap">
+    <!-- TOP BAR -->
+    <header class="admin-topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <h2 id="adminCurrentViewTitle" style="font-size:16px; font-weight:800; color:var(--text-main); margin:0;">
+          ⚡ Trung Tâm Huấn Luyện AI &amp; Quản Lý Hội Thoại
+        </h2>
       </div>
 
-      <table class="data-table">
-        <thead>
-          <tr>
-            <th style="width:20%;">Người Đánh Giá</th>
-            <th style="width:12%;">Điểm Số</th>
-            <th style="width:18%;">Gói Sản Phẩm</th>
-            <th style="width:38%;">Tiêu Đề &amp; Nội Dung Đánh Giá</th>
-            <th style="width:12%; text-align:right;">Thao Tác</th>
-          </tr>
-        </thead>
-        <tbody id="adminReviewsTableBody">
-          <!-- Dynamically populated via renderAdminReviewsTable() -->
-        </tbody>
-      </table>
-    </div>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div style="font-size:12.5px; color:var(--text-secondary); display:flex; align-items:center; gap:8px;">
+          <span>Sản Phẩm MVP:</span>
+          <b id="headerMvpName" style="color:var(--text-main);">T-Flow Pro</b>
+        </div>
+        <div style="font-size:11.5px; background:rgba(52,199,89,0.12); color:#248A3D; padding:4px 10px; border-radius:99px; font-weight:700; display:flex; align-items:center; gap:6px;">
+          <span style="width:6px; height:6px; border-radius:50%; background:#34C759;"></span>
+          Gemini 3.5 Cloud AI • Active
+        </div>
+      </div>
+    </header>
 
-    <!-- 6. KHỐI TRUNG TÂM HUẤN LUYỆN AI & QUẢN LÝ HỘI THOẠI (AI TRAINING & MODERATION CENTER) -->
+    <!-- CONTENT AREA -->
+    <main class="admin-content-area">
+
+      <!-- VIEW 1: HUẤN LUYỆN AI (view-ai) -->
+      <div id="view-ai" class="admin-view-panel">
+        <!-- 6. KHỐI TRUNG TÂM HUẤN LUYỆN AI & QUẢN LÝ HỘI THOẠI (AI TRAINING & MODERATION CENTER) -->
     <div class="card" id="sectionAiTraining" style="margin-top:32px;">
       <div class="card-title-row">
         <div>
@@ -1286,10 +1476,263 @@
     </div>
 </div>
   </div>
+      </div>
+
+      <!-- VIEW 2: TỔNG QUAN KPI (view-overview) -->
+      <div id="view-overview" class="admin-view-panel" style="display:none;">
+        <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Nhóm Hàng Hóa (Cấp 1)</div>
+        <div class="kpi-val" id="kpiGroupsCount">3</div>
+        <div class="kpi-sub">Danh mục cấp cao nhất</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Bài Đăng Sản Phẩm (Cấp 2)</div>
+        <div class="kpi-val" id="kpiProductsCount">10</div>
+        <div class="kpi-sub">Đang mở bán trên web</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Tổng Số Đơn Đã Bán</div>
+        <div class="kpi-val" id="kpiOrdersCount">5.180</div>
+        <div class="kpi-sub">Số đơn trên toàn hệ thống</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Sản Phẩm MVP Ghim Đầu</div>
+        <div class="kpi-val" id="kpiMvpName" style="font-size:22px;">T-Flow T-Flow Pro</div>
+        <div class="kpi-sub">Hiển thị đầu Trang Chủ</div>
+      </div>
+    </div>
+
+        <!-- QUICK SHORTCUTS -->
+        <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin:24px 0;">
+          <div class="card" onclick="switchAdminView('ai')" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease; border:1px solid rgba(0,113,227,0.2); background:linear-gradient(135deg, #FFF 0%, rgba(0,113,227,0.03) 100%);">
+            <div style="font-size:28px; margin-bottom:8px;">⚡</div>
+            <div style="font-weight:800; font-size:14px; color:#0071E3;">Huấn Luyện AI</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Bộ não Gemini Cloud AI</div>
+          </div>
+          <div class="card" onclick="switchAdminView('groups'); openCreateGroupModal();" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease;">
+            <div style="font-size:28px; margin-bottom:8px;">📁</div>
+            <div style="font-weight:800; font-size:14px; color:var(--text-main);">Tạo Nhóm Hàng</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Cấu hình ngành hàng cấp 1</div>
+          </div>
+          <div class="card" onclick="switchAdminView('products'); openPublishProductModal();" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease;">
+            <div style="font-size:28px; margin-bottom:8px;">📦</div>
+            <div style="font-weight:800; font-size:14px; color:var(--text-main);">Đăng Sản Phẩm</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Đăng bán bài viết &amp; combo</div>
+          </div>
+          <div class="card" onclick="window.open('index.html', '_blank')" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease;">
+            <div style="font-size:28px; margin-bottom:8px;">🌐</div>
+            <div style="font-weight:800; font-size:14px; color:var(--text-main);">Xem Website</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Cửa hàng bán lẻ trực tuyến</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIEW 3: NHÓM SẢN PHẨM (view-groups) -->
+      <div id="view-groups" class="admin-view-panel" style="display:none;">
+        <!-- 2. KHỐI QUẢN LÝ NHÓM SẢN PHẨM (DANH MỤC CẤP 1 - DYNAMIC GROUPS CRUD) -->
+    <div class="card">
+      <div class="card-title-row">
+        <div>
+          <div class="card-title">Quản Lý Nhóm Sản Phẩm (Danh Mục Cấp 1)</div>
+          <div class="card-sub">
+            Cấu hình các nhóm ngành hàng chính. Thêm, sửa, xóa nhóm tại đây sẽ tự động cập nhật ngay lập tức sang bộ lọc trên website bán hàng và form đăng bài sản phẩm.
+          </div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-dark" onclick="openCreateGroupModal()">&#43; Tạo Mới Nhóm Sản Phẩm</button>
+        </div>
+      </div>
+
+      <!-- Grid of Groups Cards -->
+      <div class="groups-grid" id="groupsListGrid">
+        <!-- Dynamically rendered from SmartGimbalCatalog.getGroups() -->
+      </div>
+    </div>
+      </div>
+
+      <!-- VIEW 4: BÀI ĐĂNG SẢN PHẨM (view-products) -->
+      <div id="view-products" class="admin-view-panel" style="display:none;">
+        <!-- 3. KHỐI QUẢN LÝ BÀI ĐĂNG SẢN PHẨM & PHÂN CẤP (CẤP 2 & CẤP 3) -->
+    <div class="card">
+      <div class="card-title-row">
+        <div>
+          <div class="card-title">Quản Lý Bài Đăng Sản Phẩm &amp; Phân Cấp (Cấp 2 &amp; Cấp 3)</div>
+          <div class="card-sub">Quản trị nội dung hiển thị, hình ảnh góc chụp, màu sắc, thông số kỹ thuật và các phân cấp giá bán (Bản Thường, Pro, Max...).</div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-dark" onclick="openPublishProductModal()">&#43; Đăng Bài Sản Phẩm Mới</button>
+          <button class="btn btn-outline" onclick="triggerImportProductsCSV()">Nhập Khẩu (Excel / CSV)</button>
+          <button class="btn btn-outline" onclick="exportProductsCSV()">Xuất Khẩu (Excel)</button>
+          <input type="file" id="csvFileInput" accept=".csv" style="display:none;" onchange="handleCSVFileSelect(this)">
+        </div>
+      </div>
+
+      <!-- Dynamic Filter Pills (Rendered from Groups) -->
+      <div class="filter-pills-row" id="adminFilterPills">
+        <!-- Dynamically rendered from SmartGimbalCatalog.getGroups() -->
+      </div>
+
+      <!-- Products Table -->
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:26%;">Sản Phẩm &amp; Tagline</th>
+            <th style="width:14%;">Nhóm Hàng</th>
+            <th style="width:15%;">Màu Sắc &amp; Trạng Thái</th>
+            <th style="width:13%;">Số Đơn Bán</th>
+            <th style="width:20%;">Phân Cấp &amp; Giá Bán</th>
+            <th style="width:12%; text-align:right;">Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody id="productsTableBody">
+          <!-- Dynamically populated from SmartGimbalCatalog.getProducts() -->
+        </tbody>
+      </table>
+    </div>
+      </div>
+
+      <!-- VIEW 5: NGƯỜI DÙNG & 7 MODULE (view-users) -->
+      <div id="view-users" class="admin-view-panel" style="display:none;">
+        <!-- 4. USERS MANAGEMENT & 7-MODULE PERMISSIONS -->
+    <div class="card">
+      <div class="card-title-row">
+        <div>
+          <div class="card-title">Cấp Quyền 7 Module Ứng Dụng Cho Người Dùng</div>
+          <div class="card-sub">Bật/tắt tức thời 7 tính năng chuyên sâu và đồng bộ trực tiếp tới Cổng Khách Hàng.</div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-outline" onclick="exportUsersCSV()">Xuất Khẩu Người Dùng (Excel)</button>
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Họ và Tên</th>
+            <th>Email &amp; Số Điện Thoại</th>
+            <th>Thiết Bị Liên Kết</th>
+            <th>Cấp Bậc Tài Khoản</th>
+            <th>Module Đang Bật</th>
+            <th style="text-align:right;">Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody id="usersTableBody">
+          <!-- Dynamically populated from SmartGimbalCatalog.getUsers() -->
+        </tbody>
+      </table>
+    </div>
+      </div>
+
+      <!-- VIEW 6: ĐÁNH GIÁ KHÁCH HÀNG (view-reviews) -->
+      <div id="view-reviews" class="admin-view-panel" style="display:none;">
+        <!-- 5. KHỐI QUẢN LÝ ĐÁNH GIÁ & CẢM NHẬN KHÁCH HÀNG (REVIEWS MODERATION) -->
+    <div class="card" style="margin-top:32px;">
+      <div class="card-title-row">
+        <div>
+          <div class="card-title">Quản Lý Đánh Giá &amp; Cảm Nhận Khách Hàng (T-Flow Pro Reviews)</div>
+          <div class="card-sub">Duyệt, xem chi tiết và kiểm duyệt toàn bộ đánh giá do người dùng gửi từ website bán hàng.</div>
+        </div>
+        <div class="toolbar-actions">
+          <span style="font-size:12px; font-weight:700; background:rgba(0,113,227,0.1); color:#0071E3; padding:6px 14px; border-radius:99px;" id="adminReviewsCountBadge">Đang tải đánh giá...</span>
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:20%;">Người Đánh Giá</th>
+            <th style="width:12%;">Điểm Số</th>
+            <th style="width:18%;">Gói Sản Phẩm</th>
+            <th style="width:38%;">Tiêu Đề &amp; Nội Dung Đánh Giá</th>
+            <th style="width:12%; text-align:right;">Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody id="adminReviewsTableBody">
+          <!-- Dynamically populated via renderAdminReviewsTable() -->
+        </tbody>
+      </table>
+    </div>
+      </div>
+
+      <!-- VIEW 7: CÀI ĐẶT HỆ THỐNG (view-settings) -->
+      <div id="view-settings" class="admin-view-panel" style="display:none;">
+        <div class="card">
+          <div class="card-title-row">
+            <div>
+              <div class="card-title" style="display:flex; align-items:center; gap:10px;">
+                <span>⚙️</span> Cấu Hình Chìa Khóa Hệ Thống (Google Cloud AI &amp; OAuth 2.0)
+              </div>
+              <div class="card-sub">
+                Toàn bộ thông tin cấu hình được lưu tự động và bảo vệ tuyệt đối trong môi trường quản trị.
+              </div>
+            </div>
+            <div class="toolbar-actions">
+              <button class="btn btn-dark" onclick="saveCloudAiConfigUI()">💾 Lưu Toàn Bộ Cấu Hình</button>
+            </div>
+          </div>
+
+          <div style="background:#F0F7FF; border:1px solid #BAE6FD; border-radius:14px; padding:18px 20px; margin-bottom:20px;">
+            <div style="font-size:13.5px; font-weight:800; color:#0369A1; margin-bottom:4px;">
+              🔐 Google OAuth 2.0 Client ID
+            </div>
+            <div style="font-size:12px; color:#0C4A6E; margin-bottom:12px;">
+              Mã xác thực đăng nhập Google chính hãng liên kết tới Google Identity Services:
+            </div>
+            <div style="display:flex; gap:10px;">
+              <input type="text" id="googleOAuthClientIdInput2" readonly value="725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com" style="flex:1; padding:10px 14px; border:1px solid #7DD3FC; border-radius:10px; font-size:12.5px; font-family:monospace; background:#FFF;">
+              <button class="btn btn-outline" onclick="navigator.clipboard.writeText('725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com'); showNotification('✓ Đã copy Client ID!');">Copy</button>
+            </div>
+          </div>
+
+          <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:14px; padding:18px 20px;">
+            <div style="font-size:13.5px; font-weight:800; color:#15803D; margin-bottom:4px;">
+              🤖 Google Gemini Cloud AI
+            </div>
+            <div style="font-size:12px; color:#166534; margin-bottom:12px;">
+              Động cơ AI Đám Mây xử lý tư vấn bán hàng và đạo diễn quay chụp trên Mobile App:
+            </div>
+            <div style="display:flex; gap:10px;">
+              <input type="text" readonly value="AIzaSyDluWTvQMgGmw2yceO27urpn4UBOZ1LQF0" style="flex:1; padding:10px 14px; border:1px solid #86EFAC; border-radius:10px; font-size:12.5px; font-family:monospace; background:#FFF;">
+              <button class="btn btn-outline" onclick="switchAdminView('ai'); switchAiTab('config');">Quản Lý Tại Tab AI</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
 
   <!-- ==========================================================================
-       MODAL 2: PRODUCT PUBLISHING MODAL (WITH MULTI-TIER MANAGEMENT)
+       ALL MODALS AT ROOT LEVEL (TRÁNH LỖI OVERFLOW VÀ UNCLOSED TAGS)
        ========================================================================== -->
+  <div class="modal-overlay" id="groupModal">
+    <div class="modal-card-medium">
+      <div class="modal-header">
+        <h3 id="groupModalTitle">Tạo Mới Nhóm Sản Phẩm</h3>
+        <button class="btn btn-outline" style="padding:4px 10px;" onclick="closeGroupModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="formGroupId">
+        <div class="form-group">
+          <label>Tên Nhóm Sản Phẩm</label>
+          <input type="text" class="form-control" id="formGroupName" placeholder="Ví dụ: Gimbal Điện Thoại, Camera Bỏ Túi...">
+        </div>
+        <div class="form-group">
+          <label>Mô Tả Ngắn Về Nhóm Hàng</label>
+          <textarea class="form-control" id="formGroupDesc" placeholder="Mô tả nhóm hàng hóa hiển thị cho khách hàng..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Badge Phân Loại (Tùy chọn)</label>
+          <input type="text" class="form-control" id="formGroupBadge" placeholder="Chủ Lực, Chuyên Nghiệp, Phổ Thông...">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeGroupModal()">Hủy</button>
+        <button class="btn btn-dark" onclick="saveGroupSubmit()">Lưu Nhóm Sản Phẩm</button>
+      </div>
+  </div>
+  </div>
   <div class="modal-overlay" id="productModal">
     <div class="modal-card-large">
       <div class="modal-header">
@@ -1585,83 +2028,49 @@
     </div>
   </div>
 
-  <footer class="enterprise-footer">
-    <div class="container" style="margin:0 auto; padding:0 24px;">
-      <div class="footer-grid-4col">
-        <!-- Col 1 -->
-        <div class="footer-col">
-          <div class="footer-brand-title">T-Flow Enterprise</div>
-          <p class="footer-col-desc">
-            Hệ sinh thái thiết bị ổn định 3 trục chuẩn điện ảnh cho iPhone và máy ảnh di động. Đổi mới sáng tạo với động cơ FOC 20kHz và trải nghiệm phần mềm chuẩn Apple.
-          </p>
-          <div class="footer-contact-info">
-            <div><strong>Hotline Hỗ Trợ:</strong> 1900 8899 (8:00 - 21:00)</div>
-            <div><strong>Email Kỹ Thuật:</strong> enterprise@smartgimbal.vn</div>
-            <div><strong>Showroom &amp; R&amp;D:</strong> Tòa nhà R&amp;D TechHub, Khu Công Nghệ Cao, Hà Nội &amp; TP. Hồ Chí Minh</div>
-          </div>
-        </div>
-
-        <!-- Col 2 -->
-        <div class="footer-col">
-          <div class="footer-col-title">Dải Sản Phẩm</div>
-          <ul class="footer-links-list">
-            <li><a href="index.html">T-Flow T-Flow Pro (Flagship)</a></li>
-            <li><a href="index.html">T-Flow S2 Cinema</a></li>
-            <li><a href="index.html">T-Flow T-Flow Pro Air (Siêu Nhẹ)</a></li>
-            <li><a href="index.html">SmartCam Pocket P1</a></li>
-            <li><a href="index.html">SmartCam Action X2</a></li>
-            <li><a href="index.html">Phụ Kiện Studio &amp; MagSafe</a></li>
-          </ul>
-        </div>
-
-        <!-- Col 3 -->
-        <div class="footer-col">
-          <div class="footer-col-title">Phần Mềm &amp; Hệ Thống</div>
-          <ul class="footer-links-list">
-            <li><a href="index.html">Ứng Dụng T-Flow iOS</a></li>
-            <li><a href="user_dashboard.html">Cổng Khách Hàng (T-Flow ID)</a></li>
-            <li><a href="admin_dashboard.html">Cổng Quản Trị Admin CMS</a></li>
-            <li><a href="javascript:void(0)" onclick="alert('Đang kết nối kho dữ liệu Firmware OTA...')">Cập Nhật Firmware OTA</a></li>
-            <li><a href="user_dashboard.html">Tải Bảng Màu 3D LUT (.cube)</a></li>
-          </ul>
-        </div>
-
-        <!-- Col 4 -->
-        <div class="footer-col">
-          <div class="footer-col-title">Chính Sách &amp; Hỗ Trợ</div>
-          <ul class="footer-links-list">
-            <li><a href="index.html">Chính Sách Bảo Hành 12 Tháng 1 Đổi 1</a></li>
-            <li><a href="index.html">Chính Sách Đổi Mới 30 Ngày Dùng Thử</a></li>
-            <li><a href="index.html">Hướng Dẫn Cân Chỉnh Trọng Tâm</a></li>
-            <li><a href="user_dashboard.html">Tra Cứu Đơn Hàng &amp; Bảo Hành</a></li>
-            <li><a href="javascript:void(0)" onclick="alert('Hotline trực tuyến 24/7: 1900 8899')">Trung Tâm Hỗ Trợ Kỹ Thuật 24/7</a></li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Bottom Strip -->
-      <div class="footer-bottom-bar">
-        <div class="footer-copy-text">
-          &copy; 2026 T-Flow Enterprise Inc. Bảo lưu mọi quyền. Tuân thủ chuẩn Apple Human Interface Guidelines (HIG).
-        </div>
-        <div class="footer-legal-links">
-          <a href="javascript:void(0)">Điều khoản sử dụng</a>
-          <span>&bull;</span>
-          <a href="javascript:void(0)">Chính sách bảo mật</a>
-          <span>&bull;</span>
-          <a href="javascript:void(0)">Pháp lý &amp; Tuân thủ</a>
-          <span>&bull;</span>
-          <a href="javascript:void(0)">Quy chuẩn bảo hành</a>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- TOAST -->
   <div class="toast-msg" id="toastMsg">Thao tác thành công</div>
 
   <script src="../shared/catalog_store.js"></script>
   <script>
+
+    // ==========================================================================
+    // MODERN SIDEBAR VIEW CONTROLLER
+    // ==========================================================================
+    function switchAdminView(viewId) {
+      const views = ['ai', 'overview', 'groups', 'products', 'users', 'reviews', 'settings'];
+      if (!views.includes(viewId)) viewId = 'ai';
+
+      views.forEach(v => {
+        const el = document.getElementById('view-' + v);
+        if (el) el.style.display = (v === viewId) ? 'block' : 'none';
+        const menu = document.getElementById('menu-item-' + v);
+        if (menu) menu.classList.toggle('active', v === viewId);
+      });
+
+      const titles = {
+        ai: '⚡ Trung Tâm Huấn Luyện AI & Quản Lý Hội Thoại',
+        overview: '📊 Bảng Điều Khiển Tổng Quan',
+        groups: '📁 Quản Lý Nhóm Sản Phẩm (Danh Mục Cấp 1)',
+        products: '📦 Quản Lý Bài Đăng Sản Phẩm (Cấp 2)',
+        users: '👥 Cấp Quyền 7 Module Người Dùng',
+        reviews: '⭐ Quản Lý Đánh Giá & Cảm Nhận Khách Hàng',
+        settings: '⚙️ Cài Đặt Google Cloud AI & OAuth 2.0'
+      };
+
+      const titleEl = document.getElementById('adminCurrentViewTitle');
+      if (titleEl) titleEl.innerHTML = titles[viewId] || 'Quản Trị';
+
+      if (viewId === 'ai' && typeof initAiTrainingDashboard === 'function') {
+        initAiTrainingDashboard();
+      }
+
+      try {
+        history.replaceState(null, '', '#' + viewId);
+      } catch(e) {}
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     const MODULE_NAMES = [
       "AI Vision Optical Tracking",
       "Apple Log & ProRes 4K/60fps",
@@ -1759,6 +2168,15 @@
         loadCatalog();
         renderAll();
       });
+
+      // Default or hash-based view
+      const curHash = (window.location.hash || '').replace('#', '');
+      if (curHash === 'overview' || curHash === 'groups' || curHash === 'products' || curHash === 'users' || curHash === 'reviews' || curHash === 'settings') {
+        switchAdminView(curHash);
+      } else {
+        switchAdminView('ai'); // Default directly to AI Training Center as requested!
+      }
+
     }
 
     function loadCatalog() {
@@ -2656,6 +3074,12 @@
       document.getElementById('tabCountLogs').textContent = totalCount;
       document.getElementById('tabCountPending').textContent = pendingCount;
       document.getElementById('tabCountKb').textContent = kb.length;
+
+      const sidebarPending = document.getElementById('sidebarPendingCount');
+      if (sidebarPending) {
+        sidebarPending.textContent = pendingCount;
+        sidebarPending.classList.toggle('empty', pendingCount === 0);
+      }
     }
 
     function switchAiTab(tabKey) {
@@ -3083,3 +3507,4 @@
   </script>
 </body>
 </html>
+
