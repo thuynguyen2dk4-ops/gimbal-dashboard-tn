@@ -1835,6 +1835,319 @@
       border-radius: 6px;
     }
 
+  
+    /* ==========================================================================
+       T-FLOW AI CHATBOT ASSISTANT WIDGET CSS
+       ========================================================================== */
+    .tflow-ai-fab {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #1D1D1F;
+      color: #FFF;
+      padding: 12px 20px 12px 14px;
+      border-radius: 99px;
+      border: 1px solid rgba(255,255,255,0.15);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,113,227,0.3);
+      cursor: pointer;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
+    }
+    .tflow-ai-fab:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 0 2px #0071E3;
+    }
+    .tflow-ai-fab-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0071E3 0%, #4285F4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 14px rgba(0,113,227,0.5);
+    }
+    .tflow-ai-fab-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+      text-align: left;
+    }
+    .tflow-ai-fab-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    .tflow-ai-fab-sub {
+      font-size: 10.5px;
+      color: rgba(255,255,255,0.7);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ai-live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #34C759;
+      animation: pulseDot 2s infinite;
+    }
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.2); }
+    }
+
+    /* Floating Chat Drawer Window */
+    .tflow-ai-drawer {
+      position: fixed;
+      bottom: 96px;
+      right: 28px;
+      width: 400px;
+      max-width: calc(100vw - 36px);
+      height: 600px;
+      max-height: calc(100vh - 120px);
+      background: #FFFFFF;
+      border-radius: 24px;
+      border: 1px solid rgba(0,0,0,0.08);
+      box-shadow: 0 24px 64px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.06);
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      animation: slideUpAi 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes slideUpAi {
+      from { opacity: 0; transform: translateY(20px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .ai-drawer-header {
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #1D1D1F 0%, #2C2C2E 100%);
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .ai-drawer-header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .ai-header-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #0071E3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,113,227,0.4);
+    }
+    .btn-ai-close {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #FFF;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+    .btn-ai-close:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* Quick Prompt Pills */
+    .ai-quick-prompts-bar {
+      padding: 10px 14px;
+      background: #F5F5F7;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      border-bottom: 1px solid var(--border);
+    }
+    .ai-quick-prompts-bar::-webkit-scrollbar {
+      display: none;
+    }
+    .ai-prompt-pill {
+      white-space: nowrap;
+      background: #FFF;
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 99px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ai-prompt-pill:hover {
+      background: #1D1D1F;
+      color: #FFF;
+      border-color: #1D1D1F;
+    }
+
+    /* Messages Stream */
+    .ai-messages-container {
+      flex: 1;
+      padding: 16px 18px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #FAFBFD;
+    }
+    .ai-msg-row {
+      display: flex;
+      gap: 10px;
+      max-width: 88%;
+    }
+    .ai-msg-row.bot {
+      align-self: flex-start;
+    }
+    .ai-msg-row.user {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+    .ai-msg-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .ai-msg-row.bot .ai-msg-avatar {
+      background: #0071E3;
+      color: #FFF;
+    }
+    .ai-msg-row.user .ai-msg-avatar {
+      background: #1D1D1F;
+      color: #FFF;
+    }
+    .ai-msg-bubble {
+      padding: 12px 16px;
+      border-radius: 16px;
+      font-size: 13.5px;
+      line-height: 1.55;
+    }
+    .ai-msg-row.bot .ai-msg-bubble {
+      background: #FFFFFF;
+      color: #1D1D1F;
+      border: 1px solid rgba(0,0,0,0.06);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      border-top-left-radius: 4px;
+    }
+    .ai-msg-row.user .ai-msg-bubble {
+      background: #0071E3;
+      color: #FFFFFF;
+      border-top-right-radius: 4px;
+    }
+
+    /* Typing indicator */
+    .ai-typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 12px;
+      background: #FFF;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.06);
+      width: fit-content;
+    }
+    .ai-typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #86868B;
+      animation: typingBounce 1.2s infinite ease-in-out;
+    }
+    .ai-typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .ai-typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typingBounce {
+      0%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-5px); }
+    }
+
+    /* Action Buttons inside Bot Reply */
+    .ai-action-btn-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+    .ai-action-btn {
+      background: #F5F5F7;
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0071E3;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .ai-action-btn:hover {
+      background: #0071E3;
+      color: #FFF;
+      border-color: #0071E3;
+    }
+
+    /* Input Bar */
+    .ai-input-bar {
+      padding: 12px 16px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ai-input-field {
+      flex: 1;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: 13.5px;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .ai-input-field:focus {
+      border-color: #0071E3;
+    }
+    .btn-ai-send {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #0071E3;
+      color: #FFF;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .btn-ai-send:hover {
+      background: #0077ED;
+      transform: scale(1.06);
+    }
+
   </style>
 </head>
 <body>
@@ -3346,6 +3659,63 @@
     </div>
 
     <button onclick="toggleGoogleAuthModal(false)" style="background:none; border:none; font-size:13px; color:#86868B; cursor:pointer;">Đóng cửa sổ</button>
+  </div>
+
+
+  <!-- T-FLOW AI ASSISTANT FLOATING CHATBOT WIDGET -->
+  <div class="tflow-ai-fab" id="tflowAiFab" onclick="toggleTflowAiChat(true)">
+    <div class="tflow-ai-fab-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    </div>
+    <div class="tflow-ai-fab-text">
+      <span class="tflow-ai-fab-title">T-Flow AI</span>
+      <span class="tflow-ai-fab-sub"><span class="ai-live-dot"></span> Trợ lý tư vấn 24/7</span>
+    </div>
+  </div>
+
+  <!-- FLOATING CHAT DRAWER -->
+  <div class="tflow-ai-drawer" id="tflowAiDrawer">
+    <!-- HEADER -->
+    <div class="ai-drawer-header">
+      <div class="ai-drawer-header-left">
+        <div class="ai-header-avatar">
+          <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="#FFF" stroke-width="12" stroke-linecap="round" fill="none" />
+            <path d="M 50 34 L 50 82" stroke="#FFF" stroke-width="12" stroke-linecap="round" />
+          </svg>
+        </div>
+        <div>
+          <div style="font-size:14.5px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px;">
+            T-Flow AI Consultant
+            <span style="font-size:9.5px; font-weight:700; background:#34C759; color:#FFF; padding:1px 6px; border-radius:99px;">PRO</span>
+          </div>
+          <div style="font-size:11px; color:rgba(255,255,255,0.7);">Chuyên gia gimbal 3 trục &amp; quay phim</div>
+        </div>
+      </div>
+      <button class="btn-ai-close" onclick="toggleTflowAiChat(false)" title="Thu nhỏ">&times;</button>
+    </div>
+
+    <!-- QUICK PROMPTS HORIZONTAL BAR -->
+    <div class="ai-quick-prompts-bar">
+      <button class="ai-prompt-pill" onclick="sendQuickPrompt('T-Flow Pro có những gói phụ kiện nào và giá bao nhiêu?')">📦 Các gói T-Flow Pro</button>
+      <button class="ai-prompt-pill" onclick="sendQuickPrompt('Ngàm MagSafe chịu lực bao nhiêu, có an toàn không?')">🧲 Ngàm MagSafe 2.8kg</button>
+      <button class="ai-prompt-pill" onclick="sendQuickPrompt('Thuật toán Pure FOC 20kHz khác gì gimbal thường?')">⚡ Thuật toán Pure FOC</button>
+      <button class="ai-prompt-pill" onclick="sendQuickPrompt('Hướng dẫn quay Apple Log và dùng Focus Wheel')">🎬 Quay Apple Log</button>
+      <button class="ai-prompt-pill" onclick="sendQuickPrompt('Chính sách bảo hành 1 đổi 1 trong 24 giờ')">🛡️ Bảo hành 1 đổi 1</button>
+    </div>
+
+    <!-- MESSAGES STREAM CONTAINER -->
+    <div class="ai-messages-container" id="aiMessagesContainer">
+      <!-- Injected dynamically via JavaScript -->
+    </div>
+
+    <!-- INPUT BAR -->
+    <form class="ai-input-bar" onsubmit="handleAiUserSubmit(event)">
+      <input type="text" class="ai-input-field" id="aiUserMessageInput" placeholder="Hỏi T-Flow AI về gimbal, FOC, kỹ thuật quay..." autocomplete="off">
+      <button type="submit" class="btn-ai-send" title="Gửi tin nhắn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+      </button>
+    </form>
   </div>
 
 </body>

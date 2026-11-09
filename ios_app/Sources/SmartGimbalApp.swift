@@ -117,11 +117,17 @@ struct MainTabShellView: View {
                 }
                 .tag(1)
 
+            TFlowAIChatAssistantView()
+                .tabItem {
+                    Label("T-Flow AI", systemImage: "sparkles")
+                }
+                .tag(2)
+
             UserProfileModuleView()
                 .tabItem {
                     Label("Tài Khoản", systemImage: "person.crop.circle")
                 }
-                .tag(2)
+                .tag(3)
         }
         .tint(Color(red: 0.90, green: 0.65, blue: 0.0))
     }
@@ -476,6 +482,161 @@ struct UserProfileModuleView: View {
                 }
             }
             .navigationTitle("Hồ Sơ & Phân Quyền")
+        }
+    }
+}
+
+
+// MARK: - 7. T-FLOW AI NATIVE CHATBOT ASSISTANT VIEW
+struct AppChatMessage: Identifiable {
+    let id = UUID()
+    let text: String
+    let isUser: Bool
+    let timestamp: String
+}
+
+struct TFlowAIChatAssistantView: View {
+    @State private var messages: [AppChatMessage] = [
+        AppChatMessage(
+            text: "Xin chào! Tôi là T-Flow AI Copilot – trợ lý thông minh trên ứng dụng T-Flow Cam. Tôi có thể hỗ trợ bạn kỹ thuật cân trục FOC, gợi ý góc quay Cinematic Inception 360°, cách cài đặt Apple Log và căn chỉnh Focus Wheel.",
+            isUser: false,
+            timestamp: "Vừa xong"
+        )
+    ]
+    @State private var inputText: String = ""
+    @State private var isThinking: Bool = false
+
+    let suggestions = [
+        "Quay Inception 360°",
+        "Cài đặt Apple Log",
+        "Hiệu chuẩn IMU & FOC",
+        "Pin & Sạc ngược PD 18W"
+    ]
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                // Quick suggestions bar
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(suggestions, id: \.self) { item in
+                            Button(action: { sendMessage(item) }) {
+                                Text(item)
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 6)
+                                    .background(Color(white: 0.15))
+                                    .foregroundColor(.white)
+                                    .cornerRadius(14)
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                }
+                .background(Color(white: 0.08))
+
+                // Chat Messages ScrollView
+                ScrollViewReader { proxy in
+                    ScrollView {
+                        LazyVStack(spacing: 14) {
+                            ForEach(messages) { msg in
+                                HStack {
+                                    if msg.isUser { Spacer() }
+                                    VStack(alignment: msg.isUser ? .trailing : .leading, spacing: 4) {
+                                        Text(msg.text)
+                                            .font(.system(size: 14))
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 14)
+                                            .padding(.vertical, 10)
+                                            .background(msg.isUser ? Color.blue : Color(white: 0.18))
+                                            .cornerRadius(16)
+
+                                        Text(msg.timestamp)
+                                            .font(.system(size: 10))
+                                            .foregroundColor(.gray)
+                                            .padding(.horizontal, 4)
+                                    }
+                                    if !msg.isUser { Spacer() }
+                                }
+                                .id(msg.id)
+                            }
+
+                            if isThinking {
+                                HStack {
+                                    HStack(spacing: 4) {
+                                        Circle().fill(Color.gray).frame(width: 6, height: 6)
+                                        Circle().fill(Color.gray).frame(width: 6, height: 6)
+                                        Circle().fill(Color.gray).frame(width: 6, height: 6)
+                                    }
+                                    .padding(12)
+                                    .background(Color(white: 0.18))
+                                    .cornerRadius(16)
+                                    Spacer()
+                                }
+                            }
+                        }
+                        .padding(16)
+                    }
+                    .onChange(of: messages.count) { _ in
+                        if let last = messages.last {
+                            withAnimation { proxy.scrollTo(last.id, anchor: .bottom) }
+                        }
+                    }
+                }
+
+                // Input Bar
+                HStack(spacing: 10) {
+                    TextField("Hỏi T-Flow AI về kỹ thuật quay, FOC...", text: $inputText)
+                        .padding(10)
+                        .background(Color(white: 0.15))
+                        .cornerRadius(20)
+                        .foregroundColor(.white)
+
+                    Button(action: {
+                        let t = inputText.trimmingCharacters(in: .whitespaces)
+                        if !t.isEmpty {
+                            sendMessage(t)
+                            inputText = ""
+                        }
+                    }) {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.system(size: 30))
+                            .foregroundColor(.blue)
+                    }
+                    .disabled(inputText.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(Color(white: 0.08))
+            }
+            .background(Color.black.ignoresSafeArea())
+            .navigationTitle("T-Flow AI Copilot")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+
+    private func sendMessage(_ text: String) {
+        messages.append(AppChatMessage(text: text, isUser: true, timestamp: "Bây giờ"))
+        isThinking = true
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            isThinking = false
+            let reply = generateReply(for: text)
+            messages.append(AppChatMessage(text: reply, isUser: false, timestamp: "Bây giờ"))
+        }
+    }
+
+    private func generateReply(for query: String) -> String {
+        let q = query.lowercased()
+        if q.contains("inception") || q.contains("360") {
+            return "Để kích hoạt Inception 360° (Vortex Mode): Giữ gimbal nằm ngang song song mặt đất, bấm đúp cò Trigger sau tay cầm. Động cơ Roll sẽ xoay tròn vô tận 360 độ trong khi bạn tiến bước về phía trước."
+        } else if q.contains("log") || q.contains("apple log") {
+            return "Chế độ Apple Log 4K/60fps: Chuyển tab Camera sang PRO CINEMA. Ứng dụng T-Flow Cam sẽ khóa dải động 10-bit ProRes Log và áp dụng 3D LUT REC.709 xem trước thời gian thực."
+        } else if q.contains("foc") || q.contains("cân") || q.contains("imu") {
+            return "Hiệu chuẩn IMU & FOC: Đặt gimbal trên mặt bàn phẳng tĩnh 5 giây, nhấn 'Hiệu chuẩn IMU'. Thuật toán Pure FOC 20kHz sẽ tự động bù sai số góc nghiêng về 0.01 độ."
+        } else {
+            return "T-Flow AI đã ghi nhận câu hỏi. Để có cảnh quay chuyển động mượt mà nhất, hãy kết hợp động cơ FOC 20kHz cùng bước chân Ninja Walk và ngàm MagSafe cố định tâm tải trọng 450g!"
         }
     }
 }
