@@ -1206,7 +1206,7 @@
         <button onclick="adminLoginWithCustomGmail()" style="padding:10px 16px; background:#F5F5F7; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;">Xác nhận</button>
       </div>
 
-      <a href="index.html" style="font-size:13px; color:#6E6E73; text-decoration:none;">&larr; Quay lại Website Cửa Hàng</a>
+      <a href="/" style="font-size:13px; color:#6E6E73; text-decoration:none;">&larr; Quay lại Website Cửa Hàng</a>
     </div>
   </div>
 
@@ -1291,10 +1291,10 @@
 
     <!-- SIDEBAR FOOTER -->
     <div class="admin-sidebar-footer">
-      <a href="index.html" target="_blank" class="sidebar-footer-btn">
+      <a href="/" target="_blank" class="sidebar-footer-btn">
         <span>🌐</span> Xem Web Bán Hàng
       </a>
-      <a href="user_dashboard.html" target="_blank" class="sidebar-footer-btn">
+      <a href="/account" target="_blank" class="sidebar-footer-btn">
         <span>📱</span> Cổng Khách Hàng
       </a>
       <button onclick="handleAdminLogout()" class="sidebar-footer-btn logout" style="width:100%; border:none; text-align:left;">
@@ -1649,7 +1649,7 @@
             <div style="font-weight:800; font-size:14px; color:var(--text-main);">Đăng Sản Phẩm</div>
             <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Đăng bán bài viết &amp; combo</div>
           </div>
-          <div class="card" onclick="window.open('index.html', '_blank')" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease;">
+          <div class="card" onclick="window.open('/', '_blank')" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease;">
             <div style="font-size:28px; margin-bottom:8px;">🌐</div>
             <div style="font-weight:800; font-size:14px; color:var(--text-main);">Xem Website</div>
             <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Cửa hàng bán lẻ trực tuyến</div>
@@ -3142,7 +3142,7 @@
               <button onclick="adminLoginWithOneClick('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; padding:14px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:12px;">
                 Chuyển sang tài khoản thuynguyen2dk4@gmail.com
               </button>
-              <a href="index.html" style="font-size:13px; color:#0071E3; text-decoration:none;">&larr; Về trang chủ mua hàng</a>
+              <a href="/" style="font-size:13px; color:#0071E3; text-decoration:none;">&larr; Về trang chủ mua hàng</a>
             </div>
           `;
         }
@@ -3172,7 +3172,7 @@
       if (typeof SmartGimbalCatalog !== 'undefined') {
         SmartGimbalCatalog.logoutUser();
       }
-      window.location.href = 'index.html';
+      window.location.href = '/';
     }
 
     // Run check on load

@@ -1811,7 +1811,7 @@
               "• **Mô hình khung xương Skeletal Mesh**: Khi chủ thể quay lưng lại hoặc đeo kính râm/khẩu trang, AI vẫn nhận diện theo tỷ lệ cơ thể và khung vai, không bao giờ bị mất dấu (Zero Tracking Lost).\n" +
               "• **Thuật toán dự đoán gia tốc Kalman Filter**: Dự đoán trước hướng di chuyển của người quay để lia trục Pan/Tilt trước một nhịp, chuyển động cực kỳ êm ái.",
       actions: [
-        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('/app', '_blank')" },
         { label: '📦 Xem Cụm Camera AI', view: 'detail' }
       ],
       isOfficial: true,
@@ -1827,7 +1827,7 @@
               "• **Bắt dính chuyển động bất quy tắc**: Thú cưng thường có thói quen đổi hướng đột ngột hoặc nhảy chồm lên. Cụm AI nhận diện tức thời khớp hông và đầu thú cưng để điều khiển motor FOC bám theo với gia tốc cao (Sport Mode 85%).\n" +
               "• **Khóa tầm thấp (Low-angle Lock)**: Giúp gimbal hạ thấp sát mặt đất để quay những thước phim ngang tầm mắt của thú cưng cực kỳ đáng yêu và sống động.",
       actions: [
-        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('/app', '_blank')" },
         { label: '⚡ Xem Chi Tiết Kỹ Thuật', view: 'detail' }
       ],
       isOfficial: true,
@@ -1843,7 +1843,7 @@
               "• **Thuật toán phân tích đặc trưng màu & hình học (Feature Vector Extraction)**: AI ghi nhớ màu sắc, hoa văn và đường nét biên của vật thể trong không gian 3 chiều.\n" +
               "• **Tự động điều chỉnh tiêu cự & giữ bố cục (Smart Framing)**: Giữ cho vật thể đã chọn luôn nằm chính xác ở vị trí 1/3 (quy tắc điểm vàng) hoặc chính giữa khung hình dù vật thể tiến lại gần hay ra xa.",
       actions: [
-        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('/app', '_blank')" },
         { label: '📦 Xem Dải Sản Phẩm', view: 'catalog' }
       ],
       isOfficial: true,
@@ -1859,7 +1859,7 @@
               "• **Tự động nhận diện nhóm đông**: Nếu phát hiện có từ 3 người trở lên hoặc có thêm bạn bè bước vào rìa khung hình, AI sẽ phát hiện và ngay lập tức gửi lệnh qua BLE ra lệnh điện thoại tự động chuyển mượt sang camera 0.5x Ultra-Wide.\n" +
               "• **Chuyển đổi Zoom mượt mà (Smooth Transition)**: Thuật toán nội suy zoom điện tử giúp cảnh chuyển từ 1x sang 0.5x êm ái như máy quay điện ảnh, không bị giật khựng.",
       actions: [
-        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('/app', '_blank')" },
         { label: '⚡ Tìm Hiểu Động Cơ FOC', view: 'detail' }
       ],
       isOfficial: true,
@@ -1876,7 +1876,7 @@
               "• ✌️ **Giơ 2 ngón tay chữ V (Peace)**: Kích hoạt đếm ngược 3 giây để chụp ảnh hoặc bắt đầu bấm máy quay video.\n" +
               "• 🤙 **Cử chỉ ngón cái & ngón trỏ (OK Gesture)**: Ra lệnh cho Gimbal tự động xoay điện thoại từ khung hình ngang (16:9 YouTube) sang dọc (9:16 TikTok/Reels) trong 0.8 giây mà không cần chạm tay vào máy.",
       actions: [
-        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('/app', '_blank')" },
         { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' }
       ],
       isOfficial: true,
@@ -2444,7 +2444,7 @@
         status: 'pending_approval',
         escalated: true,
         actions: [
-          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('/app', '_blank')" },
           { label: '📦 Xem Cụm Camera AI', view: 'detail' }
         ]
       };

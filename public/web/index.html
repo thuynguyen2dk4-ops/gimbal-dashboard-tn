@@ -3414,7 +3414,7 @@
         <div>
           <h4 style="font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:18px; color:#FFF; letter-spacing:0.05em;">Hệ Thống &amp; Quản Trị</h4>
           <ul style="list-style:none; padding:0; font-size:13.5px; color:#A1A1A6; display:flex; flex-direction:column; gap:12px;">
-            <li><a href="user_dashboard.html" style="color:inherit; text-decoration:none;">Cổng Thành Viên (Member Hub)</a></li>
+            <li><a href="/account" style="color:inherit; text-decoration:none;">Cổng Thành Viên (Member Hub)</a></li>
             <li><a href="javascript:void(0)" onclick="handleAdminNavClick()" style="color:#2997FF; font-weight:600; text-decoration:none;">Khóa Quản Trị (Admin Portal)</a></li>
             <li><a href="javascript:void(0)" onclick="openProductDetail('tf-g31-pro')" style="color:inherit; text-decoration:none;">Chính Sách Bảo Hành 24 Tháng</a></li>
           </ul>
@@ -3482,11 +3482,11 @@
 
       container.innerHTML = `
         ${isAdmin ? `
-          <a href="admin_dashboard.html" class="btn-nav-link nav-desktop-only" style="color:#FFF; background:#1D1D1F; padding:6px 14px; border-radius:99px; font-weight:700; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+          <a href="/admin" class="btn-nav-link nav-desktop-only" style="color:#FFF; background:#1D1D1F; padding:6px 14px; border-radius:99px; font-weight:700; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
             <span>⚙️ Admin CMS</span>
           </a>
         ` : ''}
-        <a href="user_dashboard.html" class="btn-nav-link nav-desktop-only" style="color:var(--text-secondary); font-size:12.5px;">Cổng Khách Hàng</a>
+        <a href="/account" class="btn-nav-link nav-desktop-only" style="color:var(--text-secondary); font-size:12.5px;">Cổng Khách Hàng</a>
         
         <!-- COMPACT USER PILL WITH CLICKABLE POPOVER DROPDOWN (100% CLEAN ON MOBILE) -->
         <div class="user-nav-dropdown-wrapper" id="userNavDropdownWrapper">
@@ -3508,14 +3508,14 @@
               <div style="font-size:11px; color:#8E8E93; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${user.email || ''}</div>
             </div>
             ${isAdmin ? `
-              <a href="admin_dashboard.html" class="dropdown-item-link" style="color:#0071E3; font-weight:700;">
+              <a href="/admin" class="dropdown-item-link" style="color:#0071E3; font-weight:700;">
                 <span>⚙️</span> Trang Quản Trị Admin CMS
               </a>
             ` : ''}
-            <a href="user_dashboard.html" class="dropdown-item-link">
+            <a href="/account" class="dropdown-item-link">
               <span>📱</span> Cổng Khách Hàng (T-Flow ID)
             </a>
-            <a href="profile_edit.html" class="dropdown-item-link">
+            <a href="/profile" class="dropdown-item-link">
               <span>✏️</span> Chỉnh Sửa Hồ Sơ &amp; Avatar
             </a>
             <div style="height:1px; background:rgba(0,0,0,0.06); margin:4px 0;"></div>
@@ -3870,7 +3870,7 @@
     function handleAdminNavClick() {
       const user = (typeof SmartGimbalCatalog !== 'undefined') ? SmartGimbalCatalog.getCurrentUser() : null;
       if (user && SmartGimbalCatalog.isUserAdmin(user)) {
-        window.location.href = 'admin_dashboard.html';
+        window.location.href = '/admin';
       } else {
         // Prompt Google Sign-in directly!
         toggleGoogleAuthModal(true);

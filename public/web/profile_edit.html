@@ -622,8 +622,8 @@
     </div>
     <div class="nav-actions">
       
-      <a href="user_dashboard.html" class="btn-nav-link">&larr; Cổng Khách Hàng</a>
-      <a href="index.html" class="btn-nav-link">Trang Chủ</a>
+      <a href="/account" class="btn-nav-link">&larr; Cổng Khách Hàng</a>
+      <a href="/" class="btn-nav-link">Trang Chủ</a>
       <button class="btn btn-outline" style="font-size:12.5px;" onclick="handleLogout()">Đăng Xuất</button>
     </div>
   </header>
@@ -631,9 +631,9 @@
   <div class="container">
     <!-- Breadcrumb -->
     <div class="breadcrumb-row">
-      <a href="index.html">Trang Chủ</a>
+      <a href="/">Trang Chủ</a>
       <span>&rsaquo;</span>
-      <a href="user_dashboard.html">Cổng Khách Hàng (T-Flow ID)</a>
+      <a href="/account">Cổng Khách Hàng (T-Flow ID)</a>
       <span>&rsaquo;</span>
       <span style="color:var(--text-main); font-weight:700;">Chỉnh Sửa Hồ Sơ Cá Nhân</span>
     </div>
@@ -647,7 +647,7 @@
         </p>
       </div>
       <div style="display:flex; gap:10px;">
-        <a href="user_dashboard.html" class="btn btn-outline">&larr; Hủy Bỏ</a>
+        <a href="/account" class="btn btn-outline">&larr; Hủy Bỏ</a>
         <button type="button" class="btn btn-dark" onclick="saveProfileChanges()">
           <span>💾</span> Lưu Thay Đổi
         </button>
@@ -892,7 +892,7 @@
 
       <!-- STICKY ACTIONS BAR -->
       <div class="actions-bar">
-        <a href="user_dashboard.html" class="btn btn-outline">
+        <a href="/account" class="btn btn-outline">
           &larr; Quay Lại Cổng Khách Hàng
         </a>
         <div style="display:flex; align-items:center; gap:12px;">
@@ -925,27 +925,27 @@
         <div class="footer-col">
           <div class="footer-col-title">Dải Sản Phẩm</div>
           <ul class="footer-links-list">
-            <li><a href="index.html">T-Flow S1 (Flagship)</a></li>
-            <li><a href="index.html">T-Flow S2 Cinema</a></li>
-            <li><a href="index.html">T-Flow S1 Air (Siêu Nhẹ)</a></li>
-            <li><a href="index.html">Phụ Kiện Studio &amp; MagSafe</a></li>
+            <li><a href="/">T-Flow S1 (Flagship)</a></li>
+            <li><a href="/">T-Flow S2 Cinema</a></li>
+            <li><a href="/">T-Flow S1 Air (Siêu Nhẹ)</a></li>
+            <li><a href="/">Phụ Kiện Studio &amp; MagSafe</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <div class="footer-col-title">Phần Mềm &amp; Hệ Thống</div>
           <ul class="footer-links-list">
-            <li><a href="index.html">Ứng Dụng T-Flow iOS</a></li>
-            <li><a href="user_dashboard.html">Cổng Khách Hàng (T-Flow ID)</a></li>
-            <li><a href="profile_edit.html">Chỉnh Sửa Hồ Sơ Cá Nhân</a></li>
-            <li><a href="user_dashboard.html">Bảo Hành Điện Tử 1 Đổi 1</a></li>
+            <li><a href="/">Ứng Dụng T-Flow iOS</a></li>
+            <li><a href="/account">Cổng Khách Hàng (T-Flow ID)</a></li>
+            <li><a href="/profile">Chỉnh Sửa Hồ Sơ Cá Nhân</a></li>
+            <li><a href="/account">Bảo Hành Điện Tử 1 Đổi 1</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <div class="footer-col-title">Chính Sách &amp; Hỗ Trợ</div>
           <ul class="footer-links-list">
-            <li><a href="index.html">Chính Sách Bảo Hành 12 Tháng 1 Đổi 1</a></li>
-            <li><a href="index.html">Chính Sách Đổi Mới 30 Ngày Dùng Thử</a></li>
-            <li><a href="user_dashboard.html">Quản Lý Phiên &amp; Bảo Mật</a></li>
+            <li><a href="/">Chính Sách Bảo Hành 12 Tháng 1 Đổi 1</a></li>
+            <li><a href="/">Chính Sách Đổi Mới 30 Ngày Dùng Thử</a></li>
+            <li><a href="/account">Quản Lý Phiên &amp; Bảo Mật</a></li>
             <li><a href="javascript:void(0)" onclick="alert('Hotline trực tuyến 24/7: 1900 8899')">Trung Tâm Kỹ Thuật 24/7</a></li>
           </ul>
         </div>
@@ -976,7 +976,7 @@
       if (!currentUser) {
         // Redirect to user dashboard for login
         alert('Vui lòng đăng nhập trước khi chỉnh sửa hồ sơ!');
-        window.location.href = 'user_dashboard.html';
+        window.location.href = '/account';
         return;
       }
 
@@ -1218,7 +1218,7 @@
 
         // Redirect back to user dashboard after 1.2 seconds
         setTimeout(() => {
-          window.location.href = 'user_dashboard.html';
+          window.location.href = '/account';
         }, 1200);
       } else {
         alert('Có lỗi xảy ra khi lưu hồ sơ. Vui lòng thử lại!');
@@ -1240,7 +1240,7 @@
     function handleLogout() {
       if (confirm('Bạn có chắc chắn muốn đăng xuất khỏi Cổng Khách Hàng?')) {
         SmartGimbalCatalog.logoutUser();
-        window.location.href = 'user_dashboard.html';
+        window.location.href = '/account';
       }
     }
   </script>
