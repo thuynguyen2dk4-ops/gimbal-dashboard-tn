@@ -502,6 +502,21 @@
         saveCatalog(DEFAULT_CATALOG);
         return DEFAULT_CATALOG;
       }
+      // Normalize tiers ensuring name & label are always populated
+      (parsed.products || []).forEach(function(p) {
+        if (p.tiers && Array.isArray(p.tiers)) {
+          p.tiers.forEach(function(t, idx) {
+            if (!t.key && t.id) t.key = t.id;
+            if (!t.key) t.key = 'tier-' + idx;
+            if (!t.name && t.label) t.name = t.label;
+            if (!t.label && t.name) t.label = t.name;
+            if (!t.name && !t.label) {
+              t.name = t.tag || ('Phiên bản ' + (idx + 1));
+              t.label = t.name;
+            }
+          });
+        }
+      });
       return parsed;
     } catch (e) {
       saveCatalog(DEFAULT_CATALOG);

@@ -2506,6 +2506,196 @@
       }
     }
 
+  
+    /* ==========================================================================
+       USER DROPDOWN POPOVER & COMPACT MOBILE NAVBAR
+       ========================================================================== */
+    .nav-desktop-only {
+      display: inline-flex;
+    }
+    .user-nav-dropdown-wrapper {
+      position: relative;
+    }
+    .user-pill-trigger {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: #F5F5F7;
+      padding: 4px 10px 4px 6px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s ease;
+    }
+    .user-pill-trigger:hover {
+      background: #EBEBEF;
+    }
+    .user-nav-dropdown-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.06);
+      width: 220px;
+      z-index: 9999;
+      padding: 6px;
+      animation: fadeInPop 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes fadeInPop {
+      from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .user-nav-dropdown-menu.show {
+      display: block !important;
+    }
+    .user-dropdown-header {
+      padding: 10px 12px 8px 12px;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      margin-bottom: 4px;
+    }
+    .dropdown-item-link {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 9px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      text-decoration: none;
+      transition: background 0.15s;
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .dropdown-item-link:hover {
+      background: #F5F5F7;
+    }
+    .dropdown-item-link.logout {
+      color: #FF3B30;
+    }
+    .dropdown-item-link.logout:hover {
+      background: #FFF2F2;
+    }
+
+    @media (max-width: 768px) {
+      .nav-desktop-only {
+        display: none !important;
+      }
+      nav {
+        height: 52px !important;
+        padding: 0 14px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+      }
+      .nav-brand {
+        font-size: 14.5px !important;
+      }
+      .nav-brand div:nth-child(2) div:last-child {
+        display: none !important;
+      }
+      .nav-actions {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        flex-wrap: nowrap !important;
+      }
+      .btn-nav-primary {
+        display: none !important;
+      }
+      .btn-nav-cart {
+        padding: 5px 10px !important;
+        font-size: 11.5px !important;
+        gap: 4px !important;
+      }
+      .btn-nav-cart span:first-child {
+        display: none !important;
+      }
+      .btn-nav-cart::before {
+        content: '🛒';
+        font-size: 13px;
+      }
+      .nav-links {
+        order: unset !important;
+        width: 100% !important;
+        display: flex !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        gap: 6px !important;
+        padding: 6px 14px !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        backdrop-filter: blur(20px) !important;
+        -webkit-backdrop-filter: blur(20px) !important;
+        border-bottom: 1px solid var(--border) !important;
+        position: sticky !important;
+        top: 52px !important;
+        z-index: 490 !important;
+        margin: 0 !important;
+      }
+      .nav-links li button {
+        padding: 6px 14px !important;
+        font-size: 12.5px !important;
+        white-space: nowrap !important;
+      }
+
+      /* Flagship Media Box on Mobile: Clean portrait display */
+      .hero-flagship-showcase {
+        padding: 16px 0 32px 0 !important;
+      }
+      .flagship-grid {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+      }
+      .flagship-media-box {
+        padding: 16px 12px !important;
+        border-radius: 18px !important;
+        background: #FAFAFA !important;
+        border: 1px solid var(--border) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+        position: relative !important;
+        min-height: unset !important;
+      }
+      .flagship-media-box img {
+        width: 100% !important;
+        max-width: 280px !important;
+        height: 320px !important;
+        object-fit: cover !important;
+        border-radius: 14px !important;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.12) !important;
+        display: block !important;
+        margin: 0 auto !important;
+      }
+      .flagship-badge {
+        position: absolute !important;
+        top: 14px !important;
+        left: 14px !important;
+        z-index: 10 !important;
+        background: rgba(29, 29, 31, 0.88) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        color: #FFF !important;
+        font-size: 10.5px !important;
+        font-weight: 700 !important;
+        padding: 5px 12px !important;
+        border-radius: 99px !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+        white-space: nowrap !important;
+      }
+    }
+
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -3268,46 +3458,82 @@
 
       const user = SmartGimbalCatalog.getCurrentUser();
 
-      // CASE 1: NOT LOGGED IN -> NO ADMIN BUTTON!
+      // CASE 1: NOT LOGGED IN
       if (!user) {
         container.innerHTML = `
-          <button onclick="toggleAuthModal(true)" class="btn-nav-link" style="display:flex; align-items:center; gap:6px; background:#F5F5F7; padding:6px 14px; border-radius:99px; border:1px solid var(--border); font-size:13px; font-weight:600; cursor:pointer;">
+          <button onclick="toggleAuthModal(true)" class="btn-nav-link" style="display:flex; align-items:center; gap:6px; background:#F5F5F7; padding:6px 14px; border-radius:99px; border:1px solid var(--border); font-size:12.5px; font-weight:600; cursor:pointer; white-space:nowrap;">
             Đăng Nhập
           </button>
         `;
-      } 
-      // CASE 2: LOGGED IN WITH THUY NGUYEN (MASTER ADMIN) -> HIỆN NÚT ADMIN CMS!
-      else if (SmartGimbalCatalog.isUserAdmin(user)) {
-        container.innerHTML = `
-          <!-- HIỆN NÚT ADMIN KHI ĐĂNG NHẬP BẰNG GOOGLE CỦA ANH -->
-          <a href="admin_dashboard.html" class="btn-nav-link" style="color:#FFF; background:#1D1D1F; padding:6px 14px; border-radius:99px; font-weight:700; font-size:12.5px; text-decoration:none; display:flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+        return;
+      }
+
+      const isAdmin = SmartGimbalCatalog.isUserAdmin(user);
+      const displayName = user.name || (user.email ? user.email.split('@')[0] : 'User');
+      const avatarSrc = (user.avatar && (user.avatar.startsWith('data:image') || user.avatar.startsWith('http'))) ? user.avatar : null;
+      const initialLetter = (displayName || 'U').charAt(0).toUpperCase();
+
+      container.innerHTML = `
+        ${isAdmin ? `
+          <a href="admin_dashboard.html" class="btn-nav-link nav-desktop-only" style="color:#FFF; background:#1D1D1F; padding:6px 14px; border-radius:99px; font-weight:700; font-size:12px; text-decoration:none; display:inline-flex; align-items:center; gap:5px; box-shadow:0 2px 8px rgba(0,0,0,0.15);">
             <span>⚙️ Admin CMS</span>
           </a>
-          <a href="user_dashboard.html" class="btn-nav-link" style="color:var(--text-secondary);">Cổng Khách Hàng</a>
-          <div style="display:flex; align-items:center; gap:8px; background:#F5F5F7; padding:4px 12px; border-radius:99px; border:1px solid var(--border);">
-            <div style="width:24px; height:24px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid rgba(0,0,0,0.08);">
-              ${user.avatar && (user.avatar.startsWith('data:image') || user.avatar.startsWith('http')) ? `<img src="${user.avatar}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block;">` : 'TN'}
+        ` : ''}
+        <a href="user_dashboard.html" class="btn-nav-link nav-desktop-only" style="color:var(--text-secondary); font-size:12.5px;">Cổng Khách Hàng</a>
+        
+        <!-- COMPACT USER PILL WITH CLICKABLE POPOVER DROPDOWN (100% CLEAN ON MOBILE) -->
+        <div class="user-nav-dropdown-wrapper" id="userNavDropdownWrapper">
+          <div class="user-pill-trigger" onclick="toggleUserDropdown(event)" title="Tài khoản: ${displayName}">
+            <div style="width:24px; height:24px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+              ${avatarSrc ? `<img src="${avatarSrc}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block;">` : (isAdmin ? 'TN' : initialLetter)}
             </div>
-            <span style="font-size:12.5px; font-weight:600;">Thuy Nguyen</span>
-            <span style="font-size:10px; font-weight:700; background:rgba(0,113,227,0.1); color:#0071E3; padding:1px 6px; border-radius:99px;">Admin</span>
-            <button onclick="handleStoreLogout()" style="background:none; border:none; font-size:11px; color:#FF3B30; font-weight:600; cursor:pointer;">Đăng Xuất</button>
+            <span class="nav-desktop-only" style="font-size:12px; font-weight:600; max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${displayName}</span>
+            <span style="font-size:9.5px; font-weight:700; background:${isAdmin ? 'rgba(0,113,227,0.12)' : 'rgba(0,0,0,0.06)'}; color:${isAdmin ? '#0071E3' : '#1D1D1F'}; padding:1px 6px; border-radius:99px;">
+              ${isAdmin ? 'Admin' : 'TV'}
+            </span>
+            <span style="font-size:9px; color:#8E8E93;">▼</span>
           </div>
-        `;
-      } 
-      // CASE 3: LOGGED IN AS REGULAR CUSTOMER -> KHÔNG HIỆN NÚT ADMIN CMS!
-      else {
-        container.innerHTML = `
-          <a href="user_dashboard.html" class="btn-nav-link" style="color:var(--text-secondary);">Cổng Khách Hàng</a>
-          <div style="display:flex; align-items:center; gap:8px; background:#F5F5F7; padding:4px 12px; border-radius:99px; border:1px solid var(--border);">
-            <div style="width:24px; height:24px; border-radius:50%; background:#6E6E73; color:#FFF; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; overflow:hidden; border:1px solid rgba(0,0,0,0.08);">
-              ${user.avatar && (user.avatar.startsWith('data:image') || user.avatar.startsWith('http')) ? `<img src="${user.avatar}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block;">` : (user.name||'U').charAt(0).toUpperCase()}
+
+          <!-- POPOVER DROPDOWN MENU -->
+          <div class="user-nav-dropdown-menu" id="userNavDropdownMenu">
+            <div class="user-dropdown-header">
+              <div style="font-weight:700; font-size:13px; color:#1D1D1F;">${displayName}</div>
+              <div style="font-size:11px; color:#8E8E93; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${user.email || ''}</div>
             </div>
-            <span style="font-size:12.5px; font-weight:600;">${user.name || user.email}</span>
-            <button onclick="handleStoreLogout()" style="background:none; border:none; font-size:11px; color:#FF3B30; font-weight:600; cursor:pointer;">Đăng Xuất</button>
+            ${isAdmin ? `
+              <a href="admin_dashboard.html" class="dropdown-item-link" style="color:#0071E3; font-weight:700;">
+                <span>⚙️</span> Trang Quản Trị Admin CMS
+              </a>
+            ` : ''}
+            <a href="user_dashboard.html" class="dropdown-item-link">
+              <span>📱</span> Cổng Khách Hàng (T-Flow ID)
+            </a>
+            <a href="profile_edit.html" class="dropdown-item-link">
+              <span>✏️</span> Chỉnh Sửa Hồ Sơ &amp; Avatar
+            </a>
+            <div style="height:1px; background:rgba(0,0,0,0.06); margin:4px 0;"></div>
+            <button onclick="handleStoreLogout()" class="dropdown-item-link logout">
+              <span>🚪</span> Đăng Xuất
+            </button>
           </div>
-        `;
-      }
+        </div>
+      `;
     }
+
+    function toggleUserDropdown(e) {
+      if (e) e.stopPropagation();
+      const menu = document.getElementById('userNavDropdownMenu');
+      if (menu) menu.classList.toggle('show');
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', function(e) {
+      const wrapper = document.getElementById('userNavDropdownWrapper');
+      const menu = document.getElementById('userNavDropdownMenu');
+      if (menu && wrapper && !wrapper.contains(e.target)) {
+        menu.classList.remove('show');
+      }
+    });
 
     // ==========================================================================
     // AUTHENTIC GOOGLE OAUTH POPUP FLOW
@@ -3776,11 +4002,12 @@
       if (currentMvp.tiers && currentMvp.tiers.length > 0) {
         currentMvp.tiers.forEach((t, idx) => {
           const btn = document.createElement('button');
-          btn.className = `hero-tier-btn ${t.key === currentMvpTierKey ? 'active' : ''}`;
-          const tName = t.name || t.label || t.key;
+          const tKey = t.key || t.id || ('tier-' + idx);
+          btn.className = `hero-tier-btn ${tKey === currentMvpTierKey || (!currentMvpTierKey && idx === 0) ? 'active' : ''}`;
+          const tName = t.name || t.label || t.title || t.tag || (t.key ? (t.key.charAt(0).toUpperCase() + t.key.slice(1)) : ('Phiên bản ' + (idx + 1)));
           const tPrice = t.priceFormatted || (t.price ? t.price.toLocaleString('vi-VN') + '₫' : '');
           btn.textContent = `${tName} — ${tPrice}`;
-          btn.onclick = () => selectHeroTier(t.key);
+          btn.onclick = () => selectHeroTier(tKey);
           tierContainer.appendChild(btn);
         });
       }
