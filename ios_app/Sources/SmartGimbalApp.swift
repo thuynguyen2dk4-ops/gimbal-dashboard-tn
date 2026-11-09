@@ -24,12 +24,12 @@ final class SupabaseModuleStore: ObservableObject {
     private let supabaseUrl = "https://dlgkrwodxdsbbliwdnkg.supabase.co"
     private let anonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZ2tyd29keGRzYmJsaXdkbmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxMjIwNjQsImV4cCI6MjEwOTY5ODA2NH0.Lg6C6MpLhX_CoKgWtl_nhWLGNw5NuYE9FZJoTxXnu6I"
 
-    @Published var userName: String = "Đặng Anh Dũng"
-    @Published var userTier: String = "Pro Cinema Tier"
-    @Published var deviceName: String = "T-Flow Cam S1 Titanium"
+    @Published var userName: String = "Thủy Nguyễn"
+    @Published var userTier: String = "Master Admin"
+    @Published var deviceName: String = "T-Flow Pro S1 Titanium"
     @Published var modules: [Bool] = [true, true, true, true, true, true, true]
     @Published var isOnline: Bool = true
-    @Published var lastSyncText: String = "Đã đồng bộ Supabase Cloud"
+    @Published var lastSyncText: String = "Đã đồng bộ T-Flow Cloud"
 
     private var timer: Timer?
 
@@ -436,7 +436,7 @@ struct GimbalDeviceHubView: View {
         NavigationStack {
             List {
                 Section("Trạng Thái Phần Cứng BLE 5.3") {
-                    HStack { Text("Thiết bị"); Spacer(); Text("T-Flow Cam T-Flow Pro").foregroundColor(.secondary) }
+                    HStack { Text("Thiết bị"); Spacer(); Text("T-Flow Pro S1 Titanium").foregroundColor(.secondary) }
                     HStack { Text("Tần số xung FOC"); Spacer(); Text("20 kHz Sine-Wave").foregroundColor(.green) }
                     HStack { Text("Dung lượng Pin"); Spacer(); Text("\(ble.batteryLevel)% (4500mAh)").foregroundColor(.green) }
                     HStack { Text("Firmware"); Spacer(); Text("v2.4.1 (Mới nhất)").foregroundColor(.secondary) }
@@ -496,9 +496,10 @@ struct AppChatMessage: Identifiable {
 }
 
 struct TFlowAIChatAssistantView: View {
+    @EnvironmentObject var store: SupabaseModuleStore
     @State private var messages: [AppChatMessage] = [
         AppChatMessage(
-            text: "Xin chào! Tôi là T-Flow AI Copilot – trợ lý thông minh trên ứng dụng T-Flow Cam. Tôi có thể hỗ trợ bạn kỹ thuật cân trục FOC, gợi ý góc quay Cinematic Inception 360°, cách cài đặt Apple Log và căn chỉnh Focus Wheel.",
+            text: "Xin chào Thủy Nguyễn! Tôi là T-Flow AI Copilot – trợ lý thông minh đồng bộ Cloud trên ứng dụng T-Flow Cam. Tôi sẵn sàng giải đáp kỹ thuật cân trục FOC 20kHz, góc quay Inception 360°, thiết lập Apple Log 4K/60fps và hỗ trợ theo kịch bản huấn luyện thời gian thực từ Admin CMS.",
             isUser: false,
             timestamp: "Vừa xong"
         )
@@ -508,9 +509,10 @@ struct TFlowAIChatAssistantView: View {
 
     let suggestions = [
         "Quay Inception 360°",
-        "Cài đặt Apple Log",
-        "Hiệu chuẩn IMU & FOC",
-        "Pin & Sạc ngược PD 18W"
+        "Cài đặt Apple Log 4K/60",
+        "Hiệu chuẩn Pure FOC 20kHz",
+        "Tư vấn người mới bắt đầu",
+        "Pin & Sạc ngược MagSafe"
     ]
 
     var body: some View {
@@ -617,14 +619,53 @@ struct TFlowAIChatAssistantView: View {
     }
 
     private func sendMessage(_ text: String) {
-        messages.append(AppChatMessage(text: text, isUser: true, timestamp: "Bây giờ"))
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        let timeStr = formatter.string(from: Date())
+
+        messages.append(AppChatMessage(text: text, isUser: true, timestamp: timeStr))
         isThinking = true
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            isThinking = false
-            let reply = generateReply(for: text)
-            messages.append(AppChatMessage(text: reply, isUser: false, timestamp: "Bây giờ"))
+        Task {
+            let cloudReply = await fetchCloudAIReply(for: text)
+            await MainActor.run {
+                isThinking = false
+                messages.append(AppChatMessage(text: cloudReply, isUser: false, timestamp: timeStr))
+            }
         }
+    }
+
+    private func fetchCloudAIReply(for query: String) async -> String {
+        guard let url = URL(string: "https://t-flow-pro.vercel.app/api/chat") else {
+            return generateReply(for: query)
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = 7.0
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+
+        let payload: [String: Any] = [
+            "query": query,
+            "source": "ios_native_app",
+            "context": [
+                "userName": store.userName,
+                "userTier": store.userTier,
+                "deviceName": store.deviceName
+            ]
+        ]
+
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: payload)
+            let (data, resp) = try await URLSession.shared.data(for: request)
+            if let http = resp as? HTTPURLResponse, http.statusCode == 200,
+               let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let reply = json["reply"] as? String, !reply.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                return reply
+            }
+        } catch {
+            // Fallback to embedded edge rules on network loss
+        }
+        return generateReply(for: query)
     }
 
     private func generateReply(for query: String) -> String {

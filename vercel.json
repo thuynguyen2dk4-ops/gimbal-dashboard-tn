@@ -1,21 +1,88 @@
 {
   "redirects": [
-    { "source": "/web/index.html", "destination": "/", "permanent": true },
-    { "source": "/web/index", "destination": "/", "permanent": true },
-    { "source": "/web/user_dashboard.html", "destination": "/account", "permanent": true },
-    { "source": "/web/user_dashboard", "destination": "/account", "permanent": true },
-    { "source": "/web/profile_edit.html", "destination": "/profile", "permanent": true },
-    { "source": "/web/profile_edit", "destination": "/profile", "permanent": true },
-    { "source": "/web/admin_dashboard.html", "destination": "/admin", "permanent": true },
-    { "source": "/web/admin_dashboard", "destination": "/admin", "permanent": true },
-    { "source": "/web/mobile_app.html", "destination": "/app", "permanent": true },
-    { "source": "/web/mobile_app", "destination": "/app", "permanent": true },
-    { "source": "/web/vibe_studio.html", "destination": "/studio", "permanent": true },
-    { "source": "/web/vibe_studio", "destination": "/studio", "permanent": true }
+    {
+      "source": "/web/index.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/web/index",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/web/user_dashboard.html",
+      "destination": "/account",
+      "permanent": true
+    },
+    {
+      "source": "/web/user_dashboard",
+      "destination": "/account",
+      "permanent": true
+    },
+    {
+      "source": "/web/profile_edit.html",
+      "destination": "/profile",
+      "permanent": true
+    },
+    {
+      "source": "/web/profile_edit",
+      "destination": "/profile",
+      "permanent": true
+    },
+    {
+      "source": "/web/admin_dashboard.html",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/web/admin_dashboard",
+      "destination": "/admin",
+      "permanent": true
+    },
+    {
+      "source": "/web/mobile_app.html",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/web/mobile_app",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/web/vibe_studio.html",
+      "destination": "/studio",
+      "permanent": true
+    },
+    {
+      "source": "/web/vibe_studio",
+      "destination": "/studio",
+      "permanent": true
+    },
+    {
+      "source": "/app",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/app/",
+      "destination": "/",
+      "permanent": true
+    }
   ],
   "rewrites": [
-    { "source": "/id", "destination": "/account" },
-    { "source": "/user", "destination": "/account" },
-    { "source": "/account/edit", "destination": "/profile" }
+    {
+      "source": "/id",
+      "destination": "/account"
+    },
+    {
+      "source": "/user",
+      "destination": "/account"
+    },
+    {
+      "source": "/account/edit",
+      "destination": "/profile"
+    }
   ]
 }
