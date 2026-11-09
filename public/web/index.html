@@ -1682,19 +1682,24 @@
       border-color: #1D1D1F;
     }
     .btn-submit-review {
-      background: #0071E3;
-      color: #FFF;
-      border: none;
+      background: #1D1D1F;
+      color: #FFFFFF;
+      border: 1px solid rgba(255, 255, 255, 0.12);
       border-radius: 99px;
-      padding: 12px 28px;
+      padding: 12px 32px;
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 4px 14px rgba(0,113,227,0.3);
-      transition: background 0.2s;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
     }
     .btn-submit-review:hover {
-      background: #0077ED;
+      background: #000000;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
     }
     .btn-cancel-review {
       background: none;
