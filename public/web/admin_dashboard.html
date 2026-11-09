@@ -3120,7 +3120,7 @@
         }
         const sess = SmartGimbalCatalog.getActiveSession();
         const sessEl = document.getElementById('adminSessionStatusLabel');
-        if (sessEl && sess) sessEl.textContent = 'Phiên: ' + sess.sessionId.substring(0, 12) + '... (Live)';
+        if (sessEl) sessEl.textContent = '🟢 Đang hoạt động • Trực tuyến';
       } else if (user) {
         // Logged in as regular customer Gmail
         if (gate) {

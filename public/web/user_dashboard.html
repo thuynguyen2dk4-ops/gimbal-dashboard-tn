@@ -717,15 +717,7 @@
       <span>T-Flow ID &mdash; Cổng Khách Hàng</span>
     </div>
     <div class="nav-actions">
-      <div class="status-badge" id="navBleStatusBox" style="display:none;">
-        <div class="dot"></div>
-        <span id="navBleStatus">Đã kết nối BLE (T-Flow S1 &bull; Pin 92%)</span>
-      </div>
       <a href="index.html" class="btn-nav-link">Trang Chủ</a>
-      <div class="status-badge" id="navSessionStatusBadge" style="display:none; background:rgba(52,199,89,0.1); border:1px solid rgba(52,199,89,0.25); color:#248A3D;">
-        <div class="dot" style="background:#34C759;"></div>
-        <span id="navSessionIdDisplay">Phiên Hoạt Động</span>
-      </div>
       <a href="admin_dashboard.html" class="btn-nav-link" id="navAdminCmsBtn" style="display:none; color:#FFF; background:#1D1D1F; font-weight:700;">⚙️ Admin CMS</a>
       <button class="btn btn-outline" id="btnSwitchAccount" style="font-size:12.5px; display:none;" onclick="logoutUser()">Đăng Xuất</button>
     </div>
@@ -981,21 +973,21 @@
         </div>
       </div>
 
-      <!-- 6. QUẢN LÝ PHIÊN ĐĂNG NHẬP & BẢO MẬT (ACTIVE SESSIONS & SECURITY) -->
+      <!-- 6. QUẢN LÝ THIẾT BỊ & TRẠNG THÁI HOẠT ĐỘNG (ACTIVE DEVICES & SECURITY) -->
       <div class="card" id="cardActiveSessionSection">
         <div class="card-title-row">
           <div>
             <div style="display:flex; align-items:center; gap:10px;">
-              <div class="card-title">Quản Lý Phiên Đăng Nhập &amp; Bảo Mật (Active Sessions)</div>
-              <span class="tier-badge" style="background:rgba(52,199,89,0.12); color:#248A3D;">🟢 Session Live</span>
+              <div class="card-title">Thiết Bị &amp; Trạng Thái Hoạt Động</div>
+              <span class="tier-badge" style="background:rgba(52,199,89,0.12); color:#248A3D;">🟢 Đang Hoạt Động</span>
             </div>
             <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
-              Kiểm soát trạng thái phiên làm việc đa tầng (sessionStorage + Cookie 30 ngày), nhận diện thiết bị và thu hồi quyền truy cập từ xa.
+              Kiểm soát các thiết bị đang đăng nhập tài khoản của bạn, cập nhật thời gian truy cập và duy trì bảo mật an toàn.
             </p>
           </div>
           <div style="display:flex; gap:8px;">
             <button class="btn btn-outline" style="font-size:12px; padding:6px 14px;" onclick="refreshSessionUI()">
-              🔄 Làm Mới Phiên
+              🔄 Làm Mới Trạng Thái
             </button>
             <button class="btn btn-outline" style="font-size:12px; padding:6px 14px; color:#FF3B30; border-color:rgba(255,59,48,0.3);" onclick="terminateOtherSessionsUI()">
               🚫 Đăng Xuất Thiết Bị Khác
@@ -1006,27 +998,27 @@
         <!-- CURRENT SESSION OVERVIEW GRID -->
         <div class="device-info-grid" style="margin-bottom:24px;">
           <div class="device-stat-box">
-            <div class="device-stat-label">Thiết Bị / Nền Tảng Hiện Tại</div>
+            <div class="device-stat-label">Thiết Bị Này</div>
             <div class="device-stat-val" id="sessCurrentDevice" style="font-size:15px; color:var(--text-main);">
               💻 Trình duyệt Web
             </div>
           </div>
           <div class="device-stat-box">
-            <div class="device-stat-label">Mã Phiên (Session ID)</div>
-            <div class="device-stat-val" id="sessCurrentId" style="font-family:var(--font-mono); font-size:13.5px; color:#0071E3;">
-              sess_active
+            <div class="device-stat-label">Trạng Thái Kết Nối</div>
+            <div class="device-stat-val" style="font-size:14px; font-weight:700; color:#34C759;">
+              🟢 Đang hoạt động
             </div>
           </div>
           <div class="device-stat-box">
-            <div class="device-stat-label">Thời Điểm Đăng Nhập</div>
+            <div class="device-stat-label">Đăng Nhập Gần Nhất</div>
             <div class="device-stat-val" id="sessCurrentStarted" style="font-size:13.5px;">
-              --:--, Hôm nay
+              Hôm nay
             </div>
           </div>
           <div class="device-stat-box">
-            <div class="device-stat-label">Trạng Thái Lưu Trữ</div>
+            <div class="device-stat-label">Bảo Mật Đăng Nhập</div>
             <div class="device-stat-val" style="color:var(--green); font-size:13.5px;">
-              ✓ sessionStorage + Cookie
+              ✓ Tự động bảo vệ 30 ngày
             </div>
           </div>
         </div>
@@ -1035,14 +1027,14 @@
         <div style="border-top:1px solid var(--border); padding-top:18px;">
           <div style="font-size:13.5px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;">
             <span>Danh Sách Thiết Bị Đã Đăng Nhập Gần Đây</span>
-            <span style="font-size:11.5px; font-weight:600; color:var(--text-muted);">Lưu tối đa 5 phiên làm việc</span>
+            <span style="font-size:11.5px; font-weight:600; color:var(--text-muted);">Tối đa 5 phiên hoạt động</span>
           </div>
           <div style="overflow-x:auto;">
             <table class="orders-table" style="margin:0;">
               <thead>
                 <tr>
-                  <th>Thiết Bị / Nền Tảng</th>
-                  <th>Mã Phiên (Session ID)</th>
+                  <th>Thiết Bị &amp; Nền Tảng</th>
+                  <th>Vị Trí / Địa Điểm</th>
                   <th>Đăng Nhập Lúc</th>
                   <th>Hoạt Động Cuối</th>
                   <th>Trạng Thái</th>
@@ -1191,7 +1183,7 @@
       // Hide Auth Gate, Show Dashboard
       authGate.style.display = 'none';
       mainDash.style.display = 'block';
-      bleBox.style.display = 'flex';
+      if (bleBox) bleBox.style.display = 'none';
       btnLogout.style.display = 'inline-flex';
 
       renderUserProfile();
@@ -1490,22 +1482,12 @@
       if (typeof SmartGimbalCatalog === 'undefined') return;
       const sess = SmartGimbalCatalog.getActiveSession();
       const sessBadge = document.getElementById('navSessionStatusBadge');
-      const sessDisplay = document.getElementById('navSessionIdDisplay');
+      if (sessBadge) sessBadge.style.display = 'none';
 
-      if (!sess) {
-        if (sessBadge) sessBadge.style.display = 'none';
-        return;
-      }
+      if (!sess) return;
 
-      // 1. Top Navbar Session Indicator
-      if (sessBadge) sessBadge.style.display = 'inline-flex';
-      if (sessDisplay) {
-        sessDisplay.textContent = 'Phiên: ' + sess.sessionId.substring(0, 14) + '...';
-      }
-
-      // 2. Active Session Card Details
+      // 1. Active Session Card Details (Friendly user-facing info)
       const devEl = document.getElementById('sessCurrentDevice');
-      const idEl = document.getElementById('sessCurrentId');
       const startEl = document.getElementById('sessCurrentStarted');
 
       if (devEl) {
@@ -1515,31 +1497,36 @@
         else if (sess.devicePlatform.includes('Android')) icon = '📱';
         devEl.textContent = icon + ' ' + sess.devicePlatform;
       }
-      if (idEl) idEl.textContent = sess.sessionId;
-      if (startEl) startEl.textContent = sess.createdAtFormatted || 'Vừa xong';
+      if (startEl) {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
+        startEl.textContent = `${timeStr} Hôm nay`;
+      }
 
-      // 3. Render Session History Table
+      // 2. Render Session History Table (No raw technical IDs)
       const historyList = SmartGimbalCatalog.getUserSessionsHistory(currentUser ? currentUser.id : null);
       const tbody = document.getElementById('sessHistoryTableBody');
       if (tbody) {
         tbody.innerHTML = '';
         if (!historyList || historyList.length === 0) {
-          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:18px; color:var(--text-muted);">Chưa có lịch sử phiên làm việc</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:18px; color:var(--text-muted);">Chưa có lịch sử thiết bị đăng nhập</td></tr>';
         } else {
           historyList.forEach(s => {
             const tr = document.createElement('tr');
             const isCurrent = s.sessionId === sess.sessionId;
+            const timeStr = s.createdAtFormatted || (s.createdAt ? s.createdAt.substring(11, 16) + ' • Hôm nay' : 'Hôm nay');
+            const lastActiveStr = s.lastActiveAt ? new Date(s.lastActiveAt).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) : 'Vừa xong';
             tr.innerHTML = `
               <td>
-                <b>${s.devicePlatform || 'Trình duyệt Web'}</b>
-                ${isCurrent ? '<span style="margin-left:6px; font-size:10.5px; background:rgba(52,199,89,0.15); color:#248A3D; padding:2px 8px; border-radius:99px; font-weight:700;">Thiết Bị Này</span>' : ''}
+                <div style="font-weight:700; color:var(--text-main); font-size:13px;">${s.devicePlatform || 'Trình duyệt Web'}</div>
+                ${isCurrent ? '<span style="font-size:10.5px; background:rgba(52,199,89,0.15); color:#248A3D; padding:2px 8px; border-radius:99px; font-weight:700; display:inline-block; margin-top:3px;">Thiết Bị Này</span>' : '<span style="font-size:10.5px; color:var(--text-muted); display:inline-block; margin-top:3px;">Thiết bị đã xác thực</span>'}
               </td>
-              <td><span style="font-family:var(--font-mono); font-size:12px; color:#0071E3;">${s.sessionId}</span></td>
-              <td style="color:var(--text-secondary); font-size:12px;">${s.createdAtFormatted || s.createdAt.substring(0, 19).replace('T', ' ')}</td>
-              <td style="color:var(--text-secondary); font-size:12px;">${s.lastActiveAt ? new Date(s.lastActiveAt).toLocaleTimeString('vi-VN') : 'Vừa xong'}</td>
+              <td><span style="font-size:12.5px; color:var(--text-secondary);">Hà Nội, Việt Nam</span></td>
+              <td style="color:var(--text-secondary); font-size:12px;">${timeStr}</td>
+              <td style="color:var(--text-secondary); font-size:12px;">${lastActiveStr}</td>
               <td>
                 <span style="color:${isCurrent ? '#34C759' : '#8E8E93'}; font-weight:700; font-size:12px;">
-                  ${isCurrent ? '🟢 Đang Mở' : '⚪ Đã Đăng Nhập'}
+                  ${isCurrent ? '🟢 Đang hoạt động' : '⚪ Đã đăng xuất'}
                 </span>
               </td>
             `;
@@ -1551,9 +1538,8 @@
 
     function refreshSessionUI() {
       if (typeof SmartGimbalCatalog !== 'undefined') {
-        const sess = SmartGimbalCatalog.getActiveSession();
         renderActiveSessionInfo();
-        alert('✓ Đã cập nhật và làm mới phiên làm việc hiện tại: ' + (sess ? sess.sessionId : 'Active'));
+        alert('✓ Trạng thái tài khoản và thiết bị đang hoạt động bình thường.');
       }
     }
 
