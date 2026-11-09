@@ -276,7 +276,7 @@
     {
       "id": "thuy-nguyen",
       "name": "Thuy Nguyen",
-      "email": "thuy.nguyen@tflow.tech",
+      "email": "thuynguyen2dk4@gmail.com",
       "phone": "0908 888 888",
       "role": "Master Administrator & Founder",
       "company": "Công ty TNHH Công nghệ T-Flow Việt Nam",
@@ -696,8 +696,158 @@
       }
       var evt = new CustomEvent(USER_EVENT, { detail: found });
       window.dispatchEvent(evt);
-      return { success: true, user: found };
+      
+  // ==========================================================================
+  // GMAIL AUTHENTICATION & ROLE-BASED ACCESS CONTROL (NO PASSWORD REQUIRED)
+  // ==========================================================================
+  var ADMIN_GMAILS = ['thuynguyen2dk4@gmail.com', 'thuy.nguyen@tflow.tech'];
+
+  function isUserAdmin(user) {
+    if (!user || !user.email) return false;
+    var em = user.email.trim().toLowerCase();
+    return ADMIN_GMAILS.indexOf(em) !== -1 || (user.role && user.role.toLowerCase().indexOf('admin') !== -1);
+  }
+
+  function loginWithGmail(email, displayName) {
+    if (!email) return { success: false, message: 'Vui lòng cung cấp email Google (Gmail) hợp lệ.' };
+    var cleanEmail = email.trim().toLowerCase();
+    var isAdmin = (ADMIN_GMAILS.indexOf(cleanEmail) !== -1);
+
+    var cat = getCatalog();
+    var user = (cat.users || []).find(function (u) { return u.email && u.email.toLowerCase() === cleanEmail; });
+
+    if (!user) {
+      user = {
+        id: cleanEmail.replace(/[^a-zA-Z0-9]/g, '-'),
+        name: displayName || (isAdmin ? 'Thuy Nguyen' : cleanEmail.split('@')[0]),
+        email: cleanEmail,
+        phone: isAdmin ? '0908 888 888' : '',
+        role: isAdmin ? 'Master Administrator & Founder' : 'Khách Hàng Thành Viên',
+        company: 'Công ty TNHH Công nghệ T-Flow Việt Nam',
+        tierBadge: isAdmin ? 'Master Admin' : 'Thành Viên Mới',
+        registeredDevice: isAdmin ? 'T-Flow Pro (TF-G31-PRO)' : 'T-Flow Pro',
+        serial: isAdmin ? 'HQYVYFYFR4' : '',
+        battery: 98,
+        firmware: 'FW-TF-G31-v1.2.0 (Mới nhất)',
+        status: 'Đang Hoạt Động',
+        modules: isAdmin ? [true, true, true, true, true, true, true] : [true, false, false, false, false, false, false]
+      };
+      cat.users.push(user);
+      saveCatalog(cat);
+    } else if (isAdmin) {
+      user.modules = [true, true, true, true, true, true, true];
+      user.role = 'Master Administrator & Founder';
+      user.tierBadge = 'Master Admin';
     }
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      if (isAdmin) {
+        sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
+      } else {
+        sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      var evt = new CustomEvent(USER_EVENT, { detail: user });
+      window.dispatchEvent(evt);
+    }
+    return { success: true, user: user, isAdmin: isAdmin };
+  }
+
+  function logoutUser() {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(CURRENT_USER_KEY);
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+    }
+    if (typeof window !== 'undefined') {
+      var evt = new CustomEvent(USER_EVENT, { detail: null });
+      window.dispatchEvent(evt);
+    }
+  }
+
+    return { success: true, user: found };
+    }
+    
+  // ==========================================================================
+  // GMAIL AUTHENTICATION & ROLE-BASED ACCESS CONTROL (NO PASSWORD REQUIRED)
+  // ==========================================================================
+  var ADMIN_GMAILS = ['thuynguyen2dk4@gmail.com', 'thuy.nguyen@tflow.tech'];
+
+  function isUserAdmin(user) {
+    if (!user || !user.email) return false;
+    var em = user.email.trim().toLowerCase();
+    return ADMIN_GMAILS.indexOf(em) !== -1 || (user.role && user.role.toLowerCase().indexOf('admin') !== -1);
+  }
+
+  function loginWithGmail(email, displayName) {
+    if (!email) return { success: false, message: 'Vui lòng cung cấp email Google (Gmail) hợp lệ.' };
+    var cleanEmail = email.trim().toLowerCase();
+    var isAdmin = (ADMIN_GMAILS.indexOf(cleanEmail) !== -1);
+
+    var cat = getCatalog();
+    var user = (cat.users || []).find(function (u) { return u.email && u.email.toLowerCase() === cleanEmail; });
+
+    if (!user) {
+      user = {
+        id: cleanEmail.replace(/[^a-zA-Z0-9]/g, '-'),
+        name: displayName || (isAdmin ? 'Thuy Nguyen' : cleanEmail.split('@')[0]),
+        email: cleanEmail,
+        phone: isAdmin ? '0908 888 888' : '',
+        role: isAdmin ? 'Master Administrator & Founder' : 'Khách Hàng Thành Viên',
+        company: 'Công ty TNHH Công nghệ T-Flow Việt Nam',
+        tierBadge: isAdmin ? 'Master Admin' : 'Thành Viên Mới',
+        registeredDevice: isAdmin ? 'T-Flow Pro (TF-G31-PRO)' : 'T-Flow Pro',
+        serial: isAdmin ? 'HQYVYFYFR4' : '',
+        battery: 98,
+        firmware: 'FW-TF-G31-v1.2.0 (Mới nhất)',
+        status: 'Đang Hoạt Động',
+        modules: isAdmin ? [true, true, true, true, true, true, true] : [true, false, false, false, false, false, false]
+      };
+      cat.users.push(user);
+      saveCatalog(cat);
+    } else if (isAdmin) {
+      user.modules = [true, true, true, true, true, true, true];
+      user.role = 'Master Administrator & Founder';
+      user.tierBadge = 'Master Admin';
+    }
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      if (isAdmin) {
+        sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
+      } else {
+        sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      var evt = new CustomEvent(USER_EVENT, { detail: user });
+      window.dispatchEvent(evt);
+    }
+    return { success: true, user: user, isAdmin: isAdmin };
+  }
+
+  function logoutUser() {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(CURRENT_USER_KEY);
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+    }
+    if (typeof window !== 'undefined') {
+      var evt = new CustomEvent(USER_EVENT, { detail: null });
+      window.dispatchEvent(evt);
+    }
+  }
+
     return { success: false, message: 'Email hoặc số điện thoại không tồn tại trong hệ thống!' };
   }
 
@@ -705,7 +855,82 @@
     var cat = getCatalog();
     var exists = cat.users.some(function (u) { return u.email.toLowerCase() === userData.email.toLowerCase(); });
     if (exists) {
-      return { success: false, message: 'Email này đã được sử dụng!' };
+      
+  // ==========================================================================
+  // GMAIL AUTHENTICATION & ROLE-BASED ACCESS CONTROL (NO PASSWORD REQUIRED)
+  // ==========================================================================
+  var ADMIN_GMAILS = ['thuynguyen2dk4@gmail.com', 'thuy.nguyen@tflow.tech'];
+
+  function isUserAdmin(user) {
+    if (!user || !user.email) return false;
+    var em = user.email.trim().toLowerCase();
+    return ADMIN_GMAILS.indexOf(em) !== -1 || (user.role && user.role.toLowerCase().indexOf('admin') !== -1);
+  }
+
+  function loginWithGmail(email, displayName) {
+    if (!email) return { success: false, message: 'Vui lòng cung cấp email Google (Gmail) hợp lệ.' };
+    var cleanEmail = email.trim().toLowerCase();
+    var isAdmin = (ADMIN_GMAILS.indexOf(cleanEmail) !== -1);
+
+    var cat = getCatalog();
+    var user = (cat.users || []).find(function (u) { return u.email && u.email.toLowerCase() === cleanEmail; });
+
+    if (!user) {
+      user = {
+        id: cleanEmail.replace(/[^a-zA-Z0-9]/g, '-'),
+        name: displayName || (isAdmin ? 'Thuy Nguyen' : cleanEmail.split('@')[0]),
+        email: cleanEmail,
+        phone: isAdmin ? '0908 888 888' : '',
+        role: isAdmin ? 'Master Administrator & Founder' : 'Khách Hàng Thành Viên',
+        company: 'Công ty TNHH Công nghệ T-Flow Việt Nam',
+        tierBadge: isAdmin ? 'Master Admin' : 'Thành Viên Mới',
+        registeredDevice: isAdmin ? 'T-Flow Pro (TF-G31-PRO)' : 'T-Flow Pro',
+        serial: isAdmin ? 'HQYVYFYFR4' : '',
+        battery: 98,
+        firmware: 'FW-TF-G31-v1.2.0 (Mới nhất)',
+        status: 'Đang Hoạt Động',
+        modules: isAdmin ? [true, true, true, true, true, true, true] : [true, false, false, false, false, false, false]
+      };
+      cat.users.push(user);
+      saveCatalog(cat);
+    } else if (isAdmin) {
+      user.modules = [true, true, true, true, true, true, true];
+      user.role = 'Master Administrator & Founder';
+      user.tierBadge = 'Master Admin';
+    }
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      if (isAdmin) {
+        sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
+      } else {
+        sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      var evt = new CustomEvent(USER_EVENT, { detail: user });
+      window.dispatchEvent(evt);
+    }
+    return { success: true, user: user, isAdmin: isAdmin };
+  }
+
+  function logoutUser() {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(CURRENT_USER_KEY);
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+    }
+    if (typeof window !== 'undefined') {
+      var evt = new CustomEvent(USER_EVENT, { detail: null });
+      window.dispatchEvent(evt);
+    }
+  }
+
+    return { success: false, message: 'Email này đã được sử dụng!' };
     }
 
     var newUser = {
@@ -733,6 +958,81 @@
     }
     var evt = new CustomEvent(USER_EVENT, { detail: newUser });
     window.dispatchEvent(evt);
+    
+  // ==========================================================================
+  // GMAIL AUTHENTICATION & ROLE-BASED ACCESS CONTROL (NO PASSWORD REQUIRED)
+  // ==========================================================================
+  var ADMIN_GMAILS = ['thuynguyen2dk4@gmail.com', 'thuy.nguyen@tflow.tech'];
+
+  function isUserAdmin(user) {
+    if (!user || !user.email) return false;
+    var em = user.email.trim().toLowerCase();
+    return ADMIN_GMAILS.indexOf(em) !== -1 || (user.role && user.role.toLowerCase().indexOf('admin') !== -1);
+  }
+
+  function loginWithGmail(email, displayName) {
+    if (!email) return { success: false, message: 'Vui lòng cung cấp email Google (Gmail) hợp lệ.' };
+    var cleanEmail = email.trim().toLowerCase();
+    var isAdmin = (ADMIN_GMAILS.indexOf(cleanEmail) !== -1);
+
+    var cat = getCatalog();
+    var user = (cat.users || []).find(function (u) { return u.email && u.email.toLowerCase() === cleanEmail; });
+
+    if (!user) {
+      user = {
+        id: cleanEmail.replace(/[^a-zA-Z0-9]/g, '-'),
+        name: displayName || (isAdmin ? 'Thuy Nguyen' : cleanEmail.split('@')[0]),
+        email: cleanEmail,
+        phone: isAdmin ? '0908 888 888' : '',
+        role: isAdmin ? 'Master Administrator & Founder' : 'Khách Hàng Thành Viên',
+        company: 'Công ty TNHH Công nghệ T-Flow Việt Nam',
+        tierBadge: isAdmin ? 'Master Admin' : 'Thành Viên Mới',
+        registeredDevice: isAdmin ? 'T-Flow Pro (TF-G31-PRO)' : 'T-Flow Pro',
+        serial: isAdmin ? 'HQYVYFYFR4' : '',
+        battery: 98,
+        firmware: 'FW-TF-G31-v1.2.0 (Mới nhất)',
+        status: 'Đang Hoạt Động',
+        modules: isAdmin ? [true, true, true, true, true, true, true] : [true, false, false, false, false, false, false]
+      };
+      cat.users.push(user);
+      saveCatalog(cat);
+    } else if (isAdmin) {
+      user.modules = [true, true, true, true, true, true, true];
+      user.role = 'Master Administrator & Founder';
+      user.tierBadge = 'Master Admin';
+    }
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      if (isAdmin) {
+        sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
+      } else {
+        sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      var evt = new CustomEvent(USER_EVENT, { detail: user });
+      window.dispatchEvent(evt);
+    }
+    return { success: true, user: user, isAdmin: isAdmin };
+  }
+
+  function logoutUser() {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(CURRENT_USER_KEY);
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+    }
+    if (typeof window !== 'undefined') {
+      var evt = new CustomEvent(USER_EVENT, { detail: null });
+      window.dispatchEvent(evt);
+    }
+  }
+
     return { success: true, user: newUser };
   }
 
@@ -951,7 +1251,82 @@
     });
   }
 
-  return {
+  
+  // ==========================================================================
+  // GMAIL AUTHENTICATION & ROLE-BASED ACCESS CONTROL (NO PASSWORD REQUIRED)
+  // ==========================================================================
+  var ADMIN_GMAILS = ['thuynguyen2dk4@gmail.com', 'thuy.nguyen@tflow.tech'];
+
+  function isUserAdmin(user) {
+    if (!user || !user.email) return false;
+    var em = user.email.trim().toLowerCase();
+    return ADMIN_GMAILS.indexOf(em) !== -1 || (user.role && user.role.toLowerCase().indexOf('admin') !== -1);
+  }
+
+  function loginWithGmail(email, displayName) {
+    if (!email) return { success: false, message: 'Vui lòng cung cấp email Google (Gmail) hợp lệ.' };
+    var cleanEmail = email.trim().toLowerCase();
+    var isAdmin = (ADMIN_GMAILS.indexOf(cleanEmail) !== -1);
+
+    var cat = getCatalog();
+    var user = (cat.users || []).find(function (u) { return u.email && u.email.toLowerCase() === cleanEmail; });
+
+    if (!user) {
+      user = {
+        id: cleanEmail.replace(/[^a-zA-Z0-9]/g, '-'),
+        name: displayName || (isAdmin ? 'Thuy Nguyen' : cleanEmail.split('@')[0]),
+        email: cleanEmail,
+        phone: isAdmin ? '0908 888 888' : '',
+        role: isAdmin ? 'Master Administrator & Founder' : 'Khách Hàng Thành Viên',
+        company: 'Công ty TNHH Công nghệ T-Flow Việt Nam',
+        tierBadge: isAdmin ? 'Master Admin' : 'Thành Viên Mới',
+        registeredDevice: isAdmin ? 'T-Flow Pro (TF-G31-PRO)' : 'T-Flow Pro',
+        serial: isAdmin ? 'HQYVYFYFR4' : '',
+        battery: 98,
+        firmware: 'FW-TF-G31-v1.2.0 (Mới nhất)',
+        status: 'Đang Hoạt Động',
+        modules: isAdmin ? [true, true, true, true, true, true, true] : [true, false, false, false, false, false, false]
+      };
+      cat.users.push(user);
+      saveCatalog(cat);
+    } else if (isAdmin) {
+      user.modules = [true, true, true, true, true, true, true];
+      user.role = 'Master Administrator & Founder';
+      user.tierBadge = 'Master Admin';
+    }
+
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      if (isAdmin) {
+        sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
+      } else {
+        sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+      }
+    }
+
+    if (typeof window !== 'undefined') {
+      var evt = new CustomEvent(USER_EVENT, { detail: user });
+      window.dispatchEvent(evt);
+    }
+    return { success: true, user: user, isAdmin: isAdmin };
+  }
+
+  function logoutUser() {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.removeItem(CURRENT_USER_KEY);
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+    }
+    if (typeof window !== 'undefined') {
+      var evt = new CustomEvent(USER_EVENT, { detail: null });
+      window.dispatchEvent(evt);
+    }
+  }
+
+    return {
     STORAGE_KEY: STORAGE_KEY,
     CART_KEY: CART_KEY,
     ORDERS_KEY: ORDERS_KEY,
@@ -997,6 +1372,9 @@
     getUsers: getUsers,
     getCurrentUser: getCurrentUser,
     loginUser: loginUser,
+    loginWithGmail: loginWithGmail,
+    isUserAdmin: isUserAdmin,
+    logoutUser: logoutUser,
     registerUser: registerUser,
     logoutUser: logoutUser,
     updateUserProfile: updateUserProfile,

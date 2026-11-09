@@ -1,20 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <script>
-    // Master Admin Auth Guard
-    (function checkAuth() {
-      if (sessionStorage.getItem('TFLOW_ADMIN_AUTH') !== 'true') {
-        const pwd = prompt('KHÓA BẢO MẬT QUẢN TRỊ VIÊN T-FLOW\nVui lòng nhập mật khẩu Quản Trị Viên để tiếp tục (Mặc định: tflow2026 hoặc 8888):');
-        if (pwd === 'tflow2026' || pwd === '8888') {
-          sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
-        } else {
-          alert('Mật khẩu không chính xác! Hệ thống tự động chuyển về trang chủ.');
-          window.location.href = 'index.html';
-        }
-      }
-    })();
-  </script>
+  
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -704,6 +691,45 @@
 </head>
 <body>
 
+  <!-- GMAIL ADMIN AUTHENTICATION GATE (ZERO PASSWORD) -->
+  <div id="adminAuthGate" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:linear-gradient(135deg, #F5F5F7 0%, #E5E5EA 100%); z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px; font-family:'Plus Jakarta Sans', -apple-system, sans-serif;">
+    <div style="background:#FFFFFF; border-radius:24px; padding:44px 40px; max-width:440px; width:100%; box-shadow:0 20px 48px rgba(0,0,0,0.12); border:1px solid rgba(0,0,0,0.08); text-align:center;">
+      
+      <!-- Brand Icon -->
+      <div style="width:54px; height:54px; background:#1D1D1F; color:#FFF; border-radius:14px; padding:10px; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.15); margin-bottom:20px;">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+          <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="currentColor" stroke-width="12" stroke-linecap="round" fill="none" />
+          <path d="M 50 34 L 50 82" stroke="currentColor" stroke-width="12" stroke-linecap="round" />
+        </svg>
+      </div>
+
+      <div style="font-size:24px; font-weight:800; letter-spacing:-0.03em; color:#1D1D1F; margin-bottom:6px;">t-flow console</div>
+      <div style="font-size:12px; font-weight:600; color:#86868B; margin-bottom:28px;">Trung Tâm Quản Trị Hệ Sinh Thái &amp; Danh Mục</div>
+
+      <div style="background:#F5F5F7; border-radius:14px; padding:18px; margin-bottom:24px; text-align:left;">
+        <div style="font-size:12px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:4px;">Phân Quyền Bằng Gmail</div>
+        <div style="font-size:13.5px; color:#1D1D1F; line-height:1.5;">Hệ thống xác thực tài khoản qua Google. Chỉ email <strong>thuynguyen2dk4@gmail.com</strong> được cấp quyền Master Admin vào console.</div>
+      </div>
+
+      <!-- 1-Click Google Admin Button -->
+      <button onclick="adminLoginWithOneClick('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; display:flex; align-items:center; justify-content:center; gap:12px; padding:14px 20px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14.5px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.15); transition:transform 0.2s, background 0.2s; margin-bottom:14px;">
+        <svg width="20" height="20" viewBox="0 0 24 24" style="background:#FFF; border-radius:50%; padding:2px;"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+        Đăng nhập với thuynguyen2dk4@gmail.com
+      </button>
+
+      <!-- Custom Gmail input toggle -->
+      <div style="font-size:12.5px; color:#86868B; margin-bottom:14px;">- hoặc đăng nhập bằng tài khoản khác -</div>
+      
+      <div style="display:flex; gap:8px; margin-bottom:20px;">
+        <input type="email" id="customGmailInput" placeholder="nhap.email@gmail.com" style="flex:1; padding:10px 14px; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-family:inherit; outline:none;">
+        <button onclick="adminLoginWithCustomGmail()" style="padding:10px 16px; background:#F5F5F7; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;">Xác nhận</button>
+      </div>
+
+      <a href="index.html" style="font-size:13px; color:#6E6E73; text-decoration:none;">&larr; Quay lại Website Cửa Hàng</a>
+    </div>
+  </div>
+
+
   <!-- ADMIN HEADER -->
   <header>
     <div class="brand">
@@ -715,6 +741,15 @@
         <span>Sản Phẩm MVP Ghim Đầu:</span>
         <b id="headerMvpName" style="color:var(--text-main);">T-Flow T-Flow Pro</b>
       </div>
+      
+      <!-- LOGGED IN ADMIN GMAIL BADGE -->
+      <div id="adminUserBadge" style="display:flex; align-items:center; gap:10px; background:#F5F5F7; padding:4px 12px; border-radius:99px; border:1px solid var(--border);">
+        <div style="width:24px; height:24px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;">TN</div>
+        <span style="font-size:12.5px; font-weight:600; color:#1D1D1F;" id="adminDisplayEmail">thuynguyen2dk4@gmail.com</span>
+        <span style="font-size:10px; font-weight:700; background:rgba(0,113,227,0.1); color:#0071E3; padding:2px 8px; border-radius:99px;">Master Admin</span>
+        <button onclick="handleAdminLogout()" style="background:none; border:none; font-size:11.5px; color:#FF3B30; font-weight:600; cursor:pointer; margin-left:4px;">Đăng Xuất</button>
+      </div>
+
       <a href="index.html" class="btn-nav-link" target="_blank">Xem Website Bán Hàng</a>
       <a href="user_dashboard.html" class="btn-nav-link" target="_blank">Cổng Khách Hàng</a>
     </div>
@@ -1928,6 +1963,73 @@
         t.classList.remove('show');
       }, 2500);
     }
-  </script>
+  
+    // ==========================================================================
+    // GMAIL AUTHENTICATION & ACCESS CONTROL (ZERO PASSWORD)
+    // ==========================================================================
+    function checkAdminAccess() {
+      const gate = document.getElementById('adminAuthGate');
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+
+      const user = SmartGimbalCatalog.getCurrentUser();
+      if (user && SmartGimbalCatalog.isUserAdmin(user)) {
+        // Authenticated as Admin!
+        if (gate) gate.style.display = 'none';
+        const emailEl = document.getElementById('adminDisplayEmail');
+        if (emailEl) emailEl.textContent = user.email;
+      } else if (user) {
+        // Logged in as regular customer Gmail
+        if (gate) {
+          gate.style.display = 'flex';
+          gate.innerHTML = `
+            <div style="background:#FFFFFF; border-radius:24px; padding:44px 40px; max-width:440px; width:100%; box-shadow:0 20px 48px rgba(0,0,0,0.12); border:1px solid rgba(0,0,0,0.08); text-align:center;">
+              <div style="font-size:40px; margin-bottom:12px;">🚫</div>
+              <div style="font-size:22px; font-weight:800; color:#1D1D1F; margin-bottom:8px;">Quyền Truy Cập Bị Từ Chối</div>
+              <div style="font-size:14px; color:#6E6E73; line-height:1.6; margin-bottom:24px;">
+                Tài khoản <strong>${user.email}</strong> là tài khoản Khách Hàng, không có quyền truy cập Quản Trị Viên.<br><br>
+                Chỉ email <strong>thuynguyen2dk4@gmail.com</strong> mới có quyền quản trị T-Flow.
+              </div>
+              <button onclick="adminLoginWithOneClick('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; padding:14px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:12px;">
+                Chuyển sang tài khoản thuynguyen2dk4@gmail.com
+              </button>
+              <a href="index.html" style="font-size:13px; color:#0071E3; text-decoration:none;">&larr; Về trang chủ mua hàng</a>
+            </div>
+          `;
+        }
+      } else {
+        // Not logged in -> Show Google Sign-in screen
+        if (gate) gate.style.display = 'flex';
+      }
+    }
+
+    function adminLoginWithOneClick(email, name) {
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.loginWithGmail(email, name);
+      }
+      checkAdminAccess();
+    }
+
+    function adminLoginWithCustomGmail() {
+      const email = (document.getElementById('customGmailInput').value || '').trim();
+      if (!email || !email.includes('@')) {
+        alert('Vui lòng nhập địa chỉ email hợp lệ!');
+        return;
+      }
+      adminLoginWithOneClick(email);
+    }
+
+    function handleAdminLogout() {
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.logoutUser();
+      }
+      window.location.href = 'index.html';
+    }
+
+    // Run check on load
+    window.addEventListener('DOMContentLoaded', () => {
+      checkAdminAccess();
+    });
+
+</script>
 </body>
 </html>
