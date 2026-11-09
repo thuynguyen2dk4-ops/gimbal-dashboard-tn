@@ -45,7 +45,7 @@
       "address": "Tòa nhà Công nghệ T-Flow, Hà Nội, Việt Nam",
       "hotline": "1900 8888",
       "email": "support@tflow.tech",
-      "website": "https://gimbal-dashboard-tn.vercel.app"
+      "website": "https://tflow-pro.vercel.app"
     },
     "namingRules": [
       {
