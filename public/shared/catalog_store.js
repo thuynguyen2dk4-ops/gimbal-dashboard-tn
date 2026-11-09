@@ -1167,18 +1167,35 @@
   }
 
   function updateUserProfile(userId, profileData) {
+    if (!profileData) return false;
     var cat = getCatalog();
-    var idx = cat.users.findIndex(function (u) { return u.id === userId; });
-    if (idx === -1) return false;
-    Object.assign(cat.users[idx], profileData);
-    saveCatalog(cat);
-
+    if (!cat.users) cat.users = [];
     var cur = getCurrentUser();
-    if (cur && cur.id === userId) {
+
+    var targetId = userId || (cur ? cur.id : null);
+    var targetEmail = (cur && cur.email ? cur.email.toLowerCase() : null) || (profileData && profileData.email ? profileData.email.toLowerCase() : null);
+
+    var idx = cat.users.findIndex(function (u) {
+      return (targetId && u.id === targetId) ||
+             (targetEmail && u.email && u.email.toLowerCase() === targetEmail);
+    });
+
+    if (idx !== -1) {
+      Object.assign(cat.users[idx], profileData);
+      saveCatalog(cat);
+    } else if (cur) {
+      Object.assign(cur, profileData);
+      cat.users.push(cur);
+      saveCatalog(cat);
+    }
+
+    if (cur) {
       Object.assign(cur, profileData);
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(cur));
       }
+      setCookie('tflow_user_session', cur, 30);
+      createSession(cur);
       if (typeof window !== 'undefined') {
         var evt = new CustomEvent(USER_EVENT, { detail: cur });
         window.dispatchEvent(evt);
