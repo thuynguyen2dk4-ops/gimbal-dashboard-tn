@@ -1741,14 +1741,16 @@
   }
 
   // =========================================================================
-  // --- T-FLOW UNIFIED CLOUD AI ENGINE (GOOGLE GEMINI 2.5/3.8 FLASH) ---
+  // --- T-FLOW UNIFIED CLOUD AI ENGINE (GOOGLE GEMINI 3.5 FLASH) ---
   // =========================================================================
+  var DEFAULT_GEMINI_API_KEY = 'AIzaSyDluWTvQMgGmw2yceO27urpn4UBOZ1LQF0';
+  var DEFAULT_AI_MODEL = 'gemini-3.5-flash';
   var AI_CLOUD_CONFIG_KEY = 'tflow_cloud_ai_config';
 
   function getCloudAiConfig() {
     var def = {
-      apiKey: '',
-      model: 'gemini-2.5-flash',
+      apiKey: DEFAULT_GEMINI_API_KEY,
+      model: DEFAULT_AI_MODEL,
       endpoint: '/api/chat',
       provider: 'google_cloud_ai',
       status: 'ready'
@@ -1758,6 +1760,12 @@
       var raw = localStorage.getItem(AI_CLOUD_CONFIG_KEY);
       if (!raw) return def;
       var parsed = JSON.parse(raw);
+      if (!parsed.apiKey || !parsed.apiKey.trim()) {
+        parsed.apiKey = def.apiKey;
+      }
+      if (!parsed.model || parsed.model === 'gemini-2.5-flash' || parsed.model === 'gemini-1.5-flash') {
+        parsed.model = DEFAULT_AI_MODEL;
+      }
       return Object.assign({}, def, parsed);
     } catch (e) {
       return def;
@@ -2172,6 +2180,8 @@
     escalateToAdmin: escalateToAdmin,
     approveAndTrainAiQuestion: approveAndTrainAiQuestion,
     ignorePendingAiQuestion: ignorePendingAiQuestion,
+    DEFAULT_GEMINI_API_KEY: DEFAULT_GEMINI_API_KEY,
+    DEFAULT_AI_MODEL: DEFAULT_AI_MODEL,
     AI_CLOUD_CONFIG_KEY: AI_CLOUD_CONFIG_KEY,
     getCloudAiConfig: getCloudAiConfig,
     saveCloudAiConfig: saveCloudAiConfig,

@@ -85,7 +85,7 @@ export default async function handler(req, res) {
       status: 'active',
       service: 'T-Flow Unified Cloud AI Engine',
       engine: 'Google Gemini AI',
-      defaultModel: 'gemini-2.5-flash',
+      defaultModel: 'gemini-3.5-flash',
       modes: ['web', 'app'],
       timestamp: new Date().toISOString()
     });
@@ -96,15 +96,21 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, mode = 'web', history = [], context = {}, apiKey: reqApiKey, model = 'gemini-2.5-flash' } = req.body || {};
+    const DEFAULT_SERVER_GEMINI_KEY = 'AIzaSyDluWTvQMgGmw2yceO27urpn4UBOZ1LQF0';
+    let { prompt, mode = 'web', history = [], context = {}, apiKey: reqApiKey, model = 'gemini-3.5-flash' } = req.body || {};
 
     if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
+    // Auto map legacy or deprecated model keys to active high-performance model
+    if (!model || model === 'gemini-2.5-flash' || model === 'gemini-1.5-flash' || model === 'gemini-2.0-flash') {
+      model = 'gemini-3.5-flash';
+    }
+
     const cleanPrompt = prompt.trim();
     const reqHeaders = req.headers || {};
-    const effectiveKey = reqApiKey || reqHeaders['x-gemini-api-key'] || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+    const effectiveKey = reqApiKey || reqHeaders['x-gemini-api-key'] || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || DEFAULT_SERVER_GEMINI_KEY;
 
     // IF NO GOOGLE API KEY AVAILABLE IN RUNTIME, USE SMART EMBEDDED KNOWLEDGE BASE ENGINE
     if (!effectiveKey) {
