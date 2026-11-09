@@ -2899,6 +2899,12 @@
     // DYNAMIC GOOGLE / GMAIL AUTHENTICATION & NAV RENDERING
     // ==========================================================================
     
+    // Master authentication state synchronizer (Navbar + Reviews Form + Drawer)
+    function syncUserAuthState() {
+      try { renderNavUserSection(); } catch(e) { console.error('User section error:', e); }
+      try { renderReviewsList(); } catch(e) { console.error('Reviews error:', e); }
+    }
+
     function renderNavUserSection() {
       const container = document.getElementById('navUserSection');
       if (!container || typeof SmartGimbalCatalog === 'undefined') return;
@@ -3205,7 +3211,7 @@
         const res = SmartGimbalCatalog.loginUser(email, pass);
         if (res.success) {
           toggleAuthModal(false);
-          renderNavUserSection();
+          syncUserAuthState();
           alert('Đăng nhập thành công!');
         } else {
           alert(res.message);
@@ -3232,7 +3238,7 @@
         });
         if (res.success) {
           toggleAuthModal(false);
-          renderNavUserSection();
+          syncUserAuthState();
           alert('Tạo tài khoản thành công!');
         } else {
           alert(res.message);
@@ -3245,7 +3251,7 @@
         SmartGimbalCatalog.loginWithGmail(email, name);
       }
       toggleAuthModal(false);
-      renderNavUserSection();
+      syncUserAuthState();
       alert('Đăng nhập Google thành công với: ' + email);
     }
 
@@ -3294,8 +3300,21 @@
       try { renderNavUserSection(); } catch(e) { console.error('User section error:', e); }
       try { renderReviewsList(); } catch(e) { console.error('Reviews error:', e); }
 
+      // Listen for user auth updates (login, logout, account switch, Google OAuth)
+      if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.USER_EVENT) {
+        window.addEventListener(SmartGimbalCatalog.USER_EVENT, () => {
+          syncUserAuthState();
+        });
+      }
+      window.addEventListener('storage', (e) => {
+        if (!e.key || e.key.includes('tflow') || e.key.includes('user')) {
+          syncUserAuthState();
+        }
+      });
+
       // Listen for store catalog updates
       window.addEventListener(SmartGimbalCatalog.SYNC_EVENT, () => {
+        syncUserAuthState();
         loadMvpData();
         renderCatalogFilterChips();
         renderCatalogGrid();
@@ -3363,7 +3382,7 @@
         renderCatalogFilterChips();
         renderCatalogGrid();
       } else if (viewName === 'reviews') {
-        renderReviewsList();
+        syncUserAuthState();
       } else if (viewName === 'home') {
         loadMvpData();
       }
@@ -3989,7 +4008,7 @@
         if (pctEl) pctEl.textContent = pct + '%';
       }
 
-      // 2. ENFORCE MUST BE LOGGED IN BEFORE REVIEWING
+      // 2. ENFORCE MUST BE LOGGED IN BEFORE REVIEWING (SEAMLESS SYNC WITH NAVBAR)
       const user = SmartGimbalCatalog.getCurrentUser();
       const formEl = document.getElementById('tflowReviewForm');
       const promptEl = document.getElementById('reviewLoginRequiredPrompt');
@@ -3998,14 +4017,16 @@
       const emailBadge = document.getElementById('reviewUserEmailBadge');
       const avatarEl = document.getElementById('reviewAvatarInitial');
 
-      if (user && user.email) {
-        // Logged in: show form, hide prompt
+      if (user) {
+        const userEmail = user.email || (user.phone ? user.phone : (user.id || 'khachhang@tflow.vn'));
+        const userName = user.name || userEmail;
+        // Logged in: show review form immediately, hide login prompt
         if (promptEl) promptEl.style.display = 'none';
         if (formEl) formEl.style.display = 'block';
         if (identityBox) identityBox.style.display = 'flex';
-        if (nameEl) nameEl.textContent = user.name || user.email;
-        if (emailBadge) emailBadge.textContent = user.email + (SmartGimbalCatalog.isUserAdmin(user) ? ' (Master Admin)' : '');
-        if (avatarEl) avatarEl.textContent = (user.name || user.email).charAt(0).toUpperCase();
+        if (nameEl) nameEl.textContent = userName;
+        if (emailBadge) emailBadge.textContent = userEmail + (SmartGimbalCatalog.isUserAdmin(user) ? ' (Master Admin)' : '');
+        if (avatarEl) avatarEl.textContent = (userName || 'U').charAt(0).toUpperCase();
       } else {
         // Not logged in: hide form, show prompt requiring login!
         if (promptEl) promptEl.style.display = 'block';
@@ -4093,14 +4114,14 @@
 
       // STRICT RULE: User MUST be logged in first before reviewing!
       const user = SmartGimbalCatalog.getCurrentUser();
-      if (!user || !user.email) {
+      if (!user) {
         alert('Vui lòng đăng nhập tài khoản trước khi gửi đánh giá sản phẩm!');
         toggleAuthModal(true);
         return;
       }
 
-      const authorName = user.name || user.email.split('@')[0];
-      const authorEmail = user.email;
+      const authorEmail = user.email || (user.phone ? user.phone : (user.id || 'khachhang@tflow.vn'));
+      const authorName = user.name || (authorEmail.includes('@') ? authorEmail.split('@')[0] : authorEmail);
 
       const rating = parseInt(document.getElementById('reviewRatingInput').value) || 5;
       const pkg = document.getElementById('reviewProductPackage').value;
