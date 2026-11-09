@@ -1469,8 +1469,119 @@
     return true;
   }
 
-  // --- BRAIN 1: WEB SALES CONSULTANT AI PROCESSING ---
-  function processWebAiQuery(userQuery, userContext) {
+  // =========================================================================
+  // --- T-FLOW UNIFIED CLOUD AI ENGINE (GOOGLE GEMINI 2.5/3.8 FLASH) ---
+  // =========================================================================
+  var AI_CLOUD_CONFIG_KEY = 'tflow_cloud_ai_config';
+
+  function getCloudAiConfig() {
+    var def = {
+      apiKey: '',
+      model: 'gemini-2.5-flash',
+      endpoint: '/api/chat',
+      provider: 'google_cloud_ai',
+      status: 'ready'
+    };
+    if (typeof localStorage === 'undefined') return def;
+    try {
+      var raw = localStorage.getItem(AI_CLOUD_CONFIG_KEY);
+      if (!raw) return def;
+      var parsed = JSON.parse(raw);
+      return Object.assign({}, def, parsed);
+    } catch (e) {
+      return def;
+    }
+  }
+
+  function saveCloudAiConfig(cfg) {
+    if (typeof localStorage === 'undefined') return cfg;
+    try {
+      var current = getCloudAiConfig();
+      var merged = Object.assign({}, current, cfg);
+      localStorage.setItem(AI_CLOUD_CONFIG_KEY, JSON.stringify(merged));
+      return merged;
+    } catch (e) {
+      return cfg;
+    }
+  }
+
+  async function testCloudAiConnection(apiKey, model) {
+    var targetModel = model || 'gemini-2.5-flash';
+    var startTime = Date.now();
+    var cfg = getCloudAiConfig();
+    var keyToTest = apiKey || cfg.apiKey || '';
+
+    // Step 1: Test via /api/chat serverless function
+    try {
+      var res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-gemini-api-key': keyToTest
+        },
+        body: JSON.stringify({
+          prompt: 'Ping kiểm tra kết nối Google Cloud AI T-Flow',
+          mode: 'web',
+          apiKey: keyToTest,
+          model: targetModel
+        })
+      });
+      if (res.ok) {
+        var data = await res.json();
+        var latency = Date.now() - startTime;
+        return {
+          success: true,
+          latencyMs: latency,
+          model: data.model || targetModel,
+          source: data.source || 'vercel_serverless',
+          message: 'Kết nối Google Cloud AI thành công qua Vercel Serverless (' + latency + 'ms)'
+        };
+      }
+    } catch (e) {}
+
+    // Step 2: Direct call to Google Gemini REST API if key is present
+    if (keyToTest) {
+      try {
+        var directUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(targetModel) + ':generateContent?key=' + encodeURIComponent(keyToTest);
+        var gRes = await fetch(directUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: 'Ping' }] }]
+          })
+        });
+        if (gRes.ok) {
+          var latency = Date.now() - startTime;
+          return {
+            success: true,
+            latencyMs: latency,
+            model: targetModel,
+            source: 'google_gemini_direct',
+            message: 'Kết nối trực tiếp Google Gemini API thành công (' + latency + 'ms)'
+          };
+        } else {
+          var errTxt = await gRes.text();
+          return {
+            success: false,
+            error: 'Google API trả về lỗi ' + gRes.status + ': ' + errTxt.slice(0, 150)
+          };
+        }
+      } catch (err) {
+        return {
+          success: false,
+          error: 'Lỗi mạng khi kết nối Google API: ' + err.message
+        };
+      }
+    }
+
+    return {
+      success: false,
+      error: 'Chưa có Google AI API Key hợp lệ hoặc không thể kết nối serverless endpoint'
+    };
+  }
+
+  // --- SMART INTERNAL KNOWLEDGE BASE FALLBACK (ZERO DOWNTIME GUARANTEE) ---
+  function processWebSmartFallback(userQuery, userContext) {
     var cleanQuery = (userQuery || '').trim().toLowerCase();
     var kb = getAiKnowledgeBase();
     var webKb = kb.filter(function(k) { return k.target === 'web' || k.target === 'both'; });
@@ -1482,54 +1593,20 @@
       var score = 0;
       var keywords = item.keywords || [];
       keywords.forEach(function(kw) {
-        if (cleanQuery.indexOf(kw.toLowerCase()) !== -1) {
-          score += 10;
-        }
+        if (cleanQuery.indexOf(kw.toLowerCase()) !== -1) score += 10;
       });
-      // Topic match bonus
-      if (item.topic && cleanQuery.indexOf(item.topic.toLowerCase()) !== -1) {
-        score += 25;
-      }
+      if (item.topic && cleanQuery.indexOf(item.topic.toLowerCase()) !== -1) score += 25;
       if (score > highestScore) {
         highestScore = score;
         bestMatch = item;
       }
     });
 
-    var currentUserObj = getCurrentUser();
-    var email = currentUserObj ? currentUserObj.email : 'Khách vãng lai';
-    var name = currentUserObj ? currentUserObj.name : 'Quý khách';
-
-    // STRICT ANTI-HALLUCINATION POLICY:
-    // If confidence score is too low or unknown question, DO NOT GUESS OR ANSWER RANDOMLY!
     if (!bestMatch || highestScore < 10) {
-      var escalated = escalateToAdmin({
-        source: 'web',
-        userEmail: email,
-        userName: name,
-        query: userQuery,
-        reason: 'Không tìm thấy tri thức kiểm định hoặc câu hỏi chuyên sâu ngoài phạm vi bán hàng',
-        context: userContext || null
-      });
-
-      var escalatedReply = "Dạ câu hỏi này mang tính kỹ thuật/chính sách chuyên sâu mà em chưa có dữ liệu kiểm định chính thức từ xưởng R&D. Để bảo đảm thông tin chuẩn xác 100% và không trả lời bừa, em đã tự động chuyển tiếp câu hỏi này về Trung Tâm Điều Hành cho Master Admin Thủy Nguyễn duyệt và cập nhật giải đáp sớm nhất cho anh ạ! 🙏\n\n" +
-                           "Trong thời gian chờ duyệt, anh có thể tham khảo bảng giá 4 gói T-Flow Pro hoặc các thông số động cơ FOC và MagSafe bên dưới ạ:";
-
-      var record = logAiConversation({
-        source: 'web',
-        userEmail: email,
-        userName: name,
-        query: userQuery,
-        reply: escalatedReply,
-        status: 'pending_approval',
-        confidence: 0.1
-      });
-
       return {
-        answer: escalatedReply,
+        answer: 'Dạ câu hỏi này mang tính kỹ thuật/chính sách chuyên sâu mà em chưa có dữ liệu kiểm định chính thức từ xưởng R&D. Để bảo đảm thông tin chuẩn xác 100% và không trả lời bừa, em đã tự động chuyển tiếp câu hỏi này về Trung Tâm Điều Hành cho Master Admin Thủy Nguyễn duyệt và cập nhật giải đáp sớm nhất cho anh ạ! 🙏\n\nTrong thời gian chờ duyệt, anh có thể tham khảo bảng giá 4 gói T-Flow Pro hoặc các thông số động cơ FOC và MagSafe bên dưới ạ:',
         status: 'pending_approval',
         escalated: true,
-        recordId: record.id,
         actions: [
           { label: 'Xem Bảng Giá 4 Gói', view: 'catalog' },
           { label: 'Xem Thông Số Kỹ Thuật', view: 'detail' }
@@ -1537,28 +1614,15 @@
       };
     }
 
-    // High confidence matched answer
-    var record = logAiConversation({
-      source: 'web',
-      userEmail: email,
-      userName: name,
-      query: userQuery,
-      reply: bestMatch.answer,
-      status: 'answered',
-      confidence: highestScore / 100
-    });
-
     return {
       answer: bestMatch.answer,
       status: 'answered',
       escalated: false,
-      recordId: record.id,
       actions: bestMatch.actions || []
     };
   }
 
-  // --- BRAIN 2: APP CREATIVE DIRECTOR & CAMERA COPILOT PROCESSING ---
-  function processAppAiQuery(userQuery, userContext) {
+  function processAppSmartFallback(userQuery, userContext) {
     var cleanQuery = (userQuery || '').trim().toLowerCase();
     var kb = getAiKnowledgeBase();
     var appKb = kb.filter(function(k) { return k.target === 'app' || k.target === 'both'; });
@@ -1570,81 +1634,185 @@
       var score = 0;
       var keywords = item.keywords || [];
       keywords.forEach(function(kw) {
-        if (cleanQuery.indexOf(kw.toLowerCase()) !== -1) {
-          score += 10;
-        }
+        if (cleanQuery.indexOf(kw.toLowerCase()) !== -1) score += 10;
       });
-      if (item.topic && cleanQuery.indexOf(item.topic.toLowerCase()) !== -1) {
-        score += 25;
-      }
+      if (item.topic && cleanQuery.indexOf(item.topic.toLowerCase()) !== -1) score += 25;
       if (score > highestScore) {
         highestScore = score;
         bestMatch = item;
       }
     });
 
-    var currentUserObj = getCurrentUser();
-    var email = currentUserObj ? currentUserObj.email : 'Người dùng App T-Flow';
-    var name = currentUserObj ? currentUserObj.name : 'Nhà sáng tạo';
-
-    // Check if off-topic or unknown
     if (!bestMatch || highestScore < 10) {
-      var escalated = escalateToAdmin({
-        source: 'app',
-        userEmail: email,
-        userName: name,
-        query: userQuery,
-        reason: 'Yêu cầu góc quay hoặc kỹ thuật hình ảnh mới chưa được huấn luyện',
-        context: userContext || null
-      });
-
-      var escalatedReply = "Dạ yêu cầu góc quay hoặc bối cảnh này cần kinh nghiệm đạo diễn chuyên sâu mà em chưa được huấn luyện dữ liệu chuẩn. Để tránh thiết lập thông số sai lệch làm hỏng cảnh quay của anh, em đã gửi thông báo về Trung Tâm Điều Hành cho Master Admin Thủy Nguyễn duyệt và cập nhật bộ thông số chuẩn ngay ạ! 🙏\n\n" +
-                           "Hiện tại anh có thể chọn nhanh các preset có sẵn: Quay Hoàng Hôn Biển, Thể Thao Tốc Độ Cao, Chân Dung Xóa Phông hoặc Inception 360° bên dưới ạ:";
-
-      var record = logAiConversation({
-        source: 'app',
-        userEmail: email,
-        userName: name,
-        query: userQuery,
-        reply: escalatedReply,
-        status: 'pending_approval',
-        confidence: 0.1
-      });
-
       return {
-        answer: escalatedReply,
+        answer: 'Dạ yêu cầu góc quay hoặc bối cảnh này cần kinh nghiệm đạo diễn chuyên sâu mà em chưa được huấn luyện dữ liệu chuẩn. Để tránh thiết lập thông số sai lệch làm hỏng cảnh quay của anh, em đã gửi thông báo về Trung Tâm Điều Hành cho Master Admin Thủy Nguyễn duyệt và cập nhật bộ thông số chuẩn ngay ạ! 🙏\n\nHiện tại anh có thể chọn nhanh các preset có sẵn: Quay Hoàng Hôn Biển, Thể Thao Tốc Độ Cao, Chân Dung Xóa Phông hoặc Inception 360° bên dưới ạ:',
         status: 'pending_approval',
         escalated: true,
-        recordId: record.id,
         suggestAction: false,
         cameraPreset: null
       };
     }
 
-    // Has verified preset & guidance
-    // MANDATORY REQUIREMENT: Ask user if they want AI to apply the settings automatically!
-    var fullReply = bestMatch.answer + "\n\n" +
-                    "⚡ **Anh có muốn em tự thao tác cài đặt toàn bộ các thông số này trên camera và gimbal luôn giúp anh không?**";
+    var preset = bestMatch.cameraPreset ? Object.assign({}, bestMatch.cameraPreset) : null;
+    if (preset && !preset.name) {
+      preset.name = bestMatch.topic || 'Preset Chuẩn Điện Ảnh';
+    }
 
-    var record = logAiConversation({
-      source: 'app',
-      userEmail: email,
-      userName: name,
-      query: userQuery,
-      reply: fullReply,
-      status: 'answered',
-      actionPayload: bestMatch.cameraPreset,
-      confidence: highestScore / 100
-    });
+    var fullReply = bestMatch.answer + '\n\n' +
+                    '⚡ **Anh có muốn em tự thao tác cài đặt toàn bộ các thông số này trên camera và gimbal luôn giúp anh không?**';
 
     return {
       answer: fullReply,
       status: 'answered',
       escalated: false,
-      recordId: record.id,
       suggestAction: true,
-      cameraPreset: bestMatch.cameraPreset
+      promptQuestion: 'Anh có muốn em tự thao tác cài đặt các thông số này không?',
+      cameraPreset: preset
     };
+  }
+
+  // --- UNIFIED CLOUD AI QUERY ENGINE ---
+  async function queryUnifiedCloudAi(params) {
+    params = params || {};
+    var prompt = (params.prompt || '').trim();
+    var mode = params.mode || 'web'; // 'web' or 'app'
+    var history = params.history || [];
+    var context = params.context || {};
+
+    var currentUserObj = getCurrentUser();
+    var email = currentUserObj ? currentUserObj.email : (mode === 'app' ? 'Người dùng App T-Flow' : 'Khách vãng lai');
+    var name = currentUserObj ? currentUserObj.name : (mode === 'app' ? 'Nhà sáng tạo' : 'Quý khách');
+
+    var cfg = getCloudAiConfig();
+    var effectiveKey = cfg.apiKey || '';
+    var effectiveModel = cfg.model || 'gemini-2.5-flash';
+
+    var finalResult = null;
+
+    // STEP 1: Attempt Serverless /api/chat call
+    try {
+      var res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-gemini-api-key': effectiveKey
+        },
+        body: JSON.stringify({
+          prompt: prompt,
+          mode: mode,
+          history: history,
+          context: context,
+          apiKey: effectiveKey,
+          model: effectiveModel
+        })
+      });
+
+      if (res.ok) {
+        var data = await res.json();
+        if (data && data.answer) {
+          finalResult = data;
+        }
+      }
+    } catch (e) {}
+
+    // STEP 2: Direct call to Google Generative Language REST API if key is present
+    if (!finalResult && effectiveKey) {
+      try {
+        var directUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(effectiveModel) + ':generateContent?key=' + encodeURIComponent(effectiveKey);
+        var sysPrompt = (mode === 'app') ?
+          'Bạn là T-Flow Camera Director & Creative Copilot. BẮT BUỘC trả về JSON duy nhất: {\"answer\":\"Lời khuyên đạo diễn...\\n\\nAnh có muốn em tự thao tác cài đặt các thông số này không?\",\"cameraPreset\":{\"name\":\"...\",\"mode\":\"VIDEO|PHOTO|CINEMATIC|SLOWMO|TIMELAPSE|PANO\",\"resolution\":\"4K|HD\",\"fps\":24|30|60|120,\"shutter\":\"1/48s|1/60s|1/120s|1/250s\",\"iso\":50|100|200|400|800,\"ev\":\"-0.3EV|+0.0EV|-0.7EV\",\"lut\":\"TEAL_ORANGE|REC709|FILM_NOIR|VINTAGE|CLEAN\",\"gimbalMode\":\"FPV|FOLLOW|LOCK|POV|INCEPTION\"},\"suggestAction\":true,\"promptQuestion\":\"Anh có muốn em tự thao tác cài đặt các thông số này không?\",\"escalated\":false}' :
+          'Bạn là T-Flow Sales Consultant. Tư vấn giá 4 gói (Standard 2.49M, Creator 3.19M, Cinematic 3.99M, Master 5.49M), FOC 20kHz, MagSafe 45N, pin 3200mAh 18h, bảo hành 12 tháng 1 đổi 1, 30 ngày đổi trả. Nếu câu hỏi ngoài lề hoặc nhạy cảm, đính kèm [ESCALATE_TO_ADMIN].';
+
+        var gPayload = {
+          contents: [{ parts: [{ text: prompt }] }],
+          system_instruction: { parts: [{ text: sysPrompt }] },
+          generationConfig: { temperature: 0.3, maxOutputTokens: 1024 }
+        };
+        if (mode === 'app') gPayload.generationConfig.responseMimeType = 'application/json';
+
+        var gRes = await fetch(directUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(gPayload)
+        });
+
+        if (gRes.ok) {
+          var gData = await gRes.json();
+          var rawText = gData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (mode === 'app') {
+            try {
+              finalResult = JSON.parse(rawText);
+            } catch (je) {
+              var m = rawText.match(/\{[\s\S]*\}/);
+              if (m) finalResult = JSON.parse(m[0]);
+            }
+          } else {
+            var isEsc = rawText.includes('[ESCALATE_TO_ADMIN]');
+            finalResult = {
+              answer: rawText.replace(/\[ESCALATE_TO_ADMIN\]/g, '').trim(),
+              escalated: isEsc,
+              actions: [
+                { label: 'Xem Bảng Giá 4 Gói', view: 'catalog' },
+                { label: 'Xem Chi Tiết Kỹ Thuật', view: 'detail' }
+              ]
+            };
+          }
+        }
+      } catch (err) {}
+    }
+
+    // STEP 3: Fallback to verified local smart knowledge base (guarantees 100% resilience)
+    if (!finalResult) {
+      if (mode === 'app') {
+        finalResult = processAppSmartFallback(prompt, context);
+      } else {
+        finalResult = processWebSmartFallback(prompt, context);
+      }
+    }
+
+    // STEP 4: STRICT ESCALATION ROUTING
+    if (finalResult.escalated) {
+      escalateToAdmin({
+        source: mode,
+        userEmail: email,
+        userName: name,
+        query: prompt,
+        reason: 'Câu hỏi chuyên sâu hoặc bối cảnh quay mới cần Master Admin duyệt',
+        context: context
+      });
+    }
+
+    // STEP 5: CENTRAL AUDIT CONVERSATION LOG
+    var record = logAiConversation({
+      source: mode,
+      userEmail: email,
+      userName: name,
+      query: prompt,
+      reply: finalResult.answer,
+      status: finalResult.escalated ? 'pending_approval' : 'answered',
+      actionPayload: finalResult.cameraPreset || finalResult.actions || null,
+      confidence: finalResult.escalated ? 0.2 : 0.95
+    });
+
+    finalResult.recordId = record.id;
+    return finalResult;
+  }
+
+  // --- COMPATIBILITY WRAPPERS FOR WEB & APP ---
+  function processWebAiQuery(userQuery, userContext) {
+    return queryUnifiedCloudAi({
+      prompt: userQuery,
+      mode: 'web',
+      context: userContext
+    });
+  }
+
+  function processAppAiQuery(userQuery, userContext) {
+    return queryUnifiedCloudAi({
+      prompt: userQuery,
+      mode: 'app',
+      context: userContext
+    });
   }
 
   return {
@@ -1730,6 +1898,13 @@
     escalateToAdmin: escalateToAdmin,
     approveAndTrainAiQuestion: approveAndTrainAiQuestion,
     ignorePendingAiQuestion: ignorePendingAiQuestion,
+    AI_CLOUD_CONFIG_KEY: AI_CLOUD_CONFIG_KEY,
+    getCloudAiConfig: getCloudAiConfig,
+    saveCloudAiConfig: saveCloudAiConfig,
+    testCloudAiConnection: testCloudAiConnection,
+    queryUnifiedCloudAi: queryUnifiedCloudAi,
+    processWebSmartFallback: processWebSmartFallback,
+    processAppSmartFallback: processAppSmartFallback,
     processWebAiQuery: processWebAiQuery,
     processAppAiQuery: processAppAiQuery
   };

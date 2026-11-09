@@ -799,11 +799,15 @@
 
       <div class="app-ai-sheet-body" id="appAiMessagesBody">
         <div class="app-ai-bubble bot">
-          👋 Chào bạn! Tôi là <strong>T-Flow AI Camera Copilot</strong>. Tôi có thể hỗ trợ bạn chọn góc quay, gợi ý thông số camera và kích hoạt các chế độ gimbal ngay trên máy bay:
+          👋 Chào bạn! Tôi là <strong>T-Flow AI Camera Copilot</strong> (Google Cloud AI). Tôi hỗ trợ phân tích bối cảnh, tư vấn góc máy điện ảnh, gợi ý thông số camera và tự động thao tác cài đặt máy giúp bạn:
           <br>
-          <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Gợi ý cách quay Cinematic Inception 360°')">🎬 Quay Inception 360°</button>
-          <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Cách dùng vòng Focus Wheel lấy nét mượt')">🎯 Focus Wheel</button>
-          <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Kiểm tra cân bằng tải và động cơ FOC')">⚡ Cân Bằng FOC</button>
+          <div style="display:flex; flex-wrap:wrap; gap:6px; margin-top:10px;">
+            <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Kỹ thuật quay cảnh hoàng hôn trên biển ngược sáng')">🌅 Hoàng Hôn Biển Vàng</button>
+            <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Quay thể thao xe chạy tốc độ cao hành động nhanh')">🏎️ Thể Thao Tốc Độ Cao</button>
+            <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Quay chân dung phỏng vấn xóa phông tự nhiên tôn da')">✨ Chân Dung Xóa Phông</button>
+            <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Gợi ý cách quay Cinematic Inception 360°')">🎬 Inception 360°</button>
+            <button class="app-ai-action-btn" onclick="sendAppAiPrompt('Kiểm tra cân bằng tải và động cơ FOC 20kHz')">⚡ Cân Bằng FOC</button>
+          </div>
         </div>
       </div>
 
@@ -1256,7 +1260,7 @@
       processAppAiMessage(text);
     }
 
-    function processAppAiMessage(userText) {
+    async function processAppAiMessage(userText) {
       appAiHistory.push({
         sender: 'user',
         text: userText
@@ -1267,20 +1271,23 @@
       const typingEl = document.createElement('div');
       typingEl.className = 'app-ai-bubble bot';
       typingEl.id = 'appAiTyping';
-      typingEl.innerHTML = '<span style="color:#5AC8FA; font-weight:700;">AI đang phân tích bối cảnh & tối ưu thông số...</span>';
+      typingEl.innerHTML = '<span style="color:#5AC8FA; font-weight:700;">⚡ Cloud AI đang phân tích bối cảnh & tối ưu thông số...</span>';
       container.appendChild(typingEl);
       container.scrollTop = container.scrollHeight;
 
-      setTimeout(() => {
-        const el = document.getElementById('appAiTyping');
-        if (el) el.remove();
-
+      try {
         let aiRes = null;
-        if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.processAppAiQuery) {
-          aiRes = SmartGimbalCatalog.processAppAiQuery(userText, {
-            currentMode: document.querySelector('.mode-item.active') ? document.querySelector('.mode-item.active').textContent : 'VIDEO',
-            currentGimbal: document.querySelector('.gimbal-pill.active') ? document.querySelector('.gimbal-pill.active').textContent : 'PF'
+        if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.queryUnifiedCloudAi) {
+          aiRes = await SmartGimbalCatalog.queryUnifiedCloudAi({
+            prompt: userText,
+            mode: 'app',
+            context: {
+              currentMode: document.querySelector('.mode-item.active') ? document.querySelector('.mode-item.active').textContent.trim() : 'VIDEO',
+              currentGimbal: document.querySelector('.gimbal-pill.active') ? document.querySelector('.gimbal-pill.active').textContent.trim() : 'PF'
+            }
           });
+        } else if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.processAppAiQuery) {
+          aiRes = await SmartGimbalCatalog.processAppAiQuery(userText);
         } else {
           aiRes = {
             answer: 'Dạ em đã nhận được yêu cầu của anh. Em đề xuất dùng chế độ PRO CINEMA 4K 60fps để có chất lượng cao nhất.',
@@ -1290,16 +1297,31 @@
           };
         }
 
+        const el = document.getElementById('appAiTyping');
+        if (el) el.remove();
+
         appAiHistory.push({
           sender: 'bot',
           text: aiRes.answer,
           cameraPreset: aiRes.cameraPreset,
+          suggestAction: aiRes.suggestAction,
+          promptQuestion: aiRes.promptQuestion,
           escalated: aiRes.escalated,
           executed: false
         });
 
         renderAppAiMessages();
-      }, 500);
+      } catch (err) {
+        const el = document.getElementById('appAiTyping');
+        if (el) el.remove();
+        appAiHistory.push({
+          sender: 'bot',
+          text: 'Dạ kết nối mạng tạm thời gián đoạn. Anh có thể chọn preset mẫu bên dưới ạ!',
+          escalated: false,
+          executed: false
+        });
+        renderAppAiMessages();
+      }
     }
 
     // MANDATORY REAL ACTION EXECUTION:

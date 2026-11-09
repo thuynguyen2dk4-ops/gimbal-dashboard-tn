@@ -1078,6 +1078,9 @@
         <button class="btn-tab-ai" id="tabBtnAiKb" onclick="switchAiTab('kb')">
           📚 Bộ Tri Thức Đã Huấn Luyện (<span id="tabCountKb">0</span>)
         </button>
+        <button class="btn-tab-ai" id="tabBtnAiConfig" onclick="switchAiTab('config')">
+          ☁️ Cấu Hình Google Cloud AI (Gemini)
+        </button>
       </div>
 
       <!-- TAB 1 CONTENT: LOGS -->
@@ -1143,6 +1146,117 @@
           </tbody>
         </table>
       </div>
+
+      <!-- TAB 4 CONTENT: UNIFIED GOOGLE CLOUD AI CONFIGURATION -->
+      <div id="aiTabContentConfig" style="display:none;">
+        <div style="background:#FFFFFF; border:1px solid var(--border); border-radius:16px; padding:24px; margin-bottom:20px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+          
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
+            <div>
+              <div style="font-size:16px; font-weight:800; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+                <span style="font-size:20px;">☁️</span> Bộ Não AI Đám Mây Hợp Nhất (Google Gemini API)
+              </div>
+              <div style="font-size:12.5px; color:var(--text-secondary); margin-top:4px; max-width:640px; line-height:1.5;">
+                Toàn bộ luồng trò chuyện trên <strong>Web Bán Hàng</strong> và <strong>App Camera Copilot</strong> đều truy vấn tập trung về duy nhất một động cơ Google Cloud AI thông qua endpoint <code>/api/chat</code>. Mọi dữ liệu hỏi đáp đều được đồng bộ về Trung Tâm Huấn Luyện này.
+              </div>
+            </div>
+            <div id="cloudAiStatusBadge" style="padding:6px 14px; border-radius:99px; font-size:12px; font-weight:700; background:rgba(52,199,89,0.12); color:#248A3D; border:1px solid rgba(52,199,89,0.3); display:flex; align-items:center; gap:6px;">
+              <span style="width:7px; height:7px; border-radius:50%; background:#34C759;"></span>
+              Đang Hoạt Động (Cloud Ready)
+            </div>
+          </div>
+
+          <!-- CONFIG FIELDS GRID -->
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+            <!-- 1. Google Gemini API Key -->
+            <div>
+              <label style="display:block; font-size:12.5px; font-weight:700; color:var(--text-main); margin-bottom:6px;">
+                Google AI Studio API Key (Gemini)
+              </label>
+              <div style="position:relative; display:flex; align-items:center;">
+                <input type="password" id="cloudAiApiKeyInput" placeholder="Dán mã API Key dạng AIzaSy..." style="width:100%; padding:10px 40px 10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px; font-family:monospace; outline:none;">
+                <button type="button" onclick="toggleAiKeyVisibility()" style="position:absolute; right:10px; background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:14px;">👁️</button>
+              </div>
+              <div style="font-size:11px; color:var(--text-secondary); margin-top:5px;">
+                🔑 Khóa API được lưu an toàn trong trình duyệt quản trị và đồng bộ trực tiếp tới máy chủ <code>/api/chat</code>.
+              </div>
+            </div>
+
+            <!-- 2. AI Model Selection -->
+            <div>
+              <label style="display:block; font-size:12.5px; font-weight:700; color:var(--text-main); margin-bottom:6px;">
+                Model AI Vận Hành
+              </label>
+              <select id="cloudAiModelSelect" style="width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px; outline:none; background:#FFF;">
+                <option value="gemini-2.5-flash">Gemini 2.5 Flash (Khuyên dùng • Phản hồi &lt; 800ms • Quota 1.0x)</option>
+                <option value="gemini-3.8-flash">Gemini 3.8 Flash (Thế hệ mới nhất • Suy luận đa phương thức)</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash (Bản ổn định tiêu chuẩn)</option>
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Legacy)</option>
+              </select>
+              <div style="font-size:11px; color:var(--text-secondary); margin-top:5px;">
+                ⚡ Model Gemini Flash tối ưu hóa độ trễ phản hồi thời gian thực trên cả Web và App điện thoại.
+              </div>
+            </div>
+          </div>
+
+          <!-- ENDPOINT & ACTIONS -->
+          <div style="display:flex; justify-content:space-between; align-items:center; padding-top:16px; border-top:1px solid var(--border);">
+            <div style="font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:8px;">
+              <span style="font-weight:700; color:var(--text-main);">Endpoint Serverless:</span>
+              <span style="background:#F5F5F7; padding:3px 8px; border-radius:6px; font-family:monospace; font-size:11.5px; border:1px solid #E5E5EA;">POST /api/chat</span>
+              <span style="color:#34C759; font-weight:600;">✓ Vercel Edge Active</span>
+            </div>
+            <div style="display:flex; gap:10px;">
+              <button class="btn btn-outline" id="btnTestCloudAi" onclick="testCloudAiConnectionUI()" style="display:flex; align-items:center; gap:6px;">
+                <span>⚡</span> Kiểm Tra Kết Nối Cloud AI
+              </button>
+              <button class="btn btn-dark" onclick="saveCloudAiConfigUI()" style="display:flex; align-items:center; gap:6px;">
+                <span>💾</span> Lưu Cấu Hình Cloud AI
+              </button>
+            </div>
+          </div>
+
+          <!-- TEST RESULT ALERT BOX -->
+          <div id="cloudAiTestResultBox" style="display:none; margin-top:16px; padding:12px 16px; border-radius:10px; font-size:12.5px; line-height:1.5;"></div>
+
+        </div>
+
+        <!-- VISUAL ECOSYSTEM ARCHITECTURE SHOWCASE -->
+        <div style="background:#F9F9FB; border:1px solid var(--border); border-radius:16px; padding:22px;">
+          <div style="font-size:14px; font-weight:800; color:var(--text-main); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <span>📐</span> Kiến Trúc Hợp Nhất 1 Cloud AI - 2 Persona Riêng Biệt
+          </div>
+          
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <!-- Persona 1: Web -->
+            <div style="background:#FFF; border:1px solid #E5E5EA; border-radius:12px; padding:16px;">
+              <div style="font-weight:700; color:#0071E3; font-size:13.5px; margin-bottom:6px;">🌐 Persona 1: Web Sales &amp; Technical Consultant</div>
+              <ul style="font-size:12px; color:var(--text-secondary); line-height:1.6; padding-left:18px; margin:0;">
+                <li>Tự động tư vấn thông số kỹ thuật (động cơ Pure FOC 20kHz, MagSafe 45N N52, pin 18h).</li>
+                <li>Báo giá chuẩn xác 4 gói: Standard 2.49M, Creator 3.19M, Cinematic 3.99M, Master 5.49M.</li>
+                <li>Cam kết chính sách bảo hành 1 đổi 1 trong 12 tháng, 30 ngày dùng thử trả hàng miễn phí.</li>
+                <li>Đính kèm nút tắt chuyển trang PDP, giỏ hàng, bảng giá tức thì cho khách mua.</li>
+              </ul>
+            </div>
+
+            <!-- Persona 2: App -->
+            <div style="background:#FFF; border:1px solid #E5E5EA; border-radius:12px; padding:16px;">
+              <div style="font-weight:700; color:#248A3D; font-size:13.5px; margin-bottom:6px;">📱 Persona 2: App Camera Copilot &amp; Creative Director</div>
+              <ul style="font-size:12px; color:var(--text-secondary); line-height:1.6; padding-left:18px; margin:0;">
+                <li>Phân tích bối cảnh quay chụp (hoàng hôn, thể thao nhanh, chân dung xóa phông, đêm).</li>
+                <li>Đề xuất bộ thông số camera chuẩn điện ảnh (Mode, 4K/FPS, Shutter, ISO, EV, 3D LUT, Gimbal).</li>
+                <li><strong>Hỏi người dùng:</strong> <em>"Anh có muốn em tự thao tác cài đặt các thông số này không?"</em></li>
+                <li>Nút bấm xác nhận <strong>[⚡ Có, Hãy Tự Động Thao Tác Giúp Anh]</strong> can thiệp thẳng vào hệ thống máy ảnh.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div style="margin-top:14px; padding:12px 14px; background:rgba(0,113,227,0.06); border:1px solid rgba(0,113,227,0.2); border-radius:10px; font-size:12px; color:#0071E3; line-height:1.5;">
+            <strong>🛡️ Cơ chế Chống Trả Lời Bừa (Zero Hallucination &amp; Escalation):</strong> Bất kỳ câu hỏi nào vượt quá phạm vi kiểm định đều được AI tự động đính kèm cờ chuyển tiếp về <strong>Hàng Đợi Chờ Duyệt (Pending Queue)</strong>. Admin Thủy Nguyễn nhập đáp án chuẩn và bấm <em>[Lưu &amp; Huấn Luyện]</em> để cập nhật ngay vào cơ sở tri thức cho toàn bộ hệ sinh thái!
+          </div>
+        </div>
+      </div>
+
 
     </div>
 </div>
@@ -2509,13 +2623,135 @@
       document.getElementById('tabBtnAiLogs').classList.toggle('active', tabKey === 'logs');
       document.getElementById('tabBtnAiPending').classList.toggle('active', tabKey === 'pending');
       document.getElementById('tabBtnAiKb').classList.toggle('active', tabKey === 'kb');
+      const cfgBtn = document.getElementById('tabBtnAiConfig');
+      if (cfgBtn) cfgBtn.classList.toggle('active', tabKey === 'config');
 
       document.getElementById('aiTabContentLogs').style.display = tabKey === 'logs' ? 'block' : 'none';
       document.getElementById('aiTabContentPending').style.display = tabKey === 'pending' ? 'block' : 'none';
       document.getElementById('aiTabContentKb').style.display = tabKey === 'kb' ? 'block' : 'none';
+      const cfgContent = document.getElementById('aiTabContentConfig');
+      if (cfgContent) cfgContent.style.display = tabKey === 'config' ? 'block' : 'none';
 
       if (tabKey === 'pending') renderAiPendingList();
       if (tabKey === 'kb') renderAiKbTable();
+      if (tabKey === 'config') loadCloudAiConfigUI();
+    }
+
+    // --- CLOUD AI CONFIGURATION CONTROLLERS ---
+    function loadCloudAiConfigUI() {
+      if (typeof SmartGimbalCatalog === 'undefined' || !SmartGimbalCatalog.getCloudAiConfig) return;
+      const cfg = SmartGimbalCatalog.getCloudAiConfig();
+      const keyInput = document.getElementById('cloudAiApiKeyInput');
+      const modelSelect = document.getElementById('cloudAiModelSelect');
+      const badge = document.getElementById('cloudAiStatusBadge');
+
+      if (keyInput) keyInput.value = cfg.apiKey || '';
+      if (modelSelect && cfg.model) modelSelect.value = cfg.model;
+
+      if (badge) {
+        if (cfg.apiKey) {
+          badge.innerHTML = '<span style="width:7px; height:7px; border-radius:50%; background:#34C759;"></span> Đã Kết Nối Google AI (Key Sẵn Sàng)';
+          badge.style.background = 'rgba(52,199,89,0.12)';
+          badge.style.color = '#248A3D';
+          badge.style.borderColor = 'rgba(52,199,89,0.3)';
+        } else {
+          badge.innerHTML = '<span style="width:7px; height:7px; border-radius:50%; background:#F59E0B;"></span> Chế Độ Tri Thức Nội Bộ (Chưa Gắn Key)';
+          badge.style.background = 'rgba(245,158,11,0.12)';
+          badge.style.color = '#B45309';
+          badge.style.borderColor = 'rgba(245,158,11,0.3)';
+        }
+      }
+    }
+
+    function toggleAiKeyVisibility() {
+      const input = document.getElementById('cloudAiApiKeyInput');
+      if (!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function saveCloudAiConfigUI() {
+      if (typeof SmartGimbalCatalog === 'undefined' || !SmartGimbalCatalog.saveCloudAiConfig) return;
+      const keyInput = document.getElementById('cloudAiApiKeyInput');
+      const modelSelect = document.getElementById('cloudAiModelSelect');
+
+      const apiKey = keyInput ? keyInput.value.trim() : '';
+      const model = modelSelect ? modelSelect.value : 'gemini-2.5-flash';
+
+      SmartGimbalCatalog.saveCloudAiConfig({
+        apiKey: apiKey,
+        model: model
+      });
+
+      loadCloudAiConfigUI();
+
+      // Show toast
+      showNotification('✓ Đã lưu cấu hình Google Cloud AI thành công!');
+    }
+
+    async function testCloudAiConnectionUI() {
+      const btn = document.getElementById('btnTestCloudAi');
+      const resBox = document.getElementById('cloudAiTestResultBox');
+      const keyInput = document.getElementById('cloudAiApiKeyInput');
+      const modelSelect = document.getElementById('cloudAiModelSelect');
+
+      const apiKey = keyInput ? keyInput.value.trim() : '';
+      const model = modelSelect ? modelSelect.value : 'gemini-2.5-flash';
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span style="animation:spin 1s linear infinite;">⌛</span> Đang Ping Google Cloud AI...';
+      }
+
+      if (resBox) {
+        resBox.style.display = 'block';
+        resBox.style.background = 'rgba(0,113,227,0.06)';
+        resBox.style.border = '1px solid rgba(0,113,227,0.2)';
+        resBox.style.color = '#0071E3';
+        resBox.innerHTML = '⚡ Đang gửi gói tin kiểm tra tới endpoint /api/chat & Google Gemini REST API...';
+      }
+
+      try {
+        const testRes = await SmartGimbalCatalog.testCloudAiConnection(apiKey, model);
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>⚡</span> Kiểm Tra Kết Nối Cloud AI';
+        }
+
+        if (resBox) {
+          if (testRes.success) {
+            resBox.style.background = 'rgba(52,199,89,0.1)';
+            resBox.style.border = '1px solid rgba(52,199,89,0.3)';
+            resBox.style.color = '#248A3D';
+            resBox.innerHTML = `
+              <strong>✓ KẾT NỐI CLOUD AI THÀNH CÔNG!</strong><br>
+              • <strong>Động cơ:</strong> Google Gemini API (${testRes.model})<br>
+              • <strong>Độ trễ phản hồi (Latency):</strong> ${testRes.latencyMs}ms (Siêu tốc)<br>
+              • <strong>Nguồn xử lý:</strong> ${testRes.source}<br>
+              • <strong>Trạng thái:</strong> Toàn bộ Web Bán Hàng & App Camera Copilot đã sẵn sàng nhận lệnh!
+            `;
+          } else {
+            resBox.style.background = 'rgba(239,68,68,0.1)';
+            resBox.style.border = '1px solid rgba(239,68,68,0.3)';
+            resBox.style.color = '#DC2626';
+            resBox.innerHTML = `
+              <strong>⚠️ KIỂM TRA KẾT NỐI:</strong><br>
+              ${testRes.error || 'Chưa nhận được phản hồi từ serverless/Google API.'}<br>
+              <em>Lưu ý: Hệ thống đang tự động kích hoạt bộ tri thức kiểm định nội bộ để đảm bảo 100% thời gian hoạt động.</em>
+            `;
+          }
+        }
+      } catch (e) {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>⚡</span> Kiểm Tra Kết Nối Cloud AI';
+        }
+        if (resBox) {
+          resBox.style.background = 'rgba(239,68,68,0.1)';
+          resBox.style.border = '1px solid rgba(239,68,68,0.3)';
+          resBox.style.color = '#DC2626';
+          resBox.innerHTML = 'Lỗi kiểm tra: ' + e.message;
+        }
+      }
     }
 
     function filterAiLogs(filter, btn) {

@@ -3972,7 +3972,7 @@
       processAiMessage(text);
     }
 
-    function processAiMessage(userText) {
+    async function processAiMessage(userText) {
       aiChatHistory.push({
         sender: 'user',
         text: userText
@@ -3994,14 +3994,16 @@
       container.appendChild(typingDiv);
       container.scrollTop = container.scrollHeight;
 
-      setTimeout(() => {
-        const el = document.getElementById('aiTypingBubble');
-        if (el) el.remove();
-
-        // CALL SMART GIMBAL CATALOG WEB AI BRAIN (STRICT ZERO HALLUCINATION)
+      try {
         let aiResult = null;
-        if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.processWebAiQuery) {
-          aiResult = SmartGimbalCatalog.processWebAiQuery(userText, { currentView: currentView });
+        if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.queryUnifiedCloudAi) {
+          aiResult = await SmartGimbalCatalog.queryUnifiedCloudAi({
+            prompt: userText,
+            mode: 'web',
+            context: { currentView: currentView }
+          });
+        } else if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.processWebAiQuery) {
+          aiResult = await SmartGimbalCatalog.processWebAiQuery(userText, { currentView: currentView });
         } else {
           aiResult = {
             answer: 'Cảm ơn câu hỏi của bạn về T-Flow Pro. Vui lòng liên hệ hotline 1900 8899 để được hỗ trợ tức thời.',
@@ -4010,6 +4012,9 @@
             actions: [{ label: 'Xem Bảng Giá', action: "switchView('catalog'); toggleTflowAiChat(false);" }]
           };
         }
+
+        const el = document.getElementById('aiTypingBubble');
+        if (el) el.remove();
 
         aiChatHistory.push({
           sender: 'bot',
@@ -4027,7 +4032,19 @@
         });
 
         renderAiMessages();
-      }, 450);
+      } catch (err) {
+        const el = document.getElementById('aiTypingBubble');
+        if (el) el.remove();
+        aiChatHistory.push({
+          sender: 'bot',
+          text: 'Dạ kết nối mạng tạm thời bị gián đoạn. Anh có thể xem nhanh bảng giá hoặc thông số kỹ thuật bên dưới ạ!',
+          actions: [
+            { label: 'Xem Bảng Giá 4 Gói', action: "switchView('catalog'); toggleTflowAiChat(false);" },
+            { label: 'Xem Chi Tiết Kỹ Thuật', action: "switchView('detail'); toggleTflowAiChat(false);" }
+          ]
+        });
+        renderAiMessages();
+      }
     }
 
     function showToast(msg) {
