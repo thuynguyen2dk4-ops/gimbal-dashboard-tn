@@ -3085,12 +3085,12 @@
         return;
       }
 
-      loadMvpData();
-      renderCatalogFilterChips();
-      renderCatalogGrid();
-      updateNavCartCount();
-      renderNavUserSection();
-      renderReviewsList();
+      try { loadMvpData(); } catch(e) { console.error('MVP load error:', e); }
+      try { renderCatalogFilterChips(); } catch(e) { console.error('Filter chips error:', e); }
+      try { renderCatalogGrid(); } catch(e) { console.error('Catalog grid error:', e); }
+      try { updateNavCartCount(); } catch(e) { console.error('Cart count error:', e); }
+      try { renderNavUserSection(); } catch(e) { console.error('User section error:', e); }
+      try { renderReviewsList(); } catch(e) { console.error('Reviews error:', e); }
 
       // Listen for store catalog updates
       window.addEventListener(SmartGimbalCatalog.SYNC_EVENT, () => {
@@ -3153,13 +3153,31 @@
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
       handleStickyBuyBar();
+
+      if (viewName === 'catalog') {
+        renderCatalogFilterChips();
+        renderCatalogGrid();
+      } else if (viewName === 'reviews') {
+        renderReviewsList();
+      } else if (viewName === 'home') {
+        loadMvpData();
+      }
     }
 
     // ==========================================================================
     // 2. HERO FLAGSHIP MVP LOGIC (REQUIREMENT 1)
     // ==========================================================================
     function loadMvpData() {
-      currentMvp = SmartGimbalCatalog.getMvpProduct();
+      try {
+        if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getMvpProduct) {
+          currentMvp = SmartGimbalCatalog.getMvpProduct();
+        } else if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getProducts) {
+          const prods = SmartGimbalCatalog.getProducts();
+          currentMvp = prods.find(p => p.is_flagship) || prods[0] || null;
+        }
+      } catch (err) {
+        console.warn('loadMvpData error:', err);
+      }
       if (!currentMvp) return;
 
       document.getElementById('heroFlagshipTitle').textContent = currentMvp.name;
@@ -3257,14 +3275,23 @@
     // ==========================================================================
     function renderCatalogGrid() {
       const container = document.getElementById('catalogProductsGrid');
+      if (!container) return;
       container.innerHTML = '';
 
-      const products = SmartGimbalCatalog.getProducts(selectedCatalogFilter);
+      const products = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getProducts)
+        ? SmartGimbalCatalog.getProducts(selectedCatalogFilter)
+        : [];
+
+      if (!products || products.length === 0) {
+        container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:48px 20px; color:#86868B; font-size:14px;">Chưa có sản phẩm nào trong danh mục này.</div>';
+        return;
+      }
+
       products.forEach(p => {
-        const group = SmartGimbalCatalog.getGroup(p.groupId);
-        const groupName = group ? group.name : 'Gimbal';
+        const group = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getGroup) ? SmartGimbalCatalog.getGroup(p.groupId) : null;
+        const groupName = group ? group.name : 'T-Flow Official';
         const startingTier = p.tiers && p.tiers[0] ? p.tiers[0] : null;
-        const priceDisplay = startingTier ? startingTier.priceFormatted : '1.990.000₫';
+        const priceDisplay = startingTier ? (startingTier.priceFormatted || SmartGimbalCatalog.formatVND(startingTier.price)) : (p.price ? SmartGimbalCatalog.formatVND(p.price) : '2.490.000₫');
 
         let colorsHtml = '';
         if (p.colors && p.colors.length > 0) {
