@@ -1908,6 +1908,37 @@
       50% { opacity: 0.5; transform: scale(1.2); }
     }
 
+        /* Backdrop Overlay for Mobile Bottom Sheet */
+    .tflow-ai-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 9998;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .tflow-ai-backdrop.active {
+      display: block;
+      opacity: 1;
+    }
+    .ai-drawer-drag-handle {
+      display: none;
+      width: 40px;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.35);
+      border-radius: 99px;
+      margin: 8px auto 4px auto;
+      cursor: pointer;
+    }
+    .tflow-ai-fab.is-hidden {
+      display: none !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
     /* Floating Chat Drawer Window */
     .tflow-ai-drawer {
       position: fixed;
@@ -2586,34 +2617,102 @@
       /* ========================================================================
          6. COMPACT FLOATING AI WIDGET (NEVER BLOCKS INTERACTIVE BUTTONS)
          ======================================================================== */
+      /* Mobile Sleek AI FAB Button */
       .tflow-ai-fab {
-        bottom: 24px !important;
+        bottom: 20px !important;
         right: 16px !important;
-        width: 50px !important;
-        height: 50px !important;
+        width: 48px !important;
+        height: 48px !important;
         border-radius: 50% !important;
         padding: 0 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.25), 0 0 0 1px rgba(255,255,255,0.1) !important;
-        z-index: 9990 !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+        z-index: 9995 !important;
+        transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease !important;
+      }
+      .tflow-ai-fab.is-hidden {
+        display: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
       }
       .tflow-ai-fab-icon {
-        width: 32px !important;
-        height: 32px !important;
+        width: 28px !important;
+        height: 28px !important;
         box-shadow: none !important;
       }
       .tflow-ai-fab-text {
         display: none !important;
       }
+
+      /* Mobile Sleek Apple-Style Bottom Sheet Drawer (Never Covers Entire Screen) */
+      .ai-drawer-drag-handle {
+        display: block !important;
+      }
       .tflow-ai-drawer {
-        width: calc(100vw - 24px) !important;
-        max-width: 420px !important;
-        height: 82vh !important;
-        bottom: 84px !important;
-        right: 12px !important;
-        border-radius: 20px !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 56dvh !important;
+        max-height: 75dvh !important;
+        border-radius: 24px 24px 0 0 !important;
+        border: none !important;
+        box-shadow: 0 -12px 48px rgba(0,0,0,0.35) !important;
+        z-index: 10000 !important;
+        animation: slideUpBottomSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      }
+      @keyframes slideUpBottomSheet {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+      }
+      .ai-drawer-header {
+        padding: 8px 16px 12px 16px !important;
+      }
+      .ai-header-avatar {
+        width: 30px !important;
+        height: 30px !important;
+        border-radius: 8px !important;
+      }
+      .btn-ai-close {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 18px !important;
+        background: rgba(255,255,255,0.2) !important;
+      }
+      .ai-domain-switcher-bar {
+        padding: 4px 8px !important;
+        gap: 4px !important;
+      }
+      .ai-domain-btn {
+        padding: 6px 4px !important;
+        font-size: 11px !important;
+      }
+      .ai-quick-prompts-bar {
+        padding: 6px 12px !important;
+        gap: 6px !important;
+      }
+      .ai-prompt-pill {
+        padding: 4px 10px !important;
+        font-size: 11px !important;
+      }
+      .ai-messages-container {
+        padding: 12px 14px !important;
+        gap: 10px !important;
+      }
+      .ai-msg-bubble {
+        padding: 10px 14px !important;
+        font-size: 13px !important;
+      }
+      .ai-input-bar {
+        padding: 8px 12px max(10px, env(safe-area-inset-bottom)) 12px !important;
+      }
+      .ai-input-field {
+        font-size: 16px !important; /* 16px strictly prevents iOS Safari automatic zoom */
+        padding: 9px 14px !important;
       }
       .cart-drawer {
         width: 100% !important;
@@ -2751,7 +2850,7 @@
   <!-- STICKY BUY BAR (VISIBLE ON DETAIL VIEW SCROLL) -->
   <div class="sticky-buy-bar" id="stickyBuyBar">
     <div class="sticky-bar-info">
-      <img id="stickyBarImg" src="../shared/img/feed_portrait_dusk.jpg" alt="Thumb">
+      <img id="stickyBarImg" src="/shared/img/feed_portrait_dusk.jpg" alt="Thumb">
       <div>
         <div class="sticky-bar-title" id="stickyBarTitle">Smart Gimbal S1</div>
         <div class="sticky-bar-price" id="stickyBarPrice">2.890.000₫</div>
@@ -2774,7 +2873,7 @@
           <!-- Left: Big Media Box -->
           <div class="flagship-media-box">
             <span class="flagship-badge">Sản Phẩm Nổi Bật</span>
-            <img id="heroFlagshipImg" src="../shared/img/feed_portrait_dusk.jpg" alt="Flagship Product">
+            <img id="heroFlagshipImg" src="/shared/img/feed_portrait_dusk.jpg" alt="Flagship Product">
           </div>
 
           <!-- Right: Flagship Info & Configurator -->
@@ -2890,7 +2989,7 @@
             <p style="font-size:14.5px; color:var(--text-secondary); line-height:1.6;">
               Giao diện tối giản dành cho sáng tạo nội dung hàng ngày. Tự động nhận diện khuôn mặt, chuyển đổi dọc ngang 1 chạm cho TikTok và Reels.
             </p>
-            <img src="../preview/01_camera_basic_dark.png" alt="Basic App Preview">
+            <img src="/preview/01_camera_basic_dark.png" alt="Basic App Preview">
           </div>
 
           <!-- Card App Pro -->
@@ -2900,7 +2999,7 @@
             <p style="font-size:14.5px; color:var(--text-secondary); line-height:1.6;">
               Hỗ trợ chuẩn quay Apple Log, ProRes 4K/60fps, nạp bảng màu 3D LUT trực tiếp và kiểm soát Focus Pulling như máy quay điện ảnh chuyên nghiệp.
             </p>
-            <img src="../preview/02_camera_pro_dark.png" alt="Pro Cinema App Preview">
+            <img src="/preview/02_camera_pro_dark.png" alt="Pro Cinema App Preview">
           </div>
         </div>
       </div>
@@ -2978,7 +3077,7 @@
           <!-- Left: Sticky Gallery -->
           <div class="sticky-gallery-col">
             <div class="gallery-main-frame">
-              <img id="detailMainImg" src="../shared/img/feed_portrait_dusk.jpg" alt="Product Image">
+              <img id="detailMainImg" src="/shared/img/feed_portrait_dusk.jpg" alt="Product Image">
             </div>
             <div class="gallery-thumbs-row" id="detailThumbsRow">
               <!-- Dynamically populated 4 angle shots -->
@@ -3431,7 +3530,7 @@
   <!-- ==========================================================================
        LOGIC & DYNAMIC STORE INTEGRATION
        ========================================================================== -->
-  <script src="../shared/catalog_store.js"></script>
+  <script src="/shared/catalog_store.js"></script>
   <script>
     // State
     let currentMvp = null;
@@ -3678,19 +3777,19 @@
 
       try {
         const popup = window.open(
-          'google_auth.html',
+          '/google_auth.html',
           'GoogleAccountsOAuth',
           `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
         );
 
         if (!popup || popup.closed || typeof popup.closed === 'undefined') {
           // If popup is blocked by browser, redirect smoothly
-          window.location.href = 'google_auth.html';
+          window.location.href = '/google_auth.html';
         } else if (popup && popup.focus) {
           popup.focus();
         }
       } catch (e) {
-        window.location.href = 'google_auth.html';
+        window.location.href = '/google_auth.html';
       }
     }
 
@@ -4001,7 +4100,7 @@
       document.getElementById('heroFlagshipTitle').textContent = currentMvp.name;
       document.getElementById('heroFlagshipTagline').textContent = currentMvp.tagline || currentMvp.subtitle || '';
       document.getElementById('heroFlagshipDesc').textContent = currentMvp.subtitle || '';
-      document.getElementById('heroFlagshipImg').src = currentMvp.img || '../shared/img/feed_portrait_dusk.jpg';
+      document.getElementById('heroFlagshipImg').src = currentMvp.img || '/shared/img/feed_portrait_dusk.jpg';
 
       // Render Tiers
       const tierContainer = document.getElementById('heroTierSelector');
@@ -4130,7 +4229,7 @@
         card.onclick = () => openProductDetail(p.id);
         card.innerHTML = `
           <div class="store-card-img-wrap">
-            <img src="${p.img || '../shared/img/feed_portrait_dusk.jpg'}" alt="${p.name}">
+            <img src="${p.img || '/shared/img/feed_portrait_dusk.jpg'}" alt="${p.name}">
           </div>
           <div>
             <div class="store-card-tag">${groupName}</div>
@@ -4199,13 +4298,13 @@
 
       // Gallery main image
       const elMainImg = document.getElementById('detailMainImg');
-      if (elMainImg) elMainImg.src = prod.img || '../shared/img/feed_portrait_dusk.jpg';
+      if (elMainImg) elMainImg.src = prod.img || '/shared/img/feed_portrait_dusk.jpg';
 
       // Thumbnails (4 photos)
       const thumbsContainer = document.getElementById('detailThumbsRow');
       if (thumbsContainer) {
         thumbsContainer.innerHTML = '';
-        const gallery = (prod.gallery && prod.gallery.length > 0) ? prod.gallery : [prod.img || '../shared/img/feed_portrait_dusk.jpg'];
+        const gallery = (prod.gallery && prod.gallery.length > 0) ? prod.gallery : [prod.img || '/shared/img/feed_portrait_dusk.jpg'];
         gallery.forEach((imgSrc, idx) => {
           const thumb = document.createElement('div');
           thumb.className = `thumb-item ${idx === 0 ? 'active' : ''}`;
@@ -4333,7 +4432,7 @@
 
       // Sticky buy bar setup
       const stickyImg = document.getElementById('stickyBarImg');
-      if (stickyImg) stickyImg.src = prod.img || '../shared/img/feed_portrait_dusk.jpg';
+      if (stickyImg) stickyImg.src = prod.img || '/shared/img/feed_portrait_dusk.jpg';
       const stickyTitle = document.getElementById('stickyBarTitle');
       if (stickyTitle) stickyTitle.textContent = prod.name;
 
@@ -4457,7 +4556,7 @@
         row.className = 'cart-item-row';
         row.innerHTML = `
           <div class="cart-item-thumb">
-            <img src="${item.img || '../shared/img/feed_portrait_dusk.jpg'}" alt="${item.productName}">
+            <img src="${item.img || '/shared/img/feed_portrait_dusk.jpg'}" alt="${item.productName}">
           </div>
           <div class="cart-item-details">
             <div class="cart-item-title">${item.productName}</div>
@@ -4881,21 +4980,63 @@
     function toggleTflowAiChat(open) {
       const drawer = document.getElementById('tflowAiDrawer');
       const fab = document.getElementById('tflowAiFab');
+      const backdrop = document.getElementById('tflowAiBackdrop');
       if (!drawer) return;
 
       if (open) {
         drawer.style.display = 'flex';
-        if (fab) fab.style.display = 'none';
+        if (fab) {
+          fab.classList.add('is-hidden');
+          fab.style.display = 'none';
+        }
+        if (backdrop) {
+          backdrop.classList.add('active');
+          backdrop.style.display = 'block';
+        }
         renderQuickPromptsBar(currentAiDomain);
         renderAiMessages();
-        setTimeout(() => {
-          const input = document.getElementById('aiUserMessageInput');
-          if (input) input.focus();
-        }, 120);
+        // Only autofocus on Desktop to prevent popping up mobile virtual keyboard uncontrollably
+        if (window.innerWidth > 768) {
+          setTimeout(() => {
+            const input = document.getElementById('aiUserMessageInput');
+            if (input) input.focus();
+          }, 120);
+        }
       } else {
         drawer.style.display = 'none';
-        if (fab) fab.style.display = 'flex';
+        if (fab) {
+          fab.classList.remove('is-hidden');
+          fab.style.display = 'flex';
+        }
+        if (backdrop) {
+          backdrop.classList.remove('active');
+          backdrop.style.display = 'none';
+        }
+        // Reset drawer styles
+        drawer.style.bottom = '';
+        drawer.style.height = '';
       }
+    }
+
+    // Dynamic Visual Viewport adjustment for Mobile Virtual Keyboard
+    if (typeof window !== 'undefined' && window.visualViewport) {
+      window.visualViewport.addEventListener('resize', () => {
+        const drawer = document.getElementById('tflowAiDrawer');
+        if (drawer && drawer.style.display === 'flex' && window.innerWidth <= 768) {
+          const keyboardOffset = window.innerHeight - window.visualViewport.height;
+          if (keyboardOffset > 120) {
+            // Keyboard is active
+            drawer.style.bottom = `${keyboardOffset}px`;
+            drawer.style.height = `${Math.min(window.visualViewport.height - 20, 380)}px`;
+          } else {
+            // Keyboard closed
+            drawer.style.bottom = '0px';
+            drawer.style.height = '56dvh';
+          }
+          const container = document.getElementById('aiMessagesContainer');
+          if (container) container.scrollTop = container.scrollHeight;
+        }
+      });
     }
 
     function renderAiMessages() {
@@ -5154,8 +5295,13 @@
     </div>
   </div>
 
+    <!-- T-FLOW AI BACKDROP OVERLAY -->
+  <div class="tflow-ai-backdrop" id="tflowAiBackdrop" onclick="toggleTflowAiChat(false)"></div>
+
   <!-- FLOATING CHAT DRAWER -->
   <div class="tflow-ai-drawer" id="tflowAiDrawer">
+    <!-- MOBILE DRAG HANDLE -->
+    <div class="ai-drawer-drag-handle" onclick="toggleTflowAiChat(false)" title="Chạm để thu nhỏ"></div>
     <!-- HEADER -->
     <div class="ai-drawer-header">
       <div class="ai-drawer-header-left">
