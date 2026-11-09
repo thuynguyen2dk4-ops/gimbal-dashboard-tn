@@ -2590,19 +2590,35 @@
           </div>
         </div>
 
-        <!-- FORM VIẾT ĐÁNH GIÁ (LUÔN MỞ SẴN - KHÔNG BỊ ẨN) -->
+        <!-- FORM VIẾT ĐÁNH GIÁ (YÊU CẦU ĐĂNG NHẬP TRƯỚC KHI ĐÁNH GIÁ) -->
         <div id="tflowReviewFormCard" class="review-form-card" style="display:block; margin-bottom:44px; border:1px solid #D2D2D7; box-shadow:0 12px 36px rgba(0,0,0,0.06);">
           <div class="form-header-bar" style="margin-bottom:18px;">
             <div style="display:flex; align-items:center; gap:12px;">
               <div style="width:36px; height:36px; border-radius:10px; background:#1D1D1F; color:#FFF; display:flex; align-items:center; justify-content:center; font-size:16px;">✍️</div>
               <div>
-                <h3 style="font-size:18px; font-weight:800; color:var(--text-main); margin:0;">Gửi Đánh Giá Trải Nghiệm Của Bạn</h3>
-                <p style="font-size:12.5px; color:var(--text-secondary); margin:2px 0 0 0;">Đánh giá của bạn sẽ hiển thị công khai ngay sau khi gửi.</p>
+                <h3 style="font-size:18px; font-weight:800; color:var(--text-main); margin:0;">Gửi Đánh Giá Trải Nghiệm T-Flow Pro</h3>
+                <p style="font-size:12.5px; color:var(--text-secondary); margin:2px 0 0 0;">Yêu cầu đăng nhập tài khoản để bảo đảm tính trung thực và minh bạch 100%.</p>
               </div>
             </div>
           </div>
 
-          <form id="tflowReviewForm" onsubmit="submitUserReview(event)">
+          <!-- PROMPT YÊU CẦU ĐĂNG NHẬP NẾU CHƯA ĐĂNG NHẬP -->
+          <div id="reviewLoginRequiredPrompt" style="text-align:center; padding:36px 20px; background:#F5F5F7; border-radius:16px; border:1px dashed #D2D2D7; margin-bottom:16px; display:block;">
+            <div style="width:48px; height:48px; border-radius:50%; background:#1D1D1F; color:#FFF; display:inline-flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px;">🔒</div>
+            <h4 style="font-size:17px; font-weight:800; color:#1D1D1F; margin-bottom:6px;">Vui Lòng Đăng Nhập Để Gửi Đánh Giá</h4>
+            <p style="font-size:13.5px; color:#86868B; max-width:440px; margin:0 auto 18px auto; line-height:1.5;">
+              Để đảm bảo 100% đánh giá là từ người dùng thực tế và loại trừ đánh giá ảo, bạn cần đăng nhập tài khoản trước khi gửi nhận xét.
+            </p>
+            <button type="button" onclick="loginWithGoogleOAuth()" style="display:inline-flex; align-items:center; gap:10px; padding:11px 22px; background:#FFFFFF; border:1px solid #747775; border-radius:99px; font-size:13.5px; font-weight:600; color:#1F1F1F; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.08); transition:background 0.2s;">
+              <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
+              <span>Đăng nhập bằng Google để đánh giá</span>
+            </button>
+            <div style="margin-top:10px;">
+              <button type="button" onclick="toggleAuthModal(true)" style="background:none; border:none; font-size:12px; color:#0071E3; font-weight:600; cursor:pointer; text-decoration:underline;">Hoặc đăng nhập bằng Email / Mật khẩu</button>
+            </div>
+          </div>
+
+          <form id="tflowReviewForm" style="display:none;" onsubmit="submitUserReview(event)">
             <!-- 1. STAR RATING SELECTOR -->
             <div class="form-field-group">
               <label class="form-label-styled">Đánh Giá Xếp Hạng <span style="color:#FF3B30;">*</span></label>
@@ -2629,16 +2645,7 @@
               <span style="font-size:10.5px; font-weight:700; background:rgba(52,199,89,0.15); color:#28CD41; padding:2px 8px; border-radius:99px;">✓ Tài khoản đã xác thực</span>
             </div>
 
-            <div id="reviewGuestFields" style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
-              <div>
-                <label class="form-label-styled">Họ và Tên của bạn <span style="color:#FF3B30;">*</span></label>
-                <input type="text" class="form-input-styled" id="reviewAuthorName" placeholder="Ví dụ: Nguyễn Văn Hưng">
-              </div>
-              <div>
-                <label class="form-label-styled">Email hoặc Số điện thoại</label>
-                <input type="text" class="form-input-styled" id="reviewAuthorEmail" placeholder="hung.photo@gmail.com">
-              </div>
-            </div>
+            <div id="reviewGuestFields" style="display:none;"></div>
 
             <!-- 3. PRODUCT PACKAGE & HIGHLIGHT CHIP -->
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
@@ -3743,23 +3750,28 @@
         if (pctEl) pctEl.textContent = pct + '%';
       }
 
-      // 2. CHECK LOGGED IN USER FOR REVIEW FORM IDENTITY
+      // 2. ENFORCE MUST BE LOGGED IN BEFORE REVIEWING
       const user = SmartGimbalCatalog.getCurrentUser();
+      const formEl = document.getElementById('tflowReviewForm');
+      const promptEl = document.getElementById('reviewLoginRequiredPrompt');
       const identityBox = document.getElementById('reviewUserIdentityBox');
-      const guestFields = document.getElementById('reviewGuestFields');
       const nameEl = document.getElementById('reviewUserDisplayName');
       const emailBadge = document.getElementById('reviewUserEmailBadge');
       const avatarEl = document.getElementById('reviewAvatarInitial');
 
       if (user && user.email) {
+        // Logged in: show form, hide prompt
+        if (promptEl) promptEl.style.display = 'none';
+        if (formEl) formEl.style.display = 'block';
         if (identityBox) identityBox.style.display = 'flex';
-        if (guestFields) guestFields.style.display = 'none';
         if (nameEl) nameEl.textContent = user.name || user.email;
         if (emailBadge) emailBadge.textContent = user.email + (SmartGimbalCatalog.isUserAdmin(user) ? ' (Master Admin)' : '');
         if (avatarEl) avatarEl.textContent = (user.name || user.email).charAt(0).toUpperCase();
       } else {
+        // Not logged in: hide form, show prompt requiring login!
+        if (promptEl) promptEl.style.display = 'block';
+        if (formEl) formEl.style.display = 'none';
         if (identityBox) identityBox.style.display = 'none';
-        if (guestFields) guestFields.style.display = 'grid';
       }
 
       // 3. RENDER REVIEWS LIST OR CLEAN REAL EMPTY STATE
@@ -3836,25 +3848,20 @@
       }
     }
 
-    function submitUserReview(e) {
+        function submitUserReview(e) {
       e.preventDefault();
       if (typeof SmartGimbalCatalog === 'undefined') return;
 
+      // STRICT RULE: User MUST be logged in first before reviewing!
       const user = SmartGimbalCatalog.getCurrentUser();
-      let authorName = '';
-      let authorEmail = '';
-
-      if (user && user.email) {
-        authorName = user.name || user.email.split('@')[0];
-        authorEmail = user.email;
-      } else {
-        authorName = (document.getElementById('reviewAuthorName').value || '').trim();
-        authorEmail = (document.getElementById('reviewAuthorEmail').value || '').trim();
+      if (!user || !user.email) {
+        alert('Vui lòng đăng nhập tài khoản trước khi gửi đánh giá sản phẩm!');
+        toggleAuthModal(true);
+        return;
       }
 
-      if (!authorName) {
-        authorName = 'Khách Hàng T-Flow';
-      }
+      const authorName = user.name || user.email.split('@')[0];
+      const authorEmail = user.email;
 
       const rating = parseInt(document.getElementById('reviewRatingInput').value) || 5;
       const pkg = document.getElementById('reviewProductPackage').value;
@@ -3862,7 +3869,7 @@
       const comment = (document.getElementById('reviewContent').value || '').trim();
 
       if (!comment || comment.length < 3) {
-        alert('Vui lòng nhập nội dung đánh giá của bạn!');
+        alert('Vui lòng nhập nội dung cảm nhận đánh giá chi tiết (tối thiểu 3 ký tự)!');
         document.getElementById('reviewContent').focus();
         return;
       }
@@ -3878,7 +3885,7 @@
       });
 
       if (res.success) {
-        alert('🎉 Cảm ơn bạn! Đánh giá trải nghiệm T-Flow Pro đã được đăng tải thành công.');
+        alert('🎉 Cảm ơn bạn! Đánh giá trải nghiệm T-Flow Pro của bạn đã được đăng tải thành công.');
         document.getElementById('tflowReviewForm').reset();
         setReviewRating(5);
         renderReviewsList();
@@ -3886,22 +3893,6 @@
         alert(res.message || 'Có lỗi xảy ra khi lưu đánh giá.');
       }
     }
-
-    // ==========================================================================
-    // 8. T-FLOW AI SALES CONSULTANT ENGINE (WEB STOREFRONT)
-    // ==========================================================================
-    let aiChatHistory = [
-      {
-        sender: 'bot',
-        text: 'Xin chào! Em là **T-Flow AI Sales Consultant** – chuyên viên tư vấn bán hàng & kỹ thuật chính hãng của **T-Flow Việt Nam**.\n\nEm có thể giải đáp chi tiết về 4 gói sản phẩm T-Flow Pro, động cơ Pure FOC 20kHz, ngàm hít MagSafe N52 45N hoặc chính sách bảo hành 12 tháng 1 đổi 1. Anh cần em hỗ trợ thông tin gì ạ?',
-        actions: [
-          { label: '💰 Bảng Giá 4 Gói Cấu Hình', action: "sendQuickPrompt('Bảng giá và các gói T-Flow Pro')" },
-          { label: '🧲 Độ Chắc Ngàm MagSafe N52', action: "sendQuickPrompt('Ngàm nam châm MagSafe N52 có chắc không?')" },
-          { label: '⚡ Động Cơ Pure FOC 20kHz', action: "sendQuickPrompt('Động cơ Pure FOC 20kHz có gì đặc biệt?')" },
-          { label: '🛡️ Bảo Hành 1 Đổi 1 & Dùng Thử', action: "sendQuickPrompt('Chính sách bảo hành và đổi trả như thế nào?')" }
-        ]
-      }
-    ];
 
     function toggleTflowAiChat(open) {
       const drawer = document.getElementById('tflowAiDrawer');
