@@ -1908,21 +1908,25 @@
       50% { opacity: 0.5; transform: scale(1.2); }
     }
 
-        /* Backdrop Overlay for Mobile Bottom Sheet */
+        /* Backdrop Overlay (ONLY on Mobile, STRICTLY DISABLED on Desktop - No blur, no darkening) */
     .tflow-ai-backdrop {
+      display: none !important;
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.45);
       backdrop-filter: blur(4px);
       -webkit-backdrop-filter: blur(4px);
       z-index: 9998;
-      display: none;
       opacity: 0;
+      pointer-events: none !important;
       transition: opacity 0.25s ease;
     }
-    .tflow-ai-backdrop.active {
-      display: block;
-      opacity: 1;
+    @media (max-width: 768px) {
+      .tflow-ai-backdrop.active {
+        display: block !important;
+        opacity: 1;
+        pointer-events: auto !important;
+      }
     }
     .ai-drawer-drag-handle {
       display: none;
@@ -1939,25 +1943,126 @@
       pointer-events: none !important;
     }
 
-    /* Floating Chat Drawer Window */
+    /* Floating Chat Drawer Window (Compact Corner Widget for Desktop) */
     .tflow-ai-drawer {
       position: fixed;
-      bottom: 96px;
-      right: 28px;
-      width: 400px;
-      max-width: calc(100vw - 36px);
-      height: 600px;
-      max-height: calc(100vh - 120px);
+      bottom: 20px;
+      right: 24px;
+      width: 350px;
+      max-width: calc(100vw - 32px);
+      height: 480px;
+      max-height: calc(100vh - 40px);
       background: #FFFFFF;
-      border-radius: 24px;
-      border: 1px solid rgba(0,0,0,0.08);
-      box-shadow: 0 24px 64px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.06);
+      border-radius: 18px;
+      border: 1px solid rgba(0,0,0,0.1);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.16), 0 2px 10px rgba(0,0,0,0.06);
       z-index: 9999;
       display: none;
       flex-direction: column;
       overflow: hidden;
       font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-      animation: slideUpAi 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: slideUpAi 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .ai-drawer-header {
+      padding: 10px 14px;
+      background: linear-gradient(135deg, #1D1D1F 0%, #2C2C2E 100%);
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
+    }
+    .ai-header-avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #0071E3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,113,227,0.3);
+    }
+    .ai-domain-switcher-bar {
+      display: flex;
+      background: #2C2C2E;
+      padding: 4px 6px;
+      gap: 4px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+    .ai-domain-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 3px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+    }
+    .ai-quick-prompts-bar {
+      padding: 6px 10px;
+      background: #F5F5F7;
+      display: flex;
+      gap: 5px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .ai-prompt-pill {
+      white-space: nowrap;
+      background: #FFF;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .ai-messages-container {
+      flex: 1;
+      padding: 12px 14px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #FAFBFD;
+    }
+    .ai-msg-bubble {
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .ai-input-bar {
+      padding: 8px 12px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+    .ai-input-field {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      transition: border 0.2s;
     }
     @keyframes slideUpAi {
       from { opacity: 0; transform: translateY(20px) scale(0.96); }
@@ -5040,15 +5145,21 @@
           fab.classList.add('is-hidden');
           fab.style.display = 'none';
         }
-        if (backdrop) {
-          backdrop.classList.add('active');
-          backdrop.style.display = 'block';
-        }
-        // On mobile, lock body scroll so page behind doesn't jitter
+        // Backdrop & body lock ONLY on Mobile (screen width <= 768px). Desktop never blurs or darkens!
         if (window.innerWidth <= 768) {
+          if (backdrop) {
+            backdrop.classList.add('active');
+            backdrop.style.display = 'block';
+          }
           document.body.style.overflow = 'hidden';
           if (window.visualViewport) {
             drawer.style.height = `${window.visualViewport.height}px`;
+          }
+        } else {
+          // Desktop: ensure backdrop is completely removed
+          if (backdrop) {
+            backdrop.classList.remove('active');
+            backdrop.style.display = 'none';
           }
         }
         renderQuickPromptsBar(currentAiDomain);
