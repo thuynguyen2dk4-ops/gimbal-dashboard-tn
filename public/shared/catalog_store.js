@@ -709,7 +709,133 @@
   }
 
   function loginWithGmail(email, displayName) {
-    if (!email) return { success: false, message: 'Vui lòng cung cấp email Google (Gmail) hợp lệ.' };
+    if (!email) 
+  // ==========================================================================
+  // REVIEWS & TESTIMONIALS API
+  // ==========================================================================
+  var REVIEWS_KEY = 'tflow_user_reviews_v1';
+  var REVIEWS_EVENT = 'tflow_reviews_updated';
+
+  var DEFAULT_REVIEWS = [
+    {
+      id: "rev-01",
+      author: "Đặng Anh Dũng",
+      avatar: "D",
+      role: "Travel Filmmaker • 1.2M Followers",
+      package: "T-Flow Pro - Cinematic Master",
+      rating: 5,
+      date: "15/10/2026",
+      title: "Ngàm MagSafe và động cơ FOC là bước đột phá xuất sắc!",
+      comment: "Ngàm MagSafe là bước cải tiến xuất sắc nhất trên T-Flow Pro. Khi cần rút máy ra nghe điện thoại hoặc đổi góc quay cầm tay, chỉ mất đúng một giây mà không phải cân lại trục. Động cơ FOC tải trọng 450g giữ máy cực kỳ vững vàng.",
+      tags: ["MagSafe cực nhạy", "Chống rung FOC", "Tải trọng 450g"],
+      verified: true
+    },
+    {
+      id: "rev-02",
+      author: "Mai Linh Creative",
+      avatar: "M",
+      role: "Đạo Diễn Hình Ảnh (DoP)",
+      package: "T-Flow Pro - Creator Kit",
+      rating: 5,
+      date: "28/10/2026",
+      title: "Vòng xoay lấy nét Focus Wheel mượt mà như máy điện ảnh",
+      comment: "Bánh xe lấy nét cơ học rất êm và có lực cản vừa phải. Khi kết hợp với chế độ quay Apple Log trên iPhone 16 Pro Max qua App T-Flow Cam, kết quả cho ra như máy quay phim rạp. Cực kỳ ấn tượng với hoàn thiện sợi Carbon 8 lớp.",
+      tags: ["Focus Wheel êm", "Apple Log Pro", "Sợi Carbon 8 lớp"],
+      verified: true
+    },
+    {
+      id: "rev-03",
+      author: "Trần Hoàng Nam",
+      avatar: "N",
+      role: "Tech Reviewer & Nhiếp Ảnh Gia",
+      package: "T-Flow Pro - Standard Kit",
+      rating: 5,
+      date: "02/11/2026",
+      title: "Triệt tiêu hoàn toàn micro-jitter trên địa hình gồ ghề",
+      comment: "Thuật toán Pure FOC 20kHz triệt tiêu hoàn toàn hiện tượng rung giật micro-jitter. Ngay cả khi đi bộ nhanh trên địa hình sỏi đá hay chạy theo chủ thể, đường chân trời vẫn thẳng tắp và mượt mà từng khoảnh khắc.",
+      tags: ["Zero Jitter", "Horizon Lock", "Pin trâu 18h"],
+      verified: true
+    }
+  ];
+
+  function getReviews() {
+    if (typeof localStorage === 'undefined') return DEFAULT_REVIEWS;
+    try {
+      var raw = localStorage.getItem(REVIEWS_KEY);
+      if (!raw) {
+        localStorage.setItem(REVIEWS_KEY, JSON.stringify(DEFAULT_REVIEWS));
+        return JSON.parse(JSON.stringify(DEFAULT_REVIEWS));
+      }
+      var parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed) || parsed.length === 0) {
+        localStorage.setItem(REVIEWS_KEY, JSON.stringify(DEFAULT_REVIEWS));
+        return JSON.parse(JSON.stringify(DEFAULT_REVIEWS));
+      }
+      return parsed;
+    } catch (e) {
+      console.warn('[SmartGimbalCatalog] Error parsing reviews:', e);
+      return DEFAULT_REVIEWS;
+    }
+  }
+
+  function addReview(reviewData) {
+    if (!reviewData) return { success: false, message: 'Dữ liệu đánh giá không hợp lệ.' };
+    var reviews = getReviews();
+    var now = new Date();
+    var dateStr = ('0' + now.getDate()).slice(-2) + '/' + ('0' + (now.getMonth() + 1)).slice(-2) + '/' + now.getFullYear();
+
+    var authorName = (reviewData.author || '').trim() || 'Người Dùng T-Flow';
+    var newRev = {
+      id: 'rev-' + Date.now(),
+      author: authorName,
+      avatar: authorName.charAt(0).toUpperCase() || 'T',
+      role: reviewData.role || 'Khách Hàng Đã Mua T-Flow Pro',
+      email: (reviewData.email || '').trim().toLowerCase(),
+      package: reviewData.package || 'T-Flow Pro - Creator Kit',
+      rating: Math.max(1, Math.min(5, parseInt(reviewData.rating) || 5)),
+      date: dateStr,
+      title: (reviewData.title || '').trim() || 'Trải nghiệm T-Flow Pro tuyệt vời',
+      comment: (reviewData.comment || '').trim(),
+      tags: Array.isArray(reviewData.tags) && reviewData.tags.length > 0 ? reviewData.tags : ['Chống rung FOC', 'Hài lòng'],
+      verified: true,
+      isRecent: true
+    };
+
+    reviews.unshift(newRev); // Prepend to top
+
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(REVIEWS_KEY, JSON.stringify(reviews));
+      } catch (e) {}
+    }
+
+    if (typeof window !== 'undefined') {
+      try {
+        var evt = new CustomEvent(REVIEWS_EVENT, { detail: reviews });
+        window.dispatchEvent(evt);
+      } catch (e) {}
+    }
+    return { success: true, review: newRev, reviews: reviews };
+  }
+
+  function deleteReview(reviewId) {
+    var reviews = getReviews();
+    var filtered = reviews.filter(function(r) { return r.id !== reviewId; });
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(REVIEWS_KEY, JSON.stringify(filtered));
+      } catch (e) {}
+    }
+    if (typeof window !== 'undefined') {
+      try {
+        var evt = new CustomEvent(REVIEWS_EVENT, { detail: filtered });
+        window.dispatchEvent(evt);
+      } catch (e) {}
+    }
+    return { success: true, reviews: filtered };
+  }
+
+  return { success: false, message: 'Vui lòng cung cấp email Google (Gmail) hợp lệ.' };
     var cleanEmail = email.trim().toLowerCase();
     var isAdmin = (ADMIN_GMAILS.indexOf(cleanEmail) !== -1);
 
@@ -1375,8 +1501,18 @@
     loginWithGmail: loginWithGmail,
     isUserAdmin: isUserAdmin,
     logoutUser: logoutUser,
+    // Reviews API
+    getReviews: getReviews,
+    addReview: addReview,
+    deleteReview: deleteReview,
+    REVIEWS_EVENT: REVIEWS_EVENT,
     registerUser: registerUser,
     logoutUser: logoutUser,
+    // Reviews API
+    getReviews: getReviews,
+    addReview: addReview,
+    deleteReview: deleteReview,
+    REVIEWS_EVENT: REVIEWS_EVENT,
     updateUserProfile: updateUserProfile,
     updateUserModules: updateUserModules,
     // Excel CSV Import / Export

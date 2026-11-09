@@ -1461,6 +1461,380 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
+  
+    /* ==========================================================================
+       USER REVIEWS & TESTIMONIALS SYSTEM CSS
+       ========================================================================== */
+    .reviews-scorecard-box {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px 40px;
+      margin-bottom: 40px;
+      display: grid;
+      grid-template-columns: 240px 1fr 240px;
+      gap: 36px;
+      align-items: center;
+    }
+    @media (max-width: 900px) {
+      .reviews-scorecard-box {
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 24px;
+      }
+    }
+    .scorecard-left {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .scorecard-big-num {
+      font-size: 56px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--text-main);
+      line-height: 1;
+    }
+    .scorecard-stars {
+      display: flex;
+      gap: 4px;
+    }
+    .scorecard-count {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    .scorecard-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .score-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+    .bar-star-label {
+      width: 48px;
+      font-weight: 600;
+    }
+    .bar-track {
+      flex: 1;
+      height: 7px;
+      background: #E5E5EA;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      background: #FFB800;
+      border-radius: 99px;
+    }
+    .bar-pct {
+      width: 36px;
+      text-align: right;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+    .scorecard-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-write-review {
+      width: 100%;
+      background: #1D1D1F;
+      color: #FFF;
+      border: none;
+      border-radius: 99px;
+      padding: 14px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      transition: transform 0.2s, background 0.2s;
+    }
+    .btn-write-review:hover {
+      background: #000;
+      transform: translateY(-2px);
+    }
+
+    /* Review Form Card */
+    .review-form-card {
+      background: #FFF;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px;
+      margin-bottom: 48px;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.08);
+      animation: fadeInForm 0.3s ease-out;
+    }
+    @keyframes fadeInForm {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .form-header-bar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .btn-close-form {
+      background: #F5F5F7;
+      border: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      font-size: 18px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .form-field-group {
+      margin-bottom: 20px;
+    }
+    .form-label-styled {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+    .form-input-styled {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 13.5px;
+      font-family: inherit;
+      color: var(--text-main);
+      background: #FFF;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-input-styled:focus {
+      border-color: #0071E3;
+      box-shadow: 0 0 0 3px rgba(0,113,227,0.12);
+    }
+    .star-rating-picker {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .star-pick-btn {
+      background: none;
+      border: none;
+      font-size: 32px;
+      color: #D2D2D7;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 4px;
+      transition: color 0.15s, transform 0.15s;
+    }
+    .star-pick-btn:hover {
+      transform: scale(1.15);
+    }
+    .star-pick-btn.active {
+      color: #FFB800;
+    }
+    .rating-text-label {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-left: 12px;
+    }
+    .review-tag-chips-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tag-chip-btn {
+      padding: 7px 14px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: #F5F5F7;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tag-chip-btn:hover {
+      background: #E5E5EA;
+    }
+    .tag-chip-btn.active {
+      background: #1D1D1F;
+      color: #FFF;
+      border-color: #1D1D1F;
+    }
+    .btn-submit-review {
+      background: #0071E3;
+      color: #FFF;
+      border: none;
+      border-radius: 99px;
+      padding: 12px 28px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0,113,227,0.3);
+      transition: background 0.2s;
+    }
+    .btn-submit-review:hover {
+      background: #0077ED;
+    }
+    .btn-cancel-review {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 12px 22px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    /* Review Filters Bar */
+    .review-filter-bar {
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .filter-tab-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .review-filter-btn {
+      padding: 8px 18px;
+      border-radius: 99px;
+      border: 1px solid var(--border);
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .review-filter-btn:hover {
+      border-color: var(--text-main);
+      color: var(--text-main);
+    }
+    .review-filter-btn.active {
+      background: #1D1D1F;
+      color: #FFF;
+      border-color: #1D1D1F;
+    }
+
+    /* Enhanced Review Cards */
+    .review-card-modern {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .review-card-modern:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.06);
+    }
+    .rev-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .rev-card-author-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .rev-card-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #1D1D1F;
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13.5px;
+    }
+    .rev-card-name {
+      font-size: 14.5px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rev-card-verified-badge {
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(52,199,89,0.12);
+      color: #28CD41;
+      padding: 1px 7px;
+      border-radius: 99px;
+    }
+    .rev-card-role {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 1px;
+    }
+    .rev-card-date {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+    .rev-card-stars {
+      display: flex;
+      gap: 3px;
+      margin-bottom: 12px;
+    }
+    .rev-card-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: var(--text-main);
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .rev-card-quote {
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      flex: 1;
+    }
+    .rev-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .rev-tag-badge {
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(0,0,0,0.04);
+      color: var(--text-secondary);
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
   </style>
 </head>
 <body>
@@ -1839,81 +2213,203 @@
   <!-- ==========================================================================
        VIEW 4: ĐÁNH GIÁ & HỎI ĐÁP
        ========================================================================== -->
-  <main class="view-panel" id="viewReviews">
+    <!-- VIEW 4: REVIEWS & USER TESTIMONIALS (WITH USER REVIEW SUBMISSION) -->
+  <main class="app-view" id="viewReviews">
     <section class="reviews-section">
       <div class="container">
+
+        <!-- SECTION HEADER -->
         <div class="section-header-clean">
-          <div class="tag-clean">Cảm Nhận Thực Tế</div>
-          <h2 class="title-clean">Được tin dùng bởi các nhà làm phim</h2>
-          <p class="sub-clean">Lắng nghe chia sẻ từ những người sáng tạo nội dung chuyên nghiệp đã đồng hành cùng Smart Gimbal.</p>
+          <div class="tag-clean">Cảm Nhận Thực Tế &amp; Cộng Đồng</div>
+          <h2 class="title-clean">Đánh Giá Từ Người Dùng &amp; Chuyên Gia</h2>
+          <p class="sub-clean">Lắng nghe chia sẻ thực tế từ các nhà làm phim, reviewer công nghệ và khách hàng đã trải nghiệm T-Flow Pro.</p>
         </div>
 
-        <!-- Testimonials -->
-        <div class="testimonials-grid">
-          <div class="testimonial-card">
-            <p class="testi-quote">
-              "Ngàm MagSafe là bước cải tiến xuất sắc nhất. Khi cần rút máy ra nghe điện thoại hoặc đổi góc quay cầm tay, chỉ mất đúng một giây mà không phải cân lại trục."
-            </p>
-            <div class="testi-author">
-              <div class="testi-avatar">D</div>
-              <div>
-                <div class="testi-name">Đặng Anh Dũng</div>
-                <div class="testi-role">Travel Filmmaker &bull; 1.2M Followers</div>
-              </div>
+        <!-- REVIEWS SCORECARD & WRITE REVIEW CTA -->
+        <div class="reviews-scorecard-box">
+          <div class="scorecard-left">
+            <div class="scorecard-big-num">4.9</div>
+            <div class="scorecard-stars">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div class="scorecard-count" id="scorecardTotalCount">Dựa trên 185+ đánh giá thực tế</div>
+          </div>
+
+          <!-- RATING BREAKDOWN BARS -->
+          <div class="scorecard-bars">
+            <div class="score-bar-row">
+              <span class="bar-star-label">5 Sao</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 92%;"></div></div>
+              <span class="bar-pct">92%</span>
+            </div>
+            <div class="score-bar-row">
+              <span class="bar-star-label">4 Sao</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 6%;"></div></div>
+              <span class="bar-pct">6%</span>
+            </div>
+            <div class="score-bar-row">
+              <span class="bar-star-label">3 Sao</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 2%;"></div></div>
+              <span class="bar-pct">2%</span>
+            </div>
+            <div class="score-bar-row">
+              <span class="bar-star-label">2 Sao</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 0%;"></div></div>
+              <span class="bar-pct">0%</span>
+            </div>
+            <div class="score-bar-row">
+              <span class="bar-star-label">1 Sao</span>
+              <div class="bar-track"><div class="bar-fill" style="width: 0%;"></div></div>
+              <span class="bar-pct">0%</span>
             </div>
           </div>
 
-          <div class="testimonial-card">
-            <p class="testi-quote">
-              "Bánh xe lấy nét cơ học rất êm và có lực cản vừa phải. Khi kết hợp với chế độ quay Apple Log trên iPhone 16 Pro Max, kết quả cho ra như máy quay phim rạp."
-            </p>
-            <div class="testi-author">
-              <div class="testi-avatar">M</div>
-              <div>
-                <div class="testi-name">Mai Linh Creative</div>
-                <div class="testi-role">Đạo Diễn Hình Ảnh (DoP)</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="testimonial-card">
-            <p class="testi-quote">
-              "Động cơ FOC triệt tiêu hoàn toàn hiện tượng rung giật micro-jitter. Ngay cả khi đi bộ nhanh trên địa hình sỏi đá, đường chân trời vẫn thẳng tắp."
-            </p>
-            <div class="testi-author">
-              <div class="testi-avatar">N</div>
-              <div>
-                <div class="testi-name">Trần Hoàng Nam</div>
-                <div class="testi-role">Tech Reviewer &amp; Nhiếp Ảnh Gia</div>
-              </div>
-            </div>
+          <!-- WRITE REVIEW CTA BUTTON -->
+          <div class="scorecard-right">
+            <button class="btn-write-review" onclick="toggleReviewForm(true)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+              <span>Viết Đánh Giá Của Bạn</span>
+            </button>
+            <div style="font-size:12px; color:var(--text-secondary); text-align:center; margin-top:8px;">Chia sẻ cảm nhận để nhận mã ưu đãi phụ kiện</div>
           </div>
         </div>
 
-        <!-- FAQ -->
-        <div class="section-header-clean" style="margin-top:60px;">
+        <!-- USER REVIEW FORM (COLLAPSIBLE CARD) -->
+        <div id="reviewFormCard" class="review-form-card" style="display:none;">
+          <div class="form-header-bar">
+            <div>
+              <h3 style="font-size:20px; font-weight:800; color:var(--text-main); margin-bottom:4px;">Gửi Đánh Giá Trải Nghiệm T-Flow Pro</h3>
+              <p style="font-size:13px; color:var(--text-secondary); margin:0;">Cảm nhận thực tế của bạn sẽ giúp cộng đồng sáng tạo có góc nhìn chân thực nhất.</p>
+            </div>
+            <button type="button" class="btn-close-form" onclick="toggleReviewForm(false)">&times;</button>
+          </div>
+
+          <form id="tflowReviewForm" onsubmit="submitUserReview(event)">
+            <!-- STAR RATING PICKER -->
+            <div class="form-field-group">
+              <label class="form-label-styled">Đánh Giá Chung Của Bạn <span style="color:#FF3B30;">*</span></label>
+              <div class="star-rating-picker" id="starRatingPicker">
+                <button type="button" class="star-pick-btn active" data-rating="1" onclick="setReviewRating(1)">★</button>
+                <button type="button" class="star-pick-btn active" data-rating="2" onclick="setReviewRating(2)">★</button>
+                <button type="button" class="star-pick-btn active" data-rating="3" onclick="setReviewRating(3)">★</button>
+                <button type="button" class="star-pick-btn active" data-rating="4" onclick="setReviewRating(4)">★</button>
+                <button type="button" class="star-pick-btn active" data-rating="5" onclick="setReviewRating(5)">★</button>
+                <span class="rating-text-label" id="ratingTextLabel">⭐⭐⭐⭐⭐ Xuất sắc (Cực kỳ hài lòng)</span>
+              </div>
+              <input type="hidden" id="reviewRatingInput" value="5">
+            </div>
+
+            <!-- USER IDENTITY SECTION -->
+            <div id="reviewUserIdentityBox" style="background:#F5F5F7; border-radius:12px; padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                <div style="width:32px; height:32px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center;" id="reviewAvatarInitial">U</div>
+                <div>
+                  <div style="font-size:13.5px; font-weight:700; color:var(--text-main);" id="reviewUserDisplayName">Đang đăng nhập...</div>
+                  <div style="font-size:12px; color:var(--text-secondary);" id="reviewUserEmailBadge">Tài khoản Google đã kết nối</div>
+                </div>
+              </div>
+              <span style="font-size:11px; font-weight:700; background:rgba(52,199,89,0.15); color:#28CD41; padding:3px 10px; border-radius:99px;">✓ Đã xác thực</span>
+            </div>
+
+            <!-- NON-LOGGED IN GUEST FIELDS -->
+            <div id="reviewGuestFields" style="display:none; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px;">
+              <div>
+                <label class="form-label-styled">Họ và Tên của bạn <span style="color:#FF3B30;">*</span></label>
+                <input type="text" class="form-input-styled" id="reviewAuthorName" placeholder="Ví dụ: Hoàng Minh Tuấn">
+              </div>
+              <div>
+                <label class="form-label-styled">Email Google (Gmail) <span style="color:#FF3B30;">*</span></label>
+                <input type="email" class="form-input-styled" id="reviewAuthorEmail" placeholder="minhtuan.photo@gmail.com">
+              </div>
+            </div>
+
+            <!-- PRODUCT PACKAGE SELECTOR -->
+            <div class="form-field-group">
+              <label class="form-label-styled">Phiên Bản Gói Sản Phẩm Đã Mua / Trải Nghiệm</label>
+              <select class="form-input-styled" id="reviewProductPackage">
+                <option value="T-Flow Pro - Creator Kit">T-Flow Pro - Creator Kit (Bao gồm Đèn từ tính &amp; Vòng xoay lấy nét)</option>
+                <option value="T-Flow Pro - Standard Kit">T-Flow Pro - Standard Kit (Bộ tiêu chuẩn 3 trục MagSafe)</option>
+                <option value="T-Flow Pro - Cinematic Master">T-Flow Pro - Cinematic Master (Full Option Vali &amp; 3D LUT)</option>
+              </select>
+            </div>
+
+            <!-- REVIEW TITLE -->
+            <div class="form-field-group">
+              <label class="form-label-styled">Tiêu Đề Đánh Giá <span style="color:#FF3B30;">*</span></label>
+              <input type="text" class="form-input-styled" id="reviewHeadline" placeholder="Ví dụ: Chống rung FOC cực êm, ngàm MagSafe siêu tiện lợi khi quay ngoại cảnh" required>
+            </div>
+
+            <!-- HIGHLIGHT TAGS PICKER -->
+            <div class="form-field-group">
+              <label class="form-label-styled">Điểm Nổi Bật Bạn Hài Lòng Nhất (Chọn nhanh)</label>
+              <div class="review-tag-chips-picker" id="reviewTagChipsPicker">
+                <button type="button" class="tag-chip-btn active" onclick="toggleReviewTag(this)">Chống rung FOC 20kHz</button>
+                <button type="button" class="tag-chip-btn active" onclick="toggleReviewTag(this)">Ngàm MagSafe chắc chắn</button>
+                <button type="button" class="tag-chip-btn" onclick="toggleReviewTag(this)">Vòng xoay Focus Wheel êm</button>
+                <button type="button" class="tag-chip-btn" onclick="toggleReviewTag(this)">Khung Carbon siêu nhẹ</button>
+                <button type="button" class="tag-chip-btn" onclick="toggleReviewTag(this)">Thời lượng pin 18h</button>
+                <button type="button" class="tag-chip-btn" onclick="toggleReviewTag(this)">App T-Flow Cam nhạy</button>
+              </div>
+            </div>
+
+            <!-- REVIEW CONTENT -->
+            <div class="form-field-group">
+              <label class="form-label-styled">Nội Dung Đánh Giá Chi Tiết <span style="color:#FF3B30;">*</span></label>
+              <textarea class="form-input-styled" id="reviewContent" rows="4" placeholder="Chia sẻ chi tiết cảm nhận của bạn về độ đầm tay khi cầm, độ mượt khi lia gimbal, chất lượng vật liệu, thời lượng pin, hoặc tính năng tracking trên ứng dụng..." required></textarea>
+              <div style="font-size:11.5px; color:var(--text-secondary); margin-top:4px; text-align:right;">Tối thiểu 15 ký tự</div>
+            </div>
+
+            <!-- FORM BUTTONS -->
+            <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:24px;">
+              <button type="button" class="btn-cancel-review" onclick="toggleReviewForm(false)">Hủy</button>
+              <button type="submit" class="btn-submit-review">Gửi Đánh Giá Ngay</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- REVIEW FILTER BUTTONS -->
+        <div class="review-filter-bar">
+          <div class="filter-tab-chips">
+            <button class="review-filter-btn active" onclick="filterReviews('all', this)">Tất Cả Đánh Giá (<span id="countFilterAll">3</span>)</button>
+            <button class="review-filter-btn" onclick="filterReviews('5', this)">⭐⭐⭐⭐⭐ (5 Sao)</button>
+            <button class="review-filter-btn" onclick="filterReviews('4', this)">⭐⭐⭐⭐ (4 Sao)</button>
+            <button class="review-filter-btn" onclick="filterReviews('verified', this)">✓ Đã Mua Hàng Chính Hãng</button>
+          </div>
+        </div>
+
+        <!-- DYNAMIC REVIEWS CONTAINER -->
+        <div class="testimonials-grid" id="reviewsListContainer">
+          <!-- Dynamic cards injected via JavaScript renderReviewsList() -->
+        </div>
+
+        <!-- FAQ SECTION (UPDATED TO T-FLOW PRO) -->
+        <div class="section-header-clean" style="margin-top:70px;">
           <div class="tag-clean">Giải Đáp Thắc Mắc</div>
-          <h2 class="title-clean">Câu Hỏi Thường Gặp</h2>
+          <h2 class="title-clean">Câu Hỏi Thường Gặp Về T-Flow Pro</h2>
         </div>
 
         <div class="faq-container">
           <div class="faq-item open">
             <div class="faq-question" onclick="toggleFaq(this)">
-              <span>Smart Gimbal S1 tương thích với những dòng điện thoại nào?</span>
+              <span>T-Flow Pro tương thích với những dòng điện thoại nào?</span>
               <span class="faq-toggle-icon">+</span>
             </div>
             <div class="faq-answer">
-              Smart Gimbal S1 tương thích hoàn hảo với mọi dòng iPhone từ iPhone 12 trở lên có MagSafe nguyên bản. Với các dòng điện thoại khác hoặc ốp lưng không có từ tính, sản phẩm đi kèm sẵn vòng từ tính trợ lực siêu mỏng dán mặt lưng.
+              T-Flow Pro tương thích hoàn hảo với mọi dòng iPhone từ iPhone 12 trở lên có MagSafe nguyên bản. Với các dòng điện thoại khác hoặc ốp lưng không có từ tính, sản phẩm đi kèm sẵn vòng từ tính trợ lực siêu mỏng dán mặt lưng.
             </div>
           </div>
 
           <div class="faq-item">
             <div class="faq-question" onclick="toggleFaq(this)">
-              <span>Ngàm hít MagSafe có đủ an toàn khi vận động mạnh không?</span>
+              <span>Ngàm hít MagSafe có đủ an toàn khi vận động thể thao mạnh không?</span>
               <span class="faq-toggle-icon">+</span>
             </div>
             <div class="faq-answer">
-              Ngàm được chế tác từ nam châm Neodymium N52 phân bố đa cực với lực hút đạt 2.8kg, gấp gần 10 lần trọng lượng của một chiếc iPhone 16 Pro Max, đảm bảo cố định chắc chắn ngay cả khi chạy nhanh.
+              Ngàm được chế tác từ nam châm Neodymium N52 phân bố đa cực với lực hút đạt 2.8kg, gấp gần 10 lần trọng lượng của một chiếc iPhone 16 Pro Max, đảm bảo cố định chắc chắn ngay cả khi chạy nhanh hoặc leo núi.
             </div>
           </div>
 
@@ -1923,20 +2419,21 @@
               <span class="faq-toggle-icon">+</span>
             </div>
             <div class="faq-answer">
-              Có. Gimbal tích hợp cổng Type-C hỗ trợ chuẩn sạc nhanh PD 18W, vừa cân bằng chống rung vừa truyền nguồn sạc ngược cho iPhone khi đang quay phim dài.
+              Có. T-Flow Pro tích hợp cổng Type-C hỗ trợ chuẩn sạc nhanh PD 18W, vừa cân bằng chống rung vừa truyền nguồn sạc ngược cho iPhone khi đang quay phim dài hoặc livestream.
             </div>
           </div>
 
           <div class="faq-item">
             <div class="faq-question" onclick="toggleFaq(this)">
-              <span>Chính sách bảo hành 1 đổi 1 áp dụng như thế nào?</span>
+              <span>Chính sách bảo hành 1 đổi 1 của T-Flow Tech áp dụng như thế nào?</span>
               <span class="faq-toggle-icon">+</span>
             </div>
             <div class="faq-answer">
-              Tất cả sản phẩm Smart Gimbal được bảo hành chính hãng 12 tháng. Nếu phát sinh lỗi cơ học hoặc mạch điều khiển FOC từ nhà sản xuất, khách hàng được đổi mới thiết bị 100% trong vòng 24 giờ.
+              Tất cả sản phẩm T-Flow Pro được bảo hành chính hãng 12 tháng từ Công ty TNHH Công nghệ T-Flow Việt Nam. Nếu phát sinh lỗi cơ học hoặc mạch điều khiển FOC từ nhà sản xuất, khách hàng được đổi mới thiết bị 100% trong vòng 24 giờ.
             </div>
           </div>
         </div>
+
       </div>
     </section>
   </main>
@@ -2147,6 +2644,7 @@
       }
       toggleGoogleAuthModal(false);
       renderNavUserSection();
+      renderReviewsList();
       alert('Đăng nhập thành công với tài khoản: ' + email);
     }
 
@@ -2164,6 +2662,7 @@
         SmartGimbalCatalog.logoutUser();
       }
       renderNavUserSection();
+      renderReviewsList();
     }
 
     // Direct Admin Nav Handler (No Password Prompt!)
@@ -2192,6 +2691,7 @@
       renderCatalogGrid();
       updateNavCartCount();
       renderNavUserSection();
+      renderReviewsList();
 
       // Listen for store catalog updates
       window.addEventListener(SmartGimbalCatalog.SYNC_EVENT, () => {
@@ -2208,6 +2708,7 @@
       window.addEventListener(SmartGimbalCatalog.CART_EVENT, () => {
         updateNavCartCount();
       renderNavUserSection();
+      renderReviewsList();
         renderCartDrawer();
       });
 

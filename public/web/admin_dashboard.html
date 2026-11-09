@@ -896,7 +896,36 @@
         <button class="btn btn-outline" onclick="closeGroupModal()">Hủy</button>
         <button class="btn btn-dark" onclick="saveGroupSubmit()">Lưu Nhóm Sản Phẩm</button>
       </div>
+    
+
+    <!-- 5. KHỐI QUẢN LÝ ĐÁNH GIÁ & CẢM NHẬN KHÁCH HÀNG (REVIEWS MODERATION) -->
+    <div class="card" style="margin-top:32px;">
+      <div class="card-title-row">
+        <div>
+          <div class="card-title">Quản Lý Đánh Giá &amp; Cảm Nhận Khách Hàng (T-Flow Pro Reviews)</div>
+          <div class="card-sub">Duyệt, xem chi tiết và kiểm duyệt toàn bộ đánh giá do người dùng gửi từ website bán hàng.</div>
+        </div>
+        <div class="toolbar-actions">
+          <span style="font-size:12px; font-weight:700; background:rgba(0,113,227,0.1); color:#0071E3; padding:6px 14px; border-radius:99px;" id="adminReviewsCountBadge">Đang tải đánh giá...</span>
+        </div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:20%;">Người Đánh Giá</th>
+            <th style="width:12%;">Điểm Số</th>
+            <th style="width:18%;">Gói Sản Phẩm</th>
+            <th style="width:38%;">Tiêu Đề &amp; Nội Dung Đánh Giá</th>
+            <th style="width:12%; text-align:right;">Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody id="adminReviewsTableBody">
+          <!-- Dynamically populated via renderAdminReviewsTable() -->
+        </tbody>
+      </table>
     </div>
+</div>
   </div>
 
   <!-- ==========================================================================
@@ -1249,6 +1278,71 @@
 
     // Temporary storage for tiers in publishing form
     let formTiersBuffer = [];
+
+    
+    // ==========================================================================
+    // ADMIN REVIEWS MODERATION ENGINE
+    // ==========================================================================
+    function renderAdminReviewsTable() {
+      const tbody = document.getElementById('adminReviewsTableBody');
+      const badge = document.getElementById('adminReviewsCountBadge');
+      if (!tbody || typeof SmartGimbalCatalog === 'undefined') return;
+
+      const reviews = SmartGimbalCatalog.getReviews() || [];
+      if (badge) badge.textContent = reviews.length + ' Đánh Giá Thực Tế';
+
+      if (reviews.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:32px; color:var(--text-secondary);">Chưa có đánh giá nào từ khách hàng.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      reviews.forEach(r => {
+        let starsStr = '';
+        for (let i = 0; i < 5; i++) {
+          starsStr += (i < r.rating) ? '★' : '☆';
+        }
+
+        html += `
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--text-main);">${r.author || 'Khách Hàng'}</div>
+              <div style="font-size:11.5px; color:var(--text-secondary);">${r.email || r.date || ''}</div>
+              ${r.verified ? '<span style="font-size:10px; font-weight:700; background:rgba(52,199,89,0.12); color:#28CD41; padding:1px 6px; border-radius:99px;">✓ Mua Chính Hãng</span>' : ''}
+            </td>
+            <td>
+              <span style="color:#FFB800; font-size:15px; font-weight:700;">${starsStr}</span>
+              <span style="font-size:12px; font-weight:700; margin-left:4px;">(${r.rating}/5)</span>
+            </td>
+            <td>
+              <span style="font-size:12px; font-weight:600; background:#F5F5F7; padding:4px 8px; border-radius:6px;">${r.package || 'T-Flow Pro'}</span>
+            </td>
+            <td>
+              <div style="font-weight:700; font-size:13px; color:var(--text-main); margin-bottom:3px;">${r.title || ''}</div>
+              <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.4;">"${r.comment || ''}"</div>
+              <div style="margin-top:4px; display:flex; gap:4px; flex-wrap:wrap;">
+                ${(r.tags || []).map(t => `<span style="font-size:10.5px; background:rgba(0,0,0,0.04); color:var(--text-secondary); padding:2px 6px; border-radius:4px;">#${t}</span>`).join('')}
+              </div>
+            </td>
+            <td style="text-align:right;">
+              <button onclick="handleDeleteReview('${r.id}')" style="background:none; border:1px solid #FF3B30; color:#FF3B30; padding:4px 10px; border-radius:6px; font-size:11.5px; font-weight:600; cursor:pointer;">
+                Xóa
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function handleDeleteReview(reviewId) {
+      if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này khỏi hệ thống?')) return;
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.deleteReview(reviewId);
+        renderAdminReviewsTable();
+      }
+    }
 
     window.addEventListener('DOMContentLoaded', () => {
       initAdmin();
@@ -2026,6 +2120,71 @@
     }
 
     // Run check on load
+    
+    // ==========================================================================
+    // ADMIN REVIEWS MODERATION ENGINE
+    // ==========================================================================
+    function renderAdminReviewsTable() {
+      const tbody = document.getElementById('adminReviewsTableBody');
+      const badge = document.getElementById('adminReviewsCountBadge');
+      if (!tbody || typeof SmartGimbalCatalog === 'undefined') return;
+
+      const reviews = SmartGimbalCatalog.getReviews() || [];
+      if (badge) badge.textContent = reviews.length + ' Đánh Giá Thực Tế';
+
+      if (reviews.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:32px; color:var(--text-secondary);">Chưa có đánh giá nào từ khách hàng.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      reviews.forEach(r => {
+        let starsStr = '';
+        for (let i = 0; i < 5; i++) {
+          starsStr += (i < r.rating) ? '★' : '☆';
+        }
+
+        html += `
+          <tr>
+            <td>
+              <div style="font-weight:700; color:var(--text-main);">${r.author || 'Khách Hàng'}</div>
+              <div style="font-size:11.5px; color:var(--text-secondary);">${r.email || r.date || ''}</div>
+              ${r.verified ? '<span style="font-size:10px; font-weight:700; background:rgba(52,199,89,0.12); color:#28CD41; padding:1px 6px; border-radius:99px;">✓ Mua Chính Hãng</span>' : ''}
+            </td>
+            <td>
+              <span style="color:#FFB800; font-size:15px; font-weight:700;">${starsStr}</span>
+              <span style="font-size:12px; font-weight:700; margin-left:4px;">(${r.rating}/5)</span>
+            </td>
+            <td>
+              <span style="font-size:12px; font-weight:600; background:#F5F5F7; padding:4px 8px; border-radius:6px;">${r.package || 'T-Flow Pro'}</span>
+            </td>
+            <td>
+              <div style="font-weight:700; font-size:13px; color:var(--text-main); margin-bottom:3px;">${r.title || ''}</div>
+              <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.4;">"${r.comment || ''}"</div>
+              <div style="margin-top:4px; display:flex; gap:4px; flex-wrap:wrap;">
+                ${(r.tags || []).map(t => `<span style="font-size:10.5px; background:rgba(0,0,0,0.04); color:var(--text-secondary); padding:2px 6px; border-radius:4px;">#${t}</span>`).join('')}
+              </div>
+            </td>
+            <td style="text-align:right;">
+              <button onclick="handleDeleteReview('${r.id}')" style="background:none; border:1px solid #FF3B30; color:#FF3B30; padding:4px 10px; border-radius:6px; font-size:11.5px; font-weight:600; cursor:pointer;">
+                Xóa
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function handleDeleteReview(reviewId) {
+      if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này khỏi hệ thống?')) return;
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.deleteReview(reviewId);
+        renderAdminReviewsTable();
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       checkAdminAccess();
     });
