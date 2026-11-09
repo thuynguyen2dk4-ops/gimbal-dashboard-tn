@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100' height='100' rx='26' fill='%231D1D1F'/%3E%3Cpath d='M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34' stroke='%23FFFFFF' stroke-width='12' stroke-linecap='round' fill='none'/%3E%3Cpath d='M 50 34 L 50 82' stroke='%23FFFFFF' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chỉnh Sửa Hồ Sơ Cá Nhân — T-Flow ID</title>
@@ -611,14 +612,16 @@
   <!-- STICKY HEADER -->
   <header>
     <div class="brand">
-      <div class="brand-mark">S</div>
+      <div class="brand-mark" style="width:32px; height:32px; background:#1D1D1F; color:#FFF; border-radius:9px; padding:6px; display:inline-flex; align-items:center; justify-content:center; box-shadow:0 4px 12px rgba(0,0,0,0.12); flex-shrink:0;">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+          <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" fill="none" />
+          <path d="M 50 34 L 50 82" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" />
+        </svg>
+      </div>
       <span>T-Flow ID &mdash; Cài Đặt Hồ Sơ</span>
     </div>
     <div class="nav-actions">
-      <div class="status-badge" id="headerSessionBadge" style="display:none;">
-        <div class="dot"></div>
-        <span id="headerSessionDisplay">Phiên Hoạt Động</span>
-      </div>
+      
       <a href="user_dashboard.html" class="btn-nav-link">&larr; Cổng Khách Hàng</a>
       <a href="index.html" class="btn-nav-link">Trang Chủ</a>
       <button class="btn btn-outline" style="font-size:12.5px;" onclick="handleLogout()">Đăng Xuất</button>
