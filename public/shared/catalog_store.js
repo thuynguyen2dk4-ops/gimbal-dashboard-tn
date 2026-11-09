@@ -22,7 +22,7 @@
   var SYNC_EVENT = 'tflow_catalog_synced';
   var CART_EVENT = 'tflow_cart_updated';
   var USER_EVENT = 'tflow_user_updated';
-  var REVIEWS_KEY = 'tflow_user_reviews_v1';
+  var REVIEWS_KEY = 'tflow_pro_real_user_reviews_v2';
   var REVIEWS_EVENT = 'tflow_reviews_updated';
 
   var ADMIN_GMAILS = ['thuynguyen2dk4@gmail.com', 'thuy.nguyen@tflow.tech'];
@@ -130,8 +130,8 @@
         "badge": "Flagship 2026",
         "img": "../shared/img/feed_portrait_dusk.jpg",
         "status": "Đang Mở Bán",
-        "totalOrders": 1850,
-        "orderGrowth": "+24%",
+        "totalOrders": 0,
+        
         "is_flagship": true,
         "gallery": [
           "../shared/img/feed_portrait_dusk.jpg",
@@ -227,47 +227,7 @@
     ]
   };
 
-  var DEFAULT_REVIEWS = [
-    {
-      id: "rev-01",
-      author: "Đặng Anh Dũng",
-      avatar: "D",
-      role: "Travel Filmmaker • 1.2M Followers",
-      package: "T-Flow Pro - Cinematic Master",
-      rating: 5,
-      date: "15/10/2026",
-      title: "Ngàm MagSafe và động cơ FOC là bước đột phá xuất sắc!",
-      comment: "Ngàm MagSafe là bước cải tiến xuất sắc nhất trên T-Flow Pro. Khi cần rút máy ra nghe điện thoại hoặc đổi góc quay cầm tay, chỉ mất đúng một giây mà không phải cân lại trục. Động cơ FOC tải trọng 450g giữ máy cực kỳ vững vàng.",
-      tags: ["MagSafe cực nhạy", "Chống rung FOC", "Tải trọng 450g"],
-      verified: true
-    },
-    {
-      id: "rev-02",
-      author: "Mai Linh Creative",
-      avatar: "M",
-      role: "Đạo Diễn Hình Ảnh (DoP)",
-      package: "T-Flow Pro - Creator Kit",
-      rating: 5,
-      date: "28/10/2026",
-      title: "Vòng xoay lấy nét Focus Wheel mượt mà như máy điện ảnh",
-      comment: "Bánh xe lấy nét cơ học rất êm và có lực cản vừa phải. Khi kết hợp với chế độ quay Apple Log trên iPhone 16 Pro Max qua App T-Flow Cam, kết quả cho ra như máy quay phim rạp. Cực kỳ ấn tượng với hoàn thiện sợi Carbon 8 lớp.",
-      tags: ["Focus Wheel êm", "Apple Log Pro", "Sợi Carbon 8 lớp"],
-      verified: true
-    },
-    {
-      id: "rev-03",
-      author: "Trần Hoàng Nam",
-      avatar: "N",
-      role: "Tech Reviewer & Nhiếp Ảnh Gia",
-      package: "T-Flow Pro - Standard Kit",
-      rating: 5,
-      date: "02/11/2026",
-      title: "Triệt tiêu hoàn toàn micro-jitter trên địa hình gồ ghề",
-      comment: "Thuật toán Pure FOC 20kHz triệt tiêu hoàn toàn hiện tượng rung giật micro-jitter. Ngay cả khi đi bộ nhanh trên địa hình sỏi đá hay chạy theo chủ thể, đường chân trời vẫn thẳng tắp và mượt mà từng khoảnh khắc.",
-      tags: ["Zero Jitter", "Horizon Lock", "Pin trâu 18h"],
-      verified: true
-    }
-  ];
+  var DEFAULT_REVIEWS = []; // 100% REAL DATA - NO FAKE REVIEWS
 
   // ==========================================================================
   // 2. CORE STORAGE HELPERS

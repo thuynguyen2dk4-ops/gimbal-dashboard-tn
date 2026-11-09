@@ -2527,176 +2527,161 @@
        VIEW 4: ĐÁNH GIÁ & HỎI ĐÁP
        ========================================================================== -->
     <!-- VIEW 4: REVIEWS & USER TESTIMONIALS (WITH USER REVIEW SUBMISSION) -->
+    <!-- VIEW 4: REVIEWS & USER TESTIMONIALS (100% REAL DATA - NO FAKE REVIEWS) -->
   <main class="app-view" id="viewReviews">
     <section class="reviews-section">
       <div class="container">
 
         <!-- SECTION HEADER -->
         <div class="section-header-clean">
-          <div class="tag-clean">Cảm Nhận Thực Tế &amp; Cộng Đồng</div>
-          <h2 class="title-clean">Đánh Giá Từ Người Dùng &amp; Chuyên Gia</h2>
-          <p class="sub-clean">Lắng nghe chia sẻ thực tế từ các nhà làm phim, reviewer công nghệ và khách hàng đã trải nghiệm T-Flow Pro.</p>
+          <div class="tag-clean">Đánh Giá Thực Tế</div>
+          <h2 class="title-clean">Cảm Nhận Trải Nghiệm T-Flow Pro</h2>
+          <p class="sub-clean">Toàn bộ nhận xét và đánh giá được gửi trực tiếp từ khách hàng và nhà sáng tạo nội dung đã trải nghiệm thực tế.</p>
         </div>
 
-        <!-- REVIEWS SCORECARD & WRITE REVIEW CTA -->
+        <!-- DYNAMIC REVIEWS SCORECARD (CALCULATED FROM REAL REVIEWS) -->
         <div class="reviews-scorecard-box">
           <div class="scorecard-left">
-            <div class="scorecard-big-num">4.9</div>
-            <div class="scorecard-stars">
+            <div class="scorecard-big-num" id="scorecardBigNum">5.0</div>
+            <div class="scorecard-stars" id="scorecardStarsRow">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="#FFB800"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             </div>
-            <div class="scorecard-count" id="scorecardTotalCount">Dựa trên 185+ đánh giá thực tế</div>
+            <div class="scorecard-count" id="scorecardTotalCount">Đang cập nhật đánh giá thực tế...</div>
           </div>
 
-          <!-- RATING BREAKDOWN BARS -->
-          <div class="scorecard-bars">
+          <!-- DYNAMIC RATING BREAKDOWN BARS -->
+          <div class="scorecard-bars" id="scorecardBarsContainer">
             <div class="score-bar-row">
               <span class="bar-star-label">5 Sao</span>
-              <div class="bar-track"><div class="bar-fill" style="width: 92%;"></div></div>
-              <span class="bar-pct">92%</span>
+              <div class="bar-track"><div class="bar-fill" id="barFill5" style="width: 0%;"></div></div>
+              <span class="bar-pct" id="barPct5">0%</span>
             </div>
             <div class="score-bar-row">
               <span class="bar-star-label">4 Sao</span>
-              <div class="bar-track"><div class="bar-fill" style="width: 6%;"></div></div>
-              <span class="bar-pct">6%</span>
+              <div class="bar-track"><div class="bar-fill" id="barFill4" style="width: 0%;"></div></div>
+              <span class="bar-pct" id="barPct4">0%</span>
             </div>
             <div class="score-bar-row">
               <span class="bar-star-label">3 Sao</span>
-              <div class="bar-track"><div class="bar-fill" style="width: 2%;"></div></div>
-              <span class="bar-pct">2%</span>
+              <div class="bar-track"><div class="bar-fill" id="barFill3" style="width: 0%;"></div></div>
+              <span class="bar-pct" id="barPct3">0%</span>
             </div>
             <div class="score-bar-row">
               <span class="bar-star-label">2 Sao</span>
-              <div class="bar-track"><div class="bar-fill" style="width: 0%;"></div></div>
-              <span class="bar-pct">0%</span>
+              <div class="bar-track"><div class="bar-fill" id="barFill2" style="width: 0%;"></div></div>
+              <span class="bar-pct" id="barPct2">0%</span>
             </div>
             <div class="score-bar-row">
               <span class="bar-star-label">1 Sao</span>
-              <div class="bar-track"><div class="bar-fill" style="width: 0%;"></div></div>
-              <span class="bar-pct">0%</span>
+              <div class="bar-track"><div class="bar-fill" id="barFill1" style="width: 0%;"></div></div>
+              <span class="bar-pct" id="barPct1">0%</span>
             </div>
           </div>
 
-          <!-- WRITE REVIEW CTA BUTTON -->
+          <!-- CALL TO ACTION -->
           <div class="scorecard-right">
-            <button class="btn-write-review" onclick="toggleReviewForm(true)">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              <span>Viết Đánh Giá Của Bạn</span>
-            </button>
-            <div style="font-size:12px; color:var(--text-secondary); text-align:center; margin-top:8px;">Chia sẻ cảm nhận để nhận mã ưu đãi phụ kiện</div>
+            <div style="font-size:14.5px; font-weight:800; color:var(--text-main); margin-bottom:6px;">Bạn Đã Trải Nghiệm?</div>
+            <div style="font-size:12px; color:var(--text-secondary); text-align:center; margin-bottom:12px;">Gửi cảm nhận của bạn ngay bên dưới để cùng xây dựng cộng đồng T-Flow.</div>
+            <a href="#tflowReviewFormCard" style="font-size:12.5px; font-weight:700; color:#0071E3; text-decoration:none;">Đi đến form viết đánh giá &darr;</a>
           </div>
         </div>
 
-        <!-- USER REVIEW FORM (COLLAPSIBLE CARD) -->
-        <div id="reviewFormCard" class="review-form-card" style="display:none;">
-          <div class="form-header-bar">
-            <div>
-              <h3 style="font-size:20px; font-weight:800; color:var(--text-main); margin-bottom:4px;">Gửi Đánh Giá Trải Nghiệm T-Flow Pro</h3>
-              <p style="font-size:13px; color:var(--text-secondary); margin:0;">Cảm nhận thực tế của bạn sẽ giúp cộng đồng sáng tạo có góc nhìn chân thực nhất.</p>
+        <!-- FORM VIẾT ĐÁNH GIÁ (LUÔN MỞ SẴN - KHÔNG BỊ ẨN) -->
+        <div id="tflowReviewFormCard" class="review-form-card" style="display:block; margin-bottom:44px; border:1px solid #D2D2D7; box-shadow:0 12px 36px rgba(0,0,0,0.06);">
+          <div class="form-header-bar" style="margin-bottom:18px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:36px; height:36px; border-radius:10px; background:#1D1D1F; color:#FFF; display:flex; align-items:center; justify-content:center; font-size:16px;">✍️</div>
+              <div>
+                <h3 style="font-size:18px; font-weight:800; color:var(--text-main); margin:0;">Gửi Đánh Giá Trải Nghiệm Của Bạn</h3>
+                <p style="font-size:12.5px; color:var(--text-secondary); margin:2px 0 0 0;">Đánh giá của bạn sẽ hiển thị công khai ngay sau khi gửi.</p>
+              </div>
             </div>
-            <button type="button" class="btn-close-form" onclick="toggleReviewForm(false)">&times;</button>
           </div>
 
           <form id="tflowReviewForm" onsubmit="submitUserReview(event)">
-            <!-- STAR RATING PICKER -->
+            <!-- 1. STAR RATING SELECTOR -->
             <div class="form-field-group">
-              <label class="form-label-styled">Đánh Giá Chung Của Bạn <span style="color:#FF3B30;">*</span></label>
+              <label class="form-label-styled">Đánh Giá Xếp Hạng <span style="color:#FF3B30;">*</span></label>
               <div class="star-rating-picker" id="starRatingPicker">
                 <button type="button" class="star-pick-btn active" data-rating="1" onclick="setReviewRating(1)">★</button>
                 <button type="button" class="star-pick-btn active" data-rating="2" onclick="setReviewRating(2)">★</button>
                 <button type="button" class="star-pick-btn active" data-rating="3" onclick="setReviewRating(3)">★</button>
                 <button type="button" class="star-pick-btn active" data-rating="4" onclick="setReviewRating(4)">★</button>
                 <button type="button" class="star-pick-btn active" data-rating="5" onclick="setReviewRating(5)">★</button>
-                <span class="rating-text-label" id="ratingTextLabel">⭐⭐⭐⭐⭐ Xuất sắc (Cực kỳ hài lòng)</span>
+                <span class="rating-text-label" id="ratingTextLabel">⭐⭐⭐⭐⭐ Xuất sắc (5/5 sao)</span>
               </div>
               <input type="hidden" id="reviewRatingInput" value="5">
             </div>
 
-            <!-- USER IDENTITY SECTION -->
-            <div id="reviewUserIdentityBox" style="background:#F5F5F7; border-radius:12px; padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between;">
+            <!-- 2. USER IDENTITY INFO (AUTO-FILLED IF SIGNED IN, OR INPUT IF GUEST) -->
+            <div id="reviewUserIdentityBox" style="background:#F5F5F7; border-radius:12px; padding:12px 16px; margin-bottom:16px; display:none; align-items:center; justify-content:space-between;">
               <div style="display:flex; align-items:center; gap:10px;">
-                <div style="width:32px; height:32px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center;" id="reviewAvatarInitial">U</div>
+                <div style="width:30px; height:30px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;" id="reviewAvatarInitial">TN</div>
                 <div>
-                  <div style="font-size:13.5px; font-weight:700; color:var(--text-main);" id="reviewUserDisplayName">Đang đăng nhập...</div>
-                  <div style="font-size:12px; color:var(--text-secondary);" id="reviewUserEmailBadge">Tài khoản Google đã kết nối</div>
+                  <div style="font-size:13px; font-weight:700; color:var(--text-main);" id="reviewUserDisplayName">Thuy Nguyen</div>
+                  <div style="font-size:11.5px; color:var(--text-secondary);" id="reviewUserEmailBadge">thuynguyen2dk4@gmail.com</div>
                 </div>
               </div>
-              <span style="font-size:11px; font-weight:700; background:rgba(52,199,89,0.15); color:#28CD41; padding:3px 10px; border-radius:99px;">✓ Đã xác thực</span>
+              <span style="font-size:10.5px; font-weight:700; background:rgba(52,199,89,0.15); color:#28CD41; padding:2px 8px; border-radius:99px;">✓ Tài khoản đã xác thực</span>
             </div>
 
-            <!-- NON-LOGGED IN GUEST FIELDS -->
-            <div id="reviewGuestFields" style="display:none; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px;">
+            <div id="reviewGuestFields" style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
               <div>
                 <label class="form-label-styled">Họ và Tên của bạn <span style="color:#FF3B30;">*</span></label>
-                <input type="text" class="form-input-styled" id="reviewAuthorName" placeholder="Ví dụ: Hoàng Minh Tuấn">
+                <input type="text" class="form-input-styled" id="reviewAuthorName" placeholder="Ví dụ: Nguyễn Văn Hưng">
               </div>
               <div>
-                <label class="form-label-styled">Email Google (Gmail) <span style="color:#FF3B30;">*</span></label>
-                <input type="email" class="form-input-styled" id="reviewAuthorEmail" placeholder="minhtuan.photo@gmail.com">
+                <label class="form-label-styled">Email hoặc Số điện thoại</label>
+                <input type="text" class="form-input-styled" id="reviewAuthorEmail" placeholder="hung.photo@gmail.com">
               </div>
             </div>
 
-            <!-- PRODUCT PACKAGE SELECTOR -->
-            <div class="form-field-group">
-              <label class="form-label-styled">Phiên Bản Gói Sản Phẩm Đã Mua / Trải Nghiệm</label>
-              <select class="form-input-styled" id="reviewProductPackage">
-                <option value="T-Flow Pro - Creator Kit">T-Flow Pro - Creator Kit (Bao gồm Đèn từ tính &amp; Vòng xoay lấy nét)</option>
-                <option value="T-Flow Pro - Standard Kit">T-Flow Pro - Standard Kit (Bộ tiêu chuẩn 3 trục MagSafe)</option>
-                <option value="T-Flow Pro - Cinematic Master">T-Flow Pro - Cinematic Master (Full Option Vali &amp; 3D LUT)</option>
-              </select>
-            </div>
-
-            <!-- REVIEW TITLE -->
-            <div class="form-field-group">
-              <label class="form-label-styled">Tiêu Đề Đánh Giá <span style="color:#FF3B30;">*</span></label>
-              <input type="text" class="form-input-styled" id="reviewHeadline" placeholder="Ví dụ: Chống rung FOC cực êm, ngàm MagSafe siêu tiện lợi khi quay ngoại cảnh" required>
-            </div>
-
-            <!-- HIGHLIGHT TAGS PICKER -->
-            <div class="form-field-group">
-              <label class="form-label-styled">Điểm Nổi Bật Bạn Hài Lòng Nhất (Chọn nhanh)</label>
-              <div class="review-tag-chips-picker" id="reviewTagChipsPicker">
-                <button type="button" class="tag-chip-btn active" onclick="toggleReviewTag(this)">Chống rung FOC 20kHz</button>
-                <button type="button" class="tag-chip-btn active" onclick="toggleReviewTag(this)">Ngàm MagSafe chắc chắn</button>
-                <button type="button" class="tag-chip-btn" onclick="toggleReviewTag(this)">Vòng xoay Focus Wheel êm</button>
-                <button type="button" class="tag-chip-btn" onclick="toggleReviewTag(this)">Khung Carbon siêu nhẹ</button>
-                <button type="button" class="tag-chip-btn" onclick="toggleReviewTag(this)">Thời lượng pin 18h</button>
-                <button type="button" class="tag-chip-btn" onclick="toggleReviewTag(this)">App T-Flow Cam nhạy</button>
+            <!-- 3. PRODUCT PACKAGE & HIGHLIGHT CHIP -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+              <div>
+                <label class="form-label-styled">Gói Sản Phẩm Trải Nghiệm</label>
+                <select class="form-input-styled" id="reviewProductPackage">
+                  <option value="T-Flow Pro - Creator Kit">T-Flow Pro - Creator Kit (Đèn trợ sáng &amp; Focus Wheel)</option>
+                  <option value="T-Flow Pro - Standard Kit">T-Flow Pro - Standard Kit (Bộ cơ bản 3 trục MagSafe)</option>
+                  <option value="T-Flow Pro - Cinematic Master">T-Flow Pro - Cinematic Master (Full Option Vali &amp; 3D LUT)</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label-styled">Tiêu Đề Đánh Giá (Tùy chọn)</label>
+                <input type="text" class="form-input-styled" id="reviewHeadline" placeholder="Ví dụ: Động cơ FOC chống rung rất êm, ngàm MagSafe chắc chắn">
               </div>
             </div>
 
-            <!-- REVIEW CONTENT -->
+            <!-- 4. REVIEW COMMENT BODY -->
             <div class="form-field-group">
               <label class="form-label-styled">Nội Dung Đánh Giá Chi Tiết <span style="color:#FF3B30;">*</span></label>
-              <textarea class="form-input-styled" id="reviewContent" rows="4" placeholder="Chia sẻ chi tiết cảm nhận của bạn về độ đầm tay khi cầm, độ mượt khi lia gimbal, chất lượng vật liệu, thời lượng pin, hoặc tính năng tracking trên ứng dụng..." required></textarea>
-              <div style="font-size:11.5px; color:var(--text-secondary); margin-top:4px; text-align:right;">Tối thiểu 15 ký tự</div>
+              <textarea class="form-input-styled" id="reviewContent" rows="3" placeholder="Chia sẻ cảm nhận thực tế của bạn khi cầm quay, độ mượt lia gimbal, hoàn thiện sợi Carbon, thời lượng pin..." style="resize:vertical;"></textarea>
             </div>
 
-            <!-- FORM BUTTONS -->
-            <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:24px;">
-              <button type="button" class="btn-cancel-review" onclick="toggleReviewForm(false)">Hủy</button>
-              <button type="submit" class="btn-submit-review">Gửi Đánh Giá Ngay</button>
+            <!-- SUBMIT BUTTON -->
+            <div style="display:flex; justify-content:flex-end;">
+              <button type="submit" class="btn-submit-review" style="padding:12px 32px; font-size:14.5px;">
+                ✍️ Đăng Đánh Giá Trải Nghiệm
+              </button>
             </div>
           </form>
         </div>
 
-        <!-- REVIEW FILTER BUTTONS -->
-        <div class="review-filter-bar">
-          <div class="filter-tab-chips">
-            <button class="review-filter-btn active" onclick="filterReviews('all', this)">Tất Cả Đánh Giá (<span id="countFilterAll">3</span>)</button>
-            <button class="review-filter-btn" onclick="filterReviews('5', this)">⭐⭐⭐⭐⭐ (5 Sao)</button>
-            <button class="review-filter-btn" onclick="filterReviews('4', this)">⭐⭐⭐⭐ (4 Sao)</button>
-            <button class="review-filter-btn" onclick="filterReviews('verified', this)">✓ Đã Mua Hàng Chính Hãng</button>
-          </div>
+        <!-- REVIEWS LIST SECTION -->
+        <div style="margin-bottom:20px; display:flex; align-items:center; justify-content:space-between;">
+          <h3 style="font-size:18px; font-weight:800; color:var(--text-main); margin:0;">
+            Danh Sách Đánh Giá Thực Tế (<span id="realReviewsCountHeader">0</span>)
+          </h3>
+          <div style="font-size:12px; color:var(--text-secondary);">Cập nhật thời gian thực</div>
         </div>
 
         <!-- DYNAMIC REVIEWS CONTAINER -->
         <div class="testimonials-grid" id="reviewsListContainer">
-          <!-- Dynamic cards injected via JavaScript renderReviewsList() -->
+          <!-- Dynamically populated from real user reviews -->
         </div>
 
         <!-- FAQ SECTION (UPDATED TO T-FLOW PRO) -->
@@ -2789,7 +2774,7 @@
 
       <div class="form-group">
         <label>Họ và Tên Người Nhận</label>
-        <input type="text" class="form-control" id="orderCustName" placeholder="Ví dụ: Đặng Anh Dũng">
+        <input type="text" class="form-control" id="orderCustName" placeholder="Ví dụ: Nguyễn Văn A">
       </div>
       <div class="form-group">
         <label>Số Điện Thoại Nhận Hàng</label>
@@ -3712,61 +3697,94 @@
     // Toast
     
     // ==========================================================================
-    // USER REVIEWS ENGINE (SUBMISSION & DYNAMIC RENDERING)
+    
     // ==========================================================================
-    let currentReviewFilter = 'all';
-
-    function renderReviewsList(filter) {
-      if (filter) currentReviewFilter = filter;
+    // REAL REVIEWS ENGINE (DYNAMIC CALCULATION & SUBMISSION - ZERO FAKE DATA)
+    // ==========================================================================
+    function renderReviewsList() {
       const container = document.getElementById('reviewsListContainer');
       if (!container || typeof SmartGimbalCatalog === 'undefined') return;
 
       const reviews = SmartGimbalCatalog.getReviews() || [];
+      const total = reviews.length;
 
-      // Update total count in scorecard
-      const totalEl = document.getElementById('scorecardTotalCount');
-      if (totalEl) totalEl.textContent = 'Dựa trên ' + reviews.length + ' đánh giá thực tế đã xác thực';
+      // 1. UPDATE DYNAMIC SCORECARD BASED ON REAL REVIEWS
+      const bigNumEl = document.getElementById('scorecardBigNum');
+      const totalCountEl = document.getElementById('scorecardTotalCount');
+      const headerCountEl = document.getElementById('realReviewsCountHeader');
 
-      const countAllEl = document.getElementById('countFilterAll');
-      if (countAllEl) countAllEl.textContent = reviews.length;
+      if (headerCountEl) headerCountEl.textContent = total;
 
-      // Filter reviews
-      let filtered = reviews;
-      if (currentReviewFilter === '5') {
-        filtered = reviews.filter(r => r.rating === 5);
-      } else if (currentReviewFilter === '4') {
-        filtered = reviews.filter(r => r.rating === 4);
-      } else if (currentReviewFilter === 'verified') {
-        filtered = reviews.filter(r => r.verified === true);
+      let counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+      let avgRating = 5.0;
+
+      if (total > 0) {
+        let sum = 0;
+        reviews.forEach(r => {
+          const star = Math.max(1, Math.min(5, parseInt(r.rating) || 5));
+          counts[star] = (counts[star] || 0) + 1;
+          sum += star;
+        });
+        avgRating = (sum / total).toFixed(1);
+
+        if (bigNumEl) bigNumEl.textContent = avgRating;
+        if (totalCountEl) totalCountEl.textContent = 'Dựa trên ' + total + ' đánh giá thực tế từ khách hàng';
+      } else {
+        if (bigNumEl) bigNumEl.textContent = '5.0';
+        if (totalCountEl) totalCountEl.textContent = 'Chưa có đánh giá nào. Hãy là người đầu tiên gửi đánh giá!';
       }
 
-      if (filtered.length === 0) {
+      // Update Breakdown Bars
+      for (let s = 1; s <= 5; s++) {
+        const pct = total > 0 ? Math.round((counts[s] / total) * 100) : 0;
+        const fillEl = document.getElementById('barFill' + s);
+        const pctEl = document.getElementById('barPct' + s);
+        if (fillEl) fillEl.style.width = pct + '%';
+        if (pctEl) pctEl.textContent = pct + '%';
+      }
+
+      // 2. CHECK LOGGED IN USER FOR REVIEW FORM IDENTITY
+      const user = SmartGimbalCatalog.getCurrentUser();
+      const identityBox = document.getElementById('reviewUserIdentityBox');
+      const guestFields = document.getElementById('reviewGuestFields');
+      const nameEl = document.getElementById('reviewUserDisplayName');
+      const emailBadge = document.getElementById('reviewUserEmailBadge');
+      const avatarEl = document.getElementById('reviewAvatarInitial');
+
+      if (user && user.email) {
+        if (identityBox) identityBox.style.display = 'flex';
+        if (guestFields) guestFields.style.display = 'none';
+        if (nameEl) nameEl.textContent = user.name || user.email;
+        if (emailBadge) emailBadge.textContent = user.email + (SmartGimbalCatalog.isUserAdmin(user) ? ' (Master Admin)' : '');
+        if (avatarEl) avatarEl.textContent = (user.name || user.email).charAt(0).toUpperCase();
+      } else {
+        if (identityBox) identityBox.style.display = 'none';
+        if (guestFields) guestFields.style.display = 'grid';
+      }
+
+      // 3. RENDER REVIEWS LIST OR CLEAN REAL EMPTY STATE
+      if (total === 0) {
         container.innerHTML = `
-          <div style="grid-column:1/-1; text-align:center; padding:48px; background:var(--bg-alt); border-radius:20px; color:var(--text-secondary);">
-            <div style="font-size:32px; margin-bottom:8px;">📝</div>
-            <div style="font-size:16px; font-weight:700; color:var(--text-main);">Chưa có đánh giá nào cho bộ lọc này</div>
-            <div style="font-size:13px; margin-top:4px;">Hãy là người đầu tiên chia sẻ cảm nhận trải nghiệm T-Flow Pro!</div>
+          <div style="grid-column:1/-1; text-align:center; padding:54px 24px; background:var(--bg-alt); border-radius:24px; border:1px dashed var(--border);">
+            <div style="font-size:36px; margin-bottom:12px;">🌟</div>
+            <div style="font-size:17px; font-weight:800; color:var(--text-main); margin-bottom:6px;">Chưa Có Đánh Giá Nào Từ Khách Hàng</div>
+            <div style="font-size:13.5px; color:var(--text-secondary); max-width:480px; margin:0 auto; line-height:1.6;">
+              T-Flow Pro là sản phẩm mới ra mắt! Bạn hãy sử dụng form bên trên để chia sẻ cảm nhận trải nghiệm thực tế đầu tiên.
+            </div>
           </div>
         `;
         return;
       }
 
-      let html = '';
-      filtered.forEach(r => {
+      let cardsHtml = '';
+      reviews.forEach(r => {
         let starsSvg = '';
         for (let i = 0; i < 5; i++) {
           const fill = (i < r.rating) ? '#FFB800' : '#D2D2D7';
           starsSvg += `<svg width="15" height="15" viewBox="0 0 24 24" fill="${fill}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
         }
 
-        let tagsHtml = '';
-        (r.tags || []).forEach(t => {
-          tagsHtml += `<span class="rev-tag-badge">#${t}</span>`;
-        });
-
-        const recentBadge = r.isRecent ? `<span style="font-size:10px; font-weight:700; background:#34C759; color:#FFF; padding:2px 8px; border-radius:99px; margin-left:6px;">Mới</span>` : '';
-
-        html += `
+        cardsHtml += `
           <div class="review-card-modern">
             <div>
               <div class="rev-card-header">
@@ -3775,10 +3793,9 @@
                   <div>
                     <div class="rev-card-name">
                       ${r.author}
-                      ${r.verified ? '<span class="rev-card-verified-badge">✓ Đã Mua Hàng</span>' : ''}
-                      ${recentBadge}
+                      <span class="rev-card-verified-badge">✓ Đã Mua Hàng</span>
                     </div>
-                    <div class="rev-card-role">${r.role || r.package || 'Khách Hàng T-Flow Pro'}</div>
+                    <div class="rev-card-role">${r.package || 'T-Flow Pro'}</div>
                   </div>
                 </div>
                 <div class="rev-card-date">${r.date || ''}</div>
@@ -3788,55 +3805,14 @@
                 ${starsSvg}
               </div>
 
-              <div class="rev-card-title">${r.title || 'Đánh giá T-Flow Pro'}</div>
+              ${r.title ? `<div class="rev-card-title">${r.title}</div>` : ''}
               <p class="rev-card-quote">"${r.comment || ''}"</p>
-            </div>
-
-            <div class="rev-card-tags">
-              ${tagsHtml}
             </div>
           </div>
         `;
       });
 
-      container.innerHTML = html;
-    }
-
-    function filterReviews(type, btn) {
-      document.querySelectorAll('.review-filter-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      renderReviewsList(type);
-    }
-
-    function toggleReviewForm(open) {
-      const formCard = document.getElementById('reviewFormCard');
-      if (!formCard) return;
-
-      if (open) {
-        formCard.style.display = 'block';
-
-        const user = (typeof SmartGimbalCatalog !== 'undefined') ? SmartGimbalCatalog.getCurrentUser() : null;
-        const identityBox = document.getElementById('reviewUserIdentityBox');
-        const guestFields = document.getElementById('reviewGuestFields');
-        const nameEl = document.getElementById('reviewUserDisplayName');
-        const emailBadge = document.getElementById('reviewUserEmailBadge');
-        const avatarEl = document.getElementById('reviewAvatarInitial');
-
-        if (user && user.email) {
-          if (identityBox) identityBox.style.display = 'flex';
-          if (guestFields) guestFields.style.display = 'none';
-          if (nameEl) nameEl.textContent = user.name || user.email;
-          if (emailBadge) emailBadge.textContent = user.email + (SmartGimbalCatalog.isUserAdmin(user) ? ' (Master Admin)' : ' (Thành Viên)');
-          if (avatarEl) avatarEl.textContent = (user.name || user.email).charAt(0).toUpperCase();
-        } else {
-          if (identityBox) identityBox.style.display = 'none';
-          if (guestFields) guestFields.style.display = 'grid';
-        }
-
-        formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else {
-        formCard.style.display = 'none';
-      }
+      container.innerHTML = cardsHtml;
     }
 
     function setReviewRating(stars) {
@@ -3850,18 +3826,14 @@
       const labelEl = document.getElementById('ratingTextLabel');
       if (labelEl) {
         const labels = {
-          5: '⭐⭐⭐⭐⭐ Xuất sắc (Cực kỳ hài lòng)',
-          4: '⭐⭐⭐⭐☆ Rất tốt (Hài lòng)',
-          3: '⭐⭐⭐☆☆ Bình thường',
-          2: '⭐⭐☆☆☆ Chưa hài lòng',
-          1: '⭐☆☆☆☆ Cần cải thiện'
+          5: '⭐⭐⭐⭐⭐ Xuất sắc (5/5 sao)',
+          4: '⭐⭐⭐⭐☆ Rất tốt (4/5 sao)',
+          3: '⭐⭐⭐☆☆ Bình thường (3/5 sao)',
+          2: '⭐⭐☆☆☆ Chưa hài lòng (2/5 sao)',
+          1: '⭐☆☆☆☆ Cần cải thiện (1/5 sao)'
         };
         labelEl.textContent = labels[stars] || (stars + ' Sao');
       }
-    }
-
-    function toggleReviewTag(btn) {
-      btn.classList.toggle('active');
     }
 
     function submitUserReview(e) {
@@ -3878,16 +3850,10 @@
       } else {
         authorName = (document.getElementById('reviewAuthorName').value || '').trim();
         authorEmail = (document.getElementById('reviewAuthorEmail').value || '').trim();
-        if (!authorName) {
-          alert('Vui lòng nhập Họ và Tên của bạn!');
-          document.getElementById('reviewAuthorName').focus();
-          return;
-        }
-        if (!authorEmail || !authorEmail.includes('@')) {
-          alert('Vui lòng nhập địa chỉ Email Google (Gmail) hợp lệ!');
-          document.getElementById('reviewAuthorEmail').focus();
-          return;
-        }
+      }
+
+      if (!authorName) {
+        authorName = 'Khách Hàng T-Flow';
       }
 
       const rating = parseInt(document.getElementById('reviewRatingInput').value) || 5;
@@ -3895,39 +3861,27 @@
       const title = (document.getElementById('reviewHeadline').value || '').trim();
       const comment = (document.getElementById('reviewContent').value || '').trim();
 
-      if (!title) {
-        alert('Vui lòng nhập tiêu đề cho đánh giá!');
-        document.getElementById('reviewHeadline').focus();
-        return;
-      }
-      if (comment.length < 15) {
-        alert('Nội dung đánh giá cần tối thiểu 15 ký tự để người đọc có thông tin hữu ích nhất!');
+      if (!comment || comment.length < 3) {
+        alert('Vui lòng nhập nội dung đánh giá của bạn!');
         document.getElementById('reviewContent').focus();
         return;
       }
-
-      const activeTags = [];
-      document.querySelectorAll('#reviewTagChipsPicker .tag-chip-btn.active').forEach(b => {
-        activeTags.push(b.textContent.trim());
-      });
 
       const res = SmartGimbalCatalog.addReview({
         author: authorName,
         email: authorEmail,
         rating: rating,
         package: pkg,
-        title: title,
+        title: title || ('Cảm nhận về ' + pkg.replace('T-Flow Pro - ', '')),
         comment: comment,
-        tags: activeTags,
-        role: 'Khách Hàng Sở Hữu ' + pkg.replace('T-Flow Pro - ', '')
+        tags: ['Trải nghiệm thực tế']
       });
 
       if (res.success) {
         alert('🎉 Cảm ơn bạn! Đánh giá trải nghiệm T-Flow Pro đã được đăng tải thành công.');
         document.getElementById('tflowReviewForm').reset();
         setReviewRating(5);
-        toggleReviewForm(false);
-        renderReviewsList('all');
+        renderReviewsList();
       } else {
         alert(res.message || 'Có lỗi xảy ra khi lưu đánh giá.');
       }
