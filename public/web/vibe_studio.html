@@ -460,7 +460,7 @@
           <button class="btn-reload" style="padding:3px 9px;" onclick="setMainIframe('user_dashboard.html')">Cổng Khách Hàng</button>
         </div>
         <div class="url-box">
-          <span id="currentPreviewUrl">https://tflow-pro.vercel.app/web/index.html</span>
+          <span id="currentPreviewUrl">https://t-flow.tech/web/index.html</span>
           <a href="index.html" id="openNewTabLink" target="_blank" style="color:#8b949e; text-decoration:none; font-size:11px;">Mở toàn màn hình ↗</a>
         </div>
       </div>
@@ -493,7 +493,7 @@
 
       <div class="qr-grid">
         <div class="qr-box">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://tflow-pro.vercel.app/web/mobile_app.html" alt="QR Code iPhone App">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://t-flow.tech/web/mobile_app.html" alt="QR Code iPhone App">
           <span style="color:#0d1117; font-size:11px; font-weight:700; margin-top:8px;">QUÉT BẰNG CAMERA IPHONE</span>
         </div>
 
@@ -514,12 +514,12 @@
       </div>
 
       <div class="public-link-pill">
-        <span>Link HTTPS cho iPhone: <strong>https://tflow-pro.vercel.app/web/mobile_app.html</strong></span>
-        <button class="btn-reload" onclick="navigator.clipboard.writeText('https://tflow-pro.vercel.app/web/mobile_app.html'); this.textContent='Đã chép!';">Copy Link</button>
+        <span>Link HTTPS cho iPhone: <strong>https://t-flow.tech/web/mobile_app.html</strong></span>
+        <button class="btn-reload" onclick="navigator.clipboard.writeText('https://t-flow.tech/web/mobile_app.html'); this.textContent='Đã chép!';">Copy Link</button>
       </div>
       <div class="public-link-pill" style="margin-top:8px;">
-        <span>Link HTTPS cho Web Cửa Hàng: <strong>https://tflow-pro.vercel.app/web/index.html</strong></span>
-        <button class="btn-reload" onclick="navigator.clipboard.writeText('https://tflow-pro.vercel.app/web/index.html'); this.textContent='Đã chép!';">Copy Link</button>
+        <span>Link HTTPS cho Web Cửa Hàng: <strong>https://t-flow.tech/web/index.html</strong></span>
+        <button class="btn-reload" onclick="navigator.clipboard.writeText('https://t-flow.tech/web/index.html'); this.textContent='Đã chép!';">Copy Link</button>
       </div>
     </div>
   </div>
@@ -591,7 +591,7 @@
     function setMainIframe(page) {
       const iframe = document.getElementById('mainPreviewIframe');
       iframe.src = page;
-      document.getElementById('currentPreviewUrl').textContent = 'https://tflow-pro.vercel.app/web/' + page;
+      document.getElementById('currentPreviewUrl').textContent = 'https://t-flow.tech/web/' + page;
       document.getElementById('openNewTabLink').href = page;
 
       // Also sync code viewer to the selected page

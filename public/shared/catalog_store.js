@@ -44,8 +44,8 @@
       "silkscreen2": "Pure FOC Inside - Zero Jitter",
       "address": "Tòa nhà Công nghệ T-Flow, Hà Nội, Việt Nam",
       "hotline": "1900 8888",
-      "email": "support@tflow.tech",
-      "website": "https://tflow-pro.vercel.app"
+      "email": "support@t-flow.tech",
+      "website": "https://t-flow.tech"
     },
     "namingRules": [
       {
