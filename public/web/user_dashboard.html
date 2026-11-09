@@ -295,11 +295,15 @@
       border-radius: 50%;
       background: var(--text-main);
       color: #FFFFFF;
-      display: grid;
-      place-items: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-size: 24px;
       font-weight: 800;
       box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      position: relative;
+      border: 2px solid rgba(0,0,0,0.06);
     }
     .profile-name {
       font-size: 24px;
@@ -1059,7 +1063,13 @@
 
     function renderUserProfile() {
       document.getElementById('userName').textContent = currentUser.name || 'Khách Hàng';
-      document.getElementById('userAvatar').textContent = currentUser.avatar || (currentUser.name || 'K').charAt(0).toUpperCase();
+      const avatarEl = document.getElementById('userAvatar');
+      const avatarVal = currentUser.avatar || '';
+      if (avatarVal && (avatarVal.startsWith('data:image') || avatarVal.startsWith('http') || avatarVal.startsWith('/'))) {
+        avatarEl.innerHTML = `<img src="${avatarVal}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;">`;
+      } else {
+        avatarEl.textContent = avatarVal || (currentUser.name || 'K').charAt(0).toUpperCase();
+      }
       document.getElementById('userEmail').textContent = currentUser.email || '';
       document.getElementById('userPhone').textContent = currentUser.phone || 'Chưa cập nhật SĐT';
       document.getElementById('userTierBadge').textContent = currentUser.tierBadge || (currentUser.tier + ' Tier');

@@ -889,6 +889,8 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.15);
     }
 
     .user-email-text {
@@ -1121,7 +1123,7 @@
 
     <!-- ADMIN IDENTITY CARD -->
     <div class="admin-sidebar-user">
-      <div class="user-avatar-circle">TN</div>
+      <div class="user-avatar-circle" id="adminSidebarAvatar">TN</div>
       <div style="flex:1; min-width:0;">
         <div class="user-email-text" id="adminDisplayEmail">thuynguyen2dk4@gmail.com</div>
         <div class="user-role-badge">Master Admin &amp; Founder</div>
@@ -2990,6 +2992,14 @@
         if (gate) gate.style.display = 'none';
         const emailEl = document.getElementById('adminDisplayEmail');
         if (emailEl) emailEl.textContent = user.email;
+        const avaEl = document.getElementById('adminSidebarAvatar');
+        if (avaEl) {
+          if (user.avatar && (user.avatar.startsWith('data:image') || user.avatar.startsWith('http'))) {
+            avaEl.innerHTML = `<img src="${user.avatar}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block;">`;
+          } else {
+            avaEl.textContent = user.avatar || 'TN';
+          }
+        }
         const sess = SmartGimbalCatalog.getActiveSession();
         const sessEl = document.getElementById('adminSessionStatusLabel');
         if (sessEl && sess) sessEl.textContent = 'Phiên: ' + sess.sessionId.substring(0, 12) + '... (Live)';

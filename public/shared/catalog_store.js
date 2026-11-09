@@ -958,20 +958,27 @@
 
   function getCurrentUser() {
     var user = null;
-    try {
-      user = getCookie('tflow_user_session') || getCookie('tflow_user');
-    } catch(e) {}
-
-    if (!user && typeof localStorage !== 'undefined') {
+    // 1. Check localStorage first for rich profiles (including Base64 photo avatars)
+    if (typeof localStorage !== 'undefined') {
       try {
         var raw = localStorage.getItem(CURRENT_USER_KEY);
         if (raw) user = JSON.parse(raw);
       } catch (e) {}
     }
+    // 2. Fallback to cookie
+    if (!user) {
+      try {
+        user = getCookie('tflow_user_session') || getCookie('tflow_user');
+      } catch(e) {}
+    }
 
     if (user) {
       try {
-        setCookie('tflow_user_session', user, 30);
+        var cookieUser = Object.assign({}, user);
+        if (cookieUser.avatar && cookieUser.avatar.length > 150) {
+          cookieUser.avatar = 'photo_avatar';
+        }
+        setCookie('tflow_user_session', cookieUser, 30);
         if (typeof localStorage !== 'undefined') {
           localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
           setCookie('tflow_user_session', user, 30);
@@ -1194,7 +1201,11 @@
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(cur));
       }
-      setCookie('tflow_user_session', cur, 30);
+      var cookieCur = Object.assign({}, cur);
+      if (cookieCur.avatar && cookieCur.avatar.length > 150) {
+        cookieCur.avatar = 'photo_avatar';
+      }
+      setCookie('tflow_user_session', cookieCur, 30);
       createSession(cur);
       if (typeof window !== 'undefined') {
         var evt = new CustomEvent(USER_EVENT, { detail: cur });
@@ -1260,7 +1271,7 @@
     var newRev = {
       id: 'rev-' + Date.now(),
       author: authorName,
-      avatar: authorName.charAt(0).toUpperCase() || 'T',
+      avatar: reviewData.avatar || (authorName.charAt(0).toUpperCase() || 'T'),
       role: reviewData.role || 'Khách Hàng Đã Mua T-Flow Pro',
       email: (reviewData.email || '').trim().toLowerCase(),
       package: reviewData.package || 'T-Flow Pro - Creator Kit',
