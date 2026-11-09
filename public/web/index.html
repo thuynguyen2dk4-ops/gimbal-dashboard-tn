@@ -3616,6 +3616,425 @@
     }
 
     // Toast
+    
+    // ==========================================================================
+    // USER REVIEWS ENGINE (SUBMISSION & DYNAMIC RENDERING)
+    // ==========================================================================
+    let currentReviewFilter = 'all';
+
+    function renderReviewsList(filter) {
+      if (filter) currentReviewFilter = filter;
+      const container = document.getElementById('reviewsListContainer');
+      if (!container || typeof SmartGimbalCatalog === 'undefined') return;
+
+      const reviews = SmartGimbalCatalog.getReviews() || [];
+
+      // Update total count in scorecard
+      const totalEl = document.getElementById('scorecardTotalCount');
+      if (totalEl) totalEl.textContent = 'Dựa trên ' + reviews.length + ' đánh giá thực tế đã xác thực';
+
+      const countAllEl = document.getElementById('countFilterAll');
+      if (countAllEl) countAllEl.textContent = reviews.length;
+
+      // Filter reviews
+      let filtered = reviews;
+      if (currentReviewFilter === '5') {
+        filtered = reviews.filter(r => r.rating === 5);
+      } else if (currentReviewFilter === '4') {
+        filtered = reviews.filter(r => r.rating === 4);
+      } else if (currentReviewFilter === 'verified') {
+        filtered = reviews.filter(r => r.verified === true);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column:1/-1; text-align:center; padding:48px; background:var(--bg-alt); border-radius:20px; color:var(--text-secondary);">
+            <div style="font-size:32px; margin-bottom:8px;">📝</div>
+            <div style="font-size:16px; font-weight:700; color:var(--text-main);">Chưa có đánh giá nào cho bộ lọc này</div>
+            <div style="font-size:13px; margin-top:4px;">Hãy là người đầu tiên chia sẻ cảm nhận trải nghiệm T-Flow Pro!</div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      filtered.forEach(r => {
+        let starsSvg = '';
+        for (let i = 0; i < 5; i++) {
+          const fill = (i < r.rating) ? '#FFB800' : '#D2D2D7';
+          starsSvg += `<svg width="15" height="15" viewBox="0 0 24 24" fill="${fill}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+        }
+
+        let tagsHtml = '';
+        (r.tags || []).forEach(t => {
+          tagsHtml += `<span class="rev-tag-badge">#${t}</span>`;
+        });
+
+        const recentBadge = r.isRecent ? `<span style="font-size:10px; font-weight:700; background:#34C759; color:#FFF; padding:2px 8px; border-radius:99px; margin-left:6px;">Mới</span>` : '';
+
+        html += `
+          <div class="review-card-modern">
+            <div>
+              <div class="rev-card-header">
+                <div class="rev-card-author-info">
+                  <div class="rev-card-avatar">${r.avatar || 'T'}</div>
+                  <div>
+                    <div class="rev-card-name">
+                      ${r.author}
+                      ${r.verified ? '<span class="rev-card-verified-badge">✓ Đã Mua Hàng</span>' : ''}
+                      ${recentBadge}
+                    </div>
+                    <div class="rev-card-role">${r.role || r.package || 'Khách Hàng T-Flow Pro'}</div>
+                  </div>
+                </div>
+                <div class="rev-card-date">${r.date || ''}</div>
+              </div>
+
+              <div class="rev-card-stars">
+                ${starsSvg}
+              </div>
+
+              <div class="rev-card-title">${r.title || 'Đánh giá T-Flow Pro'}</div>
+              <p class="rev-card-quote">"${r.comment || ''}"</p>
+            </div>
+
+            <div class="rev-card-tags">
+              ${tagsHtml}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function filterReviews(type, btn) {
+      document.querySelectorAll('.review-filter-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderReviewsList(type);
+    }
+
+    function toggleReviewForm(open) {
+      const formCard = document.getElementById('reviewFormCard');
+      if (!formCard) return;
+
+      if (open) {
+        formCard.style.display = 'block';
+
+        const user = (typeof SmartGimbalCatalog !== 'undefined') ? SmartGimbalCatalog.getCurrentUser() : null;
+        const identityBox = document.getElementById('reviewUserIdentityBox');
+        const guestFields = document.getElementById('reviewGuestFields');
+        const nameEl = document.getElementById('reviewUserDisplayName');
+        const emailBadge = document.getElementById('reviewUserEmailBadge');
+        const avatarEl = document.getElementById('reviewAvatarInitial');
+
+        if (user && user.email) {
+          if (identityBox) identityBox.style.display = 'flex';
+          if (guestFields) guestFields.style.display = 'none';
+          if (nameEl) nameEl.textContent = user.name || user.email;
+          if (emailBadge) emailBadge.textContent = user.email + (SmartGimbalCatalog.isUserAdmin(user) ? ' (Master Admin)' : ' (Thành Viên)');
+          if (avatarEl) avatarEl.textContent = (user.name || user.email).charAt(0).toUpperCase();
+        } else {
+          if (identityBox) identityBox.style.display = 'none';
+          if (guestFields) guestFields.style.display = 'grid';
+        }
+
+        formCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        formCard.style.display = 'none';
+      }
+    }
+
+    function setReviewRating(stars) {
+      document.getElementById('reviewRatingInput').value = stars;
+      const btns = document.querySelectorAll('.star-pick-btn');
+      btns.forEach(b => {
+        const r = parseInt(b.getAttribute('data-rating'));
+        b.classList.toggle('active', r <= stars);
+      });
+
+      const labelEl = document.getElementById('ratingTextLabel');
+      if (labelEl) {
+        const labels = {
+          5: '⭐⭐⭐⭐⭐ Xuất sắc (Cực kỳ hài lòng)',
+          4: '⭐⭐⭐⭐☆ Rất tốt (Hài lòng)',
+          3: '⭐⭐⭐☆☆ Bình thường',
+          2: '⭐⭐☆☆☆ Chưa hài lòng',
+          1: '⭐☆☆☆☆ Cần cải thiện'
+        };
+        labelEl.textContent = labels[stars] || (stars + ' Sao');
+      }
+    }
+
+    function toggleReviewTag(btn) {
+      btn.classList.toggle('active');
+    }
+
+    function submitUserReview(e) {
+      e.preventDefault();
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+
+      const user = SmartGimbalCatalog.getCurrentUser();
+      let authorName = '';
+      let authorEmail = '';
+
+      if (user && user.email) {
+        authorName = user.name || user.email.split('@')[0];
+        authorEmail = user.email;
+      } else {
+        authorName = (document.getElementById('reviewAuthorName').value || '').trim();
+        authorEmail = (document.getElementById('reviewAuthorEmail').value || '').trim();
+        if (!authorName) {
+          alert('Vui lòng nhập Họ và Tên của bạn!');
+          document.getElementById('reviewAuthorName').focus();
+          return;
+        }
+        if (!authorEmail || !authorEmail.includes('@')) {
+          alert('Vui lòng nhập địa chỉ Email Google (Gmail) hợp lệ!');
+          document.getElementById('reviewAuthorEmail').focus();
+          return;
+        }
+      }
+
+      const rating = parseInt(document.getElementById('reviewRatingInput').value) || 5;
+      const pkg = document.getElementById('reviewProductPackage').value;
+      const title = (document.getElementById('reviewHeadline').value || '').trim();
+      const comment = (document.getElementById('reviewContent').value || '').trim();
+
+      if (!title) {
+        alert('Vui lòng nhập tiêu đề cho đánh giá!');
+        document.getElementById('reviewHeadline').focus();
+        return;
+      }
+      if (comment.length < 15) {
+        alert('Nội dung đánh giá cần tối thiểu 15 ký tự để người đọc có thông tin hữu ích nhất!');
+        document.getElementById('reviewContent').focus();
+        return;
+      }
+
+      const activeTags = [];
+      document.querySelectorAll('#reviewTagChipsPicker .tag-chip-btn.active').forEach(b => {
+        activeTags.push(b.textContent.trim());
+      });
+
+      const res = SmartGimbalCatalog.addReview({
+        author: authorName,
+        email: authorEmail,
+        rating: rating,
+        package: pkg,
+        title: title,
+        comment: comment,
+        tags: activeTags,
+        role: 'Khách Hàng Sở Hữu ' + pkg.replace('T-Flow Pro - ', '')
+      });
+
+      if (res.success) {
+        alert('🎉 Cảm ơn bạn! Đánh giá trải nghiệm T-Flow Pro đã được đăng tải thành công.');
+        document.getElementById('tflowReviewForm').reset();
+        setReviewRating(5);
+        toggleReviewForm(false);
+        renderReviewsList('all');
+      } else {
+        alert(res.message || 'Có lỗi xảy ra khi lưu đánh giá.');
+      }
+    }
+
+    // ==========================================================================
+    // T-FLOW AI CONVERSATIONAL ASSISTANT ENGINE
+    // ==========================================================================
+    let aiChatHistory = [
+      {
+        sender: 'bot',
+        text: 'Xin chào! Tôi là **T-Flow AI Assistant** – trợ lý thông minh của **Công ty TNHH Công nghệ T-Flow Việt Nam**.\n\nTôi sẵn sàng tư vấn cho bạn về **T-Flow Pro** (thuật toán Pure FOC 20kHz, ngàm MagSafe 2.8kg, vòng xoay Focus wheel), các kỹ thuật quay điện ảnh (Apple Log, Inception 360°) hoặc chính sách bảo hành chính hãng. Bạn cần hỗ trợ gì hôm nay?',
+        actions: [
+          { label: 'Xem Chi Tiết T-Flow Pro', action: "switchView('detail'); toggleTflowAiChat(false);" },
+          { label: 'Chọn Mua Các Gói', action: "switchView('catalog'); toggleTflowAiChat(false);" }
+        ]
+      }
+    ];
+
+    function toggleTflowAiChat(open) {
+      const drawer = document.getElementById('tflowAiDrawer');
+      const fab = document.getElementById('tflowAiFab');
+      if (!drawer) return;
+
+      if (open) {
+        drawer.style.display = 'flex';
+        if (fab) fab.style.display = 'none';
+        renderAiMessages();
+        setTimeout(() => {
+          const input = document.getElementById('aiUserMessageInput');
+          if (input) input.focus();
+        }, 100);
+      } else {
+        drawer.style.display = 'none';
+        if (fab) fab.style.display = 'flex';
+      }
+    }
+
+    function renderAiMessages() {
+      const container = document.getElementById('aiMessagesContainer');
+      if (!container) return;
+
+      const user = (typeof SmartGimbalCatalog !== 'undefined') ? SmartGimbalCatalog.getCurrentUser() : null;
+      const userInitial = user ? (user.name || user.email).charAt(0).toUpperCase() : 'U';
+
+      let html = '';
+      aiChatHistory.forEach(msg => {
+        const isBot = msg.sender === 'bot';
+        let formattedText = msg.text
+          .replace(/\n/g, '<br>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        let actionsHtml = '';
+        if (msg.actions && msg.actions.length > 0) {
+          actionsHtml = '<div class="ai-action-btn-row">';
+          msg.actions.forEach(act => {
+            actionsHtml += `<button class="ai-action-btn" onclick="${act.action}">${act.label}</button>`;
+          });
+          actionsHtml += '</div>';
+        }
+
+        html += `
+          <div class="ai-msg-row ${isBot ? 'bot' : 'user'}">
+            <div class="ai-msg-avatar">${isBot ? 'TF' : userInitial}</div>
+            <div class="ai-msg-bubble">
+              ${formattedText}
+              ${actionsHtml}
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function sendQuickPrompt(promptText) {
+      const input = document.getElementById('aiUserMessageInput');
+      if (input) {
+        input.value = promptText;
+        processAiMessage(promptText);
+        input.value = '';
+      }
+    }
+
+    function handleAiUserSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('aiUserMessageInput');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      processAiMessage(text);
+    }
+
+    function processAiMessage(userText) {
+      aiChatHistory.push({
+        sender: 'user',
+        text: userText
+      });
+      renderAiMessages();
+
+      const container = document.getElementById('aiMessagesContainer');
+      const typingEl = document.createElement('div');
+      typingEl.className = 'ai-msg-row bot';
+      typingEl.id = 'aiTypingRow';
+      typingEl.innerHTML = `
+        <div class="ai-msg-avatar">TF</div>
+        <div class="ai-typing-indicator">
+          <span class="ai-typing-dot"></span>
+          <span class="ai-typing-dot"></span>
+          <span class="ai-typing-dot"></span>
+        </div>
+      `;
+      container.appendChild(typingEl);
+      container.scrollTop = container.scrollHeight;
+
+      setTimeout(() => {
+        const typing = document.getElementById('aiTypingRow');
+        if (typing) typing.remove();
+
+        const botReply = generateTFlowAiReply(userText);
+        aiChatHistory.push(botReply);
+        renderAiMessages();
+      }, 600);
+    }
+
+    function generateTFlowAiReply(query) {
+      const q = query.toLowerCase();
+
+      if (q.includes('giá') || q.includes('gói') || q.includes('bán') || q.includes('mua') || q.includes('kit') || q.includes('creator') || q.includes('master')) {
+        return {
+          sender: 'bot',
+          text: '**T-Flow Pro (TF-G31-PRO)** hiện đang mở bán chính hãng với 3 gói cấu hình thương mại:\n\n• **Standard Kit (2.890.000₫):** Gimbal 3 trục carbon, cáp sạc nhanh Type-C, chân tripod mini và vòng từ tính phụ trợ.\n• **Creator Kit (3.490.000₫ - Bán chạy nhất):** Tích hợp thêm Đèn trợ sáng từ tính T-Flow Glow và Vòng xoay lấy nét Focus Wheel.\n• **Cinematic Master (4.290.000₫):** Trọn bộ Full Option vali chống sốc cao cấp, mô-đun AI Tracking T-Flow Eye và bộ 3D LUT điện ảnh bản quyền.',
+          actions: [
+            { label: 'Xem Chi Tiết T-Flow Pro', action: "switchView('detail'); toggleTflowAiChat(false);" },
+            { label: 'Chọn Mua Creator Kit', action: "switchView('catalog'); toggleTflowAiChat(false);" }
+          ]
+        };
+      }
+
+      if (q.includes('magsafe') || q.includes('hít') || q.includes('nam châm') || q.includes('lực') || q.includes('rơi')) {
+        return {
+          sender: 'bot',
+          text: 'Ngàm **MagSafe trên T-Flow Pro** sử dụng hệ thống nam châm đất hiếm **Neodymium N52 phân bố đa cực**, cho lực hút đạt **2.8kg** (gấp 10 lần trọng lượng iPhone 16 Pro Max).\n\n• **Thao tác 1 giây:** Tháo và gắn điện thoại tức thời mà không cần căn chỉnh lại trục motor.\n• **Tương thích:** iPhone 12 trở lên có MagSafe nguyên bản. Các máy Android hoặc ốp lưng thông thường có thể dán vòng từ tính siêu mỏng tặng kèm trong hộp.',
+          actions: [
+            { label: 'Xem Thông Số MagSafe', action: "switchView('detail'); toggleTflowAiChat(false);" }
+          ]
+        };
+      }
+
+      if (q.includes('foc') || q.includes('động cơ') || q.includes('motor') || q.includes('rung') || q.includes('jitter')) {
+        return {
+          sender: 'bot',
+          text: '**Thuật toán Pure FOC 20kHz (Field Oriented Control)** là trái tim công nghệ của T-Flow:\n\n• **Tần số chuyển mạch 20kHz:** Nằm ngoài ngưỡng nghe của tai người, động cơ vận hành hoàn toàn êm ái, không phát ra tiếng rít cơ học.\n• **Zero Micro-Jitter:** Triệt tiêu hoàn toàn rung giật vi mô khi di chuyển trên địa hình gồ ghề.\n• **Tải trọng cực đại 450g:** Dễ dàng cân mọi cấu hình điện thoại gắn thêm ống kính anamorphic hoặc micro thu âm.',
+          actions: [
+            { label: 'Xem Chi Tiết Động Cơ', action: "switchView('detail'); toggleTflowAiChat(false);" }
+          ]
+        };
+      }
+
+      if (q.includes('apple log') || q.includes('log') || q.includes('focus') || q.includes('lấy nét') || q.includes('bánh xe') || q.includes('quay')) {
+        return {
+          sender: 'bot',
+          text: '**Tính năng quay phim điện ảnh trên T-Flow Pro:**\n\n• **Vòng xoay Focus Wheel:** Trang bị cảm biến từ tính với lực cản đầm tay, hỗ trợ chuyển nét mượt mà (Rack Focus) và zoom quang học vô cấp.\n• **Hỗ trợ Apple Log 4K/60fps:** Ứng dụng T-Flow Cam cho phép bật chế độ Apple Log nguyên bản, hiển thị Waveform, False Color và áp dụng 3D LUT trực tiếp trên màn hình xem trước.',
+          actions: [
+            { label: 'Mở Ứng Dụng T-Flow Cam', action: "window.open('mobile_app.html', '_blank')" }
+          ]
+        };
+      }
+
+      if (q.includes('pin') || q.includes('battery') || q.includes('sạc') || q.includes('thời lượng') || q.includes('18h')) {
+        return {
+          sender: 'bot',
+          text: '**Hệ thống Nguồn & Pin T-Flow Pro:**\n\n• **Thời lượng hoạt động:** Lên tới **18 giờ liên tục** nhờ cell pin Lithium cao cấp 5000mAh tích hợp mạch BMS thông minh.\n• **Sạc nhanh hai chiều:** Hỗ trợ sạc nhanh Type-C PD 18W (sạc đầy trong 1h45p).\n• **Sạc ngược (Power Bank):** Cho phép sạc trực tiếp cho iPhone trong lúc đang quay phim dài hoặc livestream.',
+          actions: [
+            { label: 'Xem Bảng Thông Số Kỹ Thuật', action: "switchView('detail'); toggleTflowAiChat(false);" }
+          ]
+        };
+      }
+
+      if (q.includes('bảo hành') || q.includes('đổi trả') || q.includes('công ty') || q.includes('địa chỉ') || q.includes('admin') || q.includes('thủy')) {
+        return {
+          sender: 'bot',
+          text: '**Chính Sách Bảo Hành Chính Hãng T-Flow Tech:**\n\n• **1 Đổi 1 Trong 24 Giờ:** Nếu phát sinh lỗi bo mạch hoặc cơ khí từ nhà sản xuất trong suốt 12 tháng.\n• **Nhà phát triển:** Công ty TNHH Công nghệ T-Flow Việt Nam (T-Flow Tech Co., Ltd.).\n• **Master Admin:** Kỹ sư Thủy Nguyễn (`thuynguyen2dk4@gmail.com`).\n• **Hotline hỗ trợ:** 1900 8888 (8:00 - 21:00 hàng ngày).',
+          actions: [
+            { label: 'Vào Cổng Khách Hàng', action: "window.location.href='user_dashboard.html'" }
+          ]
+        };
+      }
+
+      return {
+        sender: 'bot',
+        text: 'Cảm ơn câu hỏi của bạn! T-Flow Pro là dòng gimbal 3 trục cao cấp chuyên nghiệp:\n\n• **Tải trọng 450g** cân mọi dòng iPhone & Smartphone.\n• **Thuật toán Pure FOC 20kHz** triệt tiêu hoàn toàn rung giật.\n• **Ngàm MagSafe 2.8kg** tháo lắp 1 giây.\n• **Thời lượng pin 18h** có sạc ngược.\n\nBạn muốn tìm hiểu thêm về gói sản phẩm nào hay cần hỗ trợ kỹ thuật cân trục?',
+        actions: [
+          { label: 'Xem 3 Gói T-Flow Pro', action: "switchView('catalog'); toggleTflowAiChat(false);" },
+          { label: 'Hướng Dẫn Kỹ Thuật', action: "switchView('reviews'); toggleTflowAiChat(false);" }
+        ]
+      };
+    }
+
     function showToast(msg) {
       const t = document.getElementById('toastMsg');
       if (!t) return;
