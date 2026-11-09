@@ -938,6 +938,715 @@
   // ==========================================================================
   // 9. PUBLIC API EXPORTS
   // ==========================================================================
+
+  // =========================================================================
+  // SECTION 10: T-FLOW REAL-AI DUAL BRAIN (WEB SALES & APP COPILOT) ENGINE
+  // =========================================================================
+  var AI_CONVERSATIONS_KEY = 'tflow_ai_conversations_v2';
+  var AI_PENDING_KEY = 'tflow_ai_pending_questions_v2';
+  var AI_KB_KEY = 'tflow_ai_knowledge_base_v2';
+  var AI_EVENT = 'tflow_ai_updated_event';
+
+  var DEFAULT_AI_KNOWLEDGE_BASE = [
+    // --- 1. WEB SALES & CUSTOMER CONSULTING KNOWLEDGE (WEB BOT) ---
+    {
+      id: 'kb_web_packages_pricing',
+      target: 'web',
+      topic: 'Bảng giá và các gói T-Flow Pro',
+      keywords: ['giá', 'bao nhiêu', 'tiền', 'gói', 'bản', 'phiên bản', 'combo', 'mua', 'khuyến mãi', 'standard', 'creator', 'cinematic', 'master', 'chi phí'],
+      answer: "T-Flow Pro hiện đang mở bán chính thức với **4 gói cấu hình** chuyên nghiệp:\n\n" +
+              "• **Gói Standard (4.990.000đ)**: Thân gimbal T-Flow Pro Pure FOC, tripod kim loại, ngàm nam châm MagSafe N52 45N, cáp sạc USB-C và túi nhung cao cấp.\n" +
+              "• **Gói Creator Kit (5.990.000đ) - Bán chạy nhất ⭐**: Trọn bộ Standard + Đèn Fill Light MagSafe RGB 360 màu + Micro không dây 2.4GHz độ trễ siêu thấp.\n" +
+              "• **Gói Cinematic Pro (7.490.000đ)**: Trọn bộ Creator + Vòng xoay Focus Wheel Bluetooth độc lập + Bộ 4 kính lọc ND Cine + Vali chống sốc chuẩn quân sự IP67.\n" +
+              "• **Gói Master Bundle (8.990.000đ)**: Toàn bộ hệ sinh thái phụ kiện cao cấp + Gói Bảo Hành Kim Cương 24 tháng 1 đổi 1 tận nơi.\n\n" +
+              "Anh có muốn em hỗ trợ thêm vào giỏ hàng gói nào ngay bây giờ không ạ?",
+      actions: [
+        { label: 'Xem Chi Tiết 4 Gói', view: 'catalog' },
+        { label: 'Thêm Gói Creator Kit', action: 'addCreatorKit' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_web_magsafe_force',
+      target: 'web',
+      topic: 'Ngàm nam châm MagSafe N52 và độ an toàn',
+      keywords: ['magsafe', 'nam châm', 'rơi', 'hít', 'chắc', 'lực', 'n52', 'an toàn', 'giữ', 'rơi vỡ', 'chống rơi', 'khóa'],
+      answer: "T-Flow Pro trang bị hệ thống **MagSafe Ultra-Hold thế hệ mới** sử dụng 32 lõi nam châm vĩnh cửu Neodymium N52 với lực hút định danh **45N (giữ chắc tới 4.5kg)**.\n\n" +
+              "Điểm đột phá là cơ chế **Khóa cơ học kép Snap-Lock**: khi điện thoại hít vào, chốt khóa an toàn sẽ tự động gài chặt. Dù anh chạy bộ nước rút, trượt ván hay vận động mạnh, điện thoại tuyệt đối không bao giờ bị tuột hay rơi rớt. Đi kèm máy có thêm kẹp cơ học phụ trợ cho các dòng máy không có MagSafe.",
+      actions: [
+        { label: 'Xem Chi Tiết Ngàm MagSafe', view: 'detail' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_web_motor_foc',
+      target: 'web',
+      topic: 'Động cơ Pure FOC 20kHz và chống rung',
+      keywords: ['foc', 'động cơ', 'motor', '20khz', 'chống rung', 'rung', 'ồn', 'tiếng ồn', 'tần số', 'mô men', 'lag', 'trễ'],
+      answer: "T-Flow Pro ứng dụng **công nghệ điều khiển vector Pure FOC 20kHz** tiên tiến nhất ngành:\n\n" +
+              "• **Tần số siêu âm 20kHz**: Vượt qua ngưỡng nghe của tai người, động cơ vận hành hoàn toàn tĩnh âm 0dB, giúp mic thu âm không bị lọt tiếng rít motor.\n" +
+              "• **Tốc độ phản hồi < 1ms**: Vi xử lý ARM Cortex-M4 kép tính toán 20.000 lần mỗi giây, triệt tiêu tức thì 99.8% rung lắc.\n" +
+              "• **Độ chính xác 0.005°**: Trục chuyển động mượt như ray trượt dolly điện ảnh, không giật khấc.",
+      actions: [
+        { label: 'Xem Bản Vẽ Kỹ Thuật Động Cơ', view: 'detail' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_web_compatibility',
+      target: 'web',
+      topic: 'Độ tương thích thiết bị và trọng tải',
+      keywords: ['tương thích', 'dùng được', 'iphone', 'hỗ trợ', 'android', 'samsung', 'nặng', 'tải trọng', 'máy nào', '15 pro max', '16 pro max'],
+      answer: "T-Flow Pro tương thích hoàn hảo với:\n\n" +
+              "• **Toàn bộ dải iPhone**: Từ iPhone 12 series đến iPhone 16 Pro Max (hít nam châm MagSafe trực tiếp không cần tháo ốp).\n" +
+              "• **Điện thoại Android**: Samsung Galaxy S24 Ultra, Xiaomi, Vivo, Oppo... (thông qua vòng từ tính tặng kèm hoặc kẹp ngàm phụ trợ).\n" +
+              "• **Tải trọng tối đa 420g**: Thoải mái gắn thêm ống kính rời (Anamorphic, Tele 3x), kính lọc ND và micro thu âm bên ngoài mà không lo quá tải motor.",
+      actions: [
+        { label: 'Xem Thông Số Kích Thước', view: 'detail' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_web_battery_powerbank',
+      target: 'web',
+      topic: 'Thời lượng pin và sạc dự phòng',
+      keywords: ['pin', 'dung lượng', 'thời gian', 'dùng được bao lâu', 'sạc', 'mah', 'sạc ngược', 'powerbank', 'sạc dự phòng', '24h', '24 tiếng'],
+      answer: "T-Flow Pro sở hữu viên **pin kép 21700 dung lượng lớn 6000mAh**:\n\n" +
+              "• **24 Giờ hoạt động liên tục**: Đáp ứng trọn vẹn cả ngày dài quay phim, du lịch hoặc phát livestream sự kiện.\n" +
+              "• **Sạc ngược không dây MagSafe 15W**: Tự động sạc pin không dây trực tiếp cho iPhone trong lúc đang gắn trên gimbal.\n" +
+              "• **Cổng ra USB-C PD 20W**: Hỗ trợ sạc nhanh có dây cho phụ kiện đèn hoặc điện thoại thứ hai.",
+      actions: [
+        { label: 'Xem Thông Số Nguồn Pin', view: 'detail' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_web_warranty_policy',
+      target: 'web',
+      topic: 'Chính sách bảo hành và đổi trả',
+      keywords: ['bảo hành', 'đổi trả', 'hỏng', 'lỗi', '1 đổi 1', 'chính sách', 'sửa', 'yên tâm', 'chính hãng', '30 ngày', '12 tháng'],
+      answer: "Chính sách hậu mãi của T-Flow Pro dẫn đầu thị trường:\n\n" +
+              "• **Bảo hành 12 tháng 1 đổi 1 chính hãng**: Nếu phát sinh lỗi kỹ thuật từ nhà sản xuất, đổi mới 100% thiết bị nguyên hộp.\n" +
+              "• **Dùng thử 30 ngày miễn phí**: Khách hàng được trải nghiệm thực tế trong 30 ngày, nếu không ưng ý có thể đổi trả hoàn tiền không cần lý do.\n" +
+              "• **Hỗ trợ kỹ thuật 24/7**: Đội ngũ kỹ sư R&D tại Hà Nội và TP.HCM hỗ trợ cân chỉnh và hướng dẫn sử dụng trọn đời.",
+      actions: [
+        { label: 'Xem Chính Sách Hỗ Trợ', view: 'reviews' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_web_shipping_delivery',
+      target: 'web',
+      topic: 'Giao hàng và vận chuyển',
+      keywords: ['ship', 'giao hàng', 'vận chuyển', 'bao lâu', 'ở đâu', 'phí ship', 'hỏa tốc', 'nhận hàng', 'kiểm tra'],
+      answer: "T-Flow áp dụng chính sách **Miễn phí vận chuyển toàn quốc 100%**:\n\n" +
+              "• **Hà Nội & TP. Hồ Chí Minh**: Giao hỏa tốc nhận hàng trong vòng **2 giờ**.\n" +
+              "• **Các tỉnh thành khác**: Giao nhanh bưu điện trong **24 - 48 giờ**.\n" +
+              "• **Đồng kiểm khi nhận**: Quý khách được mở hộp kiểm tra thiết bị, bật nguồn test động cơ trước khi thanh toán tiền mặt (COD) hoặc chuyển khoản.",
+      actions: [
+        { label: 'Đặt Hàng Ngay', view: 'catalog' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+
+    // --- 2. APP CREATIVE DIRECTOR & CAMERA COPILOT KNOWLEDGE (APP BOT) ---
+    {
+      id: 'kb_app_sunset_golden_hour',
+      target: 'app',
+      topic: 'Kỹ thuật quay cảnh hoàng hôn trên biển / ngược sáng',
+      keywords: ['hoàng hôn', 'bãi biển', 'mặt trời', 'ngược sáng', 'biển', 'golden hour', 'chiều tà', 'bình minh', 'cháy sáng'],
+      answer: "🌅 **Kỹ Thuật Đạo Diễn - Cảnh Hoàng Hôn & Biển Chiều:**\n" +
+              "Khi quay ngược sáng mặt trời lặn, ánh sáng rất gắt dễ làm cháy vùng mây trời hoặc làm tối đen chủ thể. Chúng ta cần giảm nhẹ bù sáng EV để bảo vệ highlight của mặt trời, khóa ISO ở mức thấp nhất để khử nhiễu dải màu cam vàng, và kích hoạt màu phim Apple Log để cứu toàn bộ dynamic range.\n\n" +
+              "📋 **Bộ thông số tối ưu đề xuất:**\n" +
+              "• **Chế độ quay:** PRO CINEMA (4K 60fps mượt mà)\n" +
+              "• **Tốc độ màn trập (Shutter):** 1/120s (chuẩn 180° cinematic)\n" +
+              "• **ISO:** 100 (độ trong tối đa, triệt tiêu hạt noise)\n" +
+              "• **Bù sáng (EV):** -0.3 EV (bảo vệ bầu trời hoàng hôn rực rỡ)\n" +
+              "• **Màu sắc & 3D LUT:** Apple Log + 'Sunset Golden Hour Film LUT'\n" +
+              "• **Chế độ Gimbal:** FPV 3-Trục (mềm mại, bám theo hướng lia tự nhiên)",
+      cameraPreset: {
+        mode: 'PRO CINEMA',
+        fps: 60,
+        resolution: '4K',
+        iso: 100,
+        shutter: '1/120s',
+        ev: '-0.3',
+        wb: '5500K Golden',
+        lut: 'Sunset Golden Hour Film',
+        gimbalMode: 'FPV 3-Trục',
+        followSpeed: 'Mượt mà (Smooth 30%)',
+        summary: 'PRO CINEMA 4K/60fps • ISO 100 • EV -0.3 • Sunset LUT • FPV Mode'
+      },
+      suggestAction: true,
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_app_action_sport_fast',
+      target: 'app',
+      topic: 'Quay thể thao, xe chạy, hành động chuyển động nhanh',
+      keywords: ['thể thao', 'xe chạy', 'tốc độ', 'chạy bộ', 'xe máy', 'ô tô', 'nhanh', 'hành động', 'nhòe', 'slow motion', 'bắt dính'],
+      answer: "🏎️ **Kỹ Thuật Đạo Diễn - Hành Động Tốc Độ Cao:**\n" +
+              "Với các cảnh xe chạy hoặc thể thao tốc độ cao, hiện tượng nhòe nét (motion blur) và rung giật là kẻ thù số một. Chúng ta cần đẩy tốc độ khung hình lên 120fps để có thể làm chậm (slow-motion) khi edit, đồng thời tăng tốc độ phản hồi của động cơ FOC lên chế độ Sport Fast Follow để bám dính chủ thể không bị văng khung hình.\n\n" +
+              "📋 **Bộ thông số tối ưu đề xuất:**\n" +
+              "• **Chế độ quay:** SLOW-MO (4K 120fps siêu nét)\n" +
+              "• **Tốc độ màn trập (Shutter):** 1/240s (đóng băng chuyển động)\n" +
+              "• **ISO:** 200\n" +
+              "• **Bù sáng (EV):** 0.0 EV\n" +
+              "• **Màu sắc & 3D LUT:** Action Sport High Contrast LUT\n" +
+              "• **Chế độ Gimbal:** FPV 3-Trục (Phản hồi nhanh 85%)",
+      cameraPreset: {
+        mode: 'SLOW-MO',
+        fps: 120,
+        resolution: '4K',
+        iso: 200,
+        shutter: '1/240s',
+        ev: '0.0',
+        wb: 'Auto 5200K',
+        lut: 'Action Sport High Contrast',
+        gimbalMode: 'FPV 3-Trục',
+        followSpeed: 'Thể thao (Fast 85%)',
+        summary: 'SLOW-MO 4K/120fps • Shutter 1/240s • Fast Follow 85%'
+      },
+      suggestAction: true,
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_app_portrait_cinematic',
+      target: 'app',
+      topic: 'Quay chân dung, phỏng vấn, xóa phông và tôn da',
+      keywords: ['chân dung', 'phỏng vấn', 'xóa phông', 'mịn da', 'bokeh', 'người', 'mẫu', 'da đẹp', 'tự nhiên', 'nói chuyện'],
+      answer: "🎬 **Kỹ Thuật Đạo Diễn - Chân Dung Cinematic:**\n" +
+              "Để tạo thước phim chân dung có chiều sâu điện ảnh, máy ảnh cần khóa tốc độ 24fps chuẩn Hollywood, sử dụng camera tele 3x/5x để nén hậu cảnh xóa phông nhẹ nhàng, và sử dụng LUT da tự nhiên tôn vinh sắc tố da châu Á mà không bị bết màu.\n\n" +
+              "📋 **Bộ thông số tối ưu đề xuất:**\n" +
+              "• **Chế độ quay:** CHÂN DUNG (4K 24fps Cinematic)\n" +
+              "• **Tốc độ màn trập (Shutter):** 1/48s (quy tắc 180° chuyển động chuẩn)\n" +
+              "• **ISO:** 50 (độ mịn hạt cực đại)\n" +
+              "• **Bù sáng (EV):** +0.3 EV (làm sáng bừng khuôn mặt)\n" +
+              "• **Màu sắc & 3D LUT:** Natural Skin Tone Film LUT\n" +
+              "• **Chế độ Gimbal:** PF (Pan Follow mượt mà, lia nhẹ nhàng quanh mẫu)",
+      cameraPreset: {
+        mode: 'CHÂN DUNG',
+        fps: 24,
+        resolution: '4K',
+        iso: 50,
+        shutter: '1/48s',
+        ev: '+0.3',
+        wb: '5200K Warm Skin',
+        lut: 'Natural Skin Tone Film',
+        gimbalMode: 'PF (Pan Follow)',
+        followSpeed: 'Chậm điện ảnh (Slow 15%)',
+        summary: 'CHÂN DUNG 4K/24fps • Shutter 1/48s • ISO 50 • Skin LUT'
+      },
+      suggestAction: true,
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_app_night_lowlight',
+      target: 'app',
+      topic: 'Quay cảnh đêm, thiếu sáng, phố thị ánh đèn neon',
+      keywords: ['đêm', 'tối', 'thiếu sáng', 'phố đêm', 'neon', 'lung linh', 'nhiễu', 'hạt', 'mờ', 'chụp đêm'],
+      answer: "🌃 **Kỹ Thuật Đạo Diễn - Cảnh Đêm & Thiếu Sáng:**\n" +
+              "Trong môi trường ánh sáng yếu, việc đẩy ISO quá cao sẽ gây nhiễu hạt phá hỏng khung hình. Kỹ thuật ở đây là hạ FPS về 24fps để cảm biến có thời gian hấp thụ ánh sáng lâu nhất (1/48s), kết hợp thuật toán FOC khử rung tuyệt đối để không bị nhòe hình.\n\n" +
+              "📋 **Bộ thông số tối ưu đề xuất:**\n" +
+              "• **Chế độ quay:** PRO CINEMA (4K 24fps Night Mode)\n" +
+              "• **Tốc độ màn trập (Shutter):** 1/48s\n" +
+              "• **ISO:** 400 (cân bằng hoàn hảo giữa sáng và độ trong)\n" +
+              "• **Bù sáng (EV):** -0.7 EV (bảo vệ các bóng đèn neon không bị cháy trắng)\n" +
+              "• **Màu sắc & 3D LUT:** Cyberpunk Teal & Orange Neon LUT\n" +
+              "• **Chế độ Gimbal:** LOCK Khóa (giữ khung hình vững chãi như đặt tripod)",
+      cameraPreset: {
+        mode: 'PRO CINEMA',
+        fps: 24,
+        resolution: '4K',
+        iso: 400,
+        shutter: '1/48s',
+        ev: '-0.7',
+        wb: '4500K Neon Teal',
+        lut: 'Cyberpunk Teal & Orange Neon',
+        gimbalMode: 'LOCK Khóa',
+        followSpeed: 'Ổn định ban đêm (Lock 100%)',
+        summary: 'PRO CINEMA 4K/24fps • ISO 400 • EV -0.7 • Lock Axis'
+      },
+      suggestAction: true,
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_app_inception_vortex',
+      target: 'app',
+      topic: 'Quay hiệu ứng 360° Inception Roll lốc xoáy vũ trụ',
+      keywords: ['inception', '360', 'xoay', 'lốc xoáy', 'nghiêng', 'vòng tròn', 'vũ trụ', 'roll'],
+      answer: "🌀 **Kỹ Thuật Đạo Diễn - Hiệu Ứng Inception 360° Roll:**\n" +
+              "Đây là cú máy đặc trưng của các đạo diễn Hollywood! Gimbal sẽ tự động quay tròn trục Pan 360° vô cực trong khi camera tiến về phía trước, tạo cảm giác thế giới xung quanh đang xoay tròn mê hoặc.\n\n" +
+              "📋 **Bộ thông số tối ưu đề xuất:**\n" +
+              "• **Chế độ quay:** PRO CINEMA (4K 60fps mượt mà)\n" +
+              "• **Tốc độ màn trập (Shutter):** 1/120s\n" +
+              "• **ISO:** 100\n" +
+              "• **Chế độ Gimbal:** 360° Inception (Tự động kích hoạt mô-men xoắn xoay vô cực)\n" +
+              "• **Mẹo cầm máy:** Cầm gimbal nằm ngang kiểu đèn pin (Flashlight Mode) hướng thẳng về phía mục tiêu và bước đi đều chân.",
+      cameraPreset: {
+        mode: 'PRO CINEMA',
+        fps: 60,
+        resolution: '4K',
+        iso: 100,
+        shutter: '1/120s',
+        ev: '0.0',
+        wb: 'Auto',
+        lut: 'Hollywood Blockbuster Film',
+        gimbalMode: '360° Inception',
+        followSpeed: 'Tự động xoay 360°',
+        summary: 'PRO CINEMA 4K/60 • Chế độ Gimbal: 360° Inception Roll'
+      },
+      suggestAction: true,
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_app_running_walk_smooth',
+      target: 'app',
+      topic: 'Chạy bộ, leo bậc thang, triệt tiêu rung giật bước chân',
+      keywords: ['chạy', 'bước đi', 'bậc thang', 'đi bộ', 'leo núi', 'giật bước chân', 'z-axis', 'rung chân trời'],
+      answer: "🏃 **Kỹ Thuật Đạo Diễn - Triệt Tiêu Rung Bước Chân:**\n" +
+              "Khi đi bộ hoặc chạy bộ, trọng lượng cơ thể dồn lên từng bước chân tạo ra dao động trục Z (Z-axis bobbing). Chúng ta kích hoạt thuật toán giảm chấn bước đi kết hợp tính năng Khóa Chân Trời (Horizon Lock) để giữ đường chân trời luôn thẳng tuyệt đối dù thân người có nhấp nhô.\n\n" +
+              "📋 **Bộ thông số tối ưu đề xuất:**\n" +
+              "• **Chế độ quay:** VIDEO 4K/60 (ổn định khung hình cao)\n" +
+              "• **ISO:** 100\n" +
+              "• **Chế độ Gimbal:** LOCK Khóa (Triệt tiêu rung Z-axis & Khóa chân trời)\n" +
+              "• **Mẹo di chuyển:** Hơi chùng đầu gối khi bước đi (kỹ thuật Ninja Walk).",
+      cameraPreset: {
+        mode: 'VIDEO 4K/60',
+        fps: 60,
+        resolution: '4K',
+        iso: 100,
+        shutter: '1/120s',
+        ev: '0.0',
+        wb: 'Auto',
+        lut: 'Vibrant Outdoor Rec.709',
+        gimbalMode: 'LOCK Khóa',
+        followSpeed: 'Ninja Walk Dampening',
+        summary: 'VIDEO 4K/60 • Gimbal: LOCK Khóa • Khử rung bước chân'
+      },
+      suggestAction: true,
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_app_apple_log_workflow',
+      target: 'app',
+      topic: 'Chỉnh màu Apple Log và nạp 3D LUT .cube',
+      keywords: ['apple log', 'log', 'lut', 'chỉnh màu', 'cube', 'color grading', 'rec709', 'phẳng', 'màu phim'],
+      answer: "🎨 **Kỹ Thuật Chỉnh Màu - Quy Trình Apple Log & 3D LUT:**\n" +
+              "Quay ở định dạng Apple Log giúp lưu giữ tối đa 14+ stops dải nhạy sáng. Ứng dụng T-Flow cho phép bật tính năng **Realtime 3D LUT Preview**, giúp anh nhìn thấy màu phim điện ảnh hoàn chỉnh ngay trên màn hình lúc bấm máy mà không phải chờ về máy tính hậu kỳ.\n\n" +
+              "📋 **Bộ thông số tối ưu đề xuất:**\n" +
+              "• **Chế độ quay:** PRO CINEMA (ProRes Log 4K/24fps)\n" +
+              "• **Tốc độ màn trập (Shutter):** 1/48s\n" +
+              "• **ISO:** 100 (Native Base ISO của Apple Log)\n" +
+              "• **LUT đang áp dụng:** Apple Log to Rec.709 Cinema Gold (.cube)\n" +
+              "• **Chế độ Gimbal:** PF (Pan Follow)",
+      cameraPreset: {
+        mode: 'PRO CINEMA',
+        fps: 24,
+        resolution: '4K ProRes',
+        iso: 100,
+        shutter: '1/48s',
+        ev: '0.0',
+        wb: '5600K Daylight',
+        lut: 'Apple Log to Rec.709 Cinema Gold',
+        gimbalMode: 'PF (Pan Follow)',
+        followSpeed: 'Chậm điện ảnh',
+        summary: 'PRO CINEMA ProRes Log 4K/24 • LUT Rec.709 Gold'
+      },
+      suggestAction: true,
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    }
+  ];
+
+  // --- KNOWLEDGE BASE ACCESS & CRUD ---
+  function getAiKnowledgeBase() {
+    if (typeof localStorage === 'undefined') return DEFAULT_AI_KNOWLEDGE_BASE.slice();
+    try {
+      var saved = localStorage.getItem(AI_KB_KEY);
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Error reading AI knowledge base:', e);
+    }
+    // Default fallback
+    if (typeof localStorage !== 'undefined') localStorage.setItem(AI_KB_KEY, JSON.stringify(DEFAULT_AI_KNOWLEDGE_BASE));
+    return DEFAULT_AI_KNOWLEDGE_BASE.slice();
+  }
+
+  function saveAiKnowledgeBase(kbList) {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      localStorage.setItem(AI_KB_KEY, JSON.stringify(kbList));
+      if (typeof window !== 'undefined' && window.dispatchEvent) window.dispatchEvent(new CustomEvent(AI_EVENT, { detail: { action: 'kb_updated' } }));
+    } catch (e) {
+      console.error('Error saving AI knowledge base:', e);
+    }
+  }
+
+  function addOrUpdateAiKnowledge(item) {
+    var kb = getAiKnowledgeBase();
+    if (!item.id) {
+      item.id = 'kb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    }
+    item.updatedAt = new Date().toISOString();
+    var idx = kb.findIndex(function(k) { return k.id === item.id; });
+    if (idx >= 0) {
+      kb[idx] = Object.assign({}, kb[idx], item);
+    } else {
+      kb.unshift(item);
+    }
+    saveAiKnowledgeBase(kb);
+    return item;
+  }
+
+  function deleteAiKnowledge(id) {
+    var kb = getAiKnowledgeBase();
+    kb = kb.filter(function(k) { return k.id !== id; });
+    saveAiKnowledgeBase(kb);
+    return true;
+  }
+
+  // --- CONVERSATION LOGS (CENTRALIZED FOR WEB & APP) ---
+  function getAiConversations() {
+    if (typeof localStorage === 'undefined') return [];
+    try {
+      var saved = localStorage.getItem(AI_CONVERSATIONS_KEY);
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {
+      console.warn('Error reading AI conversations:', e);
+    }
+    return [];
+  }
+
+  function logAiConversation(entry) {
+    var convs = getAiConversations();
+    var record = {
+      id: 'conv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      source: entry.source || 'web', // 'web' or 'app'
+      userEmail: entry.userEmail || (getCurrentUser() ? getCurrentUser().email : 'Khách vãng lai'),
+      userName: entry.userName || (getCurrentUser() ? getCurrentUser().name : 'Khách hàng'),
+      query: (entry.query || '').trim(),
+      reply: (entry.reply || '').trim(),
+      status: entry.status || 'answered', // 'answered', 'pending_approval', 'trained'
+      actionPayload: entry.actionPayload || null,
+      confidence: entry.confidence || 1.0,
+      timestamp: new Date().toISOString()
+    };
+    convs.unshift(record);
+    // Keep last 500 conversations to prevent storage overflow
+    if (convs.length > 500) convs = convs.slice(0, 500);
+    try {
+      if (typeof localStorage !== 'undefined') localStorage.setItem(AI_CONVERSATIONS_KEY, JSON.stringify(convs));
+      if (typeof window !== 'undefined' && window.dispatchEvent) window.dispatchEvent(new CustomEvent(AI_EVENT, { detail: { action: 'conversation_logged', record: record } }));
+    } catch (e) {
+      console.error('Error saving AI conversation:', e);
+    }
+    return record;
+  }
+
+  function clearAiLogs() {
+    try {
+      localStorage.setItem(AI_CONVERSATIONS_KEY, JSON.stringify([]));
+      if (typeof window !== 'undefined' && window.dispatchEvent) window.dispatchEvent(new CustomEvent(AI_EVENT, { detail: { action: 'logs_cleared' } }));
+    } catch (e) {}
+  }
+
+  // --- PENDING QUESTIONS FOR ADMIN TRAINING ---
+  function getPendingAiQuestions() {
+    if (typeof localStorage === 'undefined') return [];
+    try {
+      var saved = localStorage.getItem(AI_PENDING_KEY);
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch (e) {
+      console.warn('Error reading pending AI questions:', e);
+    }
+    return [];
+  }
+
+  function savePendingAiQuestions(list) {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      localStorage.setItem(AI_PENDING_KEY, JSON.stringify(list));
+      if (typeof window !== 'undefined' && window.dispatchEvent) window.dispatchEvent(new CustomEvent(AI_EVENT, { detail: { action: 'pending_updated' } }));
+    } catch (e) {
+      console.error('Error saving pending AI questions:', e);
+    }
+  }
+
+  function escalateToAdmin(params) {
+    var pending = getPendingAiQuestions();
+    var record = {
+      id: 'pend_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+      source: params.source || 'web', // 'web' or 'app'
+      userEmail: params.userEmail || (getCurrentUser() ? getCurrentUser().email : 'Khách vãng lai'),
+      userName: params.userName || (getCurrentUser() ? getCurrentUser().name : 'Khách hàng'),
+      query: (params.query || '').trim(),
+      reason: params.reason || 'Câu hỏi khó hoặc chưa có trong bộ dữ liệu chuẩn',
+      context: params.context || null,
+      status: 'pending', // 'pending', 'approved', 'ignored'
+      timestamp: new Date().toISOString()
+    };
+    pending.unshift(record);
+    savePendingAiQuestions(pending);
+    return record;
+  }
+
+  function approveAndTrainAiQuestion(questionId, officialAnswer, keywords, topic, target) {
+    var pending = getPendingAiQuestions();
+    var item = pending.find(function(p) { return p.id === questionId; });
+    if (!item) return false;
+
+    item.status = 'approved';
+    item.officialAnswer = officialAnswer;
+    item.trainedAt = new Date().toISOString();
+    savePendingAiQuestions(pending);
+
+    // Extract keywords from query if not provided
+    var kwList = [];
+    if (keywords && typeof keywords === 'string') {
+      kwList = keywords.split(',').map(function(s) { return s.trim().toLowerCase(); }).filter(Boolean);
+    } else if (Array.isArray(keywords)) {
+      kwList = keywords;
+    }
+    if (kwList.length === 0) {
+      var cleanQ = item.query.toLowerCase().replace(/[^a-zA-Z0-9À-ỹ ]/g, ' ');
+      kwList = cleanQ.split(/\s+/).filter(function(w) { return w.length > 2; });
+    }
+
+    // Add to Verified Knowledge Base so AI is now TRAINED!
+    addOrUpdateAiKnowledge({
+      id: 'kb_trained_' + Date.now(),
+      target: target || item.source || 'web',
+      topic: topic || ('Giải đáp: ' + item.query.substring(0, 40) + '...'),
+      keywords: kwList,
+      answer: officialAnswer,
+      isOfficial: true,
+      trainedByAdmin: 'thuynguyen2dk4@gmail.com'
+    });
+
+    // Mark related conversations as trained
+    var convs = getAiConversations();
+    var matchedConv = convs.find(function(c) { return c.query === item.query; });
+    if (matchedConv) {
+      matchedConv.status = 'trained';
+      matchedConv.reply = officialAnswer;
+      try {
+        if (typeof localStorage !== 'undefined') localStorage.setItem(AI_CONVERSATIONS_KEY, JSON.stringify(convs));
+      } catch (e) {}
+    }
+
+    return true;
+  }
+
+  function ignorePendingAiQuestion(questionId) {
+    var pending = getPendingAiQuestions();
+    pending = pending.filter(function(p) { return p.id !== questionId; });
+    savePendingAiQuestions(pending);
+    return true;
+  }
+
+  // --- BRAIN 1: WEB SALES CONSULTANT AI PROCESSING ---
+  function processWebAiQuery(userQuery, userContext) {
+    var cleanQuery = (userQuery || '').trim().toLowerCase();
+    var kb = getAiKnowledgeBase();
+    var webKb = kb.filter(function(k) { return k.target === 'web' || k.target === 'both'; });
+
+    var bestMatch = null;
+    var highestScore = 0;
+
+    webKb.forEach(function(item) {
+      var score = 0;
+      var keywords = item.keywords || [];
+      keywords.forEach(function(kw) {
+        if (cleanQuery.indexOf(kw.toLowerCase()) !== -1) {
+          score += 10;
+        }
+      });
+      // Topic match bonus
+      if (item.topic && cleanQuery.indexOf(item.topic.toLowerCase()) !== -1) {
+        score += 25;
+      }
+      if (score > highestScore) {
+        highestScore = score;
+        bestMatch = item;
+      }
+    });
+
+    var currentUserObj = getCurrentUser();
+    var email = currentUserObj ? currentUserObj.email : 'Khách vãng lai';
+    var name = currentUserObj ? currentUserObj.name : 'Quý khách';
+
+    // STRICT ANTI-HALLUCINATION POLICY:
+    // If confidence score is too low or unknown question, DO NOT GUESS OR ANSWER RANDOMLY!
+    if (!bestMatch || highestScore < 10) {
+      var escalated = escalateToAdmin({
+        source: 'web',
+        userEmail: email,
+        userName: name,
+        query: userQuery,
+        reason: 'Không tìm thấy tri thức kiểm định hoặc câu hỏi chuyên sâu ngoài phạm vi bán hàng',
+        context: userContext || null
+      });
+
+      var escalatedReply = "Dạ câu hỏi này mang tính kỹ thuật/chính sách chuyên sâu mà em chưa có dữ liệu kiểm định chính thức từ xưởng R&D. Để bảo đảm thông tin chuẩn xác 100% và không trả lời bừa, em đã tự động chuyển tiếp câu hỏi này về Trung Tâm Điều Hành cho Master Admin Thủy Nguyễn duyệt và cập nhật giải đáp sớm nhất cho anh ạ! 🙏\n\n" +
+                           "Trong thời gian chờ duyệt, anh có thể tham khảo bảng giá 4 gói T-Flow Pro hoặc các thông số động cơ FOC và MagSafe bên dưới ạ:";
+
+      var record = logAiConversation({
+        source: 'web',
+        userEmail: email,
+        userName: name,
+        query: userQuery,
+        reply: escalatedReply,
+        status: 'pending_approval',
+        confidence: 0.1
+      });
+
+      return {
+        answer: escalatedReply,
+        status: 'pending_approval',
+        escalated: true,
+        recordId: record.id,
+        actions: [
+          { label: 'Xem Bảng Giá 4 Gói', view: 'catalog' },
+          { label: 'Xem Thông Số Kỹ Thuật', view: 'detail' }
+        ]
+      };
+    }
+
+    // High confidence matched answer
+    var record = logAiConversation({
+      source: 'web',
+      userEmail: email,
+      userName: name,
+      query: userQuery,
+      reply: bestMatch.answer,
+      status: 'answered',
+      confidence: highestScore / 100
+    });
+
+    return {
+      answer: bestMatch.answer,
+      status: 'answered',
+      escalated: false,
+      recordId: record.id,
+      actions: bestMatch.actions || []
+    };
+  }
+
+  // --- BRAIN 2: APP CREATIVE DIRECTOR & CAMERA COPILOT PROCESSING ---
+  function processAppAiQuery(userQuery, userContext) {
+    var cleanQuery = (userQuery || '').trim().toLowerCase();
+    var kb = getAiKnowledgeBase();
+    var appKb = kb.filter(function(k) { return k.target === 'app' || k.target === 'both'; });
+
+    var bestMatch = null;
+    var highestScore = 0;
+
+    appKb.forEach(function(item) {
+      var score = 0;
+      var keywords = item.keywords || [];
+      keywords.forEach(function(kw) {
+        if (cleanQuery.indexOf(kw.toLowerCase()) !== -1) {
+          score += 10;
+        }
+      });
+      if (item.topic && cleanQuery.indexOf(item.topic.toLowerCase()) !== -1) {
+        score += 25;
+      }
+      if (score > highestScore) {
+        highestScore = score;
+        bestMatch = item;
+      }
+    });
+
+    var currentUserObj = getCurrentUser();
+    var email = currentUserObj ? currentUserObj.email : 'Người dùng App T-Flow';
+    var name = currentUserObj ? currentUserObj.name : 'Nhà sáng tạo';
+
+    // Check if off-topic or unknown
+    if (!bestMatch || highestScore < 10) {
+      var escalated = escalateToAdmin({
+        source: 'app',
+        userEmail: email,
+        userName: name,
+        query: userQuery,
+        reason: 'Yêu cầu góc quay hoặc kỹ thuật hình ảnh mới chưa được huấn luyện',
+        context: userContext || null
+      });
+
+      var escalatedReply = "Dạ yêu cầu góc quay hoặc bối cảnh này cần kinh nghiệm đạo diễn chuyên sâu mà em chưa được huấn luyện dữ liệu chuẩn. Để tránh thiết lập thông số sai lệch làm hỏng cảnh quay của anh, em đã gửi thông báo về Trung Tâm Điều Hành cho Master Admin Thủy Nguyễn duyệt và cập nhật bộ thông số chuẩn ngay ạ! 🙏\n\n" +
+                           "Hiện tại anh có thể chọn nhanh các preset có sẵn: Quay Hoàng Hôn Biển, Thể Thao Tốc Độ Cao, Chân Dung Xóa Phông hoặc Inception 360° bên dưới ạ:";
+
+      var record = logAiConversation({
+        source: 'app',
+        userEmail: email,
+        userName: name,
+        query: userQuery,
+        reply: escalatedReply,
+        status: 'pending_approval',
+        confidence: 0.1
+      });
+
+      return {
+        answer: escalatedReply,
+        status: 'pending_approval',
+        escalated: true,
+        recordId: record.id,
+        suggestAction: false,
+        cameraPreset: null
+      };
+    }
+
+    // Has verified preset & guidance
+    // MANDATORY REQUIREMENT: Ask user if they want AI to apply the settings automatically!
+    var fullReply = bestMatch.answer + "\n\n" +
+                    "⚡ **Anh có muốn em tự thao tác cài đặt toàn bộ các thông số này trên camera và gimbal luôn giúp anh không?**";
+
+    var record = logAiConversation({
+      source: 'app',
+      userEmail: email,
+      userName: name,
+      query: userQuery,
+      reply: fullReply,
+      status: 'answered',
+      actionPayload: bestMatch.cameraPreset,
+      confidence: highestScore / 100
+    });
+
+    return {
+      answer: fullReply,
+      status: 'answered',
+      escalated: false,
+      recordId: record.id,
+      suggestAction: true,
+      cameraPreset: bestMatch.cameraPreset
+    };
+  }
+
   return {
     STORAGE_KEY: STORAGE_KEY,
     CART_KEY: CART_KEY,
@@ -1003,6 +1712,25 @@
     // CSV
     exportProductsCSV: exportProductsCSV,
     importProductsCSV: importProductsCSV,
-    exportUsersCSV: exportUsersCSV
+    exportUsersCSV: exportUsersCSV,
+    // AI Knowledge & Training Engine
+    AI_CONVERSATIONS_KEY: AI_CONVERSATIONS_KEY,
+    AI_PENDING_KEY: AI_PENDING_KEY,
+    AI_KB_KEY: AI_KB_KEY,
+    AI_EVENT: AI_EVENT,
+    DEFAULT_AI_KNOWLEDGE_BASE: DEFAULT_AI_KNOWLEDGE_BASE,
+    getAiKnowledgeBase: getAiKnowledgeBase,
+    saveAiKnowledgeBase: saveAiKnowledgeBase,
+    addOrUpdateAiKnowledge: addOrUpdateAiKnowledge,
+    deleteAiKnowledge: deleteAiKnowledge,
+    getAiConversations: getAiConversations,
+    logAiConversation: logAiConversation,
+    clearAiLogs: clearAiLogs,
+    getPendingAiQuestions: getPendingAiQuestions,
+    escalateToAdmin: escalateToAdmin,
+    approveAndTrainAiQuestion: approveAndTrainAiQuestion,
+    ignorePendingAiQuestion: ignorePendingAiQuestion,
+    processWebAiQuery: processWebAiQuery,
+    processAppAiQuery: processAppAiQuery
   };
 }));

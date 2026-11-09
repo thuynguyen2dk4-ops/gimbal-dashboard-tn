@@ -687,6 +687,104 @@
       transform: translateX(-50%) translateY(0);
       opacity: 1;
     }
+
+    /* AI Training Tabs & Badges */
+    .btn-tab-ai {
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      padding: 10px 16px;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-tab-ai.active {
+      color: #0071E3;
+      border-bottom-color: #0071E3;
+    }
+    .filter-pill-ai {
+      background: #F5F5F7;
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 5px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-pill-ai.active {
+      background: #1D1D1F;
+      border-color: #1D1D1F;
+      color: #FFF;
+    }
+    .badge-source-web {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 113, 227, 0.1);
+      color: #0071E3;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-source-app {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(52, 199, 89, 0.12);
+      color: #248A3D;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-status-pending {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(230, 167, 0, 0.15);
+      color: #B45309;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-status-answered {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(52, 199, 89, 0.1);
+      color: #248A3D;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-status-trained {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(175, 82, 222, 0.12);
+      color: #8944AB;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .ai-pending-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(230, 167, 0, 0.35);
+      border-left: 5px solid #F59E0B;
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+    }
+
   </style>
 </head>
 <body>
@@ -750,6 +848,7 @@
         <button onclick="handleAdminLogout()" style="background:none; border:none; font-size:11.5px; color:#FF3B30; font-weight:600; cursor:pointer; margin-left:4px;">Đăng Xuất</button>
       </div>
 
+      <a href="#sectionAiTraining" class="btn-nav-link" style="background:rgba(0,113,227,0.1); color:#0071E3; font-weight:700;">⚡ Huấn Luyện AI</a>
       <a href="index.html" class="btn-nav-link" target="_blank">Xem Website Bán Hàng</a>
       <a href="user_dashboard.html" class="btn-nav-link" target="_blank">Cổng Khách Hàng</a>
     </div>
@@ -924,6 +1023,127 @@
           <!-- Dynamically populated via renderAdminReviewsTable() -->
         </tbody>
       </table>
+    </div>
+
+    <!-- 6. KHỐI TRUNG TÂM HUẤN LUYỆN AI & QUẢN LÝ HỘI THOẠI (AI TRAINING & MODERATION CENTER) -->
+    <div class="card" id="sectionAiTraining" style="margin-top:32px;">
+      <div class="card-title-row">
+        <div>
+          <div class="card-title" style="display:flex; align-items:center; gap:10px;">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:#0071E3; color:#FFF; font-size:14px;">⚡</span>
+            Trung Tâm Huấn Luyện AI &amp; Quản Lý Hội Thoại (AI Training Center)
+          </div>
+          <div class="card-sub">
+            Tổng hợp toàn bộ câu hỏi &amp; câu trả lời từ Web Bán Hàng và App Camera Copilot. Huấn luyện câu trả lời chuẩn xác cho các câu hỏi khó, bảo đảm AI không bao giờ trả lời bừa.
+          </div>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn btn-dark" onclick="openAddKnowledgeModal()">&#43; Huấn Luyện Tri Thức Mới</button>
+          <button class="btn btn-outline" onclick="clearAiLogsConfirm()">Xóa Lịch Sử Test</button>
+        </div>
+      </div>
+
+      <!-- AI STATS KPI MINI-ROW -->
+      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin:20px 0 24px 0;">
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:16px;">
+          <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Tổng Hội Thoại</div>
+          <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-top:4px;" id="aiKpiTotal">0</div>
+          <div style="font-size:11px; color:#8E8E93;">Từ cả Web &amp; App</div>
+        </div>
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:16px;">
+          <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">🌐 Web Tư Vấn</div>
+          <div style="font-size:24px; font-weight:800; color:#0071E3; margin-top:4px;" id="aiKpiWeb">0</div>
+          <div style="font-size:11px; color:#8E8E93;">Tư vấn bán hàng &amp; gói</div>
+        </div>
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:16px;">
+          <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">📱 App Copilot</div>
+          <div style="font-size:24px; font-weight:800; color:#248A3D; margin-top:4px;" id="aiKpiApp">0</div>
+          <div style="font-size:11px; color:#8E8E93;">Quay chụp &amp; chỉnh thông số</div>
+        </div>
+        <div style="background:rgba(230,167,0,0.08); border:1px solid rgba(230,167,0,0.3); border-radius:12px; padding:16px;">
+          <div style="font-size:11.5px; font-weight:700; color:#B45309; text-transform:uppercase;">⚠️ Chờ Admin Duyệt</div>
+          <div style="font-size:24px; font-weight:800; color:#B45309; margin-top:4px;" id="aiKpiPending">0</div>
+          <div style="font-size:11px; color:#B45309;">Câu hỏi khó cần training</div>
+        </div>
+      </div>
+
+      <!-- TABS NAVIGATION -->
+      <div style="display:flex; gap:12px; border-bottom:1px solid var(--border); margin-bottom:20px;">
+        <button class="btn-tab-ai active" id="tabBtnAiLogs" onclick="switchAiTab('logs')">
+          📋 Toàn Bộ Hội Thoại Web &amp; App (<span id="tabCountLogs">0</span>)
+        </button>
+        <button class="btn-tab-ai" id="tabBtnAiPending" onclick="switchAiTab('pending')">
+          ⚡ Hàng Đợi Chờ Duyệt &amp; Huấn Luyện (<span id="tabCountPending">0</span>)
+        </button>
+        <button class="btn-tab-ai" id="tabBtnAiKb" onclick="switchAiTab('kb')">
+          📚 Bộ Tri Thức Đã Huấn Luyện (<span id="tabCountKb">0</span>)
+        </button>
+      </div>
+
+      <!-- TAB 1 CONTENT: LOGS -->
+      <div id="aiTabContentLogs">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div style="display:flex; gap:8px;">
+            <button class="filter-pill-ai active" onclick="filterAiLogs('all', this)">Tất Cả</button>
+            <button class="filter-pill-ai" onclick="filterAiLogs('web', this)">🌐 Web Sales</button>
+            <button class="filter-pill-ai" onclick="filterAiLogs('app', this)">📱 App Copilot</button>
+            <button class="filter-pill-ai" onclick="filterAiLogs('pending_approval', this)">⚠️ Chờ Duyệt</button>
+          </div>
+          <input type="text" id="aiLogsSearchInput" placeholder="Tìm kiếm câu hỏi / nội dung..." onkeyup="searchAiLogs(this.value)" style="padding:6px 12px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; width:240px; outline:none;">
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:13%;">Thời Gian</th>
+              <th style="width:11%;">Nguồn</th>
+              <th style="width:16%;">Người Hỏi</th>
+              <th style="width:25%;">Câu Hỏi Người Dùng</th>
+              <th style="width:23%;">Câu Trả Lời Của AI</th>
+              <th style="width:12%; text-align:right;">Trạng Thái</th>
+            </tr>
+          </thead>
+          <tbody id="aiLogsTableBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- TAB 2 CONTENT: PENDING QUEUE (ADMIN TRAINING INTERFACE) -->
+      <div id="aiTabContentPending" style="display:none;">
+        <div style="margin-bottom:16px; font-size:13.5px; color:var(--text-secondary); line-height:1.5;">
+          Những câu hỏi người dùng hỏi mà AI nhận định là chuyên sâu hoặc chưa có dữ liệu chuẩn sẽ được chuyển về đây. Admin Thủy Nguyễn nhập câu trả lời chuẩn và bấm <strong>[Lưu &amp; Huấn Luyện AI]</strong>. Ngay lập tức, AI trên cả Web và App sẽ nắm bắt tri thức mới này để trả lời cho những khách hàng tiếp theo!
+        </div>
+        <div id="aiPendingCardsList">
+          <!-- Dynamically populated pending cards -->
+        </div>
+      </div>
+
+      <!-- TAB 3 CONTENT: VERIFIED KNOWLEDGE BASE -->
+      <div id="aiTabContentKb" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div style="font-size:13.5px; color:var(--text-secondary);">
+            Danh sách toàn bộ các quy tắc tri thức, thông số camera và câu trả lời chuẩn đang phục vụ Web &amp; App.
+          </div>
+          <button class="btn btn-dark" onclick="openAddKnowledgeModal()">&#43; Thêm Tri Thức Mới</button>
+        </div>
+
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th style="width:18%;">Chủ Đề</th>
+              <th style="width:10%;">Nền Tảng</th>
+              <th style="width:22%;">Từ Khóa Nhận Diện</th>
+              <th style="width:38%;">Nội Dung Trả Lời / Thông Số</th>
+              <th style="width:12%; text-align:right;">Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="aiKbTableBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+
     </div>
 </div>
   </div>
@@ -1186,6 +1406,46 @@
   </div>
 
   <!-- ENTERPRISE 4-COLUMN FOOTER (#111827) -->
+  
+  <!-- MODAL: ADD / EDIT AI KNOWLEDGE -->
+  <div class="modal-overlay" id="knowledgeModal">
+    <div class="modal-card" style="width:640px; max-width:92vw;">
+      <div class="modal-header">
+        <h3 id="knowledgeModalTitle">Huấn Luyện Tri Thức Mới Cho AI</h3>
+        <button class="btn btn-outline" style="padding:4px 10px;" onclick="closeKnowledgeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="formKbId">
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Nền Tảng Áp Dụng</label>
+            <select class="form-control" id="formKbTarget">
+              <option value="web">🌐 Web Bán Hàng (Tư vấn bán hàng, giá, chính sách)</option>
+              <option value="app">📱 App Camera Copilot (Kỹ thuật quay, màu sắc, thông số)</option>
+              <option value="both">🌐📱 Cả Hai Nền Tảng</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Chủ Đề Tri Thức</label>
+            <input type="text" class="form-control" id="formKbTopic" placeholder="Ví dụ: Quay cảnh tuyết rơi, Giá gói phụ kiện...">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Từ Khóa Nhận Diện (Cách nhau bởi dấu phẩy)</label>
+          <input type="text" class="form-control" id="formKbKeywords" placeholder="tuyết, mùa đông, lạnh, trắng, phơi sáng...">
+        </div>
+        <div class="form-group">
+          <label>Nội Dung Giải Đáp Chuẩn Xác (Định Dạng Markdown)</label>
+          <textarea class="form-control" id="formKbAnswer" rows="5" placeholder="Nhập câu trả lời chính xác và đầy đủ mà AI sẽ nói với khách hàng..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeKnowledgeModal()">Hủy</button>
+        <button class="btn btn-dark" onclick="saveKnowledgeSubmit()">Lưu &amp; Huấn Luyện Ngay</button>
+      </div>
+    </div>
+  </div>
+
   <footer class="enterprise-footer">
     <div class="container" style="margin:0 auto; padding:0 24px;">
       <div class="footer-grid-4col">
@@ -2187,8 +2447,363 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       checkAdminAccess();
+      initAiTrainingDashboard();
     });
 
-</script>
+
+    // ==========================================================================
+    // 6. AI TRAINING & MODERATION CENTER LOGIC
+    // ==========================================================================
+    let currentAiTab = 'logs';
+    let currentAiFilter = 'all';
+    let aiSearchTerm = '';
+
+    function initAiTrainingDashboard() {
+      updateAiStats();
+      renderAiLogsTable(currentAiFilter, aiSearchTerm);
+      renderAiPendingList();
+      renderAiKbTable();
+
+      // Listen for realtime AI events across tabs
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        window.addEventListener(SmartGimbalCatalog.AI_EVENT, () => {
+          updateAiStats();
+          renderAiLogsTable(currentAiFilter, aiSearchTerm);
+          renderAiPendingList();
+          renderAiKbTable();
+        });
+        window.addEventListener('storage', (e) => {
+          if (e.key === SmartGimbalCatalog.AI_CONVERSATIONS_KEY || e.key === SmartGimbalCatalog.AI_PENDING_KEY || e.key === SmartGimbalCatalog.AI_KB_KEY) {
+            updateAiStats();
+            renderAiLogsTable(currentAiFilter, aiSearchTerm);
+            renderAiPendingList();
+            renderAiKbTable();
+          }
+        });
+      }
+    }
+
+    function updateAiStats() {
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+      const convs = SmartGimbalCatalog.getAiConversations();
+      const pending = SmartGimbalCatalog.getPendingAiQuestions();
+      const kb = SmartGimbalCatalog.getAiKnowledgeBase();
+
+      const totalCount = convs.length;
+      const webCount = convs.filter(c => c.source === 'web').length;
+      const appCount = convs.filter(c => c.source === 'app').length;
+      const pendingCount = pending.filter(p => p.status === 'pending').length;
+
+      document.getElementById('aiKpiTotal').textContent = totalCount;
+      document.getElementById('aiKpiWeb').textContent = webCount;
+      document.getElementById('aiKpiApp').textContent = appCount;
+      document.getElementById('aiKpiPending').textContent = pendingCount;
+
+      document.getElementById('tabCountLogs').textContent = totalCount;
+      document.getElementById('tabCountPending').textContent = pendingCount;
+      document.getElementById('tabCountKb').textContent = kb.length;
+    }
+
+    function switchAiTab(tabKey) {
+      currentAiTab = tabKey;
+      document.getElementById('tabBtnAiLogs').classList.toggle('active', tabKey === 'logs');
+      document.getElementById('tabBtnAiPending').classList.toggle('active', tabKey === 'pending');
+      document.getElementById('tabBtnAiKb').classList.toggle('active', tabKey === 'kb');
+
+      document.getElementById('aiTabContentLogs').style.display = tabKey === 'logs' ? 'block' : 'none';
+      document.getElementById('aiTabContentPending').style.display = tabKey === 'pending' ? 'block' : 'none';
+      document.getElementById('aiTabContentKb').style.display = tabKey === 'kb' ? 'block' : 'none';
+
+      if (tabKey === 'pending') renderAiPendingList();
+      if (tabKey === 'kb') renderAiKbTable();
+    }
+
+    function filterAiLogs(filter, btn) {
+      currentAiFilter = filter;
+      document.querySelectorAll('.filter-pill-ai').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderAiLogsTable(currentAiFilter, aiSearchTerm);
+    }
+
+    function searchAiLogs(term) {
+      aiSearchTerm = (term || '').trim().toLowerCase();
+      renderAiLogsTable(currentAiFilter, aiSearchTerm);
+    }
+
+    function renderAiLogsTable(filter, search) {
+      const tbody = document.getElementById('aiLogsTableBody');
+      if (!tbody || typeof SmartGimbalCatalog === 'undefined') return;
+
+      let convs = SmartGimbalCatalog.getAiConversations();
+      if (filter === 'web') convs = convs.filter(c => c.source === 'web');
+      if (filter === 'app') convs = convs.filter(c => c.source === 'app');
+      if (filter === 'pending_approval') convs = convs.filter(c => c.status === 'pending_approval');
+
+      if (search) {
+        convs = convs.filter(c => 
+          (c.query && c.query.toLowerCase().includes(search)) ||
+          (c.reply && c.reply.toLowerCase().includes(search)) ||
+          (c.userEmail && c.userEmail.toLowerCase().includes(search))
+        );
+      }
+
+      if (convs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" style="text-align:center; padding:36px; color:var(--text-secondary);">
+              Chưa có dữ liệu hội thoại nào phù hợp. Hãy thử đặt câu hỏi trên Web hoặc App để kiểm tra luồng Real-Time!
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      let html = '';
+      convs.forEach(c => {
+        const timeStr = c.timestamp ? new Date(c.timestamp).toLocaleString('vi-VN', { hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit' }) : '--';
+        const sourceBadge = c.source === 'app' 
+          ? '<span class="badge-source-app">📱 App Copilot</span>' 
+          : '<span class="badge-source-web">🌐 Web Sales</span>';
+
+        let statusBadge = '<span class="badge-status-answered">✓ Đã Trả Lời</span>';
+        if (c.status === 'pending_approval') {
+          statusBadge = '<span class="badge-status-pending">⚠️ Chờ Duyệt</span>';
+        } else if (c.status === 'trained') {
+          statusBadge = '<span class="badge-status-trained">⚡ Đã Huấn Luyện</span>';
+        }
+
+        html += `
+          <tr>
+            <td style="font-size:12px; font-family:monospace; color:var(--text-secondary);">${timeStr}</td>
+            <td>${sourceBadge}</td>
+            <td>
+              <div style="font-weight:700; font-size:12.5px;">${c.userName || 'Khách hàng'}</div>
+              <div style="font-size:11px; color:var(--text-secondary);">${c.userEmail || ''}</div>
+            </td>
+            <td>
+              <div style="font-weight:600; font-size:13px; color:var(--text-main); line-height:1.4;">${c.query || ''}</div>
+            </td>
+            <td>
+              <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.4; max-height:80px; overflow:hidden; text-overflow:ellipsis;">
+                ${(c.reply || '').replace(/\n/g, ' ')}
+              </div>
+            </td>
+            <td style="text-align:right;">${statusBadge}</td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function renderAiPendingList() {
+      const container = document.getElementById('aiPendingCardsList');
+      if (!container || typeof SmartGimbalCatalog === 'undefined') return;
+
+      const pending = SmartGimbalCatalog.getPendingAiQuestions().filter(p => p.status === 'pending');
+      if (pending.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:48px 20px; background:#F5F5F7; border-radius:14px; border:1px solid var(--border);">
+            <div style="font-size:36px; margin-bottom:10px;">🎉</div>
+            <div style="font-size:16px; font-weight:800; color:var(--text-main); margin-bottom:4px;">Không Có Câu Hỏi Nào Chờ Duyệt</div>
+            <div style="font-size:13px; color:var(--text-secondary);">AI đang hoạt động chuẩn xác và trả lời tốt toàn bộ thắc mắc của khách hàng.</div>
+          </div>
+        `;
+        return;
+      }
+
+      let html = '';
+      pending.forEach(item => {
+        const timeStr = item.timestamp ? new Date(item.timestamp).toLocaleString('vi-VN') : '--';
+        const sourceBadge = item.source === 'app' 
+          ? '<span class="badge-source-app">📱 App Camera Copilot</span>' 
+          : '<span class="badge-source-web">🌐 Web Bán Hàng</span>';
+
+        html += `
+          <div class="ai-pending-card" id="pending_card_${item.id}">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                ${sourceBadge}
+                <span style="font-size:12px; color:var(--text-secondary);">Thời gian: ${timeStr}</span>
+                <span style="font-size:12px; color:var(--text-secondary);">&bull; Người hỏi: <strong>${item.userName || item.userEmail}</strong></span>
+              </div>
+              <button onclick="handleIgnorePending('${item.id}')" style="background:none; border:none; font-size:12px; color:#FF3B30; font-weight:700; cursor:pointer;">
+                ✕ Bỏ qua câu hỏi này
+              </button>
+            </div>
+
+            <div style="background:#FFF9E6; border:1px solid rgba(230,167,0,0.3); border-radius:8px; padding:12px 16px; margin-bottom:14px;">
+              <div style="font-size:11px; font-weight:800; color:#B45309; text-transform:uppercase; margin-bottom:4px;">CÂU HỎI CẦN TRAINING:</div>
+              <div style="font-size:15px; font-weight:800; color:#1D1D1F;">"${item.query}"</div>
+              <div style="font-size:11.5px; color:#92400E; margin-top:4px;">Lý do chuyển tiếp: ${item.reason}</div>
+            </div>
+
+            <!-- TRAINING FORM -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
+              <div>
+                <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Từ Khóa Nhận Diện (Keywords)</label>
+                <input type="text" id="train_kw_${item.id}" class="form-control" placeholder="Ví dụ: chống rung, trời mưa, rơi vỡ, bảo hiểm..." value="${item.query.toLowerCase().replace(/[^a-zA-Z0-9À-ỹ ]/g, ' ').split(/\s+/).filter(w => w.length > 2).slice(0, 5).join(', ')}">
+              </div>
+              <div>
+                <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Chủ Đề Phân Loại</label>
+                <input type="text" id="train_topic_${item.id}" class="form-control" placeholder="Chủ đề giải đáp..." value="Giải đáp: ${item.query.substring(0, 35)}">
+              </div>
+            </div>
+
+            <div style="margin-bottom:14px;">
+              <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:4px;">Câu Trả Lời Chuẩn Xác Cho AI Học (Admin Official Answer)</label>
+              <textarea id="train_ans_${item.id}" class="form-control" rows="3" placeholder="Nhập câu trả lời chính thức của Master Admin Thủy Nguyễn..."></textarea>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end;">
+              <button class="btn btn-dark" onclick="handleTrainPendingSubmit('${item.id}')" style="display:flex; align-items:center; gap:8px;">
+                <span>⚡</span> Lưu &amp; Huấn Luyện AI Ngay
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+    }
+
+    function handleTrainPendingSubmit(id) {
+      const ansEl = document.getElementById('train_ans_' + id);
+      const kwEl = document.getElementById('train_kw_' + id);
+      const topicEl = document.getElementById('train_topic_' + id);
+
+      if (!ansEl) return;
+      const ans = ansEl.value.trim();
+      if (!ans) {
+        alert('Vui lòng nhập câu trả lời chính thức để huấn luyện cho AI!');
+        ansEl.focus();
+        return;
+      }
+
+      const kw = kwEl ? kwEl.value.trim() : '';
+      const topic = topicEl ? topicEl.value.trim() : '';
+
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        const ok = SmartGimbalCatalog.approveAndTrainAiQuestion(id, ans, kw, topic);
+        if (ok) {
+          alert('🎉 Đã huấn luyện AI thành công! Kể từ bây giờ, khi khách hàng hỏi câu này trên Web hoặc App, AI sẽ lập tức trả lời theo câu trả lời chính thức của bạn.');
+          updateAiStats();
+          renderAiPendingList();
+          renderAiLogsTable(currentAiFilter, aiSearchTerm);
+          renderAiKbTable();
+        }
+      }
+    }
+
+    function handleIgnorePending(id) {
+      if (!confirm('Bạn có muốn bỏ qua câu hỏi này?')) return;
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.ignorePendingAiQuestion(id);
+        updateAiStats();
+        renderAiPendingList();
+      }
+    }
+
+    function renderAiKbTable() {
+      const tbody = document.getElementById('aiKbTableBody');
+      if (!tbody || typeof SmartGimbalCatalog === 'undefined') return;
+
+      const kb = SmartGimbalCatalog.getAiKnowledgeBase();
+      if (kb.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px;">Chưa có tri thức nào.</td></tr>';
+        return;
+      }
+
+      let html = '';
+      kb.forEach(item => {
+        const targetBadge = item.target === 'app'
+          ? '<span class="badge-source-app">📱 App Copilot</span>'
+          : (item.target === 'both' ? '<span style="font-size:11px; font-weight:700; color:#AF52DE;">🌐📱 Cả Hai</span>' : '<span class="badge-source-web">🌐 Web Sales</span>');
+
+        const kws = Array.isArray(item.keywords) ? item.keywords.join(', ') : (item.keywords || '');
+        const summary = (item.answer || '').substring(0, 110) + '...';
+
+        html += `
+          <tr>
+            <td>
+              <div style="font-weight:700; font-size:13px; color:var(--text-main);">${item.topic || 'Không tên'}</div>
+              ${item.isOfficial ? '<span style="font-size:10px; color:#34C759; font-weight:700;">✓ Tri Thức Chính Thức</span>' : '<span style="font-size:10px; color:#AF52DE; font-weight:700;">⚡ Đã Huấn Luyện</span>'}
+            </td>
+            <td>${targetBadge}</td>
+            <td style="font-size:12px; color:var(--text-secondary); line-height:1.4;">${kws}</td>
+            <td style="font-size:12px; color:var(--text-main); line-height:1.4;">${summary}</td>
+            <td style="text-align:right;">
+              <button onclick="handleDeleteKnowledge('${item.id}')" style="background:none; border:1px solid #FF3B30; color:#FF3B30; padding:4px 8px; border-radius:6px; font-size:11px; cursor:pointer;">
+                Xóa
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+    }
+
+    function openAddKnowledgeModal() {
+      document.getElementById('formKbId').value = '';
+      document.getElementById('formKbTopic').value = '';
+      document.getElementById('formKbKeywords').value = '';
+      document.getElementById('formKbAnswer').value = '';
+      document.getElementById('knowledgeModalTitle').textContent = 'Huấn Luyện Tri Thức Mới Cho AI';
+      document.getElementById('knowledgeModal').classList.add('open');
+    }
+
+    function closeKnowledgeModal() {
+      document.getElementById('knowledgeModal').classList.remove('open');
+    }
+
+    function saveKnowledgeSubmit() {
+      const topic = document.getElementById('formKbTopic').value.trim();
+      const target = document.getElementById('formKbTarget').value;
+      const keywords = document.getElementById('formKbKeywords').value.trim();
+      const answer = document.getElementById('formKbAnswer').value.trim();
+
+      if (!topic || !answer) {
+        alert('Vui lòng nhập đầy đủ Chủ đề và Nội dung giải đáp!');
+        return;
+      }
+
+      const kwList = keywords.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.addOrUpdateAiKnowledge({
+          topic: topic,
+          target: target,
+          keywords: kwList,
+          answer: answer,
+          isOfficial: true
+        });
+
+        alert('🎉 Đã thêm tri thức mới thành công! AI đã được huấn luyện với kiến thức này.');
+        closeKnowledgeModal();
+        updateAiStats();
+        renderAiKbTable();
+      }
+    }
+
+    function handleDeleteKnowledge(id) {
+      if (!confirm('Bạn có chắc chắn muốn xóa tri thức này khỏi bộ nhớ của AI?')) return;
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.deleteAiKnowledge(id);
+        updateAiStats();
+        renderAiKbTable();
+      }
+    }
+
+    function clearAiLogsConfirm() {
+      if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử test hội thoại?')) return;
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        SmartGimbalCatalog.clearAiLogs();
+        updateAiStats();
+        renderAiLogsTable(currentAiFilter, aiSearchTerm);
+      }
+    }
+
+  </script>
 </body>
 </html>

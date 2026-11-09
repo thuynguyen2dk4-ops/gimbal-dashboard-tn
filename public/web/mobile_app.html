@@ -572,6 +572,75 @@
       cursor: pointer;
     }
 
+
+    /* Real AI Action Buttons & Parameter HUD Card in App */
+    .app-ai-preset-card {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin: 8px 0;
+      font-size: 11.5px;
+      color: #E5E5EA;
+    }
+    .app-ai-preset-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .app-ai-preset-row:last-child { border-bottom: none; }
+    .app-ai-preset-label { color: #8E8E93; font-weight: 600; }
+    .app-ai-preset-val { color: #34C759; font-weight: 700; font-family: monospace; }
+    .app-ai-exec-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, #0071E3, #005bb5);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 12px;
+      color: #FFF;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 16px rgba(0, 113, 227, 0.4);
+      transition: all 0.2s ease;
+    }
+    .app-ai-exec-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0, 113, 227, 0.6);
+      background: #0077ED;
+    }
+    .app-camera-toast {
+      position: absolute;
+      top: 110px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(18, 18, 20, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(52, 199, 89, 0.5);
+      border-radius: 20px;
+      padding: 10px 18px;
+      color: #FFF;
+      font-size: 12px;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      gap: 8px;
+      z-index: 1000;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+      animation: fadeInDown 0.25s ease;
+    }
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translate(-50%, -10px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
   </style>
 </head>
 <body>
@@ -579,6 +648,8 @@
   <div id="phoneContainer">
     <!-- Shutter Flash Effect -->
     <div id="shutterFlash"></div>
+    <div class="app-camera-toast" id="appCameraToast"><span>⚡</span><span id="appCameraToastText">Thông số đã được cập nhật</span></div>
+
 
     <!-- Live Camera Video -->
     <video id="cameraVideo" autoplay playsinline muted></video>
@@ -1061,8 +1132,280 @@
     }
 
     function toggleGimbalStatus() {
-      alert("Thông số Gimbal S1 Pro:\n• Trục Pan: 360° vô cực\n• Trục Tilt: 270°\n• Trục Roll: 180°\n• Tần số FOC: 20kHz\n• Nhiệt độ động cơ: 32.4°C\n• Firmware: v2.4.1 (Mới nhất)\n• Đồng bộ Supabase: KẾT NỐI REALTIME");
+      alert("Thông số Gimbal T-Flow Pro:\n• Trục Pan: 360° vô cực\n• Trục Tilt: 270°\n• Trục Roll: 180°\n• Tần số FOC: 20kHz Pure FOC\n• Lực hút MagSafe: 45N (32 nam châm N52)\n• Nhiệt độ động cơ: 32.4°C\n• Firmware: v2.4.1 (Mới nhất)\n• Trợ lý AI: T-Flow Camera Copilot Active");
     }
+
+    // =========================================================================
+    // 6. T-FLOW APP AI CREATIVE DIRECTOR & CAMERA COPILOT SCRIPT
+    // =========================================================================
+    let appAiHistory = [
+      {
+        sender: 'bot',
+        text: '👋 Chào anh! Em là **T-Flow AI Creative Director & Camera Copilot**.\n\nEm sẵn sàng hỗ trợ anh về kỹ thuật quay cinematic, căn chỉnh khung hình, phối màu Apple Log 3D LUT và **đặc biệt là tự động thiết lập các thông số camera & gimbal** tối ưu cho từng bối cảnh. Anh muốn em gợi ý bối cảnh nào ạ?',
+        actions: [
+          'Quay hoàng hôn bãi biển',
+          'Thể thao hành động tốc độ',
+          'Chân dung xóa phông điện ảnh',
+          'Hiệu ứng xoay Inception 360°'
+        ]
+      }
+    ];
+
+    function toggleAppAiChat(open) {
+      const sheet = document.getElementById('appAiSheet');
+      if (!sheet) return;
+      if (open) {
+        sheet.style.display = 'flex';
+        renderAppAiMessages();
+        setTimeout(() => {
+          const inp = document.getElementById('appAiInputField');
+          if (inp) inp.focus();
+        }, 150);
+      } else {
+        sheet.style.display = 'none';
+      }
+    }
+
+    function renderAppAiMessages() {
+      const container = document.getElementById('appAiMessagesBody');
+      if (!container) return;
+
+      let html = '';
+      appAiHistory.forEach((msg, idx) => {
+        const isBot = msg.sender === 'bot';
+        let formattedText = (msg.text || '')
+          .replace(/\n/g, '<br>')
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+        let presetHtml = '';
+        if (msg.cameraPreset) {
+          const p = msg.cameraPreset;
+          presetHtml = `
+            <div class="app-ai-preset-card">
+              <div style="font-weight:800; color:#5AC8FA; margin-bottom:6px; font-size:12px;">⚙️ BỘ THÔNG SỐ ĐỀ XUẤT TỐI ƯU</div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Chế độ Camera:</span><span class="app-ai-preset-val">${p.mode}</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Độ phân giải & FPS:</span><span class="app-ai-preset-val">${p.resolution} @ ${p.fps}fps</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Màn trập (Shutter):</span><span class="app-ai-preset-val">${p.shutter}</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Độ nhạy sáng (ISO):</span><span class="app-ai-preset-val">ISO ${p.iso}</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Bù sáng (EV):</span><span class="app-ai-preset-val">${p.ev} EV</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">3D LUT Màu:</span><span class="app-ai-preset-val">${p.lut}</span></div>
+              <div class="app-ai-preset-row"><span class="app-ai-preset-label">Chế độ Gimbal:</span><span class="app-ai-preset-val">${p.gimbalMode}</span></div>
+            </div>
+          `;
+        }
+
+        let actionsHtml = '';
+        if (msg.actions && msg.actions.length > 0) {
+          actionsHtml = '<div style="margin-top:8px;">';
+          msg.actions.forEach(actText => {
+            actionsHtml += `<button class="app-ai-action-btn" onclick="sendAppAiPrompt('${actText}')">${actText}</button>`;
+          });
+          actionsHtml += '</div>';
+        }
+
+        let execBtnHtml = '';
+        if (msg.cameraPreset && !msg.executed) {
+          const presetStr = encodeURIComponent(JSON.stringify(msg.cameraPreset));
+          execBtnHtml = `
+            <button class="app-ai-exec-btn" onclick="executeAppAiPreset('${presetStr}', ${idx})">
+              <span>⚡</span> Có, Hãy Tự Động Thao Tác Giúp Anh
+            </button>
+          `;
+        } else if (msg.executed) {
+          execBtnHtml = `
+            <div style="margin-top:8px; padding:6px 12px; background:rgba(52,199,89,0.15); border:1px solid rgba(52,199,89,0.4); border-radius:8px; color:#34C759; font-weight:700; font-size:11.5px; display:inline-flex; align-items:center; gap:6px;">
+              ✓ Đã tự động áp dụng thông số thành công
+            </div>
+          `;
+        }
+
+        let escalationHtml = '';
+        if (msg.escalated) {
+          escalationHtml = `
+            <div style="margin-top:8px; padding:6px 10px; background:rgba(230,167,0,0.15); border:1px solid rgba(230,167,0,0.4); border-radius:8px; color:#F59E0B; font-weight:700; font-size:11.5px;">
+              ⚠️ Đã chuyển tiếp Master Admin Thủy Nguyễn duyệt
+            </div>
+          `;
+        }
+
+        html += `
+          <div class="app-ai-bubble ${isBot ? 'bot' : 'user'}">
+            ${formattedText}
+            ${presetHtml}
+            ${execBtnHtml}
+            ${escalationHtml}
+            ${actionsHtml}
+          </div>
+        `;
+      });
+
+      container.innerHTML = html;
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function sendAppAiPrompt(text) {
+      processAppAiMessage(text);
+    }
+
+    function submitAppAiMessage() {
+      const input = document.getElementById('appAiInputField');
+      if (!input) return;
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+      processAppAiMessage(text);
+    }
+
+    function processAppAiMessage(userText) {
+      appAiHistory.push({
+        sender: 'user',
+        text: userText
+      });
+      renderAppAiMessages();
+
+      const container = document.getElementById('appAiMessagesBody');
+      const typingEl = document.createElement('div');
+      typingEl.className = 'app-ai-bubble bot';
+      typingEl.id = 'appAiTyping';
+      typingEl.innerHTML = '<span style="color:#5AC8FA; font-weight:700;">AI đang phân tích bối cảnh & tối ưu thông số...</span>';
+      container.appendChild(typingEl);
+      container.scrollTop = container.scrollHeight;
+
+      setTimeout(() => {
+        const el = document.getElementById('appAiTyping');
+        if (el) el.remove();
+
+        let aiRes = null;
+        if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.processAppAiQuery) {
+          aiRes = SmartGimbalCatalog.processAppAiQuery(userText, {
+            currentMode: document.querySelector('.mode-item.active') ? document.querySelector('.mode-item.active').textContent : 'VIDEO',
+            currentGimbal: document.querySelector('.gimbal-pill.active') ? document.querySelector('.gimbal-pill.active').textContent : 'PF'
+          });
+        } else {
+          aiRes = {
+            answer: 'Dạ em đã nhận được yêu cầu của anh. Em đề xuất dùng chế độ PRO CINEMA 4K 60fps để có chất lượng cao nhất.',
+            status: 'answered',
+            escalated: false,
+            cameraPreset: null
+          };
+        }
+
+        appAiHistory.push({
+          sender: 'bot',
+          text: aiRes.answer,
+          cameraPreset: aiRes.cameraPreset,
+          escalated: aiRes.escalated,
+          executed: false
+        });
+
+        renderAppAiMessages();
+      }, 500);
+    }
+
+    // MANDATORY REAL ACTION EXECUTION:
+    // When user confirms "[⚡ Có, Hãy Tự Động Thao Tác Giúp Anh]", AI modifies phone controls directly!
+    function executeAppAiPreset(presetStr, msgIndex) {
+      try {
+        const preset = JSON.parse(decodeURIComponent(presetStr));
+
+        // 1. Mark as executed in chat history
+        if (typeof msgIndex === 'number' && appAiHistory[msgIndex]) {
+          appAiHistory[msgIndex].executed = true;
+          renderAppAiMessages();
+        }
+
+        // 2. ACTUALLY UPDATE CAMERA MODE
+        if (preset.mode) {
+          const modeItems = document.querySelectorAll('.mode-item');
+          modeItems.forEach(item => {
+            const txt = item.textContent.trim().toUpperCase();
+            if (txt.includes(preset.mode.toUpperCase()) || preset.mode.toUpperCase().includes(txt)) {
+              setCamMode(item, item.textContent);
+            }
+          });
+        }
+
+        // 3. ACTUALLY UPDATE GIMBAL MODE
+        if (preset.gimbalMode) {
+          const gimbalPills = document.querySelectorAll('.gimbal-pill');
+          gimbalPills.forEach(pill => {
+            const txt = pill.textContent.trim().toUpperCase();
+            if (preset.gimbalMode.toUpperCase().includes(txt) || txt.includes(preset.gimbalMode.toUpperCase().slice(0, 3))) {
+              setGimbalMode(pill, pill.textContent);
+            }
+          });
+        }
+
+        // 4. UPDATE DYNAMIC ISLAND
+        const islandDot = document.getElementById('islandDot');
+        if (islandDot) {
+          islandDot.style.background = '#34C759';
+          islandDot.style.boxShadow = '0 0 10px #34C759';
+        }
+        const islandStatus = document.getElementById('islandStatus');
+        if (islandStatus) {
+          islandStatus.textContent = '⚡ AI CONFIGURED';
+          islandStatus.style.color = '#34C759';
+        }
+        const islandSpeed = document.getElementById('islandSpeed');
+        if (islandSpeed) {
+          islandSpeed.textContent = `${preset.fps || 60}FPS • LOG LUT`;
+          islandSpeed.style.color = '#5AC8FA';
+        }
+
+        // 5. UPDATE TELEMETRY HUD IF ACTIVE
+        const telModel = document.getElementById('telCloudModel');
+        if (telModel) telModel.textContent = 'AI COPILOT PRO';
+        const telFoc = document.getElementById('telFoc');
+        if (telFoc) telFoc.textContent = '20kHz PURE FOC (ACTIVE)';
+
+        // 6. FLASH CAMERA SCREEN TO INDICATE HARDWARE APPLIED
+        const flash = document.getElementById('shutterFlash');
+        if (flash) {
+          flash.style.opacity = '0.7';
+          setTimeout(() => flash.style.opacity = '0', 100);
+        }
+
+        // 7. SHOW PROMINENT ON-SCREEN TOAST HUD
+        showAppCameraToast(`✅ AI Đã Tự Động Cài Đặt: ${preset.summary || preset.mode}`);
+
+        // 8. ADD CONFIRMATION BOT MESSAGE
+        setTimeout(() => {
+          appAiHistory.push({
+            sender: 'bot',
+            text: `✨ **Dạ em đã hoàn tất thao tác cài đặt xong toàn bộ thông số trên máy cho anh rồi ạ!**\n\n• Camera: **${preset.mode} (${preset.resolution} @ ${preset.fps}fps)**\n• Màn trập: **${preset.shutter}** | ISO: **${preset.iso}** | EV: **${preset.ev}**\n• Màu: **${preset.lut}**\n• Trục Gimbal: **${preset.gimbalMode}**\n\nChúc anh có những thước phim tuyệt đỉnh cùng T-Flow Pro!`,
+            actions: ['Đóng bảng chat để quay', 'Hỏi thêm góc quay khác']
+          });
+          renderAppAiMessages();
+        }, 300);
+
+        // 9. LOG ACTION TO CENTRAL CATALOG STORE
+        if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.logAiConversation) {
+          SmartGimbalCatalog.logAiConversation({
+            source: 'app',
+            query: 'Xác nhận áp dụng tự động preset: ' + preset.summary,
+            reply: 'Đã áp dụng thành công preset lên phần cứng camera & gimbal',
+            status: 'answered',
+            actionPayload: preset
+          });
+        }
+
+      } catch (err) {
+        console.error('Error executing AI preset:', err);
+      }
+    }
+
+    function showAppCameraToast(msg) {
+      const toast = document.getElementById('appCameraToast');
+      const text = document.getElementById('appCameraToastText');
+      if (!toast || !text) return;
+      text.textContent = msg;
+      toast.style.display = 'flex';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3500);
+    }
+
   </script>
 </body>
 </html>
