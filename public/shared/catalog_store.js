@@ -1722,6 +1722,21 @@
   }
 
   // =========================================================================
+  // --- GOOGLE OAUTH 2.0 CLIENT CONFIGURATION ---
+  // =========================================================================
+  var GOOGLE_OAUTH_CLIENT_ID_KEY = 'tflow_google_oauth_client_id';
+
+  function getGoogleOAuthClientId() {
+    if (typeof localStorage === 'undefined') return '';
+    return localStorage.getItem(GOOGLE_OAUTH_CLIENT_ID_KEY) || '';
+  }
+
+  function saveGoogleOAuthClientId(clientId) {
+    if (typeof localStorage === 'undefined') return;
+    localStorage.setItem(GOOGLE_OAUTH_CLIENT_ID_KEY, (clientId || '').trim());
+  }
+
+  // =========================================================================
   // --- T-FLOW UNIFIED CLOUD AI ENGINE (GOOGLE GEMINI 2.5/3.8 FLASH) ---
   // =========================================================================
   var AI_CLOUD_CONFIG_KEY = 'tflow_cloud_ai_config';
@@ -2161,6 +2176,9 @@
     processWebSmartFallback: processWebSmartFallback,
     processAppSmartFallback: processAppSmartFallback,
     processWebAiQuery: processWebAiQuery,
-    processAppAiQuery: processAppAiQuery
+    processAppAiQuery: processAppAiQuery,
+    GOOGLE_OAUTH_CLIENT_ID_KEY: GOOGLE_OAUTH_CLIENT_ID_KEY,
+    getGoogleOAuthClientId: getGoogleOAuthClientId,
+    saveGoogleOAuthClientId: saveGoogleOAuthClientId
   };
 }));
