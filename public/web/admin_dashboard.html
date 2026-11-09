@@ -1125,6 +1125,10 @@
       <div style="flex:1; min-width:0;">
         <div class="user-email-text" id="adminDisplayEmail">thuynguyen2dk4@gmail.com</div>
         <div class="user-role-badge">Master Admin &amp; Founder</div>
+        <div style="font-size:10px; color:#248A3D; font-weight:600; display:flex; align-items:center; gap:5px; margin-top:2px;">
+          <span style="width:6px; height:6px; border-radius:50%; background:#34C759; display:inline-block;"></span>
+          <span id="adminSessionStatusLabel">Phiên Hoạt Động (Live)</span>
+        </div>
       </div>
     </div>
 
@@ -2888,6 +2892,9 @@
         if (gate) gate.style.display = 'none';
         const emailEl = document.getElementById('adminDisplayEmail');
         if (emailEl) emailEl.textContent = user.email;
+        const sess = SmartGimbalCatalog.getActiveSession();
+        const sessEl = document.getElementById('adminSessionStatusLabel');
+        if (sessEl && sess) sessEl.textContent = 'Phiên: ' + sess.sessionId.substring(0, 12) + '... (Live)';
       } else if (user) {
         // Logged in as regular customer Gmail
         if (gate) {

@@ -824,6 +824,126 @@
   }
 
   // ==========================================================================
+  // 5.6 ENTERPRISE SESSION ENGINE (SESSIONSTORAGE + REAL-TIME SESSION TRACKER)
+  // ==========================================================================
+  var ACTIVE_SESSION_KEY = 'tflow_active_session';
+  var ALL_SESSIONS_KEY = 'tflow_user_sessions_history';
+
+  function createSession(user) {
+    if (!user || !user.email) return null;
+    var sessId = 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 7);
+    var sessToken = 'stk_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+    var platform = 'Trình duyệt Web';
+    if (typeof navigator !== 'undefined') {
+      var ua = navigator.userAgent || '';
+      if (/iPhone|iPad|iPod/i.test(ua)) platform = 'Apple iOS (Safari)';
+      else if (/Macintosh|Mac OS X/i.test(ua)) platform = 'macOS (Safari / Chrome)';
+      else if (/Android/i.test(ua)) platform = 'Android Mobile';
+      else if (/Windows/i.test(ua)) platform = 'Windows PC';
+    }
+
+    var now = new Date();
+    var sessionData = {
+      sessionId: sessId,
+      sessionToken: sessToken,
+      userId: user.id || user.email,
+      email: user.email,
+      name: user.name || user.email,
+      role: user.role || 'Thành Viên',
+      isAdmin: isUserAdmin(user),
+      devicePlatform: platform,
+      createdAt: now.toISOString(),
+      createdAtFormatted: now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ', ' + now.toLocaleDateString('vi-VN'),
+      lastActiveAt: now.toISOString(),
+      expiresAt: new Date(now.getTime() + (24 * 60 * 60 * 1000)).toISOString(),
+      status: 'active',
+      isCurrentDevice: true
+    };
+
+    // 1. Save to sessionStorage
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(sessionData));
+    }
+
+    // 2. Set Session Cookie (No expires tag = true session cookie expiring when browser closes)
+    if (typeof document !== 'undefined') {
+      document.cookie = "tflow_session_id=" + encodeURIComponent(sessId) + ";path=/;SameSite=Lax";
+    }
+
+    // 3. Register to persistent sessions list in catalog
+    try {
+      var allSessionsRaw = localStorage.getItem(ALL_SESSIONS_KEY);
+      var allSessions = allSessionsRaw ? JSON.parse(allSessionsRaw) : [];
+      allSessions = allSessions.filter(function(s) { return s.sessionId !== sessId; });
+      allSessions.unshift(sessionData);
+      if (allSessions.length > 5) allSessions = allSessions.slice(0, 5);
+      localStorage.setItem(ALL_SESSIONS_KEY, JSON.stringify(allSessions));
+    } catch(e) {}
+
+    return sessionData;
+  }
+
+  function getActiveSession() {
+    var sess = null;
+    if (typeof sessionStorage !== 'undefined') {
+      try {
+        var raw = sessionStorage.getItem(ACTIVE_SESSION_KEY);
+        if (raw) sess = JSON.parse(raw);
+      } catch(e) {}
+    }
+
+    // If no active session in sessionStorage but user is logged in, spawn one automatically!
+    if (!sess) {
+      var user = getCurrentUser();
+      if (user) {
+        sess = createSession(user);
+      }
+    } else {
+      // Touch lastActiveAt
+      sess.lastActiveAt = new Date().toISOString();
+      if (typeof sessionStorage !== 'undefined') {
+        sessionStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(sess));
+      }
+    }
+
+    return sess;
+  }
+
+  function destroySession() {
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.removeItem(ACTIVE_SESSION_KEY);
+      sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+    }
+    if (typeof document !== 'undefined') {
+      document.cookie = "tflow_session_id=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax";
+    }
+  }
+
+  function getUserSessionsHistory(userId) {
+    if (typeof localStorage === 'undefined') return [];
+    try {
+      var raw = localStorage.getItem(ALL_SESSIONS_KEY);
+      if (!raw) return [];
+      var list = JSON.parse(raw);
+      var current = getActiveSession();
+      return list.map(function(s) {
+        s.isCurrentDevice = current && (current.sessionId === s.sessionId);
+        return s;
+      });
+    } catch(e) {
+      return [];
+    }
+  }
+
+  function terminateOtherSessions() {
+    var current = getActiveSession();
+    if (typeof localStorage !== 'undefined' && current) {
+      localStorage.setItem(ALL_SESSIONS_KEY, JSON.stringify([current]));
+    }
+    return true;
+  }
+
+  // ==========================================================================
   // 6. USER AUTHENTICATION & ACCESS CONTROL (DUAL MODE: STANDARD + GOOGLE)
   // ==========================================================================
   function isUserAdmin(user) {
@@ -854,8 +974,11 @@
         setCookie('tflow_user_session', user, 30);
         if (typeof localStorage !== 'undefined') {
           localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-      setCookie('tflow_user_session', user, 30);
-      setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
+          setCookie('tflow_user_session', user, 30);
+          setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
+          if (typeof sessionStorage !== 'undefined' && !sessionStorage.getItem(ACTIVE_SESSION_KEY)) {
+            createSession(user);
+          }
         }
       } catch(e) {}
     }
@@ -890,6 +1013,7 @@
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(found));
       setCookie('tflow_user_session', found, 30);
       setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
+      createSession(found);
     }
     if (typeof sessionStorage !== 'undefined') {
       if (isAdmin) {
@@ -948,6 +1072,7 @@
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(newUser));
       setCookie('tflow_user_session', newUser, 30);
       setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
+      createSession(newUser);
     }
     if (typeof sessionStorage !== 'undefined') {
       if (isAdmin) {
@@ -1006,6 +1131,7 @@
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
       setCookie('tflow_user_session', user, 30);
       setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
+      createSession(user);
     }
     if (typeof sessionStorage !== 'undefined') {
       if (isAdmin) {
@@ -1024,6 +1150,7 @@
   }
 
   function logoutUser() {
+    destroySession();
     deleteCookie('tflow_user_session');
     deleteCookie('tflow_user');
     deleteCookie('tflow_auth_token');
@@ -2279,6 +2406,12 @@
     getCookie: getCookie,
     deleteCookie: deleteCookie,
     getCookieConsent: getCookieConsent,
-    setCookieConsent: setCookieConsent
+    setCookieConsent: setCookieConsent,
+    ACTIVE_SESSION_KEY: ACTIVE_SESSION_KEY,
+    createSession: createSession,
+    getActiveSession: getActiveSession,
+    destroySession: destroySession,
+    getUserSessionsHistory: getUserSessionsHistory,
+    terminateOtherSessions: terminateOtherSessions
   };
 }));
