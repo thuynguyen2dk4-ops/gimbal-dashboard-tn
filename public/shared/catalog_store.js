@@ -1431,7 +1431,7 @@
       id: 'kb_sales_packages_pricing',
       target: 'sales',
       topic: 'Bảng giá và 4 gói cấu hình T-Flow Pro',
-      keywords: ['giá', 'bao nhiêu', 'tiền', 'gói', 'bản', 'phiên bản', 'combo', 'mua', 'khuyến mãi', 'standard', 'creator', 'cinematic', 'master', 'chi phí', 'báo giá'],
+      keywords: ['sản phẩm', 'sản phẩm nào', 'có những', 'bán gì', 'danh mục', 'giá', 'bao nhiêu', 'tiền', 'gói', 'bản', 'phiên bản', 'combo', 'mua', 'khuyến mãi', 'standard', 'creator', 'cinematic', 'master', 'chi phí', 'báo giá'],
       answer: "T-Flow Pro hiện đang mở bán chính thức với **4 gói cấu hình** chuyên nghiệp:\n\n" +
               "• **Gói Standard (2.490.000đ)**: Thân gimbal T-Flow Pro Pure FOC, tripod mini kim loại, ngàm nam châm MagSafe N52 45N, cáp sạc USB-C và túi nhung cao cấp.\n" +
               "• **Gói Creator Kit (3.190.000đ) - Bán chạy nhất ⭐**: Trọn bộ Standard + Đèn Fill Light MagSafe RGB 360 màu (CRI 96+) + Túi đeo chéo EVA chống sốc cao cấp.\n" +
@@ -2014,6 +2014,81 @@
     return record;
   }
 
+  // --- DIRECT ADMIN COMMENT & TRAINING ON ANY CONVERSATION ---
+  function trainConversationDirectly(convId, params) {
+    params = params || {};
+    var officialAnswer = (params.answer || '').trim();
+    var topic = (params.topic || '').trim();
+    var target = params.target || 'sales';
+    var keywords = params.keywords;
+    var adminComment = (params.adminComment || params.answer || '').trim();
+
+    var convs = getAiConversations();
+    var conv = convs.find(function(c) { return c.id === convId; });
+    if (!conv && params.query) {
+      conv = convs.find(function(c) { return c.query === params.query; });
+    }
+
+    var queryText = conv ? conv.query : (params.query || 'Câu hỏi khách hàng');
+
+    // 1. Extract or parse keywords
+    var kwList = [];
+    if (keywords && typeof keywords === 'string') {
+      kwList = keywords.split(',').map(function(s) { return s.trim().toLowerCase(); }).filter(Boolean);
+    } else if (Array.isArray(keywords)) {
+      kwList = keywords;
+    }
+    if (kwList.length === 0 && queryText) {
+      var cleanQ = queryText.toLowerCase().replace(/[^a-zA-Z0-9À-ỹ ]/g, ' ');
+      kwList = cleanQ.split(/\s+/).filter(function(w) { return w.length > 2; });
+    }
+
+    // 2. Add or update into AI Knowledge Base (SO THE AI IS TRAINED IMMEDIATELY)
+    var kbEntry = addOrUpdateAiKnowledge({
+      id: 'kb_admin_' + Date.now(),
+      target: target,
+      topic: topic || ('Giải đáp: ' + queryText.substring(0, 45)),
+      keywords: kwList,
+      answer: officialAnswer,
+      isOfficial: true,
+      trainedByAdmin: 'thuynguyen2dk4@gmail.com',
+      sourceConvId: convId
+    });
+
+    // 3. Update the conversation in aiConversations
+    if (conv) {
+      conv.status = 'trained';
+      conv.reply = officialAnswer;
+      conv.adminComment = adminComment;
+      conv.adminTrainedBy = 'Master Admin Thủy Nguyễn';
+      conv.trainedAt = new Date().toISOString();
+      try {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem(AI_CONVERSATIONS_KEY, JSON.stringify(convs));
+        }
+      } catch (e) {}
+    }
+
+    // 4. Also mark any matching pending questions as approved
+    var pending = getPendingAiQuestions();
+    var pMatch = pending.find(function(p) { return p.query === queryText && p.status === 'pending'; });
+    if (pMatch) {
+      pMatch.status = 'approved';
+      pMatch.officialAnswer = officialAnswer;
+      pMatch.trainedAt = new Date().toISOString();
+      savePendingAiQuestions(pending);
+    }
+
+    // Trigger AI_EVENT to update all listening tabs in real time
+    if (typeof window !== 'undefined' && window.dispatchEvent) {
+      window.dispatchEvent(new CustomEvent(AI_EVENT, {
+        detail: { action: 'conversation_trained', convId: convId, kbEntry: kbEntry }
+      }));
+    }
+
+    return { success: true, conv: conv, kbEntry: kbEntry };
+  }
+
   function approveAndTrainAiQuestion(questionId, officialAnswer, keywords, topic, target) {
     var pending = getPendingAiQuestions();
     var item = pending.find(function(p) { return p.id === questionId; });
@@ -2540,6 +2615,7 @@
     getAiKnowledgeBase: getAiKnowledgeBase,
     saveAiKnowledgeBase: saveAiKnowledgeBase,
     addOrUpdateAiKnowledge: addOrUpdateAiKnowledge,
+    trainConversationDirectly: trainConversationDirectly,
     deleteAiKnowledge: deleteAiKnowledge,
     getAiConversations: getAiConversations,
     logAiConversation: logAiConversation,

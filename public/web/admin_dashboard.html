@@ -1298,12 +1298,12 @@
         <table class="data-table">
           <thead>
             <tr>
-              <th style="width:13%;">Thời Gian</th>
-              <th style="width:11%;">Nguồn</th>
-              <th style="width:16%;">Người Hỏi</th>
-              <th style="width:25%;">Câu Hỏi Người Dùng</th>
-              <th style="width:23%;">Câu Trả Lời Của AI</th>
-              <th style="width:12%; text-align:right;">Trạng Thái</th>
+              <th style="width:11%;">Thời Gian</th>
+              <th style="width:11%;">Chuyên Mục</th>
+              <th style="width:13%;">Người Hỏi</th>
+              <th style="width:23%;">Câu Hỏi Khách Hàng</th>
+              <th style="width:25%;">Câu Trả Lời Của AI</th>
+              <th style="width:17%; text-align:right;">Trạng Thái &amp; Huấn Luyện</th>
             </tr>
           </thead>
           <tbody id="aiLogsTableBody">
@@ -2038,6 +2038,94 @@
       <div class="modal-footer">
         <button class="btn btn-outline" onclick="closeKnowledgeModal()">Hủy</button>
         <button class="btn btn-dark" onclick="saveKnowledgeSubmit()">Lưu &amp; Huấn Luyện Ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADMIN COMMENT & TRAIN AI DIRECTLY ON CUSTOMER QUESTION -->
+  <div class="modal-overlay" id="adminCommentModal">
+    <div class="modal-card" style="width:720px; max-width:94vw; max-height:90vh; overflow-y:auto; border-radius:18px;">
+      <div class="modal-header" style="background:#F5F5F7; border-bottom:1px solid var(--border); padding:16px 20px;">
+        <div>
+          <div style="font-size:16px; font-weight:800; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:#0071E3; color:#FFF; font-size:14px;">💬</span>
+            Admin Huấn Luyện AI Cho Câu Hỏi Của Khách
+          </div>
+          <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
+            Nhập câu trả lời chuẩn xác. Ngay sau khi lưu, AI trên toàn hệ thống (Web &amp; App) sẽ học và trả lời chuẩn xác câu hỏi này cho các khách hàng tiếp theo!
+          </div>
+        </div>
+        <button class="btn btn-outline" style="padding:4px 10px; border-radius:8px;" onclick="closeAdminCommentModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding:20px;">
+        <input type="hidden" id="adminCommentConvId">
+        
+        <!-- CUSTOMER QUESTION CARD -->
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">❓ Câu Hỏi Của Khách Hàng:</span>
+            <span id="adminCommentCustomerMeta" style="font-size:11.5px; color:var(--text-secondary); font-weight:600;"></span>
+          </div>
+          <div id="adminCommentCustomerQuery" style="font-size:14.5px; font-weight:800; color:#1D1D1F; line-height:1.45;"></div>
+        </div>
+
+        <!-- PREVIOUS AI ANSWER (FOR COMPARISON) -->
+        <div style="background:rgba(0,113,227,0.04); border:1px dashed rgba(0,113,227,0.25); border-radius:12px; padding:12px 14px; margin-bottom:18px;">
+          <div style="font-size:11px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:4px;">
+            🤖 Câu Trả Lời Tự Động Trước Đó Của AI (Cần Admin Đính Chính / Huấn Luyện):
+          </div>
+          <div id="adminCommentPreviousReply" style="font-size:12.5px; color:var(--text-secondary); line-height:1.45; max-height:85px; overflow-y:auto;"></div>
+        </div>
+
+        <!-- TRAINING FORM -->
+        <div class="form-row-2">
+          <div class="form-group">
+            <label style="font-weight:700; font-size:12.5px;">Chuyên Mục Áp Dụng Cho AI</label>
+            <select class="form-control" id="adminCommentTarget">
+              <option value="sales">🛍️ 1. Tư Vấn Bán Hàng &amp; Chính Sách (Giá, 4 Gói Pro, Bảo Hành)</option>
+              <option value="creative">🎬 2. Tư Vấn Kỹ Thuật Quay Chụp &amp; Edit (Góc máy, FOC, 3D LUT, Dựng phim)</option>
+              <option value="smart_vision">🧠 3. Tính Năng Nhận Diện AI Thông Minh (Bám nét người/thú cưng/vật thể, Auto Ultra-Wide)</option>
+              <option value="all_domains">🌐 4. Áp Dụng Cho Cả 3 Chuyên Mục (Toàn Hệ Thống)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="font-weight:700; font-size:12.5px;">Chủ Đề Tri Thức</label>
+            <input type="text" class="form-control" id="adminCommentTopic" placeholder="Ví dụ: Danh mục sản phẩm hiện có, Bảng giá 4 gói...">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label style="font-weight:700; font-size:12.5px;">Từ Khóa Nhận Diện AI (Phân tách bởi dấu phẩy)</label>
+          <input type="text" class="form-control" id="adminCommentKeywords" placeholder="sản phẩm, có những, bán gì, danh mục, combo, phiên bản...">
+        </div>
+
+        <!-- QUICK INSERT TEMPLATES -->
+        <div style="margin-bottom:12px;">
+          <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); margin-bottom:6px;">⚡ Gợi Ý Mẫu Nhanh (Click để tự điền nội dung chuẩn của xưởng R&amp;D):</div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn btn-outline" style="padding:4px 10px; font-size:11px; border-radius:6px;" onclick="insertAdminCommentTemplate('packages')">📦 Mẫu 4 Gói Sản Phẩm T-Flow Pro</button>
+            <button type="button" class="btn btn-outline" style="padding:4px 10px; font-size:11px; border-radius:6px;" onclick="insertAdminCommentTemplate('warranty')">🛡️ Mẫu Bảo Hành 1 Đổi 1 &amp; Ship</button>
+            <button type="button" class="btn btn-outline" style="padding:4px 10px; font-size:11px; border-radius:6px;" onclick="insertAdminCommentTemplate('vision')">🧠 Mẫu Cụm Camera AI &amp; Bám Nét</button>
+            <button type="button" class="btn btn-outline" style="padding:4px 10px; font-size:11px; border-radius:6px;" onclick="insertAdminCommentTemplate('foc')">⚡ Mẫu Động Cơ FOC 20kHz &amp; MagSafe</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label style="font-weight:700; font-size:12.5px; display:flex; justify-content:space-between;">
+            <span>Nội Dung Giải Đáp Chuẩn Xác Của Admin (Huấn Luyện AI)</span>
+            <span style="font-weight:400; color:#8E8E93; font-size:11.5px;">Hỗ trợ Markdown (**in đậm**, bullet points)</span>
+          </label>
+          <textarea class="form-control" id="adminCommentOfficialAnswer" rows="6" placeholder="Nhập câu trả lời chính thức của Admin Thủy Nguyễn. AI sẽ học nội dung này và trả lời chính xác cho mọi khách hàng hỏi câu hỏi tương tự..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding:14px 20px; background:#F5F5F7; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:11.5px; color:#8E8E93;">✓ Tự động đồng bộ Realtime sang Website và Mobile App</span>
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-outline" onclick="closeAdminCommentModal()">Hủy Bỏ</button>
+          <button class="btn btn-dark" onclick="submitAdminCommentTraining()" style="background:#0071E3; border-color:#0071E3; font-weight:700; padding:8px 18px;">
+            💾 Lưu &amp; Huấn Luyện AI Ngay
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -3299,8 +3387,17 @@
         let statusBadge = '<span class="badge-status-answered">✓ Đã Trả Lời</span>';
         if (c.status === 'pending_approval') {
           statusBadge = '<span class="badge-status-pending">⚠️ Chờ Duyệt</span>';
-        } else if (c.status === 'trained') {
+        } else if (c.status === 'trained' || c.adminComment) {
           statusBadge = '<span class="badge-status-trained">⚡ Đã Huấn Luyện</span>';
+        }
+
+        let adminCommentSnippet = '';
+        if (c.adminComment) {
+          adminCommentSnippet = `
+            <div style="margin-top:5px; padding:4px 8px; background:rgba(52,199,89,0.1); border-left:3px solid #34C759; border-radius:4px; font-size:11px; color:#248A3D; font-weight:600; line-height:1.35;">
+              ⚡ <strong>Admin đã sửa:</strong> ${(c.adminComment || '').replace(/\n/g, ' ').substring(0, 75)}...
+            </div>
+          `;
         }
 
         html += `
@@ -3315,11 +3412,17 @@
               <div style="font-weight:600; font-size:13px; color:var(--text-main); line-height:1.4;">${c.query || ''}</div>
             </td>
             <td>
-              <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.4; max-height:80px; overflow:hidden; text-overflow:ellipsis;">
+              <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.4; max-height:75px; overflow:hidden; text-overflow:ellipsis;">
                 ${(c.reply || '').replace(/\n/g, ' ')}
               </div>
+              ${adminCommentSnippet}
             </td>
-            <td style="text-align:right;">${statusBadge}</td>
+            <td style="text-align:right;">
+              <div>${statusBadge}</div>
+              <button class="btn btn-dark" onclick="openAdminCommentModal('${c.id}')" style="margin-top:6px; padding:4px 10px; font-size:11.5px; font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; background:#0071E3; border-color:#0071E3; color:#FFF; cursor:pointer; box-shadow:0 2px 6px rgba(0,113,227,0.25);">
+                <span>💬</span> ${c.status === 'trained' || c.adminComment ? 'Sửa Lời Huấn Luyện' : 'Comment &amp; Train AI'}
+              </button>
+            </td>
           </tr>
         `;
       });
@@ -3497,6 +3600,128 @@
       });
 
       tbody.innerHTML = html;
+    }
+
+    // --- ADMIN COMMENT & AI TRAINING CONTROLLERS ---
+    const ADMIN_TRAINING_TEMPLATES = {
+      packages: "T-Flow Pro hiện đang mở bán chính thức với **4 gói cấu hình** chuyên nghiệp:\n\n" +
+                "• **Gói Standard (2.490.000đ)**: Thân gimbal T-Flow Pro Pure FOC, tripod mini kim loại, ngàm nam châm MagSafe N52 45N, cáp sạc USB-C và túi nhung cao cấp.\n" +
+                "• **Gói Creator Kit (3.190.000đ) - Bán chạy nhất ⭐**: Trọn bộ Standard + Đèn Fill Light MagSafe RGB 360 màu (CRI 96+) + Túi đeo chéo EVA chống sốc cao cấp.\n" +
+                "• **Gói Cinematic Pro (3.990.000đ)**: Trọn bộ Creator + Micro không dây kép 2.4GHz chống ồn AI + Bộ tạ đối trọng Pro cho iPhone Pro Max.\n" +
+                "• **Gói Master Edition (5.490.000đ)**: Toàn bộ hệ sinh thái phụ kiện cao cấp + Vali nhôm hàng không nguyên khối + Khóa học MasterClass quay dựng trọn đời.\n\n" +
+                "Anh/chị có muốn em hỗ trợ thêm gói nào vào giỏ hàng ngay bây giờ không ạ?",
+      warranty: "Chính sách hậu mãi của T-Flow Pro dẫn đầu thị trường:\n\n" +
+                "• **Bảo hành 1 đổi 1 trong 12 tháng** chính hãng nếu có lỗi từ nhà sản xuất.\n" +
+                "• **Dùng thử 30 ngày hoàn tiền 100%** nếu trải nghiệm không ưng ý, không cần giải thích lý do.\n" +
+                "• **Miễn phí vận chuyển toàn quốc (Freeship)**: Giao hỏa tốc 2 giờ nội thành Hà Nội & TP.HCM, 24-48 giờ toàn quốc, được kiểm tra hàng trước khi thanh toán.",
+      vision: "🧠 **Hệ Thống Trí Tuệ Nhân Tạo Thị Giác AI Vision của T-Flow Pro:**\n\n" +
+              "• **Bám nét người & mặt quang học 120fps**: Cảm biến độc lập quét 120 khung hình/giây, nhận diện khung xương Skeletal Mesh ngay cả khi quay lưng lại.\n" +
+              "• **Bám nét thú cưng (Pet Tracking)**: Bắt dính chuyển động nhanh và bất ngờ của chó, mèo.\n" +
+              "• **Khóa nét vật thể Bounding Box**: Chạm hoặc kéo ô vuông trên màn hình để khóa bất kỳ vật thể nào.\n" +
+              "• **Tự động chuyển camera góc rộng 0.5x Ultra-Wide**: Tự động kích hoạt khi nhận diện nhóm đông người ngoài rìa khung hình.\n" +
+              "• **Cử chỉ tay không chạm (Hand Gesture)**: ✋ Bắt đầu bám nét, ✌️ Chụp/quay, 🤙 Xoay ngang dọc.",
+      foc: "T-Flow Pro ứng dụng **công nghệ điều khiển vector Pure FOC 20kHz** tiên tiến nhất ngành:\n\n" +
+           "• **Tần số siêu âm 20kHz**: Triệt tiêu hoàn toàn tiếng rít motor, tĩnh âm 0dB giúp micro thu âm không bị lọt tạp âm.\n" +
+           "• **Tốc độ phản hồi < 1ms**: Vi xử lý ARM Cortex-M4 kép triệt tiêu 99.8% rung lắc.\n" +
+           "• **Ngàm nam châm MagSafe 45N**: Lực hút 32 lõi nam châm N52 chịu tải 2.8kg - 4.5kg, kèm chốt khóa cơ học kép Snap-Lock chống rơi tuyệt đối."
+    };
+
+    function openAdminCommentModal(convId) {
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+      const convs = SmartGimbalCatalog.getAiConversations();
+      const c = convs.find(item => item.id === convId);
+      if (!c) {
+        alert('Không tìm thấy dữ liệu hội thoại này.');
+        return;
+      }
+
+      document.getElementById('adminCommentConvId').value = c.id;
+      document.getElementById('adminCommentCustomerQuery').textContent = '"' + (c.query || '') + '"';
+      document.getElementById('adminCommentCustomerMeta').textContent = (c.userName || 'Khách hàng') + ' • ' + (c.userEmail || '') + ' • ' + (c.timestamp ? new Date(c.timestamp).toLocaleString('vi-VN') : '');
+      document.getElementById('adminCommentPreviousReply').textContent = c.reply || 'Chưa có câu trả lời.';
+
+      // Determine default target
+      let target = 'sales';
+      if (c.source === 'creative' || c.source === 'app') target = 'creative';
+      else if (c.source === 'smart_vision') target = 'smart_vision';
+      else target = 'sales';
+      document.getElementById('adminCommentTarget').value = target;
+
+      // Auto topic
+      document.getElementById('adminCommentTopic').value = 'Giải đáp: ' + (c.query || '').substring(0, 45);
+
+      // Auto keywords
+      const cleanQ = (c.query || '').toLowerCase().replace(/[^a-zA-Z0-9À-ỹ ]/g, ' ');
+      const words = cleanQ.split(/\s+/).filter(w => w.length > 2);
+      document.getElementById('adminCommentKeywords').value = words.join(', ');
+
+      // Pre-fill answer: if already trained, show adminComment; otherwise show current reply for admin to edit
+      document.getElementById('adminCommentOfficialAnswer').value = c.adminComment || c.reply || '';
+
+      document.getElementById('adminCommentModal').classList.add('open');
+    }
+
+    function closeAdminCommentModal() {
+      const modal = document.getElementById('adminCommentModal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    function insertAdminCommentTemplate(tplKey) {
+      const tpl = ADMIN_TRAINING_TEMPLATES[tplKey];
+      if (!tpl) return;
+      const area = document.getElementById('adminCommentOfficialAnswer');
+      if (area) {
+        area.value = tpl;
+        area.focus();
+      }
+      if (tplKey === 'packages') {
+        document.getElementById('adminCommentTarget').value = 'sales';
+        document.getElementById('adminCommentTopic').value = 'Bảng giá và các gói sản phẩm T-Flow Pro';
+        document.getElementById('adminCommentKeywords').value = 'sản phẩm, hiện có, bán gì, có những, gói, combo, giá, bao nhiêu';
+      } else if (tplKey === 'warranty') {
+        document.getElementById('adminCommentTarget').value = 'sales';
+        document.getElementById('adminCommentTopic').value = 'Chính sách bảo hành 1 đổi 1 và dùng thử';
+        document.getElementById('adminCommentKeywords').value = 'bảo hành, đổi trả, dùng thử, ship, vận chuyển, hỏa tốc';
+      } else if (tplKey === 'vision') {
+        document.getElementById('adminCommentTarget').value = 'smart_vision';
+        document.getElementById('adminCommentTopic').value = 'Tính năng nhận diện AI thông minh 120fps';
+        document.getElementById('adminCommentKeywords').value = 'nhận diện, bám nét, thú cưng, góc rộng, tracking, cử chỉ';
+      } else if (tplKey === 'foc') {
+        document.getElementById('adminCommentTarget').value = 'creative';
+        document.getElementById('adminCommentTopic').value = 'Động cơ Pure FOC 20kHz và ngàm MagSafe 45N';
+        document.getElementById('adminCommentKeywords').value = 'động cơ, foc, 20khz, magsafe, nam châm, chống rung';
+      }
+    }
+
+    function submitAdminCommentTraining() {
+      const convId = document.getElementById('adminCommentConvId').value;
+      const topic = document.getElementById('adminCommentTopic').value.trim();
+      const target = document.getElementById('adminCommentTarget').value;
+      const keywords = document.getElementById('adminCommentKeywords').value.trim();
+      const answer = document.getElementById('adminCommentOfficialAnswer').value.trim();
+
+      if (!topic || !answer) {
+        alert('Vui lòng nhập đầy đủ Chủ đề và Nội dung câu trả lời chuẩn xác!');
+        return;
+      }
+
+      if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.trainConversationDirectly) {
+        SmartGimbalCatalog.trainConversationDirectly(convId, {
+          topic: topic,
+          target: target,
+          keywords: keywords,
+          answer: answer,
+          adminComment: answer
+        });
+
+        alert('🎉 ĐÃ HUẤN LUYỆN AI THÀNH CÔNG!\n\nCâu trả lời chuẩn của Admin đã được lưu vào Bộ Não AI. Từ bây giờ AI sẽ tự động trả lời câu hỏi này theo đúng chỉ dẫn của Admin Thủy Nguyễn.');
+        closeAdminCommentModal();
+        updateAiStats();
+        renderAiLogsTable(currentAiFilter, aiSearchTerm);
+        renderAiKbTable();
+      } else {
+        alert('Lỗi: Chưa tải được thư viện SmartGimbalCatalog.');
+      }
     }
 
     function openAddKnowledgeModal() {

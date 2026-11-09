@@ -540,7 +540,7 @@ function generateSmartFallbackResponse(query, mode, context) {
   }
 
   // 4. GIÁ CẢ & 4 GÓI SẢN PHẨM
-  if (q.includes('giá') || q.includes('bao nhiêu') || q.includes('gói') || q.includes('bảng giá') || q.includes('mua') || q.includes('creator') || q.includes('cinematic') || q.includes('standard') || q.includes('master')) {
+  if (q.includes('sản phẩm') || q.includes('bán gì') || q.includes('danh mục') || q.includes('có những') || q.includes('giá') || q.includes('bao nhiêu') || q.includes('tiền') || q.includes('gói') || q.includes('bảng giá') || q.includes('mua') || q.includes('combo') || q.includes('phiên bản') || q.includes('creator') || q.includes('cinematic') || q.includes('standard') || q.includes('master')) {
     return {
       answer: "Dạ T-Flow Pro hiện có 4 gói chính hãng phù hợp mọi nhu cầu sáng tạo nội dung:\n\n" +
               "1. **Standard Edition**: 2.490.000₫ (Gimbal 3 trục FOC + Chân mini tripod + Cáp sạc USB-C + Túi nhung)\n" +
