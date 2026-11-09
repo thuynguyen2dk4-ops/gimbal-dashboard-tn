@@ -2188,6 +2188,324 @@
       transform: scale(1.06);
     }
 
+  
+    /* ==========================================================================
+       COMPREHENSIVE MOBILE RESPONSIVE ENGINE (APPLE HIG iOS 18 STANDARD)
+       ========================================================================== */
+    @media (max-width: 992px) {
+      .bento-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 18px !important;
+      }
+      .bento-card-wide {
+        grid-column: span 2 !important;
+      }
+      .eco-grid {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+      }
+      .products-grid-3col {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 20px !important;
+      }
+      .detail-top-grid {
+        grid-template-columns: 1fr !important;
+        gap: 32px !important;
+      }
+      .overview-row {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+      }
+      .overview-row:nth-child(even) .overview-text {
+        order: 1 !important;
+      }
+      .overview-row:nth-child(even) .overview-media {
+        order: 2 !important;
+      }
+      .testimonials-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 20px !important;
+      }
+      .footer-grid-4col {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 36px !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      /* 1. Frosted Sticky Navbar on Mobile */
+      nav {
+        height: auto !important;
+        flex-wrap: wrap !important;
+        padding: 10px 14px 6px 14px !important;
+        gap: 8px !important;
+      }
+      .nav-brand {
+        font-size: 15px !important;
+      }
+      .nav-brand div:nth-child(2) div:last-child {
+        display: none !important; /* Hide tiny tagline on mobile to keep header clean */
+      }
+      .nav-actions {
+        gap: 6px !important;
+      }
+      .btn-nav-primary {
+        display: none !important; /* Save space in mobile navbar; Mua Ngay is in hero */
+      }
+      .btn-nav-cart {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+        gap: 4px !important;
+      }
+      .btn-nav-cart span:first-child {
+        display: none !important; /* Hide text, just show cart icon and badge */
+      }
+      .btn-nav-cart::before {
+        content: '🛒';
+        font-size: 13px;
+      }
+      .nav-links {
+        order: 3 !important;
+        width: 100% !important;
+        display: flex !important;
+        justify-content: flex-start !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        gap: 6px !important;
+        padding: 6px 0 2px 0 !important;
+        border-top: 1px solid rgba(0,0,0,0.06) !important;
+        margin-top: 2px !important;
+      }
+      .nav-links::-webkit-scrollbar {
+        display: none !important;
+      }
+      .nav-links li {
+        flex-shrink: 0 !important;
+      }
+      .nav-links li button {
+        padding: 6px 14px !important;
+        font-size: 12.5px !important;
+        white-space: nowrap !important;
+      }
+
+      /* 2. Flagship Hero Section */
+      .hero-flagship-showcase {
+        padding: 20px 0 36px 0 !important;
+      }
+      .flagship-grid {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+      }
+      .flagship-media-box {
+        padding: 24px 16px !important;
+        border-radius: 16px !important;
+        min-height: 240px !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+      }
+      .flagship-media-box img {
+        height: 220px !important;
+        max-height: 240px !important;
+        width: auto !important;
+      }
+      .flagship-badge {
+        top: 12px !important;
+        left: 12px !important;
+        font-size: 10px !important;
+        padding: 4px 10px !important;
+        white-space: nowrap !important;
+        letter-spacing: 0.02em !important;
+      }
+      .flagship-info {
+        width: 100% !important;
+      }
+      .flagship-info h1 {
+        font-size: 28px !important;
+        line-height: 1.2 !important;
+        margin-bottom: 8px !important;
+        word-break: break-word !important;
+      }
+      .flagship-tagline {
+        font-size: 15.5px !important;
+        line-height: 1.4 !important;
+        margin-bottom: 12px !important;
+      }
+      .flagship-desc {
+        font-size: 13.5px !important;
+        line-height: 1.55 !important;
+        margin-bottom: 18px !important;
+      }
+      .hero-tier-selector {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        width: 100% !important;
+      }
+      .hero-tier-btn {
+        width: 100% !important;
+        padding: 12px 14px !important;
+        font-size: 13px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        border-radius: 12px !important;
+        min-height: 44px !important;
+      }
+      .hero-price-box {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        margin: 16px 0 20px 0 !important;
+        align-items: baseline !important;
+      }
+      .hero-price-val {
+        font-size: 26px !important;
+      }
+      .hero-price-old {
+        font-size: 14px !important;
+      }
+      .hero-price-save {
+        font-size: 11.5px !important;
+        padding: 2px 8px !important;
+      }
+      .hero-action-buttons {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+        width: 100% !important;
+      }
+      .hero-action-buttons button {
+        width: 100% !important;
+        padding: 14px 20px !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        border-radius: 12px !important;
+        min-height: 48px !important;
+      }
+
+      /* 3. Typography & Containers */
+      .title-clean {
+        font-size: 26px !important;
+        line-height: 1.25 !important;
+      }
+      .sub-clean {
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+      }
+      .section-header-clean {
+        margin-bottom: 24px !important;
+        padding: 0 4px !important;
+      }
+      .container, .container-wide {
+        padding: 0 16px !important;
+      }
+
+      /* 4. Bento & Feature Grids */
+      .bento-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+      }
+      .bento-card-wide {
+        grid-column: span 1 !important;
+      }
+      .bento-card {
+        padding: 24px 20px !important;
+      }
+      .trust-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+      .trust-card {
+        padding: 18px 16px !important;
+      }
+      .products-grid-3col {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+      }
+      .gallery-thumbs-row {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 8px !important;
+      }
+      .box-contents-grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+      }
+      .testimonials-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+      }
+      .footer-grid-4col {
+        grid-template-columns: 1fr !important;
+        gap: 28px !important;
+        margin-bottom: 32px !important;
+      }
+
+      /* 5. Reviews Scorecard & Form */
+      .review-form-card {
+        padding: 20px 16px !important;
+        border-radius: 16px !important;
+      }
+      .reviews-scorecard-box {
+        grid-template-columns: 1fr !important;
+        padding: 20px 16px !important;
+        gap: 20px !important;
+      }
+      .scorecard-big-num {
+        font-size: 40px !important;
+      }
+      .review-filter-bar {
+        flex-direction: column !important;
+        gap: 12px !important;
+        align-items: flex-start !important;
+      }
+      .review-filter-pills {
+        overflow-x: auto !important;
+        width: 100% !important;
+        display: flex !important;
+        scrollbar-width: none !important;
+        padding-bottom: 4px !important;
+      }
+
+      /* 6. Floating Chat Drawer Window on Mobile */
+      .tflow-ai-fab {
+        bottom: 16px !important;
+        right: 14px !important;
+        padding: 8px 14px 8px 10px !important;
+        border-radius: 99px !important;
+        gap: 8px !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+      }
+      .tflow-ai-fab-title {
+        font-size: 12.5px !important;
+      }
+      .tflow-ai-fab-sub {
+        font-size: 10px !important;
+      }
+      .tflow-ai-drawer {
+        bottom: 0 !important;
+        right: 0 !important;
+        left: 0 !important;
+        top: auto !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: 88vh !important;
+        max-height: 88vh !important;
+        border-radius: 20px 20px 0 0 !important;
+        border: none !important;
+        box-shadow: 0 -8px 32px rgba(0,0,0,0.2) !important;
+      }
+      .cart-drawer {
+        width: 100vw !important;
+        max-width: 100vw !important;
+      }
+      .modal-card {
+        padding: 24px 18px !important;
+        border-radius: 18px !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+      }
+    }
+
   </style>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -3459,7 +3777,9 @@
         currentMvp.tiers.forEach((t, idx) => {
           const btn = document.createElement('button');
           btn.className = `hero-tier-btn ${t.key === currentMvpTierKey ? 'active' : ''}`;
-          btn.textContent = `${t.label} — ${t.priceFormatted}`;
+          const tName = t.name || t.label || t.key;
+          const tPrice = t.priceFormatted || (t.price ? t.price.toLocaleString('vi-VN') + '₫' : '');
+          btn.textContent = `${tName} — ${tPrice}`;
           btn.onclick = () => selectHeroTier(t.key);
           tierContainer.appendChild(btn);
         });
@@ -3490,8 +3810,10 @@
 
     function selectHeroTier(tierKey) {
       currentMvpTierKey = tierKey;
+      const targetTier = currentMvp.tiers ? currentMvp.tiers.find(t => t.key === tierKey) : null;
+      const targetLabel = targetTier ? (targetTier.name || targetTier.label || targetTier.key) : '';
       document.querySelectorAll('.hero-tier-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.textContent.includes(currentMvp.tiers.find(t=>t.key===tierKey).label));
+        btn.classList.toggle('active', targetLabel ? btn.textContent.includes(targetLabel) : false);
       });
       updateHeroPrice();
     }

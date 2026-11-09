@@ -556,6 +556,54 @@
       font-size: 12px;
       color: #6B7280;
     }
+  
+    /* ==========================================================================
+       MOBILE RESPONSIVE ENGINE FOR PROFILE EDIT
+       ========================================================================== */
+    @media (max-width: 640px) {
+      header {
+        height: auto !important;
+        padding: 12px 16px !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+      }
+      .nav-actions {
+        gap: 6px !important;
+        flex-wrap: wrap !important;
+      }
+      .container {
+        padding: 0 16px !important;
+      }
+      .page-header-box {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 16px !important;
+      }
+      .page-header-box div:last-child {
+        width: 100% !important;
+        display: flex !important;
+        gap: 8px !important;
+      }
+      .page-header-box div:last-child .btn {
+        flex: 1 !important;
+        justify-content: center !important;
+      }
+      .avatar-edit-box {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 16px !important;
+      }
+      .avatar-info-col {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+      }
+      .avatar-edit-box div:last-child {
+        align-items: center !important;
+      }
+    }
+
   </style>
 </head>
 <body>
