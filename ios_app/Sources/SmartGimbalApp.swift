@@ -1009,8 +1009,10 @@ final class CameraViewController: UIViewController, AVCaptureVideoDataOutputSamp
 
     private func setupCamera() {
         captureSession.beginConfiguration()
-        if captureSession.canSetSessionPreset(.hd3840x2160) {
-            captureSession.sessionPreset = .hd3840x2160
+        if captureSession.canSetSessionPreset(.hd4K3840x2160) {
+            captureSession.sessionPreset = .hd4K3840x2160
+        } else if captureSession.canSetSessionPreset(.hd1920x1080) {
+            captureSession.sessionPreset = .hd1920x1080
         } else {
             captureSession.sessionPreset = .high
         }
