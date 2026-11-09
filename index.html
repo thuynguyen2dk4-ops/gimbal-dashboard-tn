@@ -2646,73 +2646,124 @@
         display: none !important;
       }
 
-      /* Mobile Sleek Apple-Style Bottom Sheet Drawer (Never Covers Entire Screen) */
+      /* Dedicated Full-Screen Mobile Chat Experience (Spacious, Crystal Clear, Easy to Follow) */
       .ai-drawer-drag-handle {
-        display: block !important;
+        display: none !important;
       }
       .tflow-ai-drawer {
         position: fixed !important;
-        bottom: 0 !important;
+        top: 0 !important;
         left: 0 !important;
         right: 0 !important;
+        bottom: 0 !important;
         width: 100vw !important;
         max-width: 100vw !important;
-        height: 56dvh !important;
-        max-height: 75dvh !important;
-        border-radius: 24px 24px 0 0 !important;
+        height: 100% !important;
+        height: 100dvh !important;
+        max-height: 100dvh !important;
+        border-radius: 0 !important;
         border: none !important;
-        box-shadow: 0 -12px 48px rgba(0,0,0,0.35) !important;
-        z-index: 10000 !important;
-        animation: slideUpBottomSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        box-shadow: none !important;
+        z-index: 100000 !important;
+        background: #F8F9FA !important;
+        display: none;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        animation: mobileChatSlideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) !important;
       }
-      @keyframes slideUpBottomSheet {
-        from { transform: translateY(100%); }
-        to { transform: translateY(0); }
+      @keyframes mobileChatSlideIn {
+        from { transform: translateY(100%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
       }
       .ai-drawer-header {
-        padding: 8px 16px 12px 16px !important;
+        padding: 12px 16px max(12px, env(safe-area-inset-top)) 16px !important;
+        background: #1D1D1F !important;
+        border-bottom: 1px solid rgba(255,255,255,0.12) !important;
+        flex-shrink: 0 !important;
       }
       .ai-header-avatar {
-        width: 30px !important;
-        height: 30px !important;
-        border-radius: 8px !important;
-      }
-      .btn-ai-close {
         width: 32px !important;
         height: 32px !important;
-        font-size: 18px !important;
-        background: rgba(255,255,255,0.2) !important;
+        border-radius: 9px !important;
+      }
+      .btn-ai-close {
+        width: auto !important;
+        height: 32px !important;
+        padding: 0 12px !important;
+        border-radius: 99px !important;
+        background: rgba(255,255,255,0.18) !important;
+        color: #FFF !important;
+        font-size: 12.5px !important;
+        font-weight: 700 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 3px !important;
+        border: 1px solid rgba(255,255,255,0.2) !important;
+      }
+      .btn-ai-close:active {
+        background: rgba(255,255,255,0.3) !important;
       }
       .ai-domain-switcher-bar {
-        padding: 4px 8px !important;
-        gap: 4px !important;
+        padding: 6px 12px !important;
+        background: #2C2C2E !important;
+        gap: 6px !important;
+        flex-shrink: 0 !important;
       }
       .ai-domain-btn {
-        padding: 6px 4px !important;
-        font-size: 11px !important;
+        padding: 7px 6px !important;
+        font-size: 11.5px !important;
+        border-radius: 8px !important;
       }
       .ai-quick-prompts-bar {
-        padding: 6px 12px !important;
+        padding: 8px 12px !important;
         gap: 6px !important;
+        background: #FFFFFF !important;
+        border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+        flex-shrink: 0 !important;
       }
       .ai-prompt-pill {
-        padding: 4px 10px !important;
-        font-size: 11px !important;
+        padding: 5px 12px !important;
+        font-size: 11.5px !important;
+        background: #F2F2F7 !important;
+        border: 1px solid rgba(0,0,0,0.08) !important;
+        color: #1D1D1F !important;
       }
       .ai-messages-container {
-        padding: 12px 14px !important;
-        gap: 10px !important;
+        flex: 1 1 0% !important;
+        min-height: 0 !important;
+        height: auto !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 16px 14px 20px 14px !important;
+        gap: 12px !important;
+        background: #F8F9FA !important;
       }
       .ai-msg-bubble {
-        padding: 10px 14px !important;
-        font-size: 13px !important;
+        padding: 12px 16px !important;
+        font-size: 14px !important;
+        line-height: 1.55 !important;
+        max-width: 90% !important;
       }
       .ai-input-bar {
-        padding: 8px 12px max(10px, env(safe-area-inset-bottom)) 12px !important;
+        background: #FFFFFF !important;
+        border-top: 1px solid rgba(0,0,0,0.1) !important;
+        padding: 10px 14px max(12px, env(safe-area-inset-bottom)) 14px !important;
+        box-shadow: 0 -4px 16px rgba(0,0,0,0.04) !important;
+        flex-shrink: 0 !important;
       }
       .ai-input-field {
         font-size: 16px !important; /* 16px strictly prevents iOS Safari automatic zoom */
-        padding: 9px 14px !important;
+        padding: 10px 16px !important;
+        border: 1.5px solid rgba(0,0,0,0.12) !important;
+        background: #F8F9FA !important;
+        border-radius: 99px !important;
+      }
+      .btn-ai-send {
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 50% !important;
+        background: #0071E3 !important;
+        color: #FFF !important;
       }
       .cart-drawer {
         width: 100% !important;
@@ -4993,6 +5044,13 @@
           backdrop.classList.add('active');
           backdrop.style.display = 'block';
         }
+        // On mobile, lock body scroll so page behind doesn't jitter
+        if (window.innerWidth <= 768) {
+          document.body.style.overflow = 'hidden';
+          if (window.visualViewport) {
+            drawer.style.height = `${window.visualViewport.height}px`;
+          }
+        }
         renderQuickPromptsBar(currentAiDomain);
         renderAiMessages();
         // Only autofocus on Desktop to prevent popping up mobile virtual keyboard uncontrollably
@@ -5012,31 +5070,31 @@
           backdrop.classList.remove('active');
           backdrop.style.display = 'none';
         }
-        // Reset drawer styles
+        // Unlock body scroll and reset drawer styles
+        document.body.style.overflow = '';
+        drawer.style.top = '';
         drawer.style.bottom = '';
         drawer.style.height = '';
       }
     }
 
-    // Dynamic Visual Viewport adjustment for Mobile Virtual Keyboard
+    // Dynamic Visual Viewport Adjustment for Mobile (Keyboard Attachment without gaps)
     if (typeof window !== 'undefined' && window.visualViewport) {
-      window.visualViewport.addEventListener('resize', () => {
+      const adjustMobileChatViewport = () => {
         const drawer = document.getElementById('tflowAiDrawer');
         if (drawer && drawer.style.display === 'flex' && window.innerWidth <= 768) {
-          const keyboardOffset = window.innerHeight - window.visualViewport.height;
-          if (keyboardOffset > 120) {
-            // Keyboard is active
-            drawer.style.bottom = `${keyboardOffset}px`;
-            drawer.style.height = `${Math.min(window.visualViewport.height - 20, 380)}px`;
-          } else {
-            // Keyboard closed
-            drawer.style.bottom = '0px';
-            drawer.style.height = '56dvh';
-          }
+          // Adjust drawer height to exactly match visible viewport height above virtual keyboard
+          drawer.style.height = `${window.visualViewport.height}px`;
+          drawer.style.top = '0px';
+          drawer.style.bottom = 'auto';
           const container = document.getElementById('aiMessagesContainer');
-          if (container) container.scrollTop = container.scrollHeight;
+          if (container) {
+            container.scrollTop = container.scrollHeight;
+          }
         }
-      });
+      };
+      window.visualViewport.addEventListener('resize', adjustMobileChatViewport);
+      window.visualViewport.addEventListener('scroll', adjustMobileChatViewport);
     }
 
     function renderAiMessages() {
@@ -5319,7 +5377,7 @@
           <div style="font-size:11px; color:rgba(255,255,255,0.7);" id="aiDrawerSubtitle">🛍️ Tư vấn bán hàng &amp; báo giá 4 gói Pro</div>
         </div>
       </div>
-      <button class="btn-ai-close" onclick="toggleTflowAiChat(false)" title="Thu nhỏ">&times;</button>
+      <button class="btn-ai-close" onclick="toggleTflowAiChat(false)" title="Đóng cửa sổ chat"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg><span>Đóng</span></button>
     </div>
 
     <!-- 3-DOMAIN SPECIALIZED TAB SWITCHER -->
