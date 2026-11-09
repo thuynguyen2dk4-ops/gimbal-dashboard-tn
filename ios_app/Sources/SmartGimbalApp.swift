@@ -119,7 +119,7 @@ struct MainTabShellView: View {
 
             TFlowAIChatAssistantView()
                 .tabItem {
-                    Label("T-Flow AI", systemImage: "sparkles")
+                    Label("T-Flow Bot", systemImage: "sparkles")
                 }
                 .tag(2)
 
@@ -499,7 +499,7 @@ struct TFlowAIChatAssistantView: View {
     @EnvironmentObject var store: SupabaseModuleStore
     @State private var messages: [AppChatMessage] = [
         AppChatMessage(
-            text: "Xin chào Thủy Nguyễn! Tôi là T-Flow AI Copilot – trợ lý thông minh đồng bộ Cloud trên ứng dụng T-Flow Cam. Tôi sẵn sàng giải đáp kỹ thuật cân trục FOC 20kHz, góc quay Inception 360°, thiết lập Apple Log 4K/60fps và hỗ trợ theo kịch bản huấn luyện thời gian thực từ Admin CMS.",
+            text: "Xin chào Thủy Nguyễn! Tôi là T-Flow Bot – trợ lý thông minh đồng bộ Cloud trên ứng dụng T-Flow Cam. Tôi sẵn sàng giải đáp kỹ thuật cân trục FOC 20kHz, góc quay Inception 360°, thiết lập Apple Log 4K/60fps và hỗ trợ theo kịch bản huấn luyện thời gian thực từ Admin CMS.",
             isUser: false,
             timestamp: "Vừa xong"
         )
@@ -589,7 +589,7 @@ struct TFlowAIChatAssistantView: View {
 
                 // Input Bar
                 HStack(spacing: 10) {
-                    TextField("Hỏi T-Flow AI về kỹ thuật quay, FOC...", text: $inputText)
+                    TextField("Hỏi T-Flow Bot về kỹ thuật quay, FOC...", text: $inputText)
                         .padding(10)
                         .background(Color(white: 0.15))
                         .cornerRadius(20)
@@ -613,7 +613,7 @@ struct TFlowAIChatAssistantView: View {
                 .background(Color(white: 0.08))
             }
             .background(Color.black.ignoresSafeArea())
-            .navigationTitle("T-Flow AI Copilot")
+            .navigationTitle("T-Flow Bot")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
@@ -677,7 +677,7 @@ struct TFlowAIChatAssistantView: View {
         } else if q.contains("foc") || q.contains("cân") || q.contains("imu") {
             return "Hiệu chuẩn IMU & FOC: Đặt gimbal trên mặt bàn phẳng tĩnh 5 giây, nhấn 'Hiệu chuẩn IMU'. Thuật toán Pure FOC 20kHz sẽ tự động bù sai số góc nghiêng về 0.01 độ."
         } else {
-            return "T-Flow AI đã ghi nhận câu hỏi. Để có cảnh quay chuyển động mượt mà nhất, hãy kết hợp động cơ FOC 20kHz cùng bước chân Ninja Walk và ngàm MagSafe cố định tâm tải trọng 450g!"
+            return "T-Flow Bot đã ghi nhận câu hỏi. Để có cảnh quay chuyển động mượt mà nhất, hãy kết hợp động cơ FOC 20kHz cùng bước chân Ninja Walk và ngàm MagSafe cố định tâm tải trọng 450g!"
         }
     }
 }

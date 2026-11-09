@@ -507,7 +507,7 @@ function generateSmartFallbackResponse(query, mode, context) {
   // 1. GREETINGS & CASUAL OPENINGS (hi em, chào bạn, hello, alo, ơi...)
   if (q === 'hi' || q === 'hello' || q === 'alo' || q.includes('hi em') || q.includes('chào em') || q.includes('chào bạn') || q.includes('xin chào') || q.includes('em ơi') || q.includes('tflow ơi') || q.includes('bạn ơi') || q === 'hey') {
     return {
-      answer: "Dạ em chào anh/chị ạ! 👋 Em là **T-Flow AI Consultant** — Trợ lý ảo AI Đám Mây chính thức của Hệ sinh thái Gimbal T-Flow Pro.\n\nEm rất vui được đồng hành cùng anh/chị. Em có thể giải đáp chi tiết về:\n• **4 gói sản phẩm T-Flow Pro** (từ gói cơ bản 2.49M đến gói Master)\n• **Công nghệ độc quyền**: Động cơ Pure FOC 20kHz, ngàm hít nam châm MagSafe 45N N52, pin 18h\n• **Tính năng AI Vision Cloud**: Tự nhận diện bám nét người, thú cưng, vật thể tự chọn & tự động chuyển cam góc rộng 0.5x khi đông người\n• **Chính sách**: Bảo hành 1 đổi 1 trong 12 tháng, 30 ngày dùng thử miễn phí.\n\nAnh/chị đang quan tâm đến nội dung nào ạ? Em tư vấn ngay cho anh/chị nhé!",
+      answer: "Dạ em chào anh/chị ạ! 👋 Em là **T-Flow Bot** — Trợ lý ảo AI Đám Mây chính thức của Hệ sinh thái Gimbal T-Flow Pro.\n\nEm rất vui được đồng hành cùng anh/chị. Em có thể giải đáp chi tiết về:\n• **4 gói sản phẩm T-Flow Pro** (từ gói cơ bản 2.49M đến gói Master)\n• **Công nghệ độc quyền**: Động cơ Pure FOC 20kHz, ngàm hít nam châm MagSafe 45N N52, pin 18h\n• **Tính năng AI Vision Cloud**: Tự nhận diện bám nét người, thú cưng, vật thể tự chọn & tự động chuyển cam góc rộng 0.5x khi đông người\n• **Chính sách**: Bảo hành 1 đổi 1 trong 12 tháng, 30 ngày dùng thử miễn phí.\n\nAnh/chị đang quan tâm đến nội dung nào ạ? Em tư vấn ngay cho anh/chị nhé!",
       escalated: false,
       actions: [
         { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' },
@@ -616,7 +616,7 @@ function generateSmartFallbackResponse(query, mode, context) {
   // 8. BẠN LÀ AI / NGƯỜI SÁNG LẬP
   if (q.includes('bạn là ai') || q.includes('thủy nguyễn') || q.includes('sáng lập') || q.includes('thương hiệu') || q.includes('tflow') || q.includes('t-flow')) {
     return {
-      answer: "Dạ em là **T-Flow AI Consultant** — Trợ lý ảo AI Đám Mây độc quyền của Hệ sinh thái Gimbal T-Flow Pro, được sáng lập và phát triển bởi **Master Admin Thủy Nguyễn**.\n\nSứ mệnh của em là đồng hành cùng các nhà sáng tạo nội dung từ khâu tư vấn thiết bị, hỗ trợ kỹ thuật đến đạo diễn góc máy quay chụp chuyên nghiệp. Anh/chị cần em hỗ trợ gì thêm không ạ?",
+      answer: "Dạ em là **T-Flow Bot** — Trợ lý ảo AI Đám Mây độc quyền của Hệ sinh thái Gimbal T-Flow Pro, được sáng lập và phát triển bởi **Master Admin Thủy Nguyễn**.\n\nSứ mệnh của em là đồng hành cùng các nhà sáng tạo nội dung từ khâu tư vấn thiết bị, hỗ trợ kỹ thuật đến đạo diễn góc máy quay chụp chuyên nghiệp. Anh/chị cần em hỗ trợ gì thêm không ạ?",
       escalated: false,
       actions: [
         { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' },
