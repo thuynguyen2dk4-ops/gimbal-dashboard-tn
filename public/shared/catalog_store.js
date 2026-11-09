@@ -1424,120 +1424,124 @@
   var AI_EVENT = 'tflow_ai_updated_event';
 
   var DEFAULT_AI_KNOWLEDGE_BASE = [
-    // --- 1. WEB SALES & CUSTOMER CONSULTING KNOWLEDGE (WEB BOT) ---
+    // =========================================================================
+    // --- 1. CHUYÊN MỤC 1: TƯ VẤN BÁN HÀNG & CHÍNH SÁCH (SALES CONSULTING) ---
+    // =========================================================================
     {
-      id: 'kb_web_packages_pricing',
-      target: 'web',
-      topic: 'Bảng giá và các gói T-Flow Pro',
-      keywords: ['giá', 'bao nhiêu', 'tiền', 'gói', 'bản', 'phiên bản', 'combo', 'mua', 'khuyến mãi', 'standard', 'creator', 'cinematic', 'master', 'chi phí'],
+      id: 'kb_sales_packages_pricing',
+      target: 'sales',
+      topic: 'Bảng giá và 4 gói cấu hình T-Flow Pro',
+      keywords: ['giá', 'bao nhiêu', 'tiền', 'gói', 'bản', 'phiên bản', 'combo', 'mua', 'khuyến mãi', 'standard', 'creator', 'cinematic', 'master', 'chi phí', 'báo giá'],
       answer: "T-Flow Pro hiện đang mở bán chính thức với **4 gói cấu hình** chuyên nghiệp:\n\n" +
-              "• **Gói Standard (4.990.000đ)**: Thân gimbal T-Flow Pro Pure FOC, tripod kim loại, ngàm nam châm MagSafe N52 45N, cáp sạc USB-C và túi nhung cao cấp.\n" +
-              "• **Gói Creator Kit (5.990.000đ) - Bán chạy nhất ⭐**: Trọn bộ Standard + Đèn Fill Light MagSafe RGB 360 màu + Micro không dây 2.4GHz độ trễ siêu thấp.\n" +
-              "• **Gói Cinematic Pro (7.490.000đ)**: Trọn bộ Creator + Vòng xoay Focus Wheel Bluetooth độc lập + Bộ 4 kính lọc ND Cine + Vali chống sốc chuẩn quân sự IP67.\n" +
-              "• **Gói Master Bundle (8.990.000đ)**: Toàn bộ hệ sinh thái phụ kiện cao cấp + Gói Bảo Hành Kim Cương 24 tháng 1 đổi 1 tận nơi.\n\n" +
-              "Anh có muốn em hỗ trợ thêm vào giỏ hàng gói nào ngay bây giờ không ạ?",
+              "• **Gói Standard (2.490.000đ)**: Thân gimbal T-Flow Pro Pure FOC, tripod mini kim loại, ngàm nam châm MagSafe N52 45N, cáp sạc USB-C và túi nhung cao cấp.\n" +
+              "• **Gói Creator Kit (3.190.000đ) - Bán chạy nhất ⭐**: Trọn bộ Standard + Đèn Fill Light MagSafe RGB 360 màu (CRI 96+) + Túi đeo chéo EVA chống sốc cao cấp.\n" +
+              "• **Gói Cinematic Pro (3.990.000đ)**: Trọn bộ Creator + Micro không dây kép 2.4GHz chống ồn AI + Bộ tạ đối trọng Pro cho iPhone Pro Max.\n" +
+              "• **Gói Master Edition (5.490.000đ)**: Toàn bộ hệ sinh thái phụ kiện cao cấp + Vali nhôm hàng không nguyên khối + Khóa học MasterClass quay dựng trọn đời.\n\n" +
+              "Anh/chị có muốn em hỗ trợ thêm gói nào vào giỏ hàng ngay bây giờ không ạ?",
       actions: [
-        { label: 'Xem Chi Tiết 4 Gói', view: 'catalog' },
-        { label: 'Thêm Gói Creator Kit', action: 'addCreatorKit' }
+        { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' },
+        { label: '⭐ Thêm Gói Creator Kit', action: 'addCreatorKit' }
       ],
       isOfficial: true,
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_web_magsafe_force',
-      target: 'web',
+      id: 'kb_sales_magsafe_force',
+      target: 'sales',
       topic: 'Ngàm nam châm MagSafe N52 và độ an toàn',
-      keywords: ['magsafe', 'nam châm', 'rơi', 'hít', 'chắc', 'lực', 'n52', 'an toàn', 'giữ', 'rơi vỡ', 'chống rơi', 'khóa'],
-      answer: "T-Flow Pro trang bị hệ thống **MagSafe Ultra-Hold thế hệ mới** sử dụng 32 lõi nam châm vĩnh cửu Neodymium N52 với lực hút định danh **45N (giữ chắc tới 4.5kg)**.\n\n" +
-              "Điểm đột phá là cơ chế **Khóa cơ học kép Snap-Lock**: khi điện thoại hít vào, chốt khóa an toàn sẽ tự động gài chặt. Dù anh chạy bộ nước rút, trượt ván hay vận động mạnh, điện thoại tuyệt đối không bao giờ bị tuột hay rơi rớt. Đi kèm máy có thêm kẹp cơ học phụ trợ cho các dòng máy không có MagSafe.",
+      keywords: ['magsafe', 'nam châm', 'rơi', 'hít', 'chắc', 'lực', 'n52', 'an toàn', 'giữ', 'rơi vỡ', 'chống rơi', 'khóa', 'lực hút'],
+      answer: "T-Flow Pro trang bị hệ thống **MagSafe Ultra-Hold thế hệ mới** sử dụng 32 lõi nam châm vĩnh cửu Neodymium N52 với lực hút định danh **45N (chịu tải 2.8kg - 4.5kg)**.\n\n" +
+              "Điểm đột phá là cơ chế **Khóa cơ học kép Snap-Lock**: khi điện thoại hít vào, chốt khóa an toàn tự động gài chặt. Dù anh/chị chạy bộ nước rút, trượt ván hay vận động mạnh, điện thoại tuyệt đối không bao giờ bị tuột hay rơi rớt. Đi kèm máy có thêm vòng từ tính trợ lực dán lưng cho điện thoại Android.",
       actions: [
-        { label: 'Xem Chi Tiết Ngàm MagSafe', view: 'detail' }
+        { label: '⚡ Xem Chi Tiết Ngàm MagSafe', view: 'detail' }
       ],
       isOfficial: true,
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_web_motor_foc',
-      target: 'web',
-      topic: 'Động cơ Pure FOC 20kHz và chống rung',
-      keywords: ['foc', 'động cơ', 'motor', '20khz', 'chống rung', 'rung', 'ồn', 'tiếng ồn', 'tần số', 'mô men', 'lag', 'trễ'],
+      id: 'kb_sales_motor_foc',
+      target: 'sales',
+      topic: 'Động cơ Pure FOC 20kHz và chống rung điện ảnh',
+      keywords: ['foc', 'động cơ', 'motor', '20khz', 'chống rung', 'rung', 'ồn', 'tiếng ồn', 'tần số', 'mô men', 'lag', 'trễ', 'mượt'],
       answer: "T-Flow Pro ứng dụng **công nghệ điều khiển vector Pure FOC 20kHz** tiên tiến nhất ngành:\n\n" +
-              "• **Tần số siêu âm 20kHz**: Vượt qua ngưỡng nghe của tai người, động cơ vận hành hoàn toàn tĩnh âm 0dB, giúp mic thu âm không bị lọt tiếng rít motor.\n" +
+              "• **Tần số siêu âm 20kHz**: Vượt qua ngưỡng nghe của tai người, động cơ vận hành hoàn toàn tĩnh âm 0dB, giúp micro thu âm không bị lọt tiếng rít motor.\n" +
               "• **Tốc độ phản hồi < 1ms**: Vi xử lý ARM Cortex-M4 kép tính toán 20.000 lần mỗi giây, triệt tiêu tức thì 99.8% rung lắc.\n" +
               "• **Độ chính xác 0.005°**: Trục chuyển động mượt như ray trượt dolly điện ảnh, không giật khấc.",
       actions: [
-        { label: 'Xem Bản Vẽ Kỹ Thuật Động Cơ', view: 'detail' }
+        { label: '📐 Xem Bản Vẽ Kỹ Thuật Động Cơ', view: 'detail' }
       ],
       isOfficial: true,
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_web_compatibility',
-      target: 'web',
-      topic: 'Độ tương thích thiết bị và trọng tải',
-      keywords: ['tương thích', 'dùng được', 'iphone', 'hỗ trợ', 'android', 'samsung', 'nặng', 'tải trọng', 'máy nào', '15 pro max', '16 pro max'],
+      id: 'kb_sales_compatibility',
+      target: 'sales',
+      topic: 'Độ tương thích thiết bị và trọng tải smartphone',
+      keywords: ['tương thích', 'dùng được', 'iphone', 'hỗ trợ', 'android', 'samsung', 'nặng', 'tải trọng', 'máy nào', '15 pro max', '16 pro max', 'điện thoại'],
       answer: "T-Flow Pro tương thích hoàn hảo với:\n\n" +
               "• **Toàn bộ dải iPhone**: Từ iPhone 12 series đến iPhone 16 Pro Max (hít nam châm MagSafe trực tiếp không cần tháo ốp).\n" +
-              "• **Điện thoại Android**: Samsung Galaxy S24 Ultra, Xiaomi, Vivo, Oppo... (thông qua vòng từ tính tặng kèm hoặc kẹp ngàm phụ trợ).\n" +
+              "• **Điện thoại Android**: Samsung Galaxy S24 Ultra, Xiaomi, Vivo, Oppo... (thông qua vòng từ tính siêu mỏng tặng kèm).\n" +
               "• **Tải trọng tối đa 420g**: Thoải mái gắn thêm ống kính rời (Anamorphic, Tele 3x), kính lọc ND và micro thu âm bên ngoài mà không lo quá tải motor.",
       actions: [
-        { label: 'Xem Thông Số Kích Thước', view: 'detail' }
+        { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' }
       ],
       isOfficial: true,
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_web_battery_powerbank',
-      target: 'web',
-      topic: 'Thời lượng pin và sạc dự phòng',
-      keywords: ['pin', 'dung lượng', 'thời gian', 'dùng được bao lâu', 'sạc', 'mah', 'sạc ngược', 'powerbank', 'sạc dự phòng', '24h', '24 tiếng'],
-      answer: "T-Flow Pro sở hữu viên **pin kép 21700 dung lượng lớn 6000mAh**:\n\n" +
-              "• **24 Giờ hoạt động liên tục**: Đáp ứng trọn vẹn cả ngày dài quay phim, du lịch hoặc phát livestream sự kiện.\n" +
-              "• **Sạc ngược không dây MagSafe 15W**: Tự động sạc pin không dây trực tiếp cho iPhone trong lúc đang gắn trên gimbal.\n" +
+      id: 'kb_sales_battery_powerbank',
+      target: 'sales',
+      topic: 'Thời lượng pin và sạc dự phòng không dây',
+      keywords: ['pin', 'dung lượng', 'thời gian', 'dùng được bao lâu', 'sạc', 'mah', 'sạc ngược', 'powerbank', 'sạc dự phòng', '18h', '24h', 'pin bao lâu'],
+      answer: "T-Flow Pro sở hữu hệ thống pin kép hiệu năng cao:\n\n" +
+              "• **Thời lượng 18 - 24 giờ liên tục**: Đáp ứng trọn vẹn cả ngày dài quay phim, du lịch hoặc phát livestream sự kiện mà không cần cắm sạc.\n" +
+              "• **Sạc ngược không dây MagSafe 15W**: Tự động sạc pin không dây chuẩn Qi trực tiếp cho iPhone trong lúc đang gắn trên ngàm gimbal.\n" +
               "• **Cổng ra USB-C PD 20W**: Hỗ trợ sạc nhanh có dây cho phụ kiện đèn hoặc điện thoại thứ hai.",
       actions: [
-        { label: 'Xem Thông Số Nguồn Pin', view: 'detail' }
+        { label: '⚡ Xem Chi Tiết Kỹ Thuật', view: 'detail' }
       ],
       isOfficial: true,
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_web_warranty_policy',
-      target: 'web',
-      topic: 'Chính sách bảo hành và đổi trả',
+      id: 'kb_sales_warranty_policy',
+      target: 'sales',
+      topic: 'Chính sách bảo hành và cam kết đổi trả',
       keywords: ['bảo hành', 'đổi trả', 'hỏng', 'lỗi', '1 đổi 1', 'chính sách', 'sửa', 'yên tâm', 'chính hãng', '30 ngày', '12 tháng'],
       answer: "Chính sách hậu mãi của T-Flow Pro dẫn đầu thị trường:\n\n" +
-              "• **Bảo hành 12 tháng 1 đổi 1 chính hãng**: Nếu phát sinh lỗi kỹ thuật từ nhà sản xuất, đổi mới 100% thiết bị nguyên hộp.\n" +
-              "• **Dùng thử 30 ngày miễn phí**: Khách hàng được trải nghiệm thực tế trong 30 ngày, nếu không ưng ý có thể đổi trả hoàn tiền không cần lý do.\n" +
-              "• **Hỗ trợ kỹ thuật 24/7**: Đội ngũ kỹ sư R&D tại Hà Nội và TP.HCM hỗ trợ cân chỉnh và hướng dẫn sử dụng trọn đời.",
+              "• **Bảo hành 1 đổi 1 chính hãng 12 tháng**: Nếu phát sinh bất kỳ lỗi kỹ thuật nào từ nhà sản xuất, đổi mới 100% thiết bị nguyên hộp.\n" +
+              "• **Dùng thử 30 ngày hoàn tiền 100%**: Khách hàng được trải nghiệm thực tế trong 30 ngày, nếu không ưng ý có thể đổi trả hoàn tiền không cần lý do.\n" +
+              "• **Hỗ trợ kỹ thuật 24/7**: Đội ngũ kỹ sư R&D do Master Admin Thủy Nguyễn dẫn dắt hỗ trợ căn chỉnh và hướng dẫn sử dụng trọn đời.",
       actions: [
-        { label: 'Xem Chính Sách Hỗ Trợ', view: 'reviews' }
+        { label: '⭐ Xem Đánh Giá Khách Hàng', view: 'reviews' }
       ],
       isOfficial: true,
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_web_shipping_delivery',
-      target: 'web',
-      topic: 'Giao hàng và vận chuyển',
-      keywords: ['ship', 'giao hàng', 'vận chuyển', 'bao lâu', 'ở đâu', 'phí ship', 'hỏa tốc', 'nhận hàng', 'kiểm tra'],
-      answer: "T-Flow áp dụng chính sách **Miễn phí vận chuyển toàn quốc 100%**:\n\n" +
+      id: 'kb_sales_shipping_delivery',
+      target: 'sales',
+      topic: 'Giao hàng và vận chuyển hỏa tốc toàn quốc',
+      keywords: ['ship', 'giao hàng', 'vận chuyển', 'bao lâu', 'ở đâu', 'phí ship', 'hỏa tốc', 'nhận hàng', 'kiểm tra', 'freeship', 'cod'],
+      answer: "T-Flow áp dụng chính sách **Miễn phí vận chuyển toàn quốc 100% (Freeship)**:\n\n" +
               "• **Hà Nội & TP. Hồ Chí Minh**: Giao hỏa tốc nhận hàng trong vòng **2 giờ**.\n" +
               "• **Các tỉnh thành khác**: Giao nhanh bưu điện trong **24 - 48 giờ**.\n" +
               "• **Đồng kiểm khi nhận**: Quý khách được mở hộp kiểm tra thiết bị, bật nguồn test động cơ trước khi thanh toán tiền mặt (COD) hoặc chuyển khoản.",
       actions: [
-        { label: 'Đặt Hàng Ngay', view: 'catalog' }
+        { label: '📦 Đặt Hàng Ngay', view: 'catalog' }
       ],
       isOfficial: true,
       updatedAt: '2026-11-09T08:00:00Z'
     },
 
-    // --- 2. APP CREATIVE DIRECTOR & CAMERA COPILOT KNOWLEDGE (APP BOT) ---
+    // =========================================================================
+    // --- 2. CHUYÊN MỤC 2: KỸ THUẬT QUAY CHỤP & EDIT (CREATIVE & POST-PROD) ---
+    // =========================================================================
     {
-      id: 'kb_app_sunset_golden_hour',
-      target: 'app',
+      id: 'kb_creative_sunset_golden_hour',
+      target: 'creative',
       topic: 'Kỹ thuật quay cảnh hoàng hôn trên biển / ngược sáng',
-      keywords: ['hoàng hôn', 'bãi biển', 'mặt trời', 'ngược sáng', 'biển', 'golden hour', 'chiều tà', 'bình minh', 'cháy sáng'],
+      keywords: ['hoàng hôn', 'bãi biển', 'mặt trời', 'ngược sáng', 'biển', 'golden hour', 'chiều tà', 'bình minh', 'cháy sáng', 'quay hoàng hôn'],
       answer: "🌅 **Kỹ Thuật Đạo Diễn - Cảnh Hoàng Hôn & Biển Chiều:**\n" +
               "Khi quay ngược sáng mặt trời lặn, ánh sáng rất gắt dễ làm cháy vùng mây trời hoặc làm tối đen chủ thể. Chúng ta cần giảm nhẹ bù sáng EV để bảo vệ highlight của mặt trời, khóa ISO ở mức thấp nhất để khử nhiễu dải màu cam vàng, và kích hoạt màu phim Apple Log để cứu toàn bộ dynamic range.\n\n" +
               "📋 **Bộ thông số tối ưu đề xuất:**\n" +
@@ -1565,8 +1569,8 @@
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_app_action_sport_fast',
-      target: 'app',
+      id: 'kb_creative_action_sport_fast',
+      target: 'creative',
       topic: 'Quay thể thao, xe chạy, hành động chuyển động nhanh',
       keywords: ['thể thao', 'xe chạy', 'tốc độ', 'chạy bộ', 'xe máy', 'ô tô', 'nhanh', 'hành động', 'nhòe', 'slow motion', 'bắt dính'],
       answer: "🏎️ **Kỹ Thuật Đạo Diễn - Hành Động Tốc Độ Cao:**\n" +
@@ -1596,10 +1600,10 @@
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_app_portrait_cinematic',
-      target: 'app',
+      id: 'kb_creative_portrait_cinematic',
+      target: 'creative',
       topic: 'Quay chân dung, phỏng vấn, xóa phông và tôn da',
-      keywords: ['chân dung', 'phỏng vấn', 'xóa phông', 'mịn da', 'bokeh', 'người', 'mẫu', 'da đẹp', 'tự nhiên', 'nói chuyện'],
+      keywords: ['chân dung', 'phỏng vấn', 'xóa phông', 'mịn da', 'bokeh', 'người', 'mẫu', 'da đẹp', 'tự nhiên', 'nói chuyện', 'quay mẫu'],
       answer: "🎬 **Kỹ Thuật Đạo Diễn - Chân Dung Cinematic:**\n" +
               "Để tạo thước phim chân dung có chiều sâu điện ảnh, máy ảnh cần khóa tốc độ 24fps chuẩn Hollywood, sử dụng camera tele 3x/5x để nén hậu cảnh xóa phông nhẹ nhàng, và sử dụng LUT da tự nhiên tôn vinh sắc tố da châu Á mà không bị bết màu.\n\n" +
               "📋 **Bộ thông số tối ưu đề xuất:**\n" +
@@ -1627,10 +1631,10 @@
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_app_night_lowlight',
-      target: 'app',
+      id: 'kb_creative_night_lowlight',
+      target: 'creative',
       topic: 'Quay cảnh đêm, thiếu sáng, phố thị ánh đèn neon',
-      keywords: ['đêm', 'tối', 'thiếu sáng', 'phố đêm', 'neon', 'lung linh', 'nhiễu', 'hạt', 'mờ', 'chụp đêm'],
+      keywords: ['đêm', 'tối', 'thiếu sáng', 'phố đêm', 'neon', 'lung linh', 'nhiễu', 'hạt', 'mờ', 'chụp đêm', 'quay tối'],
       answer: "🌃 **Kỹ Thuật Đạo Diễn - Cảnh Đêm & Thiếu Sáng:**\n" +
               "Trong môi trường ánh sáng yếu, việc đẩy ISO quá cao sẽ gây nhiễu hạt phá hỏng khung hình. Kỹ thuật ở đây là hạ FPS về 24fps để cảm biến có thời gian hấp thụ ánh sáng lâu nhất (1/48s), kết hợp thuật toán FOC khử rung tuyệt đối để không bị nhòe hình.\n\n" +
               "📋 **Bộ thông số tối ưu đề xuất:**\n" +
@@ -1658,10 +1662,10 @@
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_app_inception_vortex',
-      target: 'app',
+      id: 'kb_creative_inception_vortex',
+      target: 'creative',
       topic: 'Quay hiệu ứng 360° Inception Roll lốc xoáy vũ trụ',
-      keywords: ['inception', '360', 'xoay', 'lốc xoáy', 'nghiêng', 'vòng tròn', 'vũ trụ', 'roll'],
+      keywords: ['inception', '360', 'xoay', 'lốc xoáy', 'nghiêng', 'vòng tròn', 'vũ trụ', 'roll', 'xoay vòng'],
       answer: "🌀 **Kỹ Thuật Đạo Diễn - Hiệu Ứng Inception 360° Roll:**\n" +
               "Đây là cú máy đặc trưng của các đạo diễn Hollywood! Gimbal sẽ tự động quay tròn trục Pan 360° vô cực trong khi camera tiến về phía trước, tạo cảm giác thế giới xung quanh đang xoay tròn mê hoặc.\n\n" +
               "📋 **Bộ thông số tối ưu đề xuất:**\n" +
@@ -1688,10 +1692,10 @@
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_app_running_walk_smooth',
-      target: 'app',
+      id: 'kb_creative_running_walk_smooth',
+      target: 'creative',
       topic: 'Chạy bộ, leo bậc thang, triệt tiêu rung giật bước chân',
-      keywords: ['chạy', 'bước đi', 'bậc thang', 'đi bộ', 'leo núi', 'giật bước chân', 'z-axis', 'rung chân trời'],
+      keywords: ['chạy', 'bước đi', 'bậc thang', 'đi bộ', 'leo núi', 'giật bước chân', 'z-axis', 'rung chân trời', 'chống rung bước chân'],
       answer: "🏃 **Kỹ Thuật Đạo Diễn - Triệt Tiêu Rung Bước Chân:**\n" +
               "Khi đi bộ hoặc chạy bộ, trọng lượng cơ thể dồn lên từng bước chân tạo ra dao động trục Z (Z-axis bobbing). Chúng ta kích hoạt thuật toán giảm chấn bước đi kết hợp tính năng Khóa Chân Trời (Horizon Lock) để giữ đường chân trời luôn thẳng tuyệt đối dù thân người có nhấp nhô.\n\n" +
               "📋 **Bộ thông số tối ưu đề xuất:**\n" +
@@ -1717,10 +1721,10 @@
       updatedAt: '2026-11-09T08:00:00Z'
     },
     {
-      id: 'kb_app_apple_log_workflow',
-      target: 'app',
+      id: 'kb_creative_apple_log_workflow',
+      target: 'creative',
       topic: 'Chỉnh màu Apple Log và nạp 3D LUT .cube',
-      keywords: ['apple log', 'log', 'lut', 'chỉnh màu', 'cube', 'color grading', 'rec709', 'phẳng', 'màu phim'],
+      keywords: ['apple log', 'log', 'lut', 'chỉnh màu', 'cube', 'color grading', 'rec709', 'phẳng', 'màu phim', 'nạp lut'],
       answer: "🎨 **Kỹ Thuật Chỉnh Màu - Quy Trình Apple Log & 3D LUT:**\n" +
               "Quay ở định dạng Apple Log giúp lưu giữ tối đa 14+ stops dải nhạy sáng. Ứng dụng T-Flow cho phép bật tính năng **Realtime 3D LUT Preview**, giúp anh nhìn thấy màu phim điện ảnh hoàn chỉnh ngay trên màn hình lúc bấm máy mà không phải chờ về máy tính hậu kỳ.\n\n" +
               "📋 **Bộ thông số tối ưu đề xuất:**\n" +
@@ -1745,10 +1749,114 @@
       suggestAction: true,
       isOfficial: true,
       updatedAt: '2026-11-09T08:00:00Z'
-    }
-  ];
+    },
+    {
+      id: 'kb_creative_edit_capcut_premiere',
+      target: 'creative',
+      topic: 'Kỹ thuật hậu kỳ CapCut & Premiere Pro với 3D LUT Rec.709',
+      keywords: ['capcut', 'premiere', 'edit', 'hậu kỳ', 'cắt dựng', 'dựng phim', 'render', 'xuất video', 'áp màu', 'lồng tiếng', 'dựng'],
+      answer: "✂️ **Kỹ Thuật Hậu Kỳ & Edit Video Điện Ảnh (CapCut & Premiere Pro):**\n\n" +
+              "1. **Quy trình dựng trên CapCut:**\n" +
+              "• Tải file quay từ iPhone về, import vào CapCut.\n" +
+              "• Vào mục **Bộ lọc (Filters)** > **Thêm LUT tùy chỉnh (.cube)** do T-Flow cung cấp sẵn để chuyển không gian màu Apple Log sang Rec.709 rực rỡ chuẩn màn hình di động.\n" +
+              "• Tăng nhẹ độ tương phản (Contrast +5) và giảm sáng vùng tối (Shadows -3) để tạo chiều sâu khối điện ảnh.\n\n" +
+              "2. **Quy trình dựng trên Adobe Premiere Pro / DaVinci Resolve:**\n" +
+              "• Áp dụng Color Space Transform từ Apple Log sang Rec.709.\n" +
+              "• Âm thanh thu từ micro kép 2.4GHz của T-Flow tự động khớp sync 1-click, áp nhẹ hiệu ứng De-Noise khử ồn tạp âm.\n" +
+              "• Xuất file định dạng H.265 / ProRes 422 HQ ở bitrate 60Mbps để giữ nguyên độ nét 4K khi đăng TikTok/YouTube.",
+      actions: [
+        { label: '🎨 Xem Thư Viện 3D LUT', view: 'catalog' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
 
-  // --- KNOWLEDGE BASE ACCESS & CRUD ---
+    // =========================================================================
+    // --- 3. CHUYÊN MỤC 3: TÍNH NĂNG NHẬN DIỆN AI THÔNG MINH (SMART VISION) ---
+    // =========================================================================
+    {
+      id: 'kb_vision_face_body_tracking',
+      target: 'smart_vision',
+      topic: 'Bám nét người & khuôn mặt quang học 120fps (Optical Tracking)',
+      keywords: ['bám nét', 'người', 'khuôn mặt', 'chủ thể', 'tracking', 'optical', '120fps', 'mặt', 'theo dõi', 'bắt nét', 'bám người', 'nhận diện người'],
+      answer: "🧠 **Tính Năng Nhận Diện AI: Bám Nét Người & Khuôn Mặt Quang Học 120fps:**\n\n" +
+              "• **Cảm biến AI Vision quang học độc lập**: Gắn trực tiếp trên ngàm gimbal, xử lý độc lập không tiêu tốn RAM hay làm nóng điện thoại.\n" +
+              "• **Tốc độ bám nét 120fps siêu tốc**: Tần số quét 120 khung hình/giây với độ trễ phản hồi < 5ms, bám sát từng chuyển động quay đầu, xoay người hay chạy nước rút.\n" +
+              "• **Mô hình khung xương Skeletal Mesh**: Khi chủ thể quay lưng lại hoặc đeo kính râm/khẩu trang, AI vẫn nhận diện theo tỷ lệ cơ thể và khung vai, không bao giờ bị mất dấu (Zero Tracking Lost).\n" +
+              "• **Thuật toán dự đoán gia tốc Kalman Filter**: Dự đoán trước hướng di chuyển của người quay để lia trục Pan/Tilt trước một nhịp, chuyển động cực kỳ êm ái.",
+      actions: [
+        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '📦 Xem Cụm Camera AI', view: 'detail' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_vision_pet_tracking',
+      target: 'smart_vision',
+      topic: 'Bám nét thú cưng thông minh (Pet Tracking chó, mèo chuyển động)',
+      keywords: ['chó', 'mèo', 'thú cưng', 'pet', 'động vật', 'chạy nhảy', 'nhanh', 'bám chó mèo', 'pet tracking', 'chó mèo'],
+      answer: "🐕 **Tính Năng Nhận Diện AI: Bám Nét Thú Cưng Thông Minh (Pet Tracking):**\n\n" +
+              "• **Thuật toán thị giác động học 4 chân (Quadruped Kinematics)**: Được huấn luyện trên hơn 100.000 clip chuyển động của các giống chó mèo khác nhau.\n" +
+              "• **Bắt dính chuyển động bất quy tắc**: Thú cưng thường có thói quen đổi hướng đột ngột hoặc nhảy chồm lên. Cụm AI nhận diện tức thời khớp hông và đầu thú cưng để điều khiển motor FOC bám theo với gia tốc cao (Sport Mode 85%).\n" +
+              "• **Khóa tầm thấp (Low-angle Lock)**: Giúp gimbal hạ thấp sát mặt đất để quay những thước phim ngang tầm mắt của thú cưng cực kỳ đáng yêu và sống động.",
+      actions: [
+        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '⚡ Xem Chi Tiết Kỹ Thuật', view: 'detail' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_vision_custom_object_bounding_box',
+      target: 'smart_vision',
+      topic: 'Khóa và bám nét vật thể tùy chọn (Target Bounding Box Tracking)',
+      keywords: ['khóa vật thể', 'khoanh vùng', 'bounding box', 'vật thể', 'chọn vật', 'xe', 'bóng', 'đồ vật', 'chạm', 'khoanh', 'bám vật thể'],
+      answer: "📦 **Tính Năng Nhận Diện AI: Khóa Vật Thể Tùy Chọn Bằng Khung Viền Bounding Box:**\n\n" +
+              "• **Khoanh vùng trực tiếp trên màn hình**: Người dùng chỉ cần chạm tay hoặc kéo một ô vuông (Bounding Box) bao quanh bất kỳ vật thể nào: xe ô tô đang chạy, quả bóng rổ, flycam trên trời, hoặc món đồ trên bàn xoay sản phẩm.\n" +
+              "• **Thuật toán phân tích đặc trưng màu & hình học (Feature Vector Extraction)**: AI ghi nhớ màu sắc, hoa văn và đường nét biên của vật thể trong không gian 3 chiều.\n" +
+              "• **Tự động điều chỉnh tiêu cự & giữ bố cục (Smart Framing)**: Giữ cho vật thể đã chọn luôn nằm chính xác ở vị trí 1/3 (quy tắc điểm vàng) hoặc chính giữa khung hình dù vật thể tiến lại gần hay ra xa.",
+      actions: [
+        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '📦 Xem Dải Sản Phẩm', view: 'catalog' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_vision_auto_ultrawide_switch',
+      target: 'smart_vision',
+      topic: 'Tự động kích hoạt camera góc rộng 0.5x Ultra-Wide khi đông người',
+      keywords: ['góc rộng', 'ultra-wide', '0.5x', 'đông người', 'nhóm', 'tập thể', 'ngoài khung hình', 'tự đổi cam', 'tự bật', 'đổi camera', 'rộng hơn'],
+      answer: "📐 **Tính Năng Nhận Diện AI: Tự Động Kích Hoạt Camera Góc Rộng 0.5x Ultra-Wide:**\n\n" +
+              "• **Quét vùng ngoại vi thông minh**: Khi đang quay ở ống kính chính 1x, cụm AI liên tục phân tích chu vi xung quanh khung hình.\n" +
+              "• **Tự động nhận diện nhóm đông**: Nếu phát hiện có từ 3 người trở lên hoặc có thêm bạn bè bước vào rìa khung hình, AI sẽ phát hiện và ngay lập tức gửi lệnh qua BLE ra lệnh điện thoại tự động chuyển mượt sang camera 0.5x Ultra-Wide.\n" +
+              "• **Chuyển đổi Zoom mượt mà (Smooth Transition)**: Thuật toán nội suy zoom điện tử giúp cảnh chuyển từ 1x sang 0.5x êm ái như máy quay điện ảnh, không bị giật khựng.",
+      actions: [
+        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '⚡ Tìm Hiểu Động Cơ FOC', view: 'detail' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    },
+    {
+      id: 'kb_vision_gesture_control',
+      target: 'smart_vision',
+      topic: 'Điều khiển bằng cử chỉ tay không chạm (Hand Gesture AI Control)',
+      keywords: ['cử chỉ', 'vẫy tay', 'bàn tay', 'chữ v', 'giơ tay', 'gesture', 'không chạm', 'bắt đầu quay', 'chụp ảnh cử chỉ', 'điều khiển tay'],
+      answer: "✋ **Tính Năng Nhận Diện AI: Điều Khiển Cử Chỉ Tay Không Chạm (Hand Gesture Control):**\n\n" +
+              "Rất thích hợp cho solo creator, vũ công, vlogger khi đứng cách xa máy quay mà không có người hỗ trợ:\n" +
+              "• ✋ **Giơ lòng bàn tay (Palm)**: Bắt đầu khóa mục tiêu và theo dõi AI (Start AI Tracking). Giơ lại lần nữa để dừng theo dõi.\n" +
+              "• ✌️ **Giơ 2 ngón tay chữ V (Peace)**: Kích hoạt đếm ngược 3 giây để chụp ảnh hoặc bắt đầu bấm máy quay video.\n" +
+              "• 🤙 **Cử chỉ ngón cái & ngón trỏ (OK Gesture)**: Ra lệnh cho Gimbal tự động xoay điện thoại từ khung hình ngang (16:9 YouTube) sang dọc (9:16 TikTok/Reels) trong 0.8 giây mà không cần chạm tay vào máy.",
+      actions: [
+        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' }
+      ],
+      isOfficial: true,
+      updatedAt: '2026-11-09T08:00:00Z'
+    }
+  ];  // --- KNOWLEDGE BASE ACCESS & CRUD ---
   function getAiKnowledgeBase() {
     if (typeof localStorage === 'undefined') return DEFAULT_AI_KNOWLEDGE_BASE.slice();
     try {
@@ -1756,6 +1864,19 @@
       if (saved) {
         var parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          // Self-heal: ensure all official entries across the 3 domains are present
+          var idMap = {};
+          parsed.forEach(function(p) { idMap[p.id] = true; });
+          var modified = false;
+          DEFAULT_AI_KNOWLEDGE_BASE.forEach(function(def) {
+            if (!idMap[def.id]) {
+              parsed.push(def);
+              modified = true;
+            }
+          });
+          if (modified) {
+            try { localStorage.setItem(AI_KB_KEY, JSON.stringify(parsed)); } catch (e) {}
+          }
           return parsed;
         }
       }
@@ -1763,7 +1884,9 @@
       console.warn('Error reading AI knowledge base:', e);
     }
     // Default fallback
-    if (typeof localStorage !== 'undefined') localStorage.setItem(AI_KB_KEY, JSON.stringify(DEFAULT_AI_KNOWLEDGE_BASE));
+    if (typeof localStorage !== 'undefined') {
+      try { localStorage.setItem(AI_KB_KEY, JSON.stringify(DEFAULT_AI_KNOWLEDGE_BASE)); } catch (e) {}
+    }
     return DEFAULT_AI_KNOWLEDGE_BASE.slice();
   }
 
@@ -2083,16 +2206,20 @@
     };
   }
 
-  // --- SMART INTERNAL KNOWLEDGE BASE FALLBACK (ZERO DOWNTIME GUARANTEE) ---
+  // --- SMART INTERNAL KNOWLEDGE BASE FALLBACK (ZERO DOWNTIME GUARANTEE - 3 DOMAINS) ---
+  
+  // 1. DOMAIN: TƯ VẤN BÁN HÀNG & CHÍNH SÁCH
   function processWebSmartFallback(userQuery, userContext) {
     var cleanQuery = (userQuery || '').trim().toLowerCase();
     var kb = getAiKnowledgeBase();
-    var webKb = kb.filter(function(k) { return k.target === 'web' || k.target === 'both'; });
+    var salesKb = kb.filter(function(k) {
+      return k.target === 'sales' || k.target === 'web' || k.target === 'all_domains' || k.target === 'both';
+    });
 
     var bestMatch = null;
     var highestScore = 0;
 
-    webKb.forEach(function(item) {
+    salesKb.forEach(function(item) {
       var score = 0;
       var keywords = item.keywords || [];
       keywords.forEach(function(kw) {
@@ -2107,12 +2234,12 @@
 
     if (!bestMatch || highestScore < 10) {
       return {
-        answer: 'Dạ câu hỏi này mang tính kỹ thuật/chính sách chuyên sâu mà em chưa có dữ liệu kiểm định chính thức từ xưởng R&D. Để bảo đảm thông tin chuẩn xác 100% và không trả lời bừa, em đã tự động chuyển tiếp câu hỏi này về Trung Tâm Điều Hành cho Master Admin Thủy Nguyễn duyệt và cập nhật giải đáp sớm nhất cho anh ạ! 🙏\n\nTrong thời gian chờ duyệt, anh có thể tham khảo bảng giá 4 gói T-Flow Pro hoặc các thông số động cơ FOC và MagSafe bên dưới ạ:',
+        answer: 'Dạ câu hỏi này mang tính chính sách/đặc quyền chuyên sâu mà em chưa có dữ liệu kiểm định từ Master Admin Thủy Nguyễn. Để bảo đảm thông tin chuẩn xác 100% và không trả lời bừa, em đã tự động chuyển tiếp câu hỏi này về Trung Tâm Huấn Luyện AI cho Admin duyệt giải đáp sớm nhất cho anh/chị ạ! 🙏\n\nTrong lúc chờ duyệt, anh/chị có thể tham khảo nhanh bảng giá 4 gói T-Flow Pro hoặc các thông số động cơ Pure FOC 20kHz và ngàm MagSafe bên dưới ạ:',
         status: 'pending_approval',
         escalated: true,
         actions: [
-          { label: 'Xem Bảng Giá 4 Gói', view: 'catalog' },
-          { label: 'Xem Thông Số Kỹ Thuật', view: 'detail' }
+          { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' },
+          { label: '⚡ Xem Thông Số Kỹ Thuật', view: 'detail' }
         ]
       };
     }
@@ -2125,15 +2252,18 @@
     };
   }
 
+  // 2. DOMAIN: KỸ THUẬT QUAY CHỤP & EDIT DỰNG PHIM
   function processAppSmartFallback(userQuery, userContext) {
     var cleanQuery = (userQuery || '').trim().toLowerCase();
     var kb = getAiKnowledgeBase();
-    var appKb = kb.filter(function(k) { return k.target === 'app' || k.target === 'both'; });
+    var creativeKb = kb.filter(function(k) {
+      return k.target === 'creative' || k.target === 'app' || k.target === 'all_domains' || k.target === 'both';
+    });
 
     var bestMatch = null;
     var highestScore = 0;
 
-    appKb.forEach(function(item) {
+    creativeKb.forEach(function(item) {
       var score = 0;
       var keywords = item.keywords || [];
       keywords.forEach(function(kw) {
@@ -2148,7 +2278,7 @@
 
     if (!bestMatch || highestScore < 10) {
       return {
-        answer: 'Dạ yêu cầu góc quay hoặc bối cảnh này cần kinh nghiệm đạo diễn chuyên sâu mà em chưa được huấn luyện dữ liệu chuẩn. Để tránh thiết lập thông số sai lệch làm hỏng cảnh quay của anh, em đã gửi thông báo về Trung Tâm Điều Hành cho Master Admin Thủy Nguyễn duyệt và cập nhật bộ thông số chuẩn ngay ạ! 🙏\n\nHiện tại anh có thể chọn nhanh các preset có sẵn: Quay Hoàng Hôn Biển, Thể Thao Tốc Độ Cao, Chân Dung Xóa Phông hoặc Inception 360° bên dưới ạ:',
+        answer: 'Dạ yêu cầu góc quay hoặc kỹ thuật edit này cần kinh nghiệm đạo diễn chuyên sâu mà em chưa được huấn luyện dữ liệu chuẩn. Để tránh thiết lập thông số sai lệch làm hỏng cảnh quay của anh/chị, em đã gửi thông báo về Trung Tâm Điều Hành cho Master Admin Thủy Nguyễn duyệt và cập nhật bộ thông số chuẩn ngay ạ! 🙏\n\nHiện tại anh/chị có thể chọn nhanh các preset có sẵn: Quay Hoàng Hôn Biển, Thể Thao Tốc Độ Cao, Chân Dung Xóa Phông hoặc Inception 360° bên dưới ạ:',
         status: 'pending_approval',
         escalated: true,
         suggestAction: false,
@@ -2161,34 +2291,92 @@
       preset.name = bestMatch.topic || 'Preset Chuẩn Điện Ảnh';
     }
 
-    var fullReply = bestMatch.answer + '\n\n' +
-                    '⚡ **Anh có muốn em tự thao tác cài đặt toàn bộ các thông số này trên camera và gimbal luôn giúp anh không?**';
+    var fullReply = bestMatch.answer;
+    if (preset) {
+      fullReply += '\n\n⚡ **Anh có muốn em tự thao tác cài đặt toàn bộ các thông số này trên camera và gimbal luôn giúp anh không?**';
+    }
 
     return {
       answer: fullReply,
       status: 'answered',
       escalated: false,
-      suggestAction: true,
-      promptQuestion: 'Anh có muốn em tự thao tác cài đặt các thông số này không?',
-      cameraPreset: preset
+      suggestAction: !!preset,
+      promptQuestion: preset ? 'Anh có muốn em tự thao tác cài đặt các thông số này không?' : null,
+      cameraPreset: preset,
+      actions: bestMatch.actions || []
     };
   }
 
-  // --- UNIFIED CLOUD AI QUERY ENGINE ---
+  // 3. DOMAIN: TÍNH NĂNG NHẬN DIỆN AI THÔNG MINH (SMART VISION)
+  function processSmartVisionFallback(userQuery, userContext) {
+    var cleanQuery = (userQuery || '').trim().toLowerCase();
+    var kb = getAiKnowledgeBase();
+    var visionKb = kb.filter(function(k) {
+      return k.target === 'smart_vision' || k.target === 'all_domains' || k.target === 'both';
+    });
+
+    var bestMatch = null;
+    var highestScore = 0;
+
+    visionKb.forEach(function(item) {
+      var score = 0;
+      var keywords = item.keywords || [];
+      keywords.forEach(function(kw) {
+        if (cleanQuery.indexOf(kw.toLowerCase()) !== -1) score += 10;
+      });
+      if (item.topic && cleanQuery.indexOf(item.topic.toLowerCase()) !== -1) score += 25;
+      if (score > highestScore) {
+        highestScore = score;
+        bestMatch = item;
+      }
+    });
+
+    if (!bestMatch || highestScore < 10) {
+      return {
+        answer: 'Dạ về tính năng nhận diện thị giác máy tính AI của T-Flow Pro:\n\n' +
+                '• **Bám nét người & mặt 120fps**: Sử dụng cảm biến quang học độc lập bám chuẩn xác theo khung xương Skeletal Mesh.\n' +
+                '• **Bám nét thú cưng (Pet Tracking)**: Bắt dính chuyển động nhanh, luồn lách của chó mèo theo thuật toán động học 4 chân.\n' +
+                '• **Khóa vật thể Bounding Box**: Chạm hoặc kéo ô vuông trên màn hình để khóa bất kỳ vật thể nào.\n' +
+                '• **Tự động đổi camera góc rộng 0.5x Ultra-Wide**: Tự kích hoạt khi phát hiện nhóm đông ngoài khung hình.\n' +
+                '• **Cử chỉ tay Gesture**: Giơ bàn tay ✋ để bám nét, giơ chữ V ✌️ để chụp/quay.\n\n' +
+                'Nếu câu hỏi mang tính nghiên cứu thuật toán chuyên sâu, em đã ghi nhận và chuyển về cho Master Admin Thủy Nguyễn duyệt trả lời thêm cho anh/chị ạ!',
+        status: 'pending_approval',
+        escalated: true,
+        actions: [
+          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '📦 Xem Cụm Camera AI', view: 'detail' }
+        ]
+      };
+    }
+
+    return {
+      answer: bestMatch.answer,
+      status: 'answered',
+      escalated: false,
+      actions: bestMatch.actions || []
+    };
+  }
+
+  // --- UNIFIED CLOUD AI QUERY ENGINE (SUPPORTS 3 DOMAINS) ---
   async function queryUnifiedCloudAi(params) {
     params = params || {};
     var prompt = (params.prompt || '').trim();
-    var mode = params.mode || 'web'; // 'web' or 'app'
+    var rawMode = params.mode || 'sales';
+    var mode = 'sales';
+    if (rawMode === 'creative' || rawMode === 'app') mode = 'creative';
+    else if (rawMode === 'smart_vision') mode = 'smart_vision';
+    else mode = 'sales';
+
     var history = params.history || [];
     var context = params.context || {};
 
     var currentUserObj = getCurrentUser();
-    var email = currentUserObj ? currentUserObj.email : (mode === 'app' ? 'Người dùng App T-Flow' : 'Khách vãng lai');
-    var name = currentUserObj ? currentUserObj.name : (mode === 'app' ? 'Nhà sáng tạo' : 'Quý khách');
+    var email = currentUserObj ? currentUserObj.email : (mode === 'creative' ? 'Người dùng App T-Flow' : 'Khách vãng lai');
+    var name = currentUserObj ? currentUserObj.name : (mode === 'creative' ? 'Nhà sáng tạo' : 'Quý khách');
 
     var cfg = getCloudAiConfig();
     var effectiveKey = cfg.apiKey || '';
-    var effectiveModel = cfg.model || 'gemini-2.5-flash';
+    var effectiveModel = cfg.model || 'gemini-3.5-flash';
 
     var finalResult = null;
 
@@ -2218,74 +2406,30 @@
       }
     } catch (e) {}
 
-    // STEP 2: Direct call to Google Generative Language REST API if key is present
-    if (!finalResult && effectiveKey) {
-      try {
-        var directUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(effectiveModel) + ':generateContent?key=' + encodeURIComponent(effectiveKey);
-        var sysPrompt = (mode === 'app') ?
-          'Bạn là T-Flow Camera Director & Creative Copilot. BẮT BUỘC trả về JSON duy nhất: {\"answer\":\"Lời khuyên đạo diễn...\\n\\nAnh có muốn em tự thao tác cài đặt các thông số này không?\",\"cameraPreset\":{\"name\":\"...\",\"mode\":\"VIDEO|PHOTO|CINEMATIC|SLOWMO|TIMELAPSE|PANO\",\"resolution\":\"4K|HD\",\"fps\":24|30|60|120,\"shutter\":\"1/48s|1/60s|1/120s|1/250s\",\"iso\":50|100|200|400|800,\"ev\":\"-0.3EV|+0.0EV|-0.7EV\",\"lut\":\"TEAL_ORANGE|REC709|FILM_NOIR|VINTAGE|CLEAN\",\"gimbalMode\":\"FPV|FOLLOW|LOCK|POV|INCEPTION\"},\"suggestAction\":true,\"promptQuestion\":\"Anh có muốn em tự thao tác cài đặt các thông số này không?\",\"escalated\":false}' :
-          'Bạn là T-Flow Sales Consultant. Tư vấn giá 4 gói (Standard 2.49M, Creator 3.19M, Cinematic 3.99M, Master 5.49M), FOC 20kHz, MagSafe 45N, pin 3200mAh 18h, bảo hành 12 tháng 1 đổi 1, 30 ngày đổi trả. Nếu câu hỏi ngoài lề hoặc nhạy cảm, đính kèm [ESCALATE_TO_ADMIN].';
-
-        var gPayload = {
-          contents: [{ parts: [{ text: prompt }] }],
-          system_instruction: { parts: [{ text: sysPrompt }] },
-          generationConfig: { temperature: 0.3, maxOutputTokens: 1024 }
-        };
-        if (mode === 'app') gPayload.generationConfig.responseMimeType = 'application/json';
-
-        var gRes = await fetch(directUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(gPayload)
-        });
-
-        if (gRes.ok) {
-          var gData = await gRes.json();
-          var rawText = gData?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          if (mode === 'app') {
-            try {
-              finalResult = JSON.parse(rawText);
-            } catch (je) {
-              var m = rawText.match(/\{[\s\S]*\}/);
-              if (m) finalResult = JSON.parse(m[0]);
-            }
-          } else {
-            var isEsc = rawText.includes('[ESCALATE_TO_ADMIN]');
-            finalResult = {
-              answer: rawText.replace(/\[ESCALATE_TO_ADMIN\]/g, '').trim(),
-              escalated: isEsc,
-              actions: [
-                { label: 'Xem Bảng Giá 4 Gói', view: 'catalog' },
-                { label: 'Xem Chi Tiết Kỹ Thuật', view: 'detail' }
-              ]
-            };
-          }
-        }
-      } catch (err) {}
-    }
-
-    // STEP 3: Fallback to verified local smart knowledge base (guarantees 100% resilience)
+    // STEP 2: Fallback to verified local smart knowledge base for the selected domain
     if (!finalResult) {
-      if (mode === 'app') {
+      if (mode === 'creative') {
         finalResult = processAppSmartFallback(prompt, context);
+      } else if (mode === 'smart_vision') {
+        finalResult = processSmartVisionFallback(prompt, context);
       } else {
         finalResult = processWebSmartFallback(prompt, context);
       }
     }
 
-    // STEP 4: STRICT ESCALATION ROUTING
+    // STEP 3: STRICT ESCALATION ROUTING
     if (finalResult.escalated) {
       escalateToAdmin({
         source: mode,
         userEmail: email,
         userName: name,
         query: prompt,
-        reason: 'Câu hỏi chuyên sâu hoặc bối cảnh quay mới cần Master Admin duyệt',
+        reason: 'Câu hỏi chuyên sâu thuộc chuyên mục ' + mode + ' cần Master Admin duyệt',
         context: context
       });
     }
 
-    // STEP 5: CENTRAL AUDIT CONVERSATION LOG
+    // STEP 4: CENTRAL AUDIT CONVERSATION LOG
     var record = logAiConversation({
       source: mode,
       userEmail: email,
@@ -2415,6 +2559,7 @@
     processAppSmartFallback: processAppSmartFallback,
     processWebAiQuery: processWebAiQuery,
     processAppAiQuery: processAppAiQuery,
+    processSmartVisionFallback: processSmartVisionFallback,
     DEFAULT_GOOGLE_OAUTH_CLIENT_ID: DEFAULT_GOOGLE_OAUTH_CLIENT_ID,
     GOOGLE_OAUTH_CLIENT_ID_KEY: GOOGLE_OAUTH_CLIENT_ID_KEY,
     getGoogleOAuthClientId: getGoogleOAuthClientId,

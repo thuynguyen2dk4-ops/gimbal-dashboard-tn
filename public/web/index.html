@@ -1931,6 +1931,40 @@
       from { opacity: 0; transform: translateY(20px) scale(0.96); }
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
+    .ai-domain-switcher-bar {
+      display: flex;
+      background: #2C2C2E;
+      padding: 5px;
+      gap: 5px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+    .ai-domain-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 7px 4px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .ai-domain-btn:hover {
+      background: rgba(255,255,255,0.1);
+      color: #FFF;
+    }
+    .ai-domain-btn.active {
+      background: #FFFFFF;
+      color: #1D1D1F;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+    }
     .ai-drawer-header {
       padding: 16px 20px;
       background: linear-gradient(135deg, #1D1D1F 0%, #2C2C2E 100%);
@@ -4160,19 +4194,120 @@
     }
 
     // ==========================================================================
-    // T-FLOW AI CONSULTANT CHATBOT (100% UNIFIED CLOUD ENGINE)
+    // T-FLOW AI ASSISTANT (3 SPECIALIZED DOMAINS: SALES • CREATIVE • SMART VISION)
     // ==========================================================================
-    let aiChatHistory = [
-      {
-        sender: 'bot',
-        text: '👋 Xin chào quý khách! Em là **T-Flow AI Consultant** — Trợ lý ảo Đám Mây hỗ trợ tư vấn 24/7.\n\nEm sẵn sàng giải đáp ngay mọi thông tin:\n• Báo giá chính hãng của **4 gói T-Flow Pro**\n• Động cơ **Pure FOC 20kHz** & ngàm nam châm **MagSafe 45N N52**\n• Chính sách **Bảo hành 1 đổi 1 trong 12 tháng** và **30 ngày dùng thử miễn phí**.\n\nAnh/chị đang quan tâm đến gói thiết bị nào ạ?',
+    let currentAiDomain = 'sales';
+
+    const AI_DOMAIN_CONFIG = {
+      sales: {
+        badge: 'BÁN HÀNG',
+        subtitle: '🛍️ 1. Tư vấn bán hàng & báo giá 4 gói Pro',
+        placeholder: 'Hỏi về giá 4 gói, ngàm MagSafe, bảo hành, ship...',
+        welcome: '👋 Xin chào quý khách! Em là **T-Flow Sales Consultant** — Trợ lý ảo chuyên trách **Tư Vấn Bán Hàng & Chính Sách**.\n\nEm sẵn sàng tư vấn ngay:\n• Báo giá chính hãng của **4 gói cấu hình T-Flow Pro**\n• Động cơ **Pure FOC 20kHz** & ngàm **MagSafe 45N N52 (chịu tải 4.5kg)**\n• Chính sách **Bảo hành 1 đổi 1 trong 12 tháng** và **30 ngày dùng thử miễn phí**.\n\nAnh/chị đang quan tâm đến gói thiết bị nào ạ?',
         actions: [
           { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' },
           { label: '⚡ Tìm Hiểu Động Cơ FOC', action: "sendQuickPrompt('Thuật toán Pure FOC 20kHz khác gì gimbal thường?')" },
-          { label: '🛡️ Chính Sách Bảo Hành', action: "sendQuickPrompt('Chính sách bảo hành 1 đổi 1 trong 24 giờ')" }
+          { label: '🛡️ Chính Sách Bảo Hành', action: "sendQuickPrompt('Chính sách bảo hành 1 đổi 1 và dùng thử 30 ngày thế nào?')" }
+        ],
+        prompts: [
+          { label: '📦 Báo giá 4 gói Pro', text: 'T-Flow Pro có những gói phụ kiện nào và giá bao nhiêu?' },
+          { label: '🧲 Ngàm MagSafe 45N', text: 'Ngàm MagSafe chịu lực bao nhiêu, có an toàn không?' },
+          { label: '⚡ Động cơ Pure FOC 20kHz', text: 'Thuật toán Pure FOC 20kHz khác gì gimbal thường?' },
+          { label: '🛡️ Bảo hành 1 đổi 1', text: 'Chính sách bảo hành 1 đổi 1 và dùng thử 30 ngày thế nào?' },
+          { label: '🚚 Giao hàng hỏa tốc 2H', text: 'Chính sách giao hàng hỏa tốc và đồng kiểm thế nào?' }
+        ]
+      },
+      creative: {
+        badge: 'QUAY & EDIT',
+        subtitle: '🎬 2. Kỹ thuật quay chụp & hậu kỳ dựng phim',
+        placeholder: 'Hỏi về góc máy điện ảnh, FOC, Apple Log, CapCut, LUT...',
+        welcome: '🎬 Xin chào nhà sáng tạo! Tôi là **T-Flow Creative Director & Editing Copilot**.\n\nTôi đồng hành cùng bạn thiết lập góc máy và quy trình hậu kỳ chuẩn điện ảnh:\n• **Kỹ thuật lia máy FOC damping 20kHz** mượt như ray trượt dolly\n• **Quy trình Apple Log ProRes 4K** & nạp file **3D LUT .cube** xem trước trực tiếp\n• **Hiệu ứng Inception 360° Roll** & mẹo bước chân **Ninja Walk** triệt tiêu rung Z-axis\n• **Mẹo cắt dựng CapCut & Premiere Pro** xuất video 4K sắc nét.\n\nBạn đang chuẩn bị quay cảnh nào?',
+        actions: [
+          { label: '🌅 Quay Hoàng Hôn Biển', action: "sendQuickPrompt('Kỹ thuật quay cảnh hoàng hôn trên biển ngược sáng')" },
+          { label: '🏎️ Thể Thao Tốc Độ', action: "sendQuickPrompt('Quay thể thao xe chạy hành động chuyển động nhanh 120fps')" },
+          { label: '🎨 Hướng Dẫn Nạp 3D LUT', action: "sendQuickPrompt('Cách quay Apple Log và nạp bảng màu 3D LUT .cube')" }
+        ],
+        prompts: [
+          { label: '🎬 Quay Cinematic 4K/24fps', text: 'Hướng dẫn thiết lập góc máy Cinematic 4K 24fps quy tắc 180 độ' },
+          { label: '🎨 Nạp 3D LUT .cube', text: 'Cách quay Apple Log và nạp bảng màu 3D LUT .cube vào app' },
+          { label: '🌀 Inception 360° Roll', text: 'Kỹ thuật quay lốc xoáy vũ trụ 360 độ Inception Roll' },
+          { label: '🏃 Triệt tiêu rung bước chân', text: 'Mẹo bước đi Ninja Walk và khóa chân trời Horizon Lock' },
+          { label: '✂️ Hậu kỳ CapCut / Premiere', text: 'Quy trình edit hậu kỳ CapCut và Premiere Pro cho video T-Flow' }
+        ]
+      },
+      smart_vision: {
+        badge: 'NHẬN DIỆN AI',
+        subtitle: '🧠 3. Tính năng nhận diện AI thông minh 120fps',
+        placeholder: 'Hỏi về bám nét người, thú cưng, vật thể, cam góc rộng, cử chỉ...',
+        welcome: '🧠 Chào bạn! Tôi là **T-Flow Smart Vision AI Specialist** — Chuyên gia phụ trách hệ thống Thị Giác Máy Tính AI của T-Flow Pro.\n\nCác tính năng AI đỉnh cao đã sẵn sàng:\n• **Bám nét người & mặt quang học 120fps** (độ trễ <5ms, không hao pin)\n• **Bám nét thú cưng thông minh (Pet Tracking)** bám dính chó mèo chạy nhảy\n• **Khóa vật thể Bounding Box** chạm khoanh vùng bất kỳ vật thể nào\n• **Tự động kích hoạt camera góc rộng 0.5x Ultra-Wide** khi phát hiện nhóm đông\n• **Cử chỉ tay Gesture**: ✋ Bắt đầu bám nét, ✌️ Chụp/quay, 🤙 Xoay ngang dọc.\n\nBạn muốn tìm hiểu tính năng nhận diện nào trước?',
+        actions: [
+          { label: '🎯 Bám Nét Người 120fps', action: "sendQuickPrompt('Bám nét người và khuôn mặt quang học 120fps')" },
+          { label: '🐕 Bám Nét Thú Cưng', action: "sendQuickPrompt('Bám nét thú cưng chó mèo chuyển động nhanh')" },
+          { label: '📐 Tự Động Đổi Cam Góc Rộng', action: "sendQuickPrompt('Tự động bật camera góc rộng 0.5x khi đông người')" }
+        ],
+        prompts: [
+          { label: '🧠 Bám nét người 120fps', text: 'Tính năng nhận diện và bám nét người quang học 120fps hoạt động thế nào?' },
+          { label: '🐕 Bám nét thú cưng', text: 'Chế độ Pet Tracking bám nét chó mèo chuyển động nhanh hoạt động ra sao?' },
+          { label: '📦 Khóa vật thể Bounding Box', text: 'Làm thế nào để khoanh vùng khóa nét một vật thể tùy ý?' },
+          { label: '📐 Tự động bật cam Ultra-Wide', text: 'Tính năng tự động kích hoạt camera góc rộng 0.5x khi đông người' },
+          { label: '✋ Điều khiển cử chỉ tay', text: 'Các cử chỉ tay Gesture Control để điều khiển gimbal không chạm' }
         ]
       }
+    };
+
+    let aiChatHistory = [
+      {
+        sender: 'bot',
+        text: AI_DOMAIN_CONFIG.sales.welcome,
+        actions: AI_DOMAIN_CONFIG.sales.actions
+      }
     ];
+
+    function switchAiChatDomain(domain) {
+      if (!AI_DOMAIN_CONFIG[domain]) domain = 'sales';
+      currentAiDomain = domain;
+
+      // Update tabs UI
+      const tabSales = document.getElementById('domainTabSales');
+      const tabCreative = document.getElementById('domainTabCreative');
+      const tabVision = document.getElementById('domainTabVision');
+
+      if (tabSales) tabSales.classList.toggle('active', domain === 'sales');
+      if (tabCreative) tabCreative.classList.toggle('active', domain === 'creative');
+      if (tabVision) tabVision.classList.toggle('active', domain === 'smart_vision');
+
+      // Update header details
+      const cfg = AI_DOMAIN_CONFIG[domain];
+      const badge = document.getElementById('aiDomainBadge');
+      if (badge) badge.textContent = cfg.badge;
+      const subtitle = document.getElementById('aiDrawerSubtitle');
+      if (subtitle) subtitle.textContent = cfg.subtitle;
+      const input = document.getElementById('aiUserMessageInput');
+      if (input) input.placeholder = cfg.placeholder;
+
+      // Update quick prompts bar
+      renderQuickPromptsBar(domain);
+
+      // Append domain greeting card
+      aiChatHistory.push({
+        sender: 'bot',
+        text: cfg.welcome,
+        actions: cfg.actions
+      });
+      renderAiMessages();
+    }
+
+    function renderQuickPromptsBar(domain) {
+      const bar = document.getElementById('aiQuickPromptsBar');
+      if (!bar) return;
+      const cfg = AI_DOMAIN_CONFIG[domain] || AI_DOMAIN_CONFIG.sales;
+      let html = '';
+      cfg.prompts.forEach(p => {
+        const safeText = p.text.replace(/'/g, "\\'");
+        html += `<button class="ai-prompt-pill" onclick="sendQuickPrompt('${safeText}')">${p.label}</button>`;
+      });
+      bar.innerHTML = html;
+    }
 
     function toggleTflowAiChat(open) {
       const drawer = document.getElementById('tflowAiDrawer');
@@ -4182,6 +4317,7 @@
       if (open) {
         drawer.style.display = 'flex';
         if (fab) fab.style.display = 'none';
+        renderQuickPromptsBar(currentAiDomain);
         renderAiMessages();
         setTimeout(() => {
           const input = document.getElementById('aiUserMessageInput');
@@ -4201,11 +4337,8 @@
         aiChatHistory = [
           {
             sender: 'bot',
-            text: '👋 Xin chào quý khách! Em là **T-Flow AI Consultant**. Em có thể hỗ trợ gì cho anh/chị hôm nay ạ?',
-            actions: [
-              { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' },
-              { label: '⚡ Xem Chi Tiết Kỹ Thuật', view: 'detail' }
-            ]
+            text: AI_DOMAIN_CONFIG[currentAiDomain].welcome,
+            actions: AI_DOMAIN_CONFIG[currentAiDomain].actions
           }
         ];
       }
@@ -4235,9 +4368,14 @@
           escalationBadge = '<div style="margin-top:8px; display:inline-flex; align-items:center; gap:6px; padding:4px 10px; background:rgba(230,167,0,0.12); border:1px solid rgba(230,167,0,0.3); border-radius:6px; font-size:11.5px; font-weight:700; color:#B45309;">⚠️ Đã chuyển tiếp Master Admin Thủy Nguyễn duyệt</div>';
         }
 
+        let avatarBg = '#0071E3';
+        let avatarText = 'TF';
+        if (currentAiDomain === 'creative') avatarBg = '#8944AB';
+        else if (currentAiDomain === 'smart_vision') avatarBg = '#248A3D';
+
         html += `
           <div class="ai-msg-row ${isBot ? 'bot' : 'user'}">
-            <div class="ai-msg-avatar" style="${isBot ? 'background:#0071E3; color:#FFF;' : 'background:#1D1D1F; color:#FFF;'}">${isBot ? 'TF' : userInitial}</div>
+            <div class="ai-msg-avatar" style="${isBot ? `background:${avatarBg}; color:#FFF;` : 'background:#1D1D1F; color:#FFF;'}">${isBot ? avatarText : userInitial}</div>
             <div class="ai-msg-bubble">
               ${formattedText}
               ${escalationBadge}
@@ -4281,8 +4419,13 @@
       const typingDiv = document.createElement('div');
       typingDiv.className = 'ai-msg-row bot';
       typingDiv.id = 'aiTypingBubble';
+      
+      let typingColor = '#0071E3';
+      if (currentAiDomain === 'creative') typingColor = '#8944AB';
+      else if (currentAiDomain === 'smart_vision') typingColor = '#248A3D';
+
       typingDiv.innerHTML = `
-        <div class="ai-msg-avatar" style="background:#0071E3; color:#FFF;">TF</div>
+        <div class="ai-msg-avatar" style="background:${typingColor}; color:#FFF;">TF</div>
         <div class="ai-typing-indicator" style="padding:10px 14px; background:rgba(0,113,227,0.08); border-radius:14px; display:inline-flex; gap:4px; align-items:center;">
           <span class="ai-typing-dot"></span>
           <span class="ai-typing-dot"></span>
@@ -4299,12 +4442,10 @@
         if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.queryUnifiedCloudAi) {
           aiResult = await SmartGimbalCatalog.queryUnifiedCloudAi({
             prompt: userText,
-            mode: 'web',
+            mode: currentAiDomain,
             history: aiChatHistory,
-            context: { currentView: curV }
+            context: { currentView: curV, domain: currentAiDomain }
           });
-        } else if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.processWebAiQuery) {
-          aiResult = await SmartGimbalCatalog.processWebAiQuery(userText, { currentView: curV });
         } else {
           // Direct fallback to serverless /api/chat
           const res = await fetch('/api/chat', {
@@ -4312,9 +4453,9 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               prompt: userText,
-              mode: 'web',
+              mode: currentAiDomain,
               history: aiChatHistory,
-              context: { currentView: curV }
+              context: { currentView: curV, domain: currentAiDomain }
             })
           });
           if (res.ok) {
@@ -4347,19 +4488,18 @@
         console.error('AI chat error:', err);
         const el = document.getElementById('aiTypingBubble');
         if (el) el.remove();
+
+        const cfg = AI_DOMAIN_CONFIG[currentAiDomain] || AI_DOMAIN_CONFIG.sales;
         aiChatHistory.push({
           sender: 'bot',
-          text: 'Dạ em chào anh/chị ạ! Hiện T-Flow Pro có 4 gói chính hãng: Standard (2.490.000₫), Creator Kit (3.190.000₫), Cinematic Pro (3.990.000₫), Master Edition (5.490.000₫). Anh/chị bấm vào các nút bên dưới để xem chi tiết ngay nhé!',
-          actions: [
-            { label: '📦 Xem Bảng Giá 4 Gói', action: "switchView('catalog'); toggleTflowAiChat(false);" },
-            { label: '⚡ Xem Chi Tiết Kỹ Thuật', action: "switchView('detail'); toggleTflowAiChat(false);" }
-          ]
+          text: cfg.welcome,
+          actions: cfg.actions
         });
         renderAiMessages();
       }
     }
 
-    function showToast(msg) {
+        function showToast(msg) {
       const t = document.getElementById('toastMsg');
       if (!t) return;
       t.textContent = msg;
@@ -4458,22 +4598,31 @@
         </div>
         <div>
           <div style="font-size:14.5px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px;">
-            T-Flow AI Consultant
-            <span style="font-size:9.5px; font-weight:700; background:#34C759; color:#FFF; padding:1px 6px; border-radius:99px;">PRO</span>
+            T-Flow AI Assistant
+            <span style="font-size:9.5px; font-weight:700; background:#34C759; color:#FFF; padding:1px 6px; border-radius:99px;" id="aiDomainBadge">BÁN HÀNG</span>
           </div>
-          <div style="font-size:11px; color:rgba(255,255,255,0.7);">Chuyên gia gimbal 3 trục &amp; quay phim</div>
+          <div style="font-size:11px; color:rgba(255,255,255,0.7);" id="aiDrawerSubtitle">🛍️ Tư vấn bán hàng &amp; báo giá 4 gói Pro</div>
         </div>
       </div>
       <button class="btn-ai-close" onclick="toggleTflowAiChat(false)" title="Thu nhỏ">&times;</button>
     </div>
 
+    <!-- 3-DOMAIN SPECIALIZED TAB SWITCHER -->
+    <div class="ai-domain-switcher-bar">
+      <button class="ai-domain-btn active" id="domainTabSales" onclick="switchAiChatDomain('sales')">
+        🛍️ Bán Hàng
+      </button>
+      <button class="ai-domain-btn" id="domainTabCreative" onclick="switchAiChatDomain('creative')">
+        🎬 Quay &amp; Edit
+      </button>
+      <button class="ai-domain-btn" id="domainTabVision" onclick="switchAiChatDomain('smart_vision')">
+        🧠 Nhận Diện AI
+      </button>
+    </div>
+
     <!-- QUICK PROMPTS HORIZONTAL BAR -->
-    <div class="ai-quick-prompts-bar">
-      <button class="ai-prompt-pill" onclick="sendQuickPrompt('T-Flow Pro có những gói phụ kiện nào và giá bao nhiêu?')">📦 Các gói T-Flow Pro</button>
-      <button class="ai-prompt-pill" onclick="sendQuickPrompt('Ngàm MagSafe chịu lực bao nhiêu, có an toàn không?')">🧲 Ngàm MagSafe 2.8kg</button>
-      <button class="ai-prompt-pill" onclick="sendQuickPrompt('Thuật toán Pure FOC 20kHz khác gì gimbal thường?')">⚡ Thuật toán Pure FOC</button>
-      <button class="ai-prompt-pill" onclick="sendQuickPrompt('Hướng dẫn quay Apple Log và dùng Focus Wheel')">🎬 Quay Apple Log</button>
-      <button class="ai-prompt-pill" onclick="sendQuickPrompt('Chính sách bảo hành 1 đổi 1 trong 24 giờ')">🛡️ Bảo hành 1 đổi 1</button>
+    <div class="ai-quick-prompts-bar" id="aiQuickPromptsBar">
+      <!-- Injected dynamically based on domain -->
     </div>
 
     <!-- MESSAGES STREAM CONTAINER -->

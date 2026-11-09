@@ -1237,27 +1237,32 @@
         </div>
       </div>
 
-      <!-- AI STATS KPI MINI-ROW -->
-      <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin:20px 0 24px 0;">
-        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:16px;">
-          <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Tổng Hội Thoại</div>
-          <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-top:4px;" id="aiKpiTotal">0</div>
-          <div style="font-size:11px; color:#8E8E93;">Từ cả Web &amp; App</div>
+      <!-- AI STATS KPI MINI-ROW (3 SPECIALIZED DOMAINS) -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin:20px 0 24px 0;">
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
+          <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Tổng Hội Thoại</div>
+          <div style="font-size:22px; font-weight:800; color:var(--text-main); margin-top:4px;" id="aiKpiTotal">0</div>
+          <div style="font-size:10.5px; color:#8E8E93;">Tất cả 3 chuyên mục</div>
         </div>
-        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:16px;">
-          <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">🌐 Web Tư Vấn</div>
-          <div style="font-size:24px; font-weight:800; color:#0071E3; margin-top:4px;" id="aiKpiWeb">0</div>
-          <div style="font-size:11px; color:#8E8E93;">Tư vấn bán hàng &amp; gói</div>
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
+          <div style="font-size:11px; font-weight:700; color:#0071E3; text-transform:uppercase;">🛍️ 1. Tư Vấn Bán Hàng</div>
+          <div style="font-size:22px; font-weight:800; color:#0071E3; margin-top:4px;" id="aiKpiSales">0</div>
+          <div style="font-size:10.5px; color:#8E8E93;">Báo giá 4 gói, MagSafe, BH</div>
         </div>
-        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:16px;">
-          <div style="font-size:11.5px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">📱 App Copilot</div>
-          <div style="font-size:24px; font-weight:800; color:#248A3D; margin-top:4px;" id="aiKpiApp">0</div>
-          <div style="font-size:11px; color:#8E8E93;">Quay chụp &amp; chỉnh thông số</div>
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
+          <div style="font-size:11px; font-weight:700; color:#8944AB; text-transform:uppercase;">🎬 2. Quay Chụp &amp; Edit</div>
+          <div style="font-size:22px; font-weight:800; color:#8944AB; margin-top:4px;" id="aiKpiCreative">0</div>
+          <div style="font-size:10.5px; color:#8E8E93;">Góc máy, LUT, Dựng phim</div>
         </div>
-        <div style="background:rgba(230,167,0,0.08); border:1px solid rgba(230,167,0,0.3); border-radius:12px; padding:16px;">
-          <div style="font-size:11.5px; font-weight:700; color:#B45309; text-transform:uppercase;">⚠️ Chờ Admin Duyệt</div>
-          <div style="font-size:24px; font-weight:800; color:#B45309; margin-top:4px;" id="aiKpiPending">0</div>
-          <div style="font-size:11px; color:#B45309;">Câu hỏi khó cần training</div>
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
+          <div style="font-size:11px; font-weight:700; color:#248A3D; text-transform:uppercase;">🧠 3. Nhận Diện AI</div>
+          <div style="font-size:22px; font-weight:800; color:#248A3D; margin-top:4px;" id="aiKpiSmartVision">0</div>
+          <div style="font-size:10.5px; color:#8E8E93;">Bám nét, Thú cưng, Ultra-Wide</div>
+        </div>
+        <div style="background:rgba(230,167,0,0.08); border:1px solid rgba(230,167,0,0.3); border-radius:12px; padding:14px;">
+          <div style="font-size:11px; font-weight:700; color:#B45309; text-transform:uppercase;">⚠️ Chờ Admin Duyệt</div>
+          <div style="font-size:22px; font-weight:800; color:#B45309; margin-top:4px;" id="aiKpiPending">0</div>
+          <div style="font-size:10.5px; color:#B45309;">Câu hỏi khó cần training</div>
         </div>
       </div>
 
@@ -1280,10 +1285,11 @@
       <!-- TAB 1 CONTENT: LOGS -->
       <div id="aiTabContentLogs">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
-          <div style="display:flex; gap:8px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
             <button class="filter-pill-ai active" onclick="filterAiLogs('all', this)">Tất Cả</button>
-            <button class="filter-pill-ai" onclick="filterAiLogs('web', this)">🌐 Web Sales</button>
-            <button class="filter-pill-ai" onclick="filterAiLogs('app', this)">📱 App Copilot</button>
+            <button class="filter-pill-ai" onclick="filterAiLogs('sales', this)">🛍️ Tư Vấn Bán Hàng</button>
+            <button class="filter-pill-ai" onclick="filterAiLogs('creative', this)">🎬 Kỹ Thuật Quay &amp; Edit</button>
+            <button class="filter-pill-ai" onclick="filterAiLogs('smart_vision', this)">🧠 Nhận Diện AI Thông Minh</button>
             <button class="filter-pill-ai" onclick="filterAiLogs('pending_approval', this)">⚠️ Chờ Duyệt</button>
           </div>
           <input type="text" id="aiLogsSearchInput" placeholder="Tìm kiếm câu hỏi / nội dung..." onkeyup="searchAiLogs(this.value)" style="padding:6px 12px; border:1px solid var(--border); border-radius:8px; font-size:12.5px; width:240px; outline:none;">
@@ -1318,11 +1324,14 @@
 
       <!-- TAB 3 CONTENT: VERIFIED KNOWLEDGE BASE -->
       <div id="aiTabContentKb" style="display:none;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <div style="font-size:13.5px; color:var(--text-secondary);">
-            Danh sách toàn bộ các quy tắc tri thức, thông số camera và câu trả lời chuẩn đang phục vụ Web &amp; App.
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="filter-pill-ai active" onclick="filterAiKbTable('all', this)">Tất Cả Tri Thức</button>
+            <button class="filter-pill-ai" onclick="filterAiKbTable('sales', this)">🛍️ Tư Vấn Bán Hàng</button>
+            <button class="filter-pill-ai" onclick="filterAiKbTable('creative', this)">🎬 Quay Chụp &amp; Edit</button>
+            <button class="filter-pill-ai" onclick="filterAiKbTable('smart_vision', this)">🧠 Nhận Diện AI Thông Minh</button>
           </div>
-          <button class="btn btn-dark" onclick="openAddKnowledgeModal()">&#43; Thêm Tri Thức Mới</button>
+          <button class="btn btn-dark" onclick="openAddKnowledgeModal()">&#43; Huấn Luyện Tri Thức Mới</button>
         </div>
 
         <table class="data-table">
@@ -2006,9 +2015,10 @@
           <div class="form-group">
             <label>Nền Tảng Áp Dụng</label>
             <select class="form-control" id="formKbTarget">
-              <option value="web">🌐 Web Bán Hàng (Tư vấn bán hàng, giá, chính sách)</option>
-              <option value="app">📱 App Camera Copilot (Kỹ thuật quay, màu sắc, thông số)</option>
-              <option value="both">🌐📱 Cả Hai Nền Tảng</option>
+              <option value="sales">🛍️ 1. Tư Vấn Bán Hàng &amp; Chính Sách (Giá, 4 Gói Pro, Bảo Hành)</option>
+              <option value="creative">🎬 2. Tư Vấn Kỹ Thuật Quay Chụp &amp; Edit (Góc máy, FOC, 3D LUT, Dựng phim)</option>
+              <option value="smart_vision">🧠 3. Tính Năng Nhận Diện AI Thông Minh (Bám nét người/thú cưng/vật thể, Auto Ultra-Wide)</option>
+              <option value="all_domains">🌐 4. Áp Dụng Cho Cả 3 Chuyên Mục (Toàn Hệ Thống)</option>
             </select>
           </div>
           <div class="form-group">
@@ -3062,6 +3072,8 @@
       }
     }
 
+    let currentKbFilter = 'all';
+
     function updateAiStats() {
       if (typeof SmartGimbalCatalog === 'undefined') return;
       const convs = SmartGimbalCatalog.getAiConversations();
@@ -3069,18 +3081,22 @@
       const kb = SmartGimbalCatalog.getAiKnowledgeBase();
 
       const totalCount = convs.length;
-      const webCount = convs.filter(c => c.source === 'web').length;
-      const appCount = convs.filter(c => c.source === 'app').length;
+      const salesCount = convs.filter(c => c.source === 'sales' || c.source === 'web').length;
+      const creativeCount = convs.filter(c => c.source === 'creative' || c.source === 'app').length;
+      const visionCount = convs.filter(c => c.source === 'smart_vision').length;
       const pendingCount = pending.filter(p => p.status === 'pending').length;
 
-      document.getElementById('aiKpiTotal').textContent = totalCount;
-      document.getElementById('aiKpiWeb').textContent = webCount;
-      document.getElementById('aiKpiApp').textContent = appCount;
-      document.getElementById('aiKpiPending').textContent = pendingCount;
+      if (document.getElementById('aiKpiTotal')) document.getElementById('aiKpiTotal').textContent = totalCount;
+      if (document.getElementById('aiKpiSales')) document.getElementById('aiKpiSales').textContent = salesCount;
+      if (document.getElementById('aiKpiCreative')) document.getElementById('aiKpiCreative').textContent = creativeCount;
+      if (document.getElementById('aiKpiSmartVision')) document.getElementById('aiKpiSmartVision').textContent = visionCount;
+      if (document.getElementById('aiKpiWeb')) document.getElementById('aiKpiWeb').textContent = salesCount;
+      if (document.getElementById('aiKpiApp')) document.getElementById('aiKpiApp').textContent = creativeCount;
+      if (document.getElementById('aiKpiPending')) document.getElementById('aiKpiPending').textContent = pendingCount;
 
-      document.getElementById('tabCountLogs').textContent = totalCount;
-      document.getElementById('tabCountPending').textContent = pendingCount;
-      document.getElementById('tabCountKb').textContent = kb.length;
+      if (document.getElementById('tabCountLogs')) document.getElementById('tabCountLogs').textContent = totalCount;
+      if (document.getElementById('tabCountPending')) document.getElementById('tabCountPending').textContent = pendingCount;
+      if (document.getElementById('tabCountKb')) document.getElementById('tabCountKb').textContent = kb.length;
 
       const sidebarPending = document.getElementById('sidebarPendingCount');
       if (sidebarPending) {
@@ -3242,9 +3258,10 @@
       if (!tbody || typeof SmartGimbalCatalog === 'undefined') return;
 
       let convs = SmartGimbalCatalog.getAiConversations();
-      if (filter === 'web') convs = convs.filter(c => c.source === 'web');
-      if (filter === 'app') convs = convs.filter(c => c.source === 'app');
-      if (filter === 'pending_approval') convs = convs.filter(c => c.status === 'pending_approval');
+      if (filter === 'sales' || filter === 'web') convs = convs.filter(c => c.source === 'sales' || c.source === 'web');
+      else if (filter === 'creative' || filter === 'app') convs = convs.filter(c => c.source === 'creative' || c.source === 'app');
+      else if (filter === 'smart_vision') convs = convs.filter(c => c.source === 'smart_vision');
+      else if (filter === 'pending_approval') convs = convs.filter(c => c.status === 'pending_approval');
 
       if (search) {
         convs = convs.filter(c => 
@@ -3268,9 +3285,16 @@
       let html = '';
       convs.forEach(c => {
         const timeStr = c.timestamp ? new Date(c.timestamp).toLocaleString('vi-VN', { hour:'2-digit', minute:'2-digit', day:'2-digit', month:'2-digit' }) : '--';
-        const sourceBadge = c.source === 'app' 
-          ? '<span class="badge-source-app">📱 App Copilot</span>' 
-          : '<span class="badge-source-web">🌐 Web Sales</span>';
+        let sourceBadge = '';
+        if (c.source === 'sales' || c.source === 'web') {
+          sourceBadge = '<span style="background:rgba(0,113,227,0.1); color:#0071E3; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🛍️ Bán Hàng</span>';
+        } else if (c.source === 'creative' || c.source === 'app') {
+          sourceBadge = '<span style="background:rgba(175,82,222,0.12); color:#8944AB; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🎬 Quay &amp; Edit</span>';
+        } else if (c.source === 'smart_vision') {
+          sourceBadge = '<span style="background:rgba(52,199,89,0.12); color:#248A3D; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🧠 Nhận Diện AI</span>';
+        } else {
+          sourceBadge = '<span style="background:rgba(255,149,0,0.12); color:#D97706; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🌐 Toàn Hệ Thống</span>';
+        }
 
         let statusBadge = '<span class="badge-status-answered">✓ Đã Trả Lời</span>';
         if (c.status === 'pending_approval') {
@@ -3411,21 +3435,45 @@
       }
     }
 
+    function filterAiKbTable(domain, btn) {
+      currentKbFilter = domain || 'all';
+      if (btn && btn.parentElement) {
+        btn.parentElement.querySelectorAll('.filter-pill-ai').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      renderAiKbTable();
+    }
+
     function renderAiKbTable() {
       const tbody = document.getElementById('aiKbTableBody');
       if (!tbody || typeof SmartGimbalCatalog === 'undefined') return;
 
-      const kb = SmartGimbalCatalog.getAiKnowledgeBase();
+      let kb = SmartGimbalCatalog.getAiKnowledgeBase();
+      if (currentKbFilter === 'sales') {
+        kb = kb.filter(k => k.target === 'sales' || k.target === 'web' || k.target === 'all_domains' || k.target === 'both');
+      } else if (currentKbFilter === 'creative') {
+        kb = kb.filter(k => k.target === 'creative' || k.target === 'app' || k.target === 'all_domains' || k.target === 'both');
+      } else if (currentKbFilter === 'smart_vision') {
+        kb = kb.filter(k => k.target === 'smart_vision' || k.target === 'all_domains' || k.target === 'both');
+      }
+
       if (kb.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px;">Chưa có tri thức nào.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px;">Chưa có tri thức nào trong chuyên mục này.</td></tr>';
         return;
       }
 
       let html = '';
       kb.forEach(item => {
-        const targetBadge = item.target === 'app'
-          ? '<span class="badge-source-app">📱 App Copilot</span>'
-          : (item.target === 'both' ? '<span style="font-size:11px; font-weight:700; color:#AF52DE;">🌐📱 Cả Hai</span>' : '<span class="badge-source-web">🌐 Web Sales</span>');
+        let targetBadge = '';
+        if (item.target === 'sales' || item.target === 'web') {
+          targetBadge = '<span style="background:rgba(0,113,227,0.1); color:#0071E3; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🛍️ Bán Hàng</span>';
+        } else if (item.target === 'creative' || item.target === 'app') {
+          targetBadge = '<span style="background:rgba(175,82,222,0.12); color:#8944AB; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🎬 Quay &amp; Edit</span>';
+        } else if (item.target === 'smart_vision') {
+          targetBadge = '<span style="background:rgba(52,199,89,0.12); color:#248A3D; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🧠 Nhận Diện AI</span>';
+        } else {
+          targetBadge = '<span style="background:rgba(255,149,0,0.12); color:#D97706; font-weight:700; padding:3px 8px; border-radius:6px; font-size:11px;">🌐 Toàn Hệ Thống</span>';
+        }
 
         const kws = Array.isArray(item.keywords) ? item.keywords.join(', ') : (item.keywords || '');
         const summary = (item.answer || '').substring(0, 110) + '...';

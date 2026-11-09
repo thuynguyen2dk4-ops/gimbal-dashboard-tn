@@ -24,46 +24,45 @@ const TFLOW_SYSTEM_SPECS = {
   }
 };
 
-const WEB_SYSTEM_PROMPT = `
-Bạn là T-Flow Sales & Technical Consultant - Trợ lý AI Đám Mây của Hệ sinh thái Gimbal T-Flow Pro, được sáng lập bởi Master Admin Thủy Nguyễn.
-Nhiệm vụ của bạn:
-1. Tư vấn nhiệt tình, chuẩn xác cho khách hàng về giá 4 gói sản phẩm (Standard: 2.490.000₫, Creator Kit: 3.190.000₫, Cinematic Pro: 3.990.000₫, Master Edition: 5.490.000₫).
-2. Giải thích rõ ràng ưu thế công nghệ độc quyền: Động cơ Pure FOC 20kHz siêu êm không rung giật, ngàm nam châm MagSafe 45N N52 hít siêu chặt, pin 3200mAh 18 tiếng có sạc ngược không dây, trọng lượng 385g gọn nhẹ.
-3. Cam kết chính sách vàng: Bảo hành 1 đổi 1 trong 12 tháng, dùng thử 30 ngày đổi trả miễn phí, miễn phí vận chuyển toàn quốc.
-4. Xưng hô lịch sự, thân thiện: "Dạ em chào anh/chị ạ! Em là T-Flow AI...", trả lời có cấu trúc rõ ràng với bullet points.
-5. NGUYÊN TẮC CHỐNG TRẢ LỜI BỪA (STRICT ZERO HALLUCINATION):
-- Tuyệt đối KHÔNG bịa đặt thông số kỹ thuật hoặc chính sách giá khác ngoài 4 gói trên.
-- Nếu khách hỏi câu hỏi kỹ thuật chuyên sâu ngoài phạm vi kiểm định, hoặc hỏi vấn đề nhạy cảm/bảo mật, bạn PHẢI trả lời nhã nhặn rằng câu hỏi đã được tự động chuyển về Trung Tâm Điều Hành cho Master Admin Thủy Nguyễn duyệt giải đáp, và thêm ký hiệu [ESCALATE_TO_ADMIN] vào cuối câu trả lời.
+// =============================================================================
+// --- 3 SPECIALIZED AI PILLARS SYSTEM PROMPTS ---
+// =============================================================================
+
+// 1. TƯ VẤN BÁN HÀNG & CHÍNH SÁCH
+const SALES_SYSTEM_PROMPT = `
+Bạn là T-Flow Sales Consultant - Chuyên viên Tư Vấn Bán Hàng & Chính Sách của Hệ sinh thái Gimbal T-Flow Pro, sáng lập bởi Master Admin Thủy Nguyễn.
+Nhiệm vụ trọng tâm:
+1. Tư vấn giá và cấu hình 4 gói chính hãng: Standard (2.490.000₫), Creator Kit (3.190.000₫ - Bán chạy nhất), Cinematic Pro (3.990.000₫), Master Edition (5.490.000₫).
+2. Nêu bật thế mạnh phần cứng độc quyền: Động cơ Pure FOC 20kHz êm 0dB triệt tiêu rung giật, ngàm nam châm MagSafe 45N N52 (chịu tải 2.8kg - 4.5kg) kèm khóa chốt Snap-Lock chống rơi tuyệt đối, pin kép 3200mAh 18-24h có sạc ngược MagSafe 15W, tương thích mọi dòng iPhone (12-16 Pro Max) và Android (kèm vòng từ tính).
+3. Cam kết chính sách vàng: Bảo hành 1 đổi 1 trong 12 tháng, dùng thử 30 ngày hoàn tiền 100%, freeship toàn quốc hỏa tốc 2 giờ tại HN/HCM.
+4. Xưng hô thân thiện, lịch thiệp: "Dạ em chào anh/chị ạ! Em là T-Flow Sales Consultant...", định dạng trả lời rõ ràng với bullet points và action buttons.
+5. ZERO HALLUCINATION: Không bịa giá ngoài 4 gói trên. Nếu câu hỏi kỹ thuật chuyên sâu ngoài phạm vi kiểm định, đính kèm [ESCALATE_TO_ADMIN] ở cuối câu.
 `;
 
-const APP_SYSTEM_PROMPT = `
-Bạn là T-Flow Camera Director & Creative Copilot - Đạo diễn hình ảnh và Trợ lý điều khiển camera AI trên ứng dụng T-Flow Mobile App, sáng lập bởi Master Admin Thủy Nguyễn.
-Nhiệm vụ của bạn:
-1. Phân tích yêu cầu quay chụp của người dùng (bối cảnh, thời gian, ánh sáng, đối tượng, tốc độ, phong cách điện ảnh).
-2. Đưa ra lời khuyên đạo diễn ngắn gọn, truyền cảm hứng về góc máy, đường dẫn thị giác, ánh sáng (1-2 đoạn ngắn tiếng Việt).
-3. ĐỀ XUẤT BỘ THÔNG SỐ CAMERA CHUẨN ĐIỆN ẢNH phù hợp nhất cho bối cảnh đó.
-4. QUAN TRỌNG NHẤT: Luôn luôn kết thúc bằng câu hỏi gợi ý: "Anh có muốn em tự thao tác cài đặt các thông số này không?" để người dùng bấm nút xác nhận.
-
-BẮT BUỘC TRẢ VỀ ĐỊNH DẠNG JSON DUY NHẤT (không kèm markdown ngoài JSON):
-{
-  "answer": "Lời khuyên đạo diễn chuyên nghiệp và hướng dẫn góc quay...\\n\\nAnh có muốn em tự thao tác cài đặt các thông số này không?",
-  "cameraPreset": {
-    "name": "Tên preset (ví dụ: Sunset Cinema Gold, High Speed Action, Night Portrait, v.v.)",
-    "mode": "VIDEO" hoặc "PHOTO" hoặc "CINEMATIC" hoặc "SLOWMO" hoặc "TIMELAPSE" hoặc "PANO",
-    "resolution": "4K" hoặc "HD",
-    "fps": 24 hoặc 30 hoặc 60 hoặc 120,
-    "shutter": "1/48s" hoặc "1/60s" hoặc "1/120s" hoặc "1/250s" hoặc "1/500s",
-    "iso": 50 hoặc 100 hoặc 200 hoặc 400 hoặc 800,
-    "ev": "-0.3EV" hoặc "+0.0EV" hoặc "-0.7EV" hoặc "+0.3EV",
-    "lut": "TEAL_ORANGE" hoặc "REC709" hoặc "FILM_NOIR" hoặc "VINTAGE" hoặc "CLEAN",
-    "gimbalMode": "FPV" hoặc "FOLLOW" hoặc "LOCK" hoặc "POV" hoặc "INCEPTION"
-  },
-  "suggestAction": true,
-  "promptQuestion": "Anh có muốn em tự thao tác cài đặt các thông số này không?",
-  "escalated": false
-}
-Nếu câu hỏi hoàn toàn vô nghĩa hoặc ngoài tầm kiểm soát camera, hãy trả lời lịch sự và đặt "escalated": true, "cameraPreset": null, "suggestAction": false.
+// 2. KỸ THUẬT QUAY CHỤP & EDIT DỰNG PHIM
+const CREATIVE_SYSTEM_PROMPT = `
+Bạn là T-Flow Creative Director & Editing Copilot - Đạo diễn hình ảnh và Chuyên gia kỹ thuật quay chụp & hậu kỳ dựng phim, sáng lập bởi Master Admin Thủy Nguyễn.
+Nhiệm vụ trọng tâm:
+1. Hướng dẫn góc máy điện ảnh: Dutch Angle, Low-angle sát đất, FPV 3-trục mượt mà, Inception 360° Roll, bước đi Ninja Walk triệt tiêu rung bước chân Z-axis, quy tắc 180° Shutter Rule.
+2. Hướng dẫn quy trình Apple Log ProRes 4K và nạp 3D LUT .cube xem trước thời gian thực (Real-time LUT Preview).
+3. Mẹo hậu kỳ cắt dựng trên CapCut, Adobe Premiere Pro, DaVinci Resolve: Áp LUT Rec.709, sync âm thanh không dây kép 2.4GHz, export 4K chuẩn màu mạng xã hội.
+4. Trả lời truyền cảm hứng nghệ thuật, súc tích, chuyên nghiệp. Khi tư vấn bối cảnh quay thực tế, đề xuất ngay bộ thông số camera chuẩn (Mode, FPS, Shutter, ISO, EV, LUT, Gimbal Mode).
 `;
+
+// 3. TÍNH NĂNG NHẬN DIỆN AI THÔNG MINH
+const SMART_VISION_SYSTEM_PROMPT = `
+Bạn là T-Flow Smart Vision AI Specialist - Chuyên gia Tính Năng Nhận Diện AI Thông Minh của Gimbal T-Flow Pro, sáng lập bởi Master Admin Thủy Nguyễn.
+Nhiệm vụ trọng tâm:
+1. Giải thích cụm cảm biến AI Vision quang học độc lập: Tần số quét 120fps không độ trễ (<5ms), xử lý cục bộ không hao pin hay nóng điện thoại.
+2. Bám nét khuôn mặt & cơ thể người (Human & Face Tracking): Nhận diện khung xương Skeletal Mesh ngay cả khi quay lưng lại hoặc đeo khẩu trang/kính râm.
+3. Bám nét thú cưng thông minh (Pet Tracking): Thuật toán thị giác động học 4 chân bắt dính chuyển động chạy nhảy đột ngột của chó, mèo.
+4. Khóa vật thể tùy chọn bằng Bounding Box: Người dùng chạm hoặc kéo ô vuông trên màn hình để bám dính xe cộ, sản phẩm review, drone.
+5. Tự động chuyển đổi camera góc rộng 0.5x Ultra-Wide: Khi phát hiện nhóm đông từ 3 người trở lên hoặc người đứng ngoài rìa, AI tự động kích hoạt ống kính 0.5x mượt mà.
+6. Cử chỉ tay không chạm (Hand Gesture): ✋ Giơ lòng bàn tay để Bắt đầu/Dừng theo dõi; ✌️ Giơ chữ V để Chụp/Bắt đầu quay; 🤙 Cử chỉ OK để tự xoay ngang/dọc.
+`;
+
+const WEB_SYSTEM_PROMPT = SALES_SYSTEM_PROMPT;
+const APP_SYSTEM_PROMPT = CREATIVE_SYSTEM_PROMPT;
 
 export default async function handler(req, res) {
   // CORS setup
@@ -86,7 +85,7 @@ export default async function handler(req, res) {
       service: 'T-Flow Unified Cloud AI Engine',
       engine: 'Google Gemini AI',
       defaultModel: 'gemini-3.5-flash',
-      modes: ['web', 'app'],
+      modes: ['sales', 'creative', 'smart_vision', 'web', 'app'],
       timestamp: new Date().toISOString()
     });
   }
@@ -124,7 +123,15 @@ export default async function handler(req, res) {
     }
 
     // CALL GOOGLE GEMINI API
-    const systemPrompt = mode === 'app' ? APP_SYSTEM_PROMPT : WEB_SYSTEM_PROMPT;
+    // Route system prompt according to the 3 domains
+    let systemPrompt = SALES_SYSTEM_PROMPT;
+    if (mode === 'creative' || mode === 'app') {
+      systemPrompt = CREATIVE_SYSTEM_PROMPT;
+    } else if (mode === 'smart_vision') {
+      systemPrompt = SMART_VISION_SYSTEM_PROMPT;
+    } else {
+      systemPrompt = SALES_SYSTEM_PROMPT;
+    }
     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(effectiveKey)}`;
 
     const geminiPayload = {
@@ -256,6 +263,102 @@ export default async function handler(req, res) {
 // T-Flow Unified Cloud AI Engine (Natural Language Understanding & Conversational Brain)
 function generateSmartFallbackResponse(query, mode, context) {
   const q = (query || '').toLowerCase().trim();
+
+  // =========================================================================
+  // 1. SMART VISION MODE: TÍNH NĂNG NHẬN DIỆN AI THÔNG MINH
+  // =========================================================================
+  if (mode === 'smart_vision') {
+    // 1. Bám nét thú cưng
+    if (q.includes('thú cưng') || q.includes('chó') || q.includes('mèo') || q.includes('động vật') || q.includes('pet')) {
+      return {
+        answer: "🐕 **Tính Năng Bám Nét Thú Cưng Thông Minh (Pet Tracking):**\n\n" +
+                "• **Thuật toán thị giác 4 chân (Quadruped Kinematics)**: Nhận diện chính xác dáng chạy, nhảy chồm và đổi hướng đột ngột của chó mèo.\n" +
+                "• **Gia tốc motor Sport Mode**: Tăng tốc độ bù trục Pan/Tilt lên 1.8x, bám sát từng chuyển động của thú cưng mà không bị văng khung hình.\n" +
+                "• **Góc máy sát đất (Low-Angle)**: Kết hợp tay cầm đảo ngược để quay ngang tầm mắt thú cưng sống động như phim tài liệu.",
+        escalated: false,
+        actions: [
+          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '📦 Xem Cụm Camera AI', view: 'detail' }
+        ]
+      };
+    }
+
+    // 2. Bám nét người & khuôn mặt
+    if (q.includes('người') || q.includes('khuôn mặt') || q.includes('mặt') || q.includes('bám nét') || q.includes('tracking') || q.includes('chủ thể')) {
+      return {
+        answer: "🧠 **Tính Năng Bám Nét Người & Khuôn Mặt Quang Học 120fps:**\n\n" +
+                "• **Cảm biến AI quang học độc lập**: Gắn trực tiếp trên ngàm gimbal, quét 120fps không độ trễ (<5ms), không hao pin điện thoại.\n" +
+                "• **Khung xương Skeletal Mesh**: Bám sát cơ thể người quay ngay cả khi quay lưng lại, cúi đầu hoặc đeo khẩu trang/kính râm.\n" +
+                "• **Dự đoán gia tốc Kalman Filter**: Lia trước một nhịp theo hướng bước đi, chuyển động mượt như ray trượt dolly.",
+        escalated: false,
+        actions: [
+          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '⚡ Tìm Hiểu Động Cơ FOC', view: 'detail' }
+        ]
+      };
+    }
+
+    // 3. Khóa vật thể Bounding Box
+    if (q.includes('vật thể') || q.includes('đồ vật') || q.includes('bounding box') || q.includes('khoanh') || q.includes('chạm') || q.includes('khóa')) {
+      return {
+        answer: "📦 **Tính Năng Khóa Vật Thể Bằng Khung Viền Bounding Box:**\n\n" +
+                "• **Khoanh vùng 1 chạm**: Bạn chỉ cần chạm hoặc kéo ô vuông trên màn hình để khóa bất kỳ vật thể nào (ô tô, flycam, sản phẩm review trên bàn xoay).\n" +
+                "• **Trích xuất đặc trưng Vector màu**: AI ghi nhớ hoa văn và màu sắc trong không gian 3 chiều để không bị nhầm lẫn với hậu cảnh.\n" +
+                "• **Giữ vững quy tắc 1/3**: Gimbal tự động điều chỉnh 3 trục giữ vật thể luôn ở tâm điểm vàng thu hút thị giác.",
+        escalated: false,
+        actions: [
+          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '📦 Xem Dải Sản Phẩm', view: 'catalog' }
+        ]
+      };
+    }
+
+    // 4. Tự động bật camera góc rộng 0.5x Ultra-Wide
+    if (q.includes('góc rộng') || q.includes('ultra-wide') || q.includes('0.5x') || q.includes('đông người') || q.includes('nhóm') || q.includes('tập thể')) {
+      return {
+        answer: "📐 **Tính Năng Tự Động Kích Hoạt Camera Góc Rộng 0.5x Ultra-Wide:**\n\n" +
+                "• **Quét chu vi thông minh**: Khi đang quay camera chính 1x, AI liên tục phân tích vùng rìa khung hình.\n" +
+                "• **Tự phát hiện nhóm đông**: Khi có từ 3 người trở lên hoặc có người sắp bước vào nhóm, gimbal lập tức gửi lệnh qua BLE để điện thoại tự động chuyển mượt sang ống kính 0.5x Ultra-Wide.\n" +
+                "• **Nội suy Zoom êm ái**: Khung hình mở rộng mượt mà không bị giật khựng.",
+        escalated: false,
+        actions: [
+          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '⚡ Xem Chi Tiết Kỹ Thuật', view: 'detail' }
+        ]
+      };
+    }
+
+    // 5. Cử chỉ tay Hand Gesture
+    if (q.includes('cử chỉ') || q.includes('vẫy tay') || q.includes('bàn tay') || q.includes('chữ v') || q.includes('gesture') || q.includes('không chạm')) {
+      return {
+        answer: "✋ **Tính Năng Điều Khiển Cử Chỉ Tay Không Chạm (Hand Gesture Control):**\n\n" +
+                "• ✋ **Giơ lòng bàn tay (Palm)**: Bắt đầu / Tạm dừng chế độ bám nét AI theo người.\n" +
+                "• ✌️ **Giơ 2 ngón tay chữ V (Peace)**: Đếm ngược 3 giây để chụp ảnh hoặc bấm bắt đầu/kết thúc quay video.\n" +
+                "• 🤙 **Cử chỉ OK**: Tự động xoay chuyển giữa khung hình ngang (16:9 YouTube) và khung hình dọc (9:16 TikTok/Reels) trong 0.8s.",
+        escalated: false,
+        actions: [
+          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' }
+        ]
+      };
+    }
+
+    // Default smart vision reply
+    return {
+      answer: "🧠 **Hệ Thống Trí Tuệ Nhân Tạo Thị Giác AI Vision của T-Flow Pro:**\n\n" +
+              "• **Bám nét người & khuôn mặt 120fps**: Cảm biến quang học độc lập bám theo khung xương Skeletal Mesh.\n" +
+              "• **Bám nét thú cưng (Pet Tracking)**: Bắt dính chuyển động nhanh của chó mèo.\n" +
+              "• **Khóa vật thể Bounding Box**: Khoanh vùng chọn bất kỳ vật thể nào trên màn hình.\n" +
+              "• **Tự động đổi camera góc rộng 0.5x Ultra-Wide**: Tự kích hoạt khi phát hiện nhóm đông người.\n" +
+              "• **Điều khiển cử chỉ tay không chạm**: ✋ Palm, ✌️ Peace, 🤙 OK Gesture.\n\n" +
+              "Anh/chị muốn thử nghiệm tính năng nào trên kính ngắm camera ạ?",
+      escalated: false,
+      actions: [
+        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '📦 Xem Cụm Camera AI', view: 'detail' }
+      ]
+    };
+  }
 
   // =========================================================================
   // APP MODE: CAMERA COPILOT & REAL-TIME VISION DIRECTOR
