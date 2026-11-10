@@ -857,41 +857,33 @@
        VIEW 3: TRANG CHI TIẾT SẢN PHẨM RIÊNG (APPLE STORE BUY PAGE)
        ========================================================================== */
     .product-detail-view {
-      padding: clamp(22px, 3.8dvh, 42px) 0 clamp(44px, 6dvh, 96px) 0;
+      padding: clamp(12px, max(1.8dvh, calc((var(--view-h) - 670px) * 0.36)), 84px) 0 clamp(40px, 6dvh, 88px) 0;
     }
 
     /* Top 2 Columns */
     .detail-top-grid {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: clamp(24px, 4vw, 56px);
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: clamp(22px, 3.6vw, 52px);
       align-items: start;
-      margin-bottom: clamp(36px, 6.5dvh, 84px);
+      margin-bottom: clamp(28px, 5dvh, 64px);
     }
     .sticky-gallery-col {
       position: sticky;
-      --gallery-total-h: clamp(328px, 60.5dvh, 540px);
-      --gallery-eye-offset: min(
-        clamp(76px, 14dvh, 148px),
-        max(
-          clamp(24px, 4dvh, 48px),
-          calc((var(--view-h) - var(--gallery-total-h)) / 2)
-        )
-      );
-      top: calc(var(--nav-h) + var(--gallery-eye-offset));
-      margin-top: max(0px, calc(var(--gallery-eye-offset) - clamp(22px, 3.8dvh, 42px)));
+      top: calc(var(--nav-h) + 24px);
+      margin-top: 0;
     }
     .gallery-main-frame {
       background: var(--bg-alt);
       border-radius: var(--radius-lg);
-      padding: clamp(16px, 2.6dvh, 36px);
+      padding: clamp(14px, 2.2dvh, 28px);
       border: 1px solid var(--border);
-      height: clamp(260px, 50dvh, 450px);
+      height: clamp(240px, 46dvh, 420px);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      margin-bottom: clamp(10px, 1.5dvh, 14px);
+      margin-bottom: clamp(8px, 1.3dvh, 12px);
     }
     .gallery-main-frame img {
       max-height: 100%;
@@ -910,7 +902,7 @@
       gap: clamp(8px, 1vw, 12px);
     }
     .thumb-item {
-      height: clamp(56px, 8.5dvh, 82px);
+      height: clamp(52px, 7.8dvh, 76px);
       background: var(--bg-alt);
       border-radius: var(--radius-md);
       border: 2px solid transparent;
@@ -935,47 +927,57 @@
     .configurator-col {
       display: flex;
       flex-direction: column;
-      gap: clamp(14px, 2.2dvh, 24px);
+      gap: clamp(10px, 1.55dvh, 18px);
     }
     .detail-heading h1 {
-      font-size: clamp(26px, min(3vw, 4.2dvh), 38px);
+      font-size: clamp(24px, min(2.7vw, 3.8dvh), 34px);
       font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1.14;
-      margin-bottom: 6px;
+      letter-spacing: -0.025em;
+      line-height: 1.12;
+      margin-bottom: 0;
+    }
+    .detail-overview-lead {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: clamp(20px, 3dvh, 34px) clamp(20px, 2.8vw, 36px);
+      margin-bottom: clamp(24px, 4dvh, 42px);
     }
     .detail-tagline {
-      font-size: clamp(15px, min(1.5vw, 2.1dvh), 18px);
-      font-weight: 600;
-      color: var(--text-secondary);
-      margin-bottom: 8px;
+      font-size: clamp(18px, min(2vw, 2.8dvh), 24px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      margin: 6px 0 10px 0;
+      line-height: 1.3;
     }
     .detail-short-desc {
-      font-size: clamp(13px, 1.15vw, 14.5px);
+      font-size: clamp(14px, 1.25vw, 15.5px);
       color: var(--text-secondary);
-      line-height: 1.55;
+      line-height: 1.65;
+      margin: 0;
     }
 
     .config-step-box {
       border-top: 1px solid var(--border);
-      padding-top: clamp(12px, 1.8dvh, 20px);
+      padding-top: clamp(9px, 1.4dvh, 16px);
     }
     .config-step-title {
-      font-size: clamp(13.5px, 1.2vw, 15px);
+      font-size: clamp(13px, 1.12vw, 14.5px);
       font-weight: 700;
-      margin-bottom: clamp(8px, 1.2dvh, 12px);
+      margin-bottom: clamp(6px, 1dvh, 10px);
     }
 
     /* Step 1: Tier Cards (Apple Store style) */
     .tier-card-group {
       display: flex;
       flex-direction: column;
-      gap: clamp(8px, 1.1dvh, 11px);
+      gap: clamp(6px, 0.9dvh, 9px);
     }
     .tier-select-card {
       border: 1.5px solid var(--border);
       border-radius: var(--radius-md);
-      padding: clamp(11px, 1.5dvh, 16px) clamp(14px, 1.6vw, 18px);
+      padding: clamp(8px, 1.15dvh, 13px) clamp(12px, 1.35vw, 17px);
       cursor: pointer;
       transition: all 0.2s var(--ease);
       display: flex;
@@ -993,16 +995,17 @@
       box-shadow: 0 0 0 1px var(--text-main);
     }
     .tier-card-label {
-      font-size: clamp(14px, 1.25vw, 15.5px);
+      font-size: clamp(13.5px, 1.15vw, 15px);
       font-weight: 700;
     }
     .tier-card-diff {
-      font-size: 12px;
+      font-size: 11.8px;
+      line-height: 1.38;
       color: var(--text-secondary);
       margin-top: 2px;
     }
     .tier-card-price {
-      font-size: clamp(14.5px, 1.3vw, 16px);
+      font-size: clamp(14px, 1.2vw, 15.5px);
       font-weight: 800;
       font-family: var(--font-mono);
       text-align: right;
@@ -1013,11 +1016,11 @@
     .colors-config-list {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 12px;
     }
     .color-swatch-btn {
-      width: 30px;
-      height: 30px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid #FFF;
@@ -1034,50 +1037,50 @@
       background: var(--bg-alt);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: clamp(14px, 2dvh, 22px);
+      padding: clamp(11px, 1.55dvh, 18px);
     }
     .summary-price-row {
       display: flex;
       align-items: baseline;
       gap: 12px;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .summary-current-price {
-      font-size: clamp(26px, min(2.8vw, 3.8dvh), 32px);
+      font-size: clamp(24px, min(2.5vw, 3.4dvh), 30px);
       font-weight: 800;
       font-family: var(--font-mono);
     }
     .summary-old-price {
-      font-size: 16px;
+      font-size: 15px;
       color: var(--text-muted);
       text-decoration: line-through;
     }
     .summary-gift-tag {
-      font-size: 13px;
+      font-size: 12.5px;
       color: var(--text-main);
-      margin-top: 6px;
+      margin-top: 4px;
       font-weight: 600;
     }
     .summary-perks {
-      margin-top: 14px;
-      padding-top: 14px;
+      margin-top: 10px;
+      padding-top: 10px;
       border-top: 1px solid var(--border);
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--text-secondary);
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 3px;
     }
 
     .detail-ctas-row {
       display: flex;
-      gap: 12px;
-      margin-top: 8px;
+      gap: 10px;
+      margin-top: 2px;
     }
     .detail-ctas-row button {
       flex: 1;
-      padding: 15px 0;
-      font-size: 15px;
+      padding: clamp(11px, 1.5dvh, 14px) 0;
+      font-size: 14.5px;
       justify-content: center;
     }
 
@@ -3108,16 +3111,39 @@
       .store-card-img-wrap {
         height: 150px !important;
       }
+      .product-detail-view {
+        padding: 12px 0 36px 0 !important;
+      }
+      .detail-top-grid {
+        gap: 16px !important;
+        margin-bottom: 24px !important;
+      }
       .gallery-main-frame {
-        height: clamp(200px, 32dvh, 300px) !important;
-        padding: 14px !important;
+        height: clamp(190px, 30dvh, 270px) !important;
+        padding: 12px !important;
       }
       .thumb-item {
-        height: 58px !important;
+        height: 54px !important;
         padding: 4px !important;
       }
       .gallery-thumbs-row {
         gap: 8px !important;
+      }
+      .configurator-col {
+        gap: 12px !important;
+      }
+      .detail-heading h1 {
+        font-size: 24px !important;
+      }
+      .detail-overview-lead {
+        padding: 16px 14px !important;
+        margin-bottom: 20px !important;
+      }
+      .detail-tagline {
+        font-size: 16px !important;
+      }
+      .detail-short-desc {
+        font-size: 13.5px !important;
       }
       .detail-ctas-row {
         gap: 8px !important;
@@ -3684,6 +3710,135 @@
       }
     }
 
+    /* Compact 2x2 Tier Grid on Standard/Medium Desktop & Laptop Heights (<= 920px) so Price + CTAs stay above the fold */
+    @media (min-width: 769px) and (max-height: 920px) {
+      .detail-top-grid {
+        gap: clamp(18px, 3vw, 44px);
+        margin-bottom: clamp(22px, 4dvh, 44px);
+      }
+      .gallery-main-frame {
+        height: clamp(220px, 45dvh, 380px);
+      }
+      .thumb-item {
+        height: clamp(48px, 7.2dvh, 66px);
+      }
+      .configurator-col {
+        gap: clamp(9px, 1.35dvh, 14px);
+      }
+      .detail-heading h1 {
+        font-size: clamp(24px, min(2.5vw, 3.5dvh), 32px);
+      }
+      .config-step-box {
+        padding-top: clamp(8px, 1.25dvh, 13px);
+      }
+      .config-step-title {
+        margin-bottom: 6px;
+      }
+      .tier-card-group {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+      }
+      .tier-select-card {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 9px 12px;
+        gap: 6px;
+      }
+      .tier-card-diff {
+        font-size: 11px;
+        line-height: 1.32;
+      }
+      .tier-card-price {
+        text-align: left;
+        font-size: 14px;
+      }
+      .detail-summary-card {
+        padding: clamp(10px, 1.4dvh, 15px) clamp(13px, 1.4vw, 18px);
+      }
+      .detail-ctas-row button {
+        padding: clamp(10px, 1.35dvh, 13px) 0;
+      }
+    }
+
+    /* Compact Laptop/Landscape Tablet Heights (701px–820px: 1366x768, 1280x720, 1024x768) */
+    @media (min-width: 769px) and (max-height: 820px) {
+      .product-detail-view {
+        padding: 10px 0 38px 0;
+      }
+      .detail-top-grid {
+        gap: clamp(18px, 2.8vw, 38px);
+        margin-bottom: 22px;
+      }
+      .gallery-main-frame {
+        height: clamp(220px, 44dvh, 340px);
+        padding: 14px;
+        margin-bottom: 8px;
+      }
+      .thumb-item {
+        height: 52px;
+        padding: 5px;
+      }
+      .configurator-col {
+        gap: 8px;
+      }
+      .detail-heading h1 {
+        font-size: clamp(22px, 3.2dvh, 28px);
+      }
+      .config-step-box {
+        padding-top: 8px;
+      }
+      .config-step-title {
+        font-size: 13px;
+        margin-bottom: 5px;
+      }
+      .tier-card-group {
+        gap: 6px;
+      }
+      .tier-select-card {
+        padding: 7px 11px;
+        gap: 4px;
+      }
+      .tier-card-label {
+        font-size: 13.5px;
+      }
+      .tier-card-diff {
+        font-size: 11px;
+        line-height: 1.28;
+      }
+      .tier-card-price {
+        font-size: 13.5px;
+      }
+      .color-swatch-btn {
+        width: 23px;
+        height: 23px;
+      }
+      .detail-summary-card {
+        padding: 9px 13px;
+      }
+      .summary-price-row {
+        margin-bottom: 2px;
+      }
+      .summary-current-price {
+        font-size: 22px;
+      }
+      .summary-gift-tag {
+        font-size: 12px;
+        margin-top: 2px;
+      }
+      .summary-perks {
+        margin-top: 6px;
+        padding-top: 6px;
+        font-size: 11.5px;
+        gap: 2px;
+      }
+      .detail-ctas-row button {
+        padding: 10px 0;
+        font-size: 14px;
+      }
+    }
+
     /* Short DPI-scaled Desktop/Laptops (e.g., 1280x620, 1366x660) */
     @media (min-width: 769px) and (max-height: 700px) {
       :root {
@@ -3782,6 +3937,84 @@
       }
       .feature-app-phone img {
         height: clamp(205px, 42dvh, 285px);
+      }
+      .product-detail-view {
+        padding: 12px 0 36px 0;
+      }
+      .detail-top-grid {
+        gap: clamp(18px, 2.8vw, 36px);
+        margin-bottom: 24px;
+      }
+      .sticky-gallery-col {
+        top: calc(var(--nav-h) + 12px);
+      }
+      .gallery-main-frame {
+        height: clamp(220px, 50dvh, 300px);
+        padding: 12px;
+        margin-bottom: 8px;
+      }
+      .thumb-item {
+        height: 48px;
+        padding: 4px;
+      }
+      .configurator-col {
+        gap: 8px;
+      }
+      .detail-heading h1 {
+        font-size: 24px;
+      }
+      .config-step-box {
+        padding-top: 8px;
+      }
+      .config-step-title {
+        font-size: 12.5px;
+        margin-bottom: 6px;
+      }
+      .tier-card-group {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+      }
+      .tier-select-card {
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding: 8px 10px;
+        gap: 4px;
+      }
+      .tier-card-diff {
+        display: none;
+      }
+      .tier-card-price {
+        text-align: left;
+        font-size: 13.5px;
+      }
+      .color-swatch-btn {
+        width: 24px;
+        height: 24px;
+      }
+      .detail-summary-card {
+        padding: 10px 14px;
+      }
+      .summary-price-row {
+        margin-bottom: 3px;
+      }
+      .summary-current-price {
+        font-size: 22px;
+      }
+      .summary-gift-tag {
+        font-size: 12px;
+        margin-top: 2px;
+      }
+      .summary-perks {
+        margin-top: 6px;
+        padding-top: 6px;
+        font-size: 11.5px;
+        gap: 2px;
+      }
+      .detail-ctas-row button {
+        padding: 10px 0;
+        font-size: 13.5px;
       }
     }
 
@@ -4250,10 +4483,6 @@
           <div class="configurator-col">
             <div class="detail-heading">
               <h1 id="detailTitle">T-Flow Pro</h1>
-              <div class="detail-tagline" id="detailTagline">Vững khung hình, Trọn cảm xúc. Đỉnh cao chống rung 3 trục cho Smartphone.</div>
-              <p class="detail-short-desc" id="detailShortDesc">
-                Chống rung siêu mượt khi vừa đi vừa quay cho iPhone &amp; Smartphone. Hít nam châm MagSafe 1 giây gọn nhẹ, xoay bánh xe thu phóng tiện lợi và pin dùng suốt 18 giờ.
-              </p>
             </div>
 
             <!-- Step 1: Select Version / Tier -->
@@ -4298,16 +4527,23 @@
 
         <!-- BOTTOM DEEP SECTIONS (4 TABS / BLOCKS) -->
         <div class="deep-tabs-nav">
-          <button class="deep-tab-btn active" onclick="switchDetailTab('overview', this)">Tổng Quan Sản Phẩm</button>
+          <button class="deep-tab-btn active" onclick="switchDetailTab('overview', this)">Mô Tả Sản Phẩm</button>
           <button class="deep-tab-btn" onclick="switchDetailTab('box', this)">Trong Hộp Có Gì</button>
           <button class="deep-tab-btn" onclick="switchDetailTab('specs', this)">Thông Số Kỹ Thuật</button>
           <button class="deep-tab-btn" onclick="switchDetailTab('warranty', this)">Bảo Hành &amp; Hỗ Trợ</button>
         </div>
 
-        <!-- Deep Tab 1: Overview (Alternating) -->
+        <!-- Deep Tab 1: Overview / Mô Tả Sản Phẩm -->
         <div id="deepTabOverview" class="deep-tab-panel">
+          <div class="detail-overview-lead" id="detailOverviewLead">
+            <div class="tag-clean">Mô Tả Sản Phẩm</div>
+            <div class="detail-tagline" id="detailTagline">Vững khung hình, Trọn cảm xúc. Đỉnh cao chống rung 3 trục cho Smartphone.</div>
+            <p class="detail-short-desc" id="detailShortDesc">
+              Chống rung siêu mượt khi vừa đi vừa quay cho iPhone &amp; Smartphone. Hít nam châm MagSafe 1 giây gọn nhẹ, xoay bánh xe thu phóng tiện lợi và pin dùng suốt 18 giờ.
+            </p>
+          </div>
           <div id="detailOverviewContainer">
-            <!-- Dynamically populated 3 highlight blocks -->
+            <!-- Dynamically populated highlight blocks -->
           </div>
         </div>
 
@@ -5623,13 +5859,23 @@
       currentDetailTierKey = (prod.tiers && prod.tiers[0]) ? (prod.tiers[0].key || prod.tiers[0].id) : 'tier-pro-std';
       currentDetailColorId = (prod.colors && prod.colors[0]) ? prod.colors[0].id : 'carbon-black';
 
-      // Heading info
+      // Heading & Overview Lead info (tagline + full description moved down into Mô Tả Sản Phẩm tab)
       const elTitle = document.getElementById('detailTitle');
       if (elTitle) elTitle.textContent = prod.name;
       const elTagline = document.getElementById('detailTagline');
-      if (elTagline) elTagline.textContent = prod.tagline || prod.subtitle || '';
+      if (elTagline) {
+        elTagline.textContent = prod.tagline || '';
+        elTagline.style.display = prod.tagline ? '' : 'none';
+      }
       const elShortDesc = document.getElementById('detailShortDesc');
-      if (elShortDesc) elShortDesc.textContent = prod.subtitle || '';
+      if (elShortDesc) {
+        elShortDesc.textContent = prod.subtitle || '';
+        elShortDesc.style.display = prod.subtitle ? '' : 'none';
+      }
+      const elLead = document.getElementById('detailOverviewLead');
+      if (elLead) {
+        elLead.style.display = (prod.tagline || prod.subtitle) ? '' : 'none';
+      }
 
       // Gallery main image
       const elMainImg = document.getElementById('detailMainImg');
@@ -5700,27 +5946,34 @@
 
       updateDetailPriceBox();
 
-      // Deep Tab 1: Overview (3 highlights)
+      // Deep Tab 1: Overview / Mô Tả Sản Phẩm (overview or highlights fallback)
       const overviewContainer = document.getElementById('detailOverviewContainer');
       if (overviewContainer) {
         overviewContainer.innerHTML = '';
-        if (prod.overview && prod.overview.length > 0) {
-          prod.overview.forEach((h, idx) => {
-            const row = document.createElement('div');
-            row.className = `overview-row ${idx % 2 === 1 ? 'reverse' : ''}`;
-            row.innerHTML = `
-              <div class="overview-text-box">
-                <div class="tag-clean">Điểm Nhấn 0${idx + 1}</div>
-                <h3>${h.title}</h3>
-                <p>${h.desc}</p>
-              </div>
-              <div class="overview-img-box">
-                <img src="${h.img || prod.img}" alt="${h.title}">
-              </div>
-            `;
-            overviewContainer.appendChild(row);
-          });
-        }
+        const overviewItems = (prod.overview && prod.overview.length > 0) ? prod.overview : (prod.highlights || []);
+        const galleryList = (prod.gallery && prod.gallery.length > 0) ? prod.gallery : [prod.img || '/shared/img/feed_portrait_dusk.jpg'];
+        overviewItems.forEach((h, idx) => {
+          const row = document.createElement('div');
+          row.className = `overview-row ${idx % 2 === 1 ? 'reverse' : ''}`;
+          const rowImg = h.img || galleryList[idx % galleryList.length] || prod.img;
+          row.innerHTML = `
+            <div class="overview-text-box">
+              <div class="tag-clean">Điểm Nhấn 0${idx + 1}</div>
+              <h3>${h.title || prod.name}</h3>
+              <p>${h.desc || ''}</p>
+            </div>
+            <div class="overview-img-box">
+              <img src="${rowImg}" alt="${h.title || prod.name}">
+            </div>
+          `;
+          overviewContainer.appendChild(row);
+        });
+      }
+
+      // Reset to default Mô Tả Sản Phẩm tab cleanly on product switch
+      const deepTabBtns = typeof document.querySelectorAll === 'function' ? document.querySelectorAll('.deep-tab-btn') : [];
+      if (deepTabBtns.length > 0 && typeof switchDetailTab === 'function') {
+        switchDetailTab('overview', deepTabBtns[0]);
       }
 
       // Deep Tab 2: What's in the Box
