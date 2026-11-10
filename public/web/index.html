@@ -37,6 +37,14 @@
       --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
       --font-mono: "JetBrains Mono", monospace;
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --nav-h: clamp(54px, 6.8vh, 62px);
+      --view-h: calc(100vh - var(--nav-h));
+    }
+    @supports (height: 100dvh) {
+      :root {
+        --nav-h: clamp(54px, 6.8dvh, 62px);
+        --view-h: calc(100dvh - var(--nav-h));
+      }
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,7 +64,7 @@
     nav {
       position: sticky;
       top: 0; left: 0; right: 0;
-      height: 64px;
+      height: var(--nav-h);
       background: rgba(255, 255, 255, 0.88);
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -65,7 +73,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 36px;
+      padding: 0 clamp(16px, 3vw, 36px);
       transition: all 0.2s var(--ease);
     }
     .nav-brand {
@@ -92,18 +100,19 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: clamp(4px, 0.6vw, 8px);
       list-style: none;
     }
     .nav-links li button {
       background: transparent;
       border: none;
-      font-size: 13.5px;
+      font-size: clamp(12.5px, 1.05vw, 13.5px);
       font-weight: 500;
       color: var(--text-secondary);
-      padding: 8px 18px;
+      padding: 7px clamp(10px, 1.35vw, 18px);
       border-radius: var(--radius-full);
       cursor: pointer;
+      white-space: nowrap;
       transition: all 0.2s var(--ease);
     }
     .nav-links li button:hover {
@@ -161,7 +170,7 @@
     /* VIEW PANELS (MULTI-VIEW ISOLATION) */
     .view-panel {
       display: none;
-      min-height: calc(100vh - 120px);
+      min-height: var(--view-h);
     }
     .view-panel.active {
       display: block;
@@ -175,54 +184,58 @@
     .container {
       max-width: 1180px;
       margin: 0 auto;
-      padding: 0 24px;
+      padding: 0 clamp(16px, 2.8vw, 28px);
+      width: 100%;
     }
     .container-wide {
       max-width: 1280px;
       margin: 0 auto;
-      padding: 0 24px;
+      padding: 0 clamp(16px, 2.8vw, 28px);
+      width: 100%;
     }
 
     /* Common typography */
     .section-header-clean {
       text-align: center;
       max-width: 680px;
-      margin: 0 auto 48px auto;
+      margin: 0 auto clamp(16px, 2.8dvh, 36px) auto;
     }
     .tag-clean {
-      font-size: 12px;
+      font-size: clamp(10.5px, 0.9vw, 12px);
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: var(--text-muted);
-      margin-bottom: 12px;
+      margin-bottom: clamp(4px, 0.8dvh, 10px);
     }
     .title-clean {
-      font-size: 40px;
+      font-size: clamp(24px, min(3.2vw, 4.4dvh), 40px);
       font-weight: 800;
       letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin-bottom: 16px;
+      line-height: 1.14;
+      margin-bottom: clamp(6px, 1dvh, 14px);
     }
     .sub-clean {
-      font-size: 16px;
+      font-size: clamp(13.5px, min(1.3vw, 1.95dvh), 16px);
       color: var(--text-secondary);
-      line-height: 1.6;
+      line-height: 1.55;
     }
 
     /* Buttons */
     .btn-dark {
       background: var(--text-main);
       color: #FFF;
-      padding: 13px 26px;
+      padding: clamp(10px, 1.45dvh, 13px) clamp(16px, 1.8vw, 24px);
       border-radius: var(--radius-full);
-      font-size: 14.5px;
+      font-size: clamp(13px, 1.1vw, 14.5px);
       font-weight: 600;
       border: none;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
+      white-space: nowrap;
       transition: all 0.2s var(--ease);
     }
     .btn-dark:hover {
@@ -233,15 +246,17 @@
     .btn-ghost {
       background: var(--bg-alt);
       color: var(--text-main);
-      padding: 13px 26px;
+      padding: clamp(10px, 1.45dvh, 13px) clamp(16px, 1.8vw, 24px);
       border-radius: var(--radius-full);
-      font-size: 14.5px;
+      font-size: clamp(13px, 1.1vw, 14.5px);
       font-weight: 600;
       border: 1px solid var(--border);
       cursor: pointer;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
+      white-space: nowrap;
       transition: all 0.2s var(--ease);
     }
     .btn-ghost:hover {
@@ -254,21 +269,24 @@
        ========================================================================== */
     /* Flagship Showcase (Hero MVP) */
     .hero-flagship-showcase {
-      padding: 48px 0 80px 0;
+      min-height: var(--view-h);
+      padding: clamp(14px, 2.8dvh, 42px) 0;
+      display: flex;
+      align-items: center;
       background: linear-gradient(180deg, #FFFFFF 0%, #F5F5F7 100%);
       border-bottom: 1px solid var(--border);
     }
     .flagship-grid {
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 56px;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: clamp(22px, 3.8vw, 52px);
       align-items: center;
     }
     .flagship-media-box {
       position: relative;
       background: #FFFFFF;
       border-radius: var(--radius-lg);
-      padding: 40px;
+      padding: clamp(16px, 2.8dvh, 36px);
       border: 1px solid var(--border);
       box-shadow: var(--shadow-md);
       display: flex;
@@ -279,7 +297,8 @@
     }
     .flagship-media-box img {
       max-width: 100%;
-      height: 440px;
+      width: auto;
+      height: clamp(250px, 53dvh, 450px);
       object-fit: contain;
       transition: transform 0.6s var(--ease);
       filter: drop-shadow(0 20px 30px rgba(0,0,0,0.12));
@@ -289,58 +308,82 @@
     }
     .flagship-badge {
       position: absolute;
-      top: 24px;
-      left: 24px;
+      top: clamp(12px, 2dvh, 22px);
+      left: clamp(12px, 2vw, 22px);
       background: var(--text-main);
       color: #FFF;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      padding: 6px 14px;
+      padding: 5px 12px;
       border-radius: var(--radius-full);
+      z-index: 2;
     }
 
     .flagship-info h1 {
-      font-size: 44px;
+      font-size: clamp(28px, min(3.8vw, 5dvh), 44px);
       font-weight: 800;
       letter-spacing: -0.03em;
-      line-height: 1.15;
-      margin-bottom: 12px;
+      line-height: 1.12;
+      margin-bottom: clamp(6px, 0.9dvh, 12px);
     }
     .flagship-tagline {
-      font-size: 19px;
+      font-size: clamp(15px, min(1.7vw, 2.25dvh), 19px);
       font-weight: 600;
       color: var(--text-secondary);
-      margin-bottom: 16px;
-      line-height: 1.4;
+      margin-bottom: clamp(6px, 1.1dvh, 14px);
+      line-height: 1.38;
     }
     .flagship-desc {
-      font-size: 14.5px;
+      font-size: clamp(13px, min(1.22vw, 1.8dvh), 14.5px);
       color: var(--text-secondary);
-      margin-bottom: 28px;
-      line-height: 1.6;
+      margin-bottom: clamp(12px, 2dvh, 22px);
+      line-height: 1.52;
+    }
+    .hero-field-label {
+      margin-bottom: clamp(5px, 0.8dvh, 8px);
+      font-size: clamp(11.5px, 1vw, 12.5px);
+      font-weight: 700;
+      color: var(--text-secondary);
     }
 
     /* Tier Selector Pills on Hero */
     .hero-tier-selector {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: clamp(6px, 1dvh, 10px);
+      margin-bottom: clamp(10px, 1.8dvh, 18px);
     }
     .hero-tier-btn {
-      padding: 10px 18px;
+      padding: clamp(7px, 1.1dvh, 10px) clamp(10px, 1.1vw, 14px);
       border-radius: var(--radius-full);
       border: 1px solid var(--border);
       background: #FFFFFF;
-      font-size: 13px;
+      font-size: clamp(11.5px, 1.05vw, 13px);
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s var(--ease);
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      gap: 6px;
+      width: 100%;
+    }
+    .hero-tier-name {
+      font-weight: 700;
+      text-align: left;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .hero-tier-price {
+      font-family: var(--font-mono);
+      font-size: 0.92em;
+      font-weight: 700;
+      opacity: 0.9;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .hero-tier-btn:hover {
       border-color: var(--text-main);
@@ -355,8 +398,9 @@
     .color-swatches-row {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 24px;
+      gap: 10px;
+      margin-bottom: clamp(10px, 1.8dvh, 20px);
+      flex-wrap: wrap;
     }
     .color-dot {
       width: 22px;
@@ -380,17 +424,18 @@
     .hero-price-box {
       display: flex;
       align-items: baseline;
-      gap: 14px;
-      margin-bottom: 28px;
+      gap: 12px;
+      margin-bottom: clamp(12px, 2dvh, 22px);
+      flex-wrap: wrap;
     }
     .hero-price-val {
-      font-size: 32px;
+      font-size: clamp(24px, min(2.8vw, 4.2dvh), 32px);
       font-weight: 800;
       letter-spacing: -0.02em;
       font-family: var(--font-mono);
     }
     .hero-price-old {
-      font-size: 18px;
+      font-size: clamp(14px, 1.5vw, 18px);
       color: var(--text-muted);
       text-decoration: line-through;
     }
@@ -406,23 +451,27 @@
     .hero-action-buttons {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: clamp(8px, 0.95vw, 12px);
       flex-wrap: wrap;
     }
 
     /* Bento Grid (FOC Core Technology) */
     .bento-section {
-      padding: 100px 0;
+      min-height: var(--view-h);
+      padding: clamp(20px, 3.8dvh, 60px) 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
     .bento-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
+      gap: clamp(12px, 2dvh, 22px);
     }
     .bento-card {
       background: var(--bg-alt);
       border-radius: var(--radius-lg);
-      padding: 36px;
+      padding: clamp(16px, 2.4dvh, 28px) clamp(18px, 2.2vw, 32px);
       border: 1px solid var(--border);
       transition: all 0.35s var(--ease);
       display: flex;
@@ -437,27 +486,32 @@
     }
     .bento-span-2 { grid-column: span 2; }
     .bento-card-title {
-      font-size: 22px;
+      font-size: clamp(17px, min(1.8vw, 2.6dvh), 22px);
       font-weight: 800;
       letter-spacing: -0.02em;
-      margin-bottom: 10px;
+      margin-bottom: clamp(4px, 0.8dvh, 10px);
     }
     .bento-card-desc {
-      font-size: 14.5px;
+      font-size: clamp(12.5px, min(1.15vw, 1.8dvh), 14.5px);
       color: var(--text-secondary);
-      line-height: 1.6;
+      line-height: 1.5;
     }
     .bento-metric-large {
-      font-size: 52px;
+      font-size: clamp(28px, min(3.6vw, 5dvh), 48px);
       font-weight: 800;
       font-family: var(--font-mono);
       letter-spacing: -0.03em;
-      margin: 20px 0 10px 0;
+      line-height: 1;
+      margin: clamp(10px, 1.6dvh, 18px) 0 0 0;
     }
 
     /* Ecosystem & iOS Apps Section */
     .eco-section {
-      padding: 100px 0;
+      min-height: var(--view-h);
+      padding: clamp(20px, 3.8dvh, 60px) 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       background: var(--bg-alt);
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
@@ -465,74 +519,101 @@
     .eco-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 40px;
+      gap: clamp(16px, 2.4vw, 32px);
     }
     .eco-card {
       background: #FFFFFF;
       border-radius: var(--radius-lg);
-      padding: 40px;
+      padding: clamp(18px, 2.8dvh, 32px);
       border: 1px solid var(--border);
       box-shadow: var(--shadow-sm);
       transition: all 0.3s var(--ease);
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: clamp(14px, 2vw, 26px);
+      align-items: center;
     }
     .eco-card:hover {
       transform: translateY(-3px);
       box-shadow: var(--shadow-md);
     }
+    .eco-card-text h3 {
+      font-size: clamp(17px, min(1.8vw, 2.6dvh), 22px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: clamp(6px, 1dvh, 10px);
+    }
+    .eco-card-text p {
+      font-size: clamp(12.5px, min(1.18vw, 1.8dvh), 14.5px);
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
     .eco-card img {
-      width: 100%;
-      height: 280px;
+      height: clamp(210px, 42dvh, 380px);
+      width: auto;
+      aspect-ratio: 380 / 823;
       object-fit: cover;
-      border-radius: var(--radius-md);
-      margin-top: 24px;
+      border-radius: 18px;
+      border: 3px solid #1D1D1F;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.16);
+      margin-top: 0;
+      display: block;
     }
 
     /* Warranty & Trust */
     .trust-section {
-      padding: 80px 0;
+      padding: clamp(22px, 3.6dvh, 52px) 0;
       text-align: center;
+    }
+    .trust-heading {
+      font-size: clamp(21px, min(2.4vw, 3.4dvh), 28px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
     }
     .trust-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 24px;
-      margin-top: 40px;
+      gap: clamp(12px, 1.8vw, 22px);
+      margin-top: clamp(16px, 2.6dvh, 34px);
     }
     .trust-item {
-      padding: 24px;
+      padding: clamp(14px, 2.1dvh, 24px) clamp(12px, 1.4vw, 20px);
       border-radius: var(--radius-md);
       background: var(--bg-alt);
       border: 1px solid var(--border);
     }
     .trust-item h4 {
-      font-size: 16px;
+      font-size: clamp(14px, 1.3vw, 16px);
       font-weight: 700;
       margin-bottom: 6px;
     }
     .trust-item p {
-      font-size: 13px;
+      font-size: clamp(12px, 1.05vw, 13px);
       color: var(--text-secondary);
+      line-height: 1.45;
     }
 
     /* ==========================================================================
        VIEW 2: DẢI SẢN PHẨM (STORE GRID)
        ========================================================================== */
     .catalog-section {
-      padding: 60px 0 120px 0;
+      min-height: var(--view-h);
+      padding: clamp(22px, 3.8dvh, 52px) 0 clamp(36px, 6dvh, 84px) 0;
     }
     .catalog-filters {
       display: flex;
       justify-content: center;
       gap: 8px;
-      margin-bottom: 48px;
+      margin-bottom: clamp(18px, 3.2dvh, 38px);
       flex-wrap: wrap;
     }
     .filter-chip {
-      padding: 10px 22px;
+      padding: 8px 18px;
       border-radius: var(--radius-full);
       border: 1px solid var(--border);
       background: #FFFFFF;
-      font-size: 13.5px;
+      font-size: 13px;
       font-weight: 600;
       color: var(--text-secondary);
       cursor: pointer;
@@ -551,13 +632,13 @@
     .products-grid-3col {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 32px;
+      gap: clamp(16px, 2.2vw, 28px);
     }
     .store-product-card {
       background: #FFFFFF;
       border: 1px solid var(--border);
       border-radius: var(--radius-lg);
-      padding: 28px;
+      padding: clamp(18px, 2.4dvh, 26px);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -571,15 +652,15 @@
       border-color: var(--border-hover);
     }
     .store-card-img-wrap {
-      height: 240px;
+      height: clamp(150px, 24dvh, 225px);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 20px;
+      margin-bottom: clamp(12px, 1.8dvh, 18px);
       overflow: hidden;
     }
     .store-card-img-wrap img {
-      max-height: 220px;
+      max-height: 100%;
       max-width: 100%;
       object-fit: contain;
       transition: transform 0.5s var(--ease);
@@ -596,7 +677,7 @@
       margin-bottom: 6px;
     }
     .store-card-title {
-      font-size: 20px;
+      font-size: clamp(17px, 1.6vw, 20px);
       font-weight: 800;
       letter-spacing: -0.02em;
       margin-bottom: 6px;
@@ -604,7 +685,7 @@
     .store-card-sub {
       font-size: 13.5px;
       color: var(--text-secondary);
-      margin-bottom: 18px;
+      margin-bottom: 14px;
       line-height: 1.5;
       height: 40px;
       overflow: hidden;
@@ -615,7 +696,7 @@
     .store-card-colors {
       display: flex;
       gap: 6px;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
     .store-mini-dot {
       width: 12px;
@@ -628,11 +709,11 @@
       align-items: center;
       justify-content: space-between;
       border-top: 1px solid var(--border);
-      padding-top: 18px;
-      margin-top: 10px;
+      padding-top: 14px;
+      margin-top: 8px;
     }
     .store-price-text {
-      font-size: 18px;
+      font-size: clamp(16px, 1.5vw, 18px);
       font-weight: 800;
       font-family: var(--font-mono);
     }
@@ -649,35 +730,35 @@
        VIEW 3: TRANG CHI TIẾT SẢN PHẨM RIÊNG (APPLE STORE BUY PAGE)
        ========================================================================== */
     .product-detail-view {
-      padding: 48px 0 120px 0;
+      padding: clamp(18px, 3dvh, 42px) 0 clamp(44px, 6dvh, 96px) 0;
     }
 
     /* Top 2 Columns */
     .detail-top-grid {
       display: grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 60px;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: clamp(24px, 4vw, 56px);
       align-items: start;
-      margin-bottom: 100px;
+      margin-bottom: clamp(36px, 6.5dvh, 84px);
     }
     .sticky-gallery-col {
       position: sticky;
-      top: 90px;
+      top: calc(var(--nav-h) + 16px);
     }
     .gallery-main-frame {
       background: var(--bg-alt);
       border-radius: var(--radius-lg);
-      padding: 40px;
+      padding: clamp(16px, 2.6dvh, 36px);
       border: 1px solid var(--border);
-      height: 480px;
+      height: clamp(260px, 50dvh, 450px);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      margin-bottom: 16px;
+      margin-bottom: clamp(10px, 1.5dvh, 14px);
     }
     .gallery-main-frame img {
-      max-height: 420px;
+      max-height: 100%;
       max-width: 100%;
       object-fit: contain;
       transition: transform 0.4s var(--ease);
@@ -689,14 +770,14 @@
     .gallery-thumbs-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
+      gap: clamp(8px, 1vw, 12px);
     }
     .thumb-item {
-      height: 84px;
+      height: clamp(56px, 8.5dvh, 82px);
       background: var(--bg-alt);
       border-radius: var(--radius-md);
       border: 2px solid transparent;
-      padding: 8px;
+      padding: 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -717,52 +798,53 @@
     .configurator-col {
       display: flex;
       flex-direction: column;
-      gap: 28px;
+      gap: clamp(14px, 2.2dvh, 24px);
     }
     .detail-heading h1 {
-      font-size: 38px;
+      font-size: clamp(26px, min(3vw, 4.2dvh), 38px);
       font-weight: 800;
       letter-spacing: -0.02em;
-      line-height: 1.15;
-      margin-bottom: 8px;
+      line-height: 1.14;
+      margin-bottom: 6px;
     }
     .detail-tagline {
-      font-size: 18px;
+      font-size: clamp(15px, min(1.5vw, 2.1dvh), 18px);
       font-weight: 600;
       color: var(--text-secondary);
-      margin-bottom: 12px;
+      margin-bottom: 8px;
     }
     .detail-short-desc {
-      font-size: 14.5px;
+      font-size: clamp(13px, 1.15vw, 14.5px);
       color: var(--text-secondary);
-      line-height: 1.6;
+      line-height: 1.55;
     }
 
     .config-step-box {
       border-top: 1px solid var(--border);
-      padding-top: 24px;
+      padding-top: clamp(12px, 1.8dvh, 20px);
     }
     .config-step-title {
-      font-size: 15px;
+      font-size: clamp(13.5px, 1.2vw, 15px);
       font-weight: 700;
-      margin-bottom: 14px;
+      margin-bottom: clamp(8px, 1.2dvh, 12px);
     }
 
     /* Step 1: Tier Cards (Apple Store style) */
     .tier-card-group {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: clamp(8px, 1.1dvh, 11px);
     }
     .tier-select-card {
       border: 1.5px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 18px 20px;
+      padding: clamp(11px, 1.5dvh, 16px) clamp(14px, 1.6vw, 18px);
       cursor: pointer;
       transition: all 0.2s var(--ease);
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
       background: #FFFFFF;
     }
     .tier-select-card:hover {
@@ -774,30 +856,31 @@
       box-shadow: 0 0 0 1px var(--text-main);
     }
     .tier-card-label {
-      font-size: 15.5px;
+      font-size: clamp(14px, 1.25vw, 15.5px);
       font-weight: 700;
     }
     .tier-card-diff {
-      font-size: 12.5px;
+      font-size: 12px;
       color: var(--text-secondary);
-      margin-top: 3px;
+      margin-top: 2px;
     }
     .tier-card-price {
-      font-size: 16px;
+      font-size: clamp(14.5px, 1.3vw, 16px);
       font-weight: 800;
       font-family: var(--font-mono);
       text-align: right;
+      white-space: nowrap;
     }
 
     /* Step 2: Color selector */
     .colors-config-list {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 14px;
     }
     .color-swatch-btn {
-      width: 32px;
-      height: 32px;
+      width: 30px;
+      height: 30px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid #FFF;
@@ -814,16 +897,16 @@
       background: var(--bg-alt);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 24px;
+      padding: clamp(14px, 2dvh, 22px);
     }
     .summary-price-row {
       display: flex;
       align-items: baseline;
       gap: 12px;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .summary-current-price {
-      font-size: 32px;
+      font-size: clamp(26px, min(2.8vw, 3.8dvh), 32px);
       font-weight: 800;
       font-family: var(--font-mono);
     }
@@ -865,18 +948,23 @@
     .deep-tabs-nav {
       display: flex;
       border-bottom: 1px solid var(--border);
-      gap: 32px;
-      margin-bottom: 48px;
+      gap: clamp(16px, 2.5vw, 32px);
+      margin-bottom: clamp(24px, 3.8dvh, 44px);
+      overflow-x: auto;
+      scrollbar-width: none;
     }
+    .deep-tabs-nav::-webkit-scrollbar { display: none; }
     .deep-tab-btn {
       background: transparent;
       border: none;
-      font-size: 16px;
+      font-size: clamp(14px, 1.3vw, 16px);
       font-weight: 600;
       color: var(--text-secondary);
-      padding-bottom: 16px;
+      padding-bottom: 14px;
       cursor: pointer;
       position: relative;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
     .deep-tab-btn.active {
       color: var(--text-main);
@@ -894,9 +982,9 @@
     .overview-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 60px;
+      gap: clamp(24px, 4vw, 56px);
       align-items: center;
-      margin-bottom: 64px;
+      margin-bottom: clamp(32px, 5dvh, 56px);
     }
     .overview-row.reverse {
       direction: rtl;
@@ -905,21 +993,21 @@
       direction: ltr;
     }
     .overview-text-box h3 {
-      font-size: 26px;
+      font-size: clamp(20px, 2.2vw, 26px);
       font-weight: 800;
       letter-spacing: -0.02em;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
     }
     .overview-text-box p {
-      font-size: 15px;
+      font-size: clamp(13.5px, 1.25vw, 15px);
       color: var(--text-secondary);
       line-height: 1.6;
     }
     .overview-img-box {
       background: var(--bg-alt);
       border-radius: var(--radius-lg);
-      padding: 24px;
-      height: 320px;
+      padding: clamp(16px, 2.2dvh, 24px);
+      height: clamp(220px, 34dvh, 320px);
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -936,13 +1024,13 @@
     .box-contents-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      gap: clamp(12px, 1.8vw, 20px);
     }
     .box-item-card {
       background: var(--bg-alt);
       border: 1px solid var(--border);
       border-radius: var(--radius-md);
-      padding: 24px;
+      padding: clamp(14px, 2dvh, 22px);
       font-size: 14px;
       font-weight: 600;
       display: flex;
@@ -961,13 +1049,13 @@
     .specs-table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 16px;
+      margin-top: 12px;
     }
     .specs-table tr {
       border-bottom: 1px solid var(--border);
     }
     .specs-table td {
-      padding: 16px 20px;
+      padding: clamp(11px, 1.6dvh, 16px) clamp(12px, 1.8vw, 20px);
       font-size: 14px;
     }
     .specs-table td:first-child {
@@ -981,13 +1069,20 @@
        VIEW 4: ĐÁNH GIÁ & HỎI ĐÁP
        ========================================================================== */
     .reviews-section {
-      padding: 60px 0 100px 0;
+      min-height: var(--view-h);
+      padding: clamp(22px, 3.8dvh, 52px) 0 clamp(40px, 6dvh, 84px) 0;
+    }
+    .review-form-row-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
     }
     .testimonials-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 24px;
-      margin-bottom: 80px;
+      gap: clamp(14px, 2vw, 24px);
+      margin-bottom: clamp(40px, 6dvh, 72px);
     }
     .testimonial-card {
       background: var(--bg-alt);
@@ -1294,20 +1389,38 @@
       border-color: var(--text-main);
     }
 
-    /* ENTERPRISE 4-COLUMN FOOTER */
+    /* ENTERPRISE FOOTER */
     .enterprise-footer {
-      background: #111827;
-      color: #9CA3AF;
-      padding: 72px 0 36px 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      background: #0F1115;
+      color: #F5F5F7;
+      padding: clamp(28px, 4.4dvh, 58px) 0 clamp(18px, 3dvh, 30px) 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
       font-size: 13.5px;
-      line-height: 1.6;
+      line-height: 1.55;
+    }
+    .enterprise-footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: clamp(20px, 3.2vw, 48px);
+      margin-bottom: clamp(20px, 3.2dvh, 42px);
+    }
+    .enterprise-footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-top: clamp(14px, 2.2dvh, 24px);
+      padding-right: 175px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      font-size: 12.5px;
+      color: #86868B;
     }
     .footer-grid-4col {
       display: grid;
       grid-template-columns: 1.4fr 0.9fr 0.9fr 1fr;
-      gap: 48px;
-      margin-bottom: 56px;
+      gap: clamp(24px, 3.2vw, 48px);
+      margin-bottom: clamp(24px, 4dvh, 56px);
     }
     .footer-brand-title {
       font-size: 17px;
@@ -2277,31 +2390,60 @@
 
   
     /* ==========================================================================
-       COMPREHENSIVE MOBILE RESPONSIVE ENGINE (APPLE HIG iOS 18 STANDARD)
+       COMPREHENSIVE MULTI-SCREEN & RATIO RESPONSIVE ENGINE
        ========================================================================== */
+    @media (max-width: 1120px) {
+      .hero-flagship-showcase .hero-action-buttons .btn-dark,
+      .hero-flagship-showcase .hero-action-buttons .btn-ghost {
+        padding: 10px 14px;
+        font-size: 13px;
+      }
+    }
+
     @media (max-width: 992px) {
+      .flagship-grid {
+        grid-template-columns: 1fr !important;
+        gap: clamp(16px, 2.5dvh, 28px) !important;
+      }
+      .flagship-media-box img {
+        height: clamp(200px, 32dvh, 340px) !important;
+      }
       .bento-grid {
         grid-template-columns: 1fr 1fr !important;
-        gap: 18px !important;
+        gap: clamp(12px, 1.8dvh, 18px) !important;
       }
+      .bento-span-2,
       .bento-card-wide {
-        grid-column: span 2 !important;
+        grid-column: span 1 !important;
       }
       .eco-grid {
         grid-template-columns: 1fr !important;
-        gap: 24px !important;
+        gap: clamp(14px, 2.2dvh, 24px) !important;
+      }
+      .eco-card img {
+        height: clamp(180px, 27dvh, 280px) !important;
+      }
+      .trust-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 14px !important;
       }
       .products-grid-3col {
         grid-template-columns: 1fr 1fr !important;
-        gap: 20px !important;
+        gap: 18px !important;
       }
       .detail-top-grid {
         grid-template-columns: 1fr !important;
-        gap: 32px !important;
+        gap: 28px !important;
+      }
+      .sticky-gallery-col {
+        position: static !important;
       }
       .overview-row {
         grid-template-columns: 1fr !important;
-        gap: 24px !important;
+        gap: 22px !important;
+      }
+      .overview-row.reverse {
+        direction: ltr !important;
       }
       .overview-row:nth-child(even) .overview-text {
         order: 1 !important;
@@ -2311,15 +2453,25 @@
       }
       .testimonials-grid {
         grid-template-columns: 1fr 1fr !important;
-        gap: 20px !important;
+        gap: 18px !important;
       }
+      .enterprise-footer-grid,
       .footer-grid-4col {
         grid-template-columns: 1fr 1fr !important;
-        gap: 36px !important;
+        gap: 24px !important;
+      }
+      .enterprise-footer-brand {
+        grid-column: 1 / -1 !important;
       }
     }
 
     @media (max-width: 768px) {
+      :root {
+        --nav-h: 82px;
+        --view-h: calc(100vh - 82px);
+        --view-h: calc(100dvh - 82px);
+      }
+
       /* ========================================================================
          1. MASTER MOBILE APP BAR & 2-TIER SEGMENTED HEADER
          ======================================================================== */
@@ -2343,45 +2495,45 @@
         margin: 0 !important;
       }
 
-      /* Row 1: Brand Logo + Cart + User Avatar (Height 54px) */
+      /* Row 1: Brand Logo + Cart + User Avatar (Height 46px) */
       .nav-brand {
         order: 1 !important;
-        height: 54px !important;
-        padding: 0 16px !important;
+        height: 46px !important;
+        padding: 0 12px !important;
         display: flex !important;
         align-items: center !important;
-        gap: 10px !important;
+        gap: 8px !important;
         flex: 1 !important;
       }
       .nav-brand > div:first-child {
-        width: 32px !important;
-        height: 32px !important;
-        border-radius: 9px !important;
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 8px !important;
         flex-shrink: 0 !important;
         box-shadow: 0 2px 8px rgba(0,0,0,0.12) !important;
       }
       .nav-brand span:first-child {
-        font-size: 20px !important;
+        font-size: 18px !important;
         font-weight: 800 !important;
         letter-spacing: -0.03em !important;
         line-height: 1 !important;
       }
       .nav-brand span:last-child {
-        display: none !important; /* Hide tiny tagline on mobile to keep header clean and prevent vertical clipping */
+        display: none !important;
       }
 
       .nav-actions {
         order: 2 !important;
-        height: 54px !important;
-        padding: 0 16px !important;
+        height: 46px !important;
+        padding: 0 12px !important;
         display: flex !important;
         align-items: center !important;
-        gap: 8px !important;
+        gap: 6px !important;
         margin-left: auto !important;
       }
       .btn-nav-cart {
-        padding: 6px 12px !important;
-        font-size: 12px !important;
+        padding: 5px 10px !important;
+        font-size: 11.5px !important;
         font-weight: 700 !important;
         background: #F5F5F7 !important;
         border: 1px solid rgba(0,0,0,0.08) !important;
@@ -2396,18 +2548,24 @@
       }
       .btn-nav-cart::before {
         content: '🛒';
-        font-size: 13px;
+        font-size: 12px;
+      }
+      #navUserSection .btn-nav-link {
+        padding: 5px 11px !important;
+        font-size: 11.5px !important;
+        white-space: nowrap !important;
       }
 
-      /* Row 2: Sticky Segmented Horizontal Tab Bar (Height 44px) */
+      /* Row 2: Compact Sticky Segmented Tab Bar (Height 36px, fits 3 tabs in 360px+) */
       .nav-links {
         order: 3 !important;
         width: 100% !important;
         flex: 0 0 100% !important;
         display: flex !important;
         align-items: center !important;
-        gap: 8px !important;
-        padding: 2px 14px 8px 14px !important;
+        justify-content: space-between !important;
+        gap: 6px !important;
+        padding: 2px 12px 6px 12px !important;
         margin: 0 !important;
         border-top: 1px solid rgba(0,0,0,0.05) !important;
         overflow-x: auto !important;
@@ -2419,11 +2577,12 @@
         display: none !important;
       }
       .nav-links li {
-        flex-shrink: 0 !important;
+        flex: 1 0 auto !important;
       }
       .nav-links li button {
-        padding: 7px 16px !important;
-        font-size: 13px !important;
+        width: 100% !important;
+        padding: 5px 10px !important;
+        font-size: 12px !important;
         font-weight: 600 !important;
         border-radius: 99px !important;
         white-space: nowrap !important;
@@ -2440,103 +2599,121 @@
       }
 
       /* ========================================================================
-         2. HERO FLAGSHIP SHOWCASE (BEACH PHOTO & CONFIGURATOR)
+         2. HERO FLAGSHIP SHOWCASE (FIT CLEANLY INSIDE MOBILE VIEWPORT)
          ======================================================================== */
       .hero-flagship-showcase {
-        padding: 16px 0 36px 0 !important;
+        min-height: calc(100dvh - 82px) !important;
+        display: flex !important;
+        align-items: center !important;
+        padding: clamp(10px, 1.6dvh, 18px) 0 !important;
       }
       .flagship-grid {
         grid-template-columns: 1fr !important;
-        gap: 20px !important;
+        gap: clamp(10px, 1.5dvh, 16px) !important;
       }
       .flagship-media-box {
         position: relative !important;
         width: 100% !important;
         max-width: 100% !important;
-        margin: 0 auto 20px auto !important;
-        padding: 0 !important;
-        background: transparent !important;
-        border: none !important;
-        box-shadow: none !important;
-        border-radius: 20px !important;
+        margin: 0 auto !important;
+        padding: clamp(8px, 1.2dvh, 14px) !important;
+        background: #FFFFFF !important;
+        border: 1px solid var(--border) !important;
+        box-shadow: var(--shadow-sm) !important;
+        border-radius: 16px !important;
         overflow: hidden !important;
         min-height: unset !important;
-        display: block !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
       }
       .flagship-media-box img {
-        width: 100% !important;
+        width: auto !important;
         max-width: 100% !important;
-        height: auto !important;
-        aspect-ratio: 4/5 !important;
-        max-height: 440px !important;
-        object-fit: cover !important;
-        border-radius: 20px !important;
-        box-shadow: 0 16px 36px rgba(0,0,0,0.14) !important;
+        height: clamp(132px, 23dvh, 230px) !important;
+        max-height: 230px !important;
+        aspect-ratio: auto !important;
+        object-fit: contain !important;
+        border-radius: 12px !important;
+        box-shadow: 0 10px 24px rgba(0,0,0,0.12) !important;
         display: block !important;
-        margin: 0 !important;
+        margin: 0 auto !important;
       }
       .flagship-badge {
         position: absolute !important;
-        top: 14px !important;
-        left: 14px !important;
+        top: 10px !important;
+        left: 10px !important;
         z-index: 10 !important;
-        background: rgba(29, 29, 31, 0.76) !important;
-        backdrop-filter: blur(16px) !important;
-        -webkit-backdrop-filter: blur(16px) !important;
+        background: rgba(29, 29, 31, 0.85) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
         color: #FFFFFF !important;
-        font-size: 11px !important;
+        font-size: 9.5px !important;
         font-weight: 700 !important;
         letter-spacing: 0.04em !important;
         text-transform: uppercase !important;
-        padding: 6px 14px !important;
+        padding: 4px 10px !important;
         border-radius: 99px !important;
         border: 1px solid rgba(255,255,255,0.2) !important;
-        box-shadow: 0 4px 14px rgba(0,0,0,0.25) !important;
         white-space: nowrap !important;
       }
 
       .flagship-info {
         width: 100% !important;
       }
+      .flagship-info .tag-clean {
+        font-size: 10px !important;
+        margin-bottom: 3px !important;
+      }
       .flagship-info h1 {
-        font-size: 30px !important;
-        line-height: 1.15 !important;
+        font-size: clamp(22px, min(6.2vw, 3.6dvh), 30px) !important;
+        line-height: 1.12 !important;
         font-weight: 800 !important;
         letter-spacing: -0.03em !important;
-        margin-bottom: 8px !important;
+        margin-bottom: 4px !important;
       }
       .flagship-tagline {
-        font-size: 16px !important;
-        line-height: 1.4 !important;
+        font-size: clamp(13px, min(3.7vw, 2.2dvh), 16px) !important;
+        line-height: 1.35 !important;
         font-weight: 600 !important;
         color: #1D1D1F !important;
-        margin-bottom: 12px !important;
+        margin-bottom: 4px !important;
       }
       .flagship-desc {
-        font-size: 13.5px !important;
-        line-height: 1.55 !important;
+        font-size: clamp(11.5px, 3vw, 13px) !important;
+        line-height: 1.42 !important;
         color: #6E6E73 !important;
-        margin-bottom: 20px !important;
+        margin-bottom: 8px !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .hero-field-label {
+        margin-bottom: 4px !important;
+        font-size: 11px !important;
       }
 
-      /* Hero Tier Selector Buttons - Clean Apple Monochrome (NO BLUE TEXT) */
+      /* Hero Tier Selector - Compact 2x2 Matrix on Mobile */
       .hero-tier-selector {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 8px !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 6px !important;
         width: 100% !important;
-        margin-bottom: 18px !important;
+        margin-bottom: 8px !important;
       }
       .hero-tier-btn {
         width: 100% !important;
-        padding: 12px 16px !important;
-        font-size: 13.5px !important;
+        padding: 6px 10px !important;
+        font-size: 11.5px !important;
         font-weight: 600 !important;
         display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        border-radius: 14px !important;
-        min-height: 48px !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: flex-start !important;
+        gap: 1px !important;
+        border-radius: 11px !important;
+        min-height: 40px !important;
         background: #FFFFFF !important;
         color: #1D1D1F !important;
         border: 1.5px solid rgba(0,0,0,0.1) !important;
@@ -2544,121 +2721,267 @@
         -webkit-tap-highlight-color: transparent !important;
         transition: all 0.2s ease !important;
       }
+      .hero-tier-btn .hero-tier-name {
+        font-size: 11px !important;
+        max-width: 100%;
+      }
+      .hero-tier-btn .hero-tier-price {
+        font-size: 11.5px !important;
+      }
       .hero-tier-btn.active {
         background: #1D1D1F !important;
         color: #FFFFFF !important;
         border-color: #1D1D1F !important;
         font-weight: 700 !important;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.15) !important;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.15) !important;
+      }
+
+      .color-swatches-row {
+        margin-bottom: 6px !important;
+        gap: 8px !important;
+      }
+      .color-dot {
+        width: 18px !important;
+        height: 18px !important;
+      }
+      .color-name-text {
+        font-size: 11.5px !important;
       }
 
       .hero-price-box {
         display: flex !important;
         flex-wrap: wrap !important;
         gap: 8px !important;
-        margin: 16px 0 20px 0 !important;
+        margin: 4px 0 8px 0 !important;
         align-items: baseline !important;
       }
       .hero-price-val {
-        font-size: 28px !important;
+        font-size: clamp(22px, 6vw, 27px) !important;
         font-weight: 800 !important;
         color: #1D1D1F !important;
       }
       .hero-price-old {
-        font-size: 14px !important;
+        font-size: 13px !important;
         color: #8E8E93 !important;
       }
       .hero-price-save {
-        font-size: 11.5px !important;
+        font-size: 10.5px !important;
         padding: 3px 8px !important;
       }
 
       .hero-action-buttons {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 10px !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
         width: 100% !important;
       }
       .hero-action-buttons button {
         width: 100% !important;
-        padding: 14px 20px !important;
-        font-size: 14px !important;
+        padding: 8px 10px !important;
+        font-size: 13px !important;
         font-weight: 700 !important;
-        border-radius: 12px !important;
-        min-height: 48px !important;
+        border-radius: 11px !important;
+        min-height: 40px !important;
+        justify-content: center !important;
+      }
+      .hero-action-buttons button:nth-child(3) {
+        grid-column: 1 / -1 !important;
+        width: calc(100% - 54px) !important;
+        justify-self: start !important;
+        min-height: 36px !important;
+        padding: 6px 12px !important;
+        font-size: 12.5px !important;
       }
 
       /* 3. Typography & Containers */
       .title-clean {
-        font-size: 26px !important;
-        line-height: 1.25 !important;
+        font-size: clamp(21px, 5.6vw, 26px) !important;
+        line-height: 1.2 !important;
+        margin-bottom: 4px !important;
       }
       .sub-clean {
-        font-size: 14px !important;
-        line-height: 1.5 !important;
+        font-size: clamp(12.5px, 3.2vw, 14px) !important;
+        line-height: 1.45 !important;
       }
       .section-header-clean {
-        margin-bottom: 24px !important;
+        margin-bottom: clamp(12px, 2dvh, 22px) !important;
         padding: 0 4px !important;
       }
       .container, .container-wide {
-        padding: 0 16px !important;
+        padding: 0 14px !important;
       }
 
-      /* 4. Bento & Feature Grids */
+      /* 4. Bento, Ecosystem & Trust Grids - Fit Cleanly in 1 Phone Viewport Each */
+      .bento-section,
+      .eco-section {
+        min-height: calc(100dvh - 82px) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        padding: clamp(14px, 2.2dvh, 26px) 0 !important;
+      }
       .bento-grid {
         grid-template-columns: 1fr !important;
-        gap: 16px !important;
+        gap: clamp(8px, 1.3dvh, 12px) !important;
       }
+      .bento-span-2,
       .bento-card-wide {
         grid-column: span 1 !important;
       }
       .bento-card {
-        padding: 24px 20px !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 12px !important;
+        padding: clamp(11px, 1.6dvh, 16px) 14px !important;
+        border-radius: 15px !important;
+      }
+      .bento-card-title {
+        font-size: clamp(14.5px, 4vw, 17px) !important;
+        margin-bottom: 2px !important;
+      }
+      .bento-card-desc {
+        font-size: clamp(11.5px, 3vw, 12.5px) !important;
+        line-height: 1.4 !important;
+      }
+      .bento-metric-large {
+        font-size: clamp(22px, 6vw, 28px) !important;
+        margin: 0 !important;
+        flex-shrink: 0 !important;
+        min-width: 70px !important;
+        text-align: right !important;
+      }
+
+      .eco-grid {
+        grid-template-columns: 1fr !important;
+        gap: clamp(10px, 1.6dvh, 16px) !important;
+      }
+      .eco-card {
+        grid-template-columns: 1fr auto !important;
+        gap: 12px !important;
+        padding: clamp(12px, 1.8dvh, 18px) 14px !important;
+        border-radius: 16px !important;
+      }
+      .eco-card-text h3 {
+        font-size: clamp(14.5px, 3.85vw, 17.5px) !important;
+        margin-bottom: 4px !important;
+      }
+      .eco-card-text p {
+        font-size: clamp(11.5px, 3vw, 13px) !important;
+        line-height: 1.42 !important;
+      }
+      .eco-card img {
+        height: clamp(138px, 22dvh, 210px) !important;
+        width: auto !important;
+        border-radius: 12px !important;
+        border-width: 2px !important;
+      }
+
+      .trust-section {
+        padding: clamp(18px, 2.8dvh, 32px) 0 !important;
+      }
+      .trust-heading {
+        font-size: clamp(19px, 5.2vw, 24px) !important;
       }
       .trust-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        margin-top: 14px !important;
+      }
+      .trust-item {
+        padding: 12px 10px !important;
+        text-align: left !important;
+      }
+      .trust-item h4 {
+        font-size: 13px !important;
+        margin-bottom: 4px !important;
+      }
+      .trust-item p {
+        font-size: 11.5px !important;
+        line-height: 1.38 !important;
+      }
+
+      .enterprise-footer {
+        padding: 24px 0 max(68px, calc(56px + env(safe-area-inset-bottom))) 0 !important;
+      }
+      .enterprise-footer-grid,
+      .footer-grid-4col {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 16px 12px !important;
+        margin-bottom: 16px !important;
+      }
+      .enterprise-footer-brand {
+        grid-column: 1 / -1 !important;
+      }
+      .enterprise-footer-bottom {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        font-size: 11.5px !important;
+        padding-top: 14px !important;
+        padding-right: 52px !important;
+        gap: 6px !important;
+      }
+
+      .products-grid-3col {
         grid-template-columns: 1fr !important;
         gap: 14px !important;
       }
-      .trust-card {
-        padding: 20px !important;
+      .store-card-img-wrap {
+        height: 150px !important;
       }
-      .products-grid-3col {
-        grid-template-columns: 1fr !important;
-        gap: 16px !important;
+      .gallery-main-frame {
+        height: clamp(200px, 32dvh, 300px) !important;
+        padding: 14px !important;
+      }
+      .thumb-item {
+        height: 58px !important;
+        padding: 4px !important;
       }
       .gallery-thumbs-row {
         gap: 8px !important;
+      }
+      .detail-ctas-row {
+        gap: 8px !important;
+      }
+      .detail-ctas-row button {
+        padding: 12px 10px !important;
+        font-size: 13.5px !important;
+      }
+      .overview-img-box {
+        height: clamp(180px, 26dvh, 240px) !important;
       }
       .box-contents-grid {
         grid-template-columns: 1fr !important;
         gap: 10px !important;
       }
+      .specs-table td {
+        padding: 10px 12px !important;
+        font-size: 12.5px !important;
+      }
       .testimonials-grid {
         grid-template-columns: 1fr !important;
         gap: 14px !important;
       }
-      .footer-grid-4col {
+      .review-form-row-2col {
         grid-template-columns: 1fr !important;
-        gap: 28px !important;
       }
 
       /* 5. Reviews Scorecard & Form */
       .review-form-card {
-        padding: 20px 16px !important;
+        padding: 18px 14px !important;
       }
       .reviews-scorecard-box {
-        flex-direction: column !important;
-        gap: 20px !important;
-        padding: 20px 16px !important;
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+        padding: 18px 14px !important;
       }
       .scorecard-big-num {
-        font-size: 48px !important;
+        font-size: 44px !important;
       }
       .review-filter-bar {
         flex-direction: column !important;
         align-items: flex-start !important;
-        gap: 12px !important;
+        gap: 10px !important;
       }
       .review-filter-pills {
         width: 100% !important;
@@ -2671,10 +2994,10 @@
          ======================================================================== */
       /* Mobile Sleek AI FAB Button */
       .tflow-ai-fab {
-        bottom: 20px !important;
-        right: 16px !important;
-        width: 48px !important;
-        height: 48px !important;
+        bottom: 14px !important;
+        right: 12px !important;
+        width: 44px !important;
+        height: 44px !important;
         border-radius: 50% !important;
         background: #000000 !important;
         padding: 0 !important;
@@ -2836,6 +3159,452 @@
       }
     }
 
+    /* Short Portrait Phones (360x640, 375x667) — Keep every section inside 1 screen */
+    @media (max-width: 768px) and (max-height: 690px) {
+      .hero-flagship-showcase {
+        align-items: flex-start !important;
+        padding: 8px 0 10px 0 !important;
+      }
+      .flagship-grid {
+        gap: 7px !important;
+      }
+      .flagship-media-box {
+        padding: 5px !important;
+      }
+      .flagship-media-box img {
+        height: clamp(102px, 18dvh, 134px) !important;
+        max-height: 134px !important;
+      }
+      .flagship-info h1 {
+        font-size: 20px !important;
+        margin-bottom: 2px !important;
+      }
+      .flagship-tagline {
+        font-size: 12.5px !important;
+        margin-bottom: 2px !important;
+      }
+      .flagship-desc {
+        -webkit-line-clamp: 2;
+        margin-bottom: 5px !important;
+        line-height: 1.32 !important;
+      }
+      .hero-tier-selector {
+        gap: 5px !important;
+        margin-bottom: 5px !important;
+      }
+      .hero-tier-btn {
+        min-height: 34px !important;
+        padding: 4px 8px !important;
+        border-radius: 9px !important;
+      }
+      .hero-price-box {
+        margin: 2px 0 5px 0 !important;
+      }
+      .hero-price-val {
+        font-size: 21px !important;
+      }
+      .hero-action-buttons {
+        gap: 6px !important;
+      }
+      .hero-action-buttons button {
+        min-height: 35px !important;
+        padding: 5px 8px !important;
+        font-size: 12.5px !important;
+      }
+      .hero-action-buttons button:nth-child(3) {
+        min-height: 31px !important;
+        width: calc(100% - 48px) !important;
+      }
+      .tflow-ai-fab {
+        bottom: 10px !important;
+        right: 10px !important;
+        width: 40px !important;
+        height: 40px !important;
+      }
+      .tflow-ai-fab-icon {
+        width: 26px !important;
+        height: 26px !important;
+      }
+      .bento-section,
+      .eco-section {
+        padding: 8px 0 !important;
+      }
+      .bento-section .section-header-clean,
+      .eco-section .section-header-clean {
+        margin-bottom: 8px !important;
+      }
+      .bento-section .tag-clean,
+      .eco-section .tag-clean {
+        font-size: 9.5px !important;
+        margin-bottom: 2px !important;
+      }
+      .bento-section .title-clean,
+      .eco-section .title-clean {
+        font-size: 19px !important;
+        margin-bottom: 2px !important;
+      }
+      .bento-section .sub-clean,
+      .eco-section .sub-clean {
+        font-size: 11.5px !important;
+        line-height: 1.32 !important;
+      }
+      .bento-grid {
+        gap: 6px !important;
+      }
+      .bento-card {
+        padding: 7px 11px !important;
+        border-radius: 12px !important;
+        gap: 8px !important;
+      }
+      .bento-card-title {
+        font-size: 13.5px !important;
+        line-height: 1.25 !important;
+        margin-bottom: 2px !important;
+      }
+      .bento-card-desc {
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        font-size: 11px !important;
+        line-height: 1.3 !important;
+      }
+      .bento-metric-large {
+        font-size: 19px !important;
+        min-width: 60px !important;
+      }
+      .eco-card {
+        padding: 10px 12px !important;
+      }
+      .eco-card img {
+        height: 122px !important;
+      }
+    }
+
+    /* Landscape Mobile (667x375, 844x390, etc.) */
+    @media (max-height: 520px) and (max-width: 960px) {
+      :root {
+        --nav-h: 48px;
+        --view-h: calc(100vh - 48px);
+        --view-h: calc(100dvh - 48px);
+      }
+      nav {
+        height: 48px !important;
+        flex-wrap: nowrap !important;
+        padding: 0 12px !important;
+      }
+      .nav-brand {
+        order: 1 !important;
+        height: 48px !important;
+        padding: 0 !important;
+        flex: 0 0 auto !important;
+      }
+      .nav-links {
+        order: 2 !important;
+        width: auto !important;
+        flex: 0 1 auto !important;
+        border-top: none !important;
+        padding: 0 8px !important;
+        gap: 4px !important;
+        justify-content: center !important;
+      }
+      .nav-links li {
+        flex: 0 0 auto !important;
+      }
+      .nav-links li button {
+        width: auto !important;
+        padding: 4px 10px !important;
+        font-size: 11.5px !important;
+      }
+      .nav-actions {
+        order: 3 !important;
+        height: 48px !important;
+        padding: 0 !important;
+        margin-left: 0 !important;
+      }
+      .tflow-ai-fab {
+        bottom: 8px !important;
+        right: 10px !important;
+        width: 40px !important;
+        height: 40px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        justify-content: center !important;
+      }
+      .tflow-ai-fab-icon {
+        width: 26px !important;
+        height: 26px !important;
+      }
+      .tflow-ai-fab-text {
+        display: none !important;
+      }
+      .hero-flagship-showcase {
+        min-height: var(--view-h) !important;
+        padding: 6px 0 !important;
+      }
+      .flagship-grid {
+        grid-template-columns: 0.78fr 1.22fr !important;
+        gap: 16px !important;
+        align-items: center !important;
+      }
+      .flagship-media-box {
+        padding: 8px !important;
+      }
+      .flagship-media-box img {
+        height: clamp(140px, 56dvh, 235px) !important;
+        max-height: 235px !important;
+      }
+      .flagship-info h1 {
+        font-size: 20px !important;
+        margin-bottom: 2px !important;
+      }
+      .flagship-tagline {
+        font-size: 12.5px !important;
+        margin-bottom: 2px !important;
+      }
+      .flagship-desc {
+        display: none !important;
+      }
+      .hero-tier-selector {
+        gap: 5px !important;
+        margin-bottom: 5px !important;
+      }
+      .hero-tier-btn {
+        min-height: 30px !important;
+        padding: 3px 8px !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+      }
+      .hero-price-box {
+        margin: 2px 0 6px 0 !important;
+      }
+      .hero-price-val {
+        font-size: 20px !important;
+      }
+      .hero-action-buttons {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        gap: 6px !important;
+        padding-right: 48px !important;
+      }
+      .hero-action-buttons button {
+        min-height: 32px !important;
+        padding: 4px 10px !important;
+        font-size: 11.5px !important;
+        width: auto !important;
+      }
+      .hero-action-buttons button:nth-child(3) {
+        grid-column: auto !important;
+        min-height: 32px !important;
+        width: auto !important;
+      }
+      .bento-section,
+      .eco-section {
+        min-height: var(--view-h) !important;
+        padding: 8px 0 !important;
+      }
+      .section-header-clean {
+        margin-bottom: 6px !important;
+      }
+      .section-header-clean .tag-clean {
+        font-size: 9.5px !important;
+        margin-bottom: 1px !important;
+      }
+      .section-header-clean .title-clean {
+        font-size: 18px !important;
+        margin-bottom: 2px !important;
+      }
+      .section-header-clean .sub-clean {
+        font-size: 11.5px !important;
+        line-height: 1.3 !important;
+      }
+      .bento-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 6px !important;
+      }
+      .bento-card {
+        flex-direction: row !important;
+        padding: 7px 11px !important;
+        border-radius: 12px !important;
+        gap: 8px !important;
+      }
+      .bento-card .tag-clean {
+        font-size: 9px !important;
+        margin-bottom: 1px !important;
+      }
+      .bento-card-title {
+        font-size: 13px !important;
+        line-height: 1.2 !important;
+        margin-bottom: 2px !important;
+      }
+      .bento-card-desc {
+        font-size: 10.5px !important;
+        line-height: 1.28 !important;
+        -webkit-line-clamp: 2;
+        display: -webkit-box !important;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .bento-metric-large {
+        font-size: 18px !important;
+        min-width: 56px !important;
+      }
+      .eco-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+      }
+      .eco-card {
+        padding: 9px 11px !important;
+      }
+      .eco-card img {
+        height: clamp(115px, 40dvh, 170px) !important;
+      }
+      .enterprise-footer-bottom {
+        padding-right: 52px !important;
+      }
+    }
+
+    /* Short DPI-scaled Desktop/Laptops (e.g., 1280x620, 1366x660) */
+    @media (min-width: 769px) and (max-height: 700px) {
+      :root {
+        --nav-h: 52px;
+        --view-h: calc(100vh - 52px);
+        --view-h: calc(100dvh - 52px);
+      }
+      .hero-flagship-showcase {
+        padding: 10px 0;
+      }
+      .flagship-media-box {
+        padding: 14px;
+      }
+      .flagship-media-box img {
+        height: clamp(200px, 48dvh, 340px);
+      }
+      .flagship-info h1 {
+        font-size: clamp(26px, 4.4dvh, 36px);
+        margin-bottom: 4px;
+      }
+      .flagship-tagline {
+        margin-bottom: 4px;
+      }
+      .flagship-desc {
+        margin-bottom: 10px;
+        line-height: 1.44;
+      }
+      .hero-tier-selector {
+        gap: 6px;
+        margin-bottom: 10px;
+      }
+      .hero-tier-btn {
+        padding: 6px 12px;
+      }
+      .color-swatches-row,
+      .hero-price-box {
+        margin-bottom: 10px;
+      }
+      .bento-section,
+      .eco-section {
+        padding: 14px 0;
+      }
+      .section-header-clean {
+        margin-bottom: 14px;
+      }
+      .bento-card {
+        padding: 14px 18px;
+      }
+      .bento-metric-large {
+        font-size: clamp(24px, 4.4dvh, 38px);
+        margin-top: 8px;
+      }
+      .eco-card {
+        padding: 16px 20px;
+      }
+      .eco-card img {
+        height: clamp(185px, 40dvh, 285px);
+      }
+    }
+
+    /* Ultra-narrow Fold Outer Displays (< 360px, e.g., 320x568) */
+    @media (max-width: 359px) {
+      .nav-brand {
+        padding: 0 8px !important;
+      }
+      .nav-actions {
+        padding: 0 8px !important;
+        gap: 4px !important;
+      }
+      .btn-nav-cart,
+      #navUserSection .btn-nav-link {
+        padding: 4px 8px !important;
+        font-size: 11px !important;
+      }
+      .nav-links {
+        padding: 2px 8px 6px 8px !important;
+        gap: 4px !important;
+      }
+      .nav-links li button {
+        font-size: 11px !important;
+        padding: 4px 6px !important;
+      }
+      .flagship-media-box img {
+        height: 88px !important;
+        max-height: 88px !important;
+      }
+      .flagship-info h1 {
+        font-size: 18px !important;
+      }
+      .flagship-tagline {
+        font-size: 11.5px !important;
+      }
+      .flagship-desc {
+        display: none !important;
+      }
+      .hero-tier-selector {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 4px !important;
+      }
+      .hero-tier-btn {
+        padding: 3px 6px !important;
+        min-height: 30px !important;
+      }
+      .hero-tier-btn .hero-tier-name,
+      .hero-tier-btn .hero-tier-price {
+        font-size: 10px !important;
+      }
+      .hero-action-buttons {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 5px !important;
+      }
+      .hero-action-buttons button {
+        font-size: 11.5px !important;
+        min-height: 33px !important;
+      }
+      .hero-action-buttons button:nth-child(3) {
+        grid-column: 1 / -1 !important;
+        width: calc(100% - 44px) !important;
+        min-height: 30px !important;
+      }
+      .bento-card {
+        padding: 6px 9px !important;
+      }
+      .bento-card-title {
+        font-size: 12.5px !important;
+      }
+      .bento-card-desc {
+        -webkit-line-clamp: 2 !important;
+        font-size: 10px !important;
+      }
+      .bento-metric-large {
+        font-size: 17px !important;
+        min-width: 50px !important;
+      }
+      .trust-grid,
+      .enterprise-footer-grid {
+        grid-template-columns: 1fr !important;
+      }
+    }
+
   
     /* ==========================================================================
        USER DROPDOWN POPOVER & COMPACT MOBILE NAVBAR
@@ -2981,13 +3750,13 @@
             </p>
 
             <!-- Tiers selector on Hero -->
-            <div style="margin-bottom:8px; font-size:12.5px; font-weight:700; color:var(--text-secondary);">Chọn Phiên Bản:</div>
+            <div class="hero-field-label">Chọn Phiên Bản:</div>
             <div class="hero-tier-selector" id="heroTierSelector">
               <!-- Dynamically populated from MVP product tiers -->
             </div>
 
             <!-- Colors on Hero -->
-            <div style="margin-bottom:8px; font-size:12.5px; font-weight:700; color:var(--text-secondary);">Màu Sắc:</div>
+            <div class="hero-field-label">Màu Sắc:</div>
             <div class="color-swatches-row" id="heroColorSwatches">
               <!-- Dynamically populated from MVP colors -->
             </div>
@@ -3079,21 +3848,25 @@
         <div class="eco-grid">
           <!-- Card App Basic -->
           <div class="eco-card">
-            <div class="tag-clean">Ứng Dụng Cơ Bản</div>
-            <h3 style="font-size:22px; font-weight:800; margin-bottom:10px;">Chụp Nhanh &amp; Bám Nét Tự Động</h3>
-            <p style="font-size:14.5px; color:var(--text-secondary); line-height:1.6;">
-              Giao diện tối giản dành cho sáng tạo nội dung hàng ngày. Tự động nhận diện khuôn mặt, chuyển đổi dọc ngang 1 chạm cho TikTok và Reels.
-            </p>
+            <div class="eco-card-text">
+              <div class="tag-clean">Ứng Dụng Cơ Bản</div>
+              <h3>Chụp Nhanh &amp; Bám Nét Tự Động</h3>
+              <p>
+                Giao diện tối giản dành cho sáng tạo nội dung hàng ngày. Tự động nhận diện khuôn mặt, chuyển đổi dọc ngang 1 chạm cho TikTok và Reels.
+              </p>
+            </div>
             <img src="/preview/01_camera_basic_dark.png" alt="Basic App Preview">
           </div>
 
           <!-- Card App Pro -->
           <div class="eco-card">
-            <div class="tag-clean">Ứng Dụng Pro Cinema</div>
-            <h3 style="font-size:22px; font-weight:800; margin-bottom:10px;">Kiểm Soát Thông Số Độc Lập</h3>
-            <p style="font-size:14.5px; color:var(--text-secondary); line-height:1.6;">
-              Hỗ trợ chuẩn quay Apple Log, ProRes 4K/60fps, nạp bảng màu 3D LUT trực tiếp và kiểm soát Focus Pulling như máy quay điện ảnh chuyên nghiệp.
-            </p>
+            <div class="eco-card-text">
+              <div class="tag-clean">Ứng Dụng Pro Cinema</div>
+              <h3>Kiểm Soát Thông Số Độc Lập</h3>
+              <p>
+                Hỗ trợ chuẩn quay Apple Log, ProRes 4K/60fps, nạp bảng màu 3D LUT trực tiếp và kiểm soát Focus Pulling như máy quay điện ảnh chuyên nghiệp.
+              </p>
+            </div>
             <img src="/preview/02_camera_pro_dark.png" alt="Pro Cinema App Preview">
           </div>
         </div>
@@ -3104,7 +3877,7 @@
     <section class="trust-section">
       <div class="container">
         <div class="tag-clean">Cam Kết Doanh Nghiệp</div>
-        <h2 style="font-size:28px; font-weight:800;">Chính sách bảo hành vàng 1 đổi 1</h2>
+        <h2 class="trust-heading">Chính sách bảo hành vàng 1 đổi 1</h2>
         <div class="trust-grid">
           <div class="trust-item">
             <h4>Bảo Hành 12 Tháng</h4>
@@ -3387,7 +4160,7 @@
             <div id="reviewGuestFields" style="display:none;"></div>
 
             <!-- 3. PRODUCT PACKAGE & HIGHLIGHT CHIP -->
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+            <div class="review-form-row-2col">
               <div>
                 <label class="form-label-styled">Gói Sản Phẩm Trải Nghiệm</label>
                 <select class="form-input-styled" id="reviewProductPackage">
@@ -3558,10 +4331,10 @@
   <div class="toast-msg" id="toastMsg">Đã cập nhật giỏ hàng</div>
 
   <!-- ENTERPRISE 4-COLUMN FOOTER (MONOCHROME LUXURY / DARK ENTERPRISE #111827) -->
-  <footer class="enterprise-footer" style="background:#0F1115; color:#F5F5F7; padding:64px 0 32px 0; border-top:1px solid rgba(255,255,255,0.1);">
+  <footer class="enterprise-footer">
     <div class="container">
-      <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:48px; margin-bottom:48px;">
-        <div>
+      <div class="enterprise-footer-grid">
+        <div class="enterprise-footer-brand">
           <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
             <div style="width:38px; height:38px; background:#FFF; color:#1D1D1F; border-radius:10px; padding:7px; display:flex; align-items:center; justify-content:center;">
               <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
@@ -3605,7 +4378,7 @@
         </div>
       </div>
 
-      <div style="border-top:1px solid rgba(255,255,255,0.08); padding-top:24px; display:flex; justify-content:space-between; align-items:center; font-size:12.5px; color:#86868B;">
+      <div class="enterprise-footer-bottom">
         <div>&copy; 2026 Công ty TNHH Công nghệ T-Flow Việt Nam. Toàn quyền bảo lưu. Slogan: <em>"Smooth Every Moment — Mượt mà từng khoảnh khắc."</em></div>
         <div>Engineered with Pure FOC in Hanoi, Vietnam.</div>
       </div>
@@ -4328,9 +5101,10 @@
           const btn = document.createElement('button');
           const tKey = t.key || t.id || ('tier-' + idx);
           btn.className = `hero-tier-btn ${tKey === currentMvpTierKey || (!currentMvpTierKey && idx === 0) ? 'active' : ''}`;
+          if (btn.dataset) btn.dataset.tierKey = tKey;
           const tName = t.name || t.label || t.title || t.tag || (t.key ? (t.key.charAt(0).toUpperCase() + t.key.slice(1)) : ('Phiên bản ' + (idx + 1)));
           const tPrice = t.priceFormatted || (t.price ? t.price.toLocaleString('vi-VN') + '₫' : '');
-          btn.textContent = `${tName} — ${tPrice}`;
+          btn.innerHTML = `<span class="hero-tier-name">${tName}</span><span class="hero-tier-price">${tPrice}</span>`;
           btn.onclick = () => selectHeroTier(tKey);
           tierContainer.appendChild(btn);
         });
@@ -4361,10 +5135,13 @@
 
     function selectHeroTier(tierKey) {
       currentMvpTierKey = tierKey;
-      const targetTier = currentMvp.tiers ? currentMvp.tiers.find(t => t.key === tierKey) : null;
+      const targetTier = currentMvp.tiers ? currentMvp.tiers.find((t, idx) => (t.key || t.id || ('tier-' + idx)) === tierKey) : null;
       const targetLabel = targetTier ? (targetTier.name || targetTier.label || targetTier.key) : '';
       document.querySelectorAll('.hero-tier-btn').forEach(btn => {
-        btn.classList.toggle('active', targetLabel ? btn.textContent.includes(targetLabel) : false);
+        const isMatch = (btn.dataset && btn.dataset.tierKey)
+          ? btn.dataset.tierKey === tierKey
+          : (targetLabel ? btn.textContent.includes(targetLabel) : false);
+        btn.classList.toggle('active', isMatch);
       });
       updateHeroPrice();
     }
