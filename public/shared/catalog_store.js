@@ -92,28 +92,28 @@
     "groups": [
       {
         "id": "group-gimbal",
-        "name": "1. Gimbal Cầm Tay (B2C Chủ Lực)",
+        "name": "Gimbal Cầm Tay",
         "icon": "bi-camera-reels",
         "prefix": "TF-G",
         "desc": "Thiết bị ổn định 3 trục chuẩn điện ảnh cho Smartphone và Camera Creator."
       },
       {
         "id": "group-cam",
-        "name": "2. Cụm Camera & Phụ Kiện AI",
+        "name": "Cụm Camera & Phụ Kiện AI",
         "icon": "bi-camera",
         "prefix": "TF-CAM",
         "desc": "Mô-đun camera AI tracking nhận diện chủ thể độc lập và đèn trợ sáng MagSafe."
       },
       {
         "id": "group-core",
-        "name": "3. Bo Mạch Điều Khiển Lõi",
+        "name": "Bo Mạch Điều Khiển Lõi",
         "icon": "bi-cpu",
         "prefix": "TF-M / TF-D",
         "desc": "Bo mạch chủ vi điều khiển 32-bit STM32 và mạch công suất Pure FOC 20kHz."
       },
       {
         "id": "group-sensor",
-        "name": "4. Bo Mạch Mở Rộng & Cảm Biến",
+        "name": "Bo Mạch Mở Rộng & Cảm Biến",
         "icon": "bi-hdd-network",
         "prefix": "TF-X",
         "desc": "Cảm biến gia tốc IMU 6 trục và cảm biến từ Magnetic Encoder độ phân giải 14-bit."
@@ -501,6 +501,22 @@
       if (!parsed.products || parsed.products.length < DEFAULT_CATALOG.products.length) {
         saveCatalog(DEFAULT_CATALOG);
         return DEFAULT_CATALOG;
+      }
+      // Normalize cached group names (remove internal numbering & B2C tags)
+      if (parsed.groups && Array.isArray(parsed.groups)) {
+        var groupsMigrated = false;
+        parsed.groups.forEach(function(g) {
+          if (g.name) {
+            var cleaned = g.name.replace(/^\d+\.\s*/, '').replace(/\s*\(B2C[^)]*\)/gi, '').trim();
+            if (cleaned !== g.name) {
+              g.name = cleaned;
+              groupsMigrated = true;
+            }
+          }
+        });
+        if (groupsMigrated) {
+          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch (e) {}
+        }
       }
       // Normalize tiers ensuring name & label are always populated
       (parsed.products || []).forEach(function(p) {

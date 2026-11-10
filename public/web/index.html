@@ -3260,7 +3260,6 @@
           <!-- Right: Configurator -->
           <div class="configurator-col">
             <div class="detail-heading">
-              <div class="tag-clean" id="detailCategoryTag">Gimbal Điện Thoại</div>
               <h1 id="detailTitle">Smart Gimbal S1</h1>
               <div class="detail-tagline" id="detailTagline">Đưa thước phim di động lên tầm điện ảnh.</div>
               <p class="detail-short-desc" id="detailShortDesc">
@@ -4385,8 +4384,6 @@
       }
 
       products.forEach(p => {
-        const group = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getGroup) ? SmartGimbalCatalog.getGroup(p.groupId) : null;
-        const groupName = group ? group.name : 'T-Flow Official';
         const startingTier = p.tiers && p.tiers[0] ? p.tiers[0] : null;
         const priceDisplay = startingTier ? (startingTier.priceFormatted || SmartGimbalCatalog.formatVND(startingTier.price)) : (p.price ? SmartGimbalCatalog.formatVND(p.price) : '2.490.000₫');
 
@@ -4405,7 +4402,6 @@
             <img src="${p.img || '/shared/img/feed_portrait_dusk.jpg'}" alt="${p.name}">
           </div>
           <div>
-            <div class="store-card-tag">${groupName}</div>
             <div class="store-card-title">${p.name}</div>
             <div class="store-card-sub">${p.tagline || p.subtitle || ''}</div>
             <div class="store-card-colors">${colorsHtml}</div>
@@ -4464,10 +4460,6 @@
       if (elTagline) elTagline.textContent = prod.tagline || prod.subtitle || '';
       const elShortDesc = document.getElementById('detailShortDesc');
       if (elShortDesc) elShortDesc.textContent = prod.subtitle || '';
-
-      const group = SmartGimbalCatalog.getGroup(prod.groupId);
-      const elCatTag = document.getElementById('detailCategoryTag');
-      if (elCatTag) elCatTag.textContent = group ? group.name : 'Gimbal Cầm Tay';
 
       // Gallery main image
       const elMainImg = document.getElementById('detailMainImg');
