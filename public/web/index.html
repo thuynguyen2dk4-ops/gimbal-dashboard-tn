@@ -1791,30 +1791,31 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      background: #1D1D1F;
+      background: #000000;
       color: #FFF;
-      padding: 12px 20px 12px 14px;
+      padding: 10px 18px 10px 10px;
       border-radius: 99px;
-      border: 1px solid rgba(255,255,255,0.15);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.25), 0 4px 20px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.16);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.28), 0 4px 20px rgba(0,0,0,0.3);
       cursor: pointer;
       font-family: 'Plus Jakarta Sans', sans-serif;
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
     }
     .tflow-ai-fab:hover {
       transform: translateY(-4px) scale(1.03);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.35), 0 0 0 2px rgba(255,255,255,0.25);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.38), 0 0 0 2px rgba(255,255,255,0.25);
     }
     .tflow-ai-fab-icon {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
-      background: #000000;
-      border: 1px solid rgba(255,255,255,0.22);
+      background: #FFFFFF;
+      color: #000000;
+      border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
       flex-shrink: 0;
     }
     .tflow-ai-fab-text {
@@ -1904,25 +1905,25 @@
     }
     .ai-drawer-header {
       padding: 10px 14px;
-      background: linear-gradient(135deg, #1D1D1F 0%, #2C2C2E 100%);
+      background: #000000;
       color: #FFF;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.12);
       flex-shrink: 0;
     }
     .ai-header-avatar {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 9px;
-      background: #000000;
-      color: #FFF;
-      border: 1px solid rgba(255,255,255,0.18);
+      background: #FFFFFF;
+      color: #000000;
+      border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
       flex-shrink: 0;
     }
     .ai-domain-switcher-bar {
@@ -2046,12 +2047,12 @@
     }
     .ai-drawer-header {
       padding: 16px 20px;
-      background: linear-gradient(135deg, #1D1D1F 0%, #2C2C2E 100%);
+      background: #000000;
       color: #FFF;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+      border-bottom: 1px solid rgba(255,255,255,0.12);
     }
     .ai-drawer-header-left {
       display: flex;
@@ -2059,16 +2060,16 @@
       gap: 12px;
     }
     .ai-header-avatar {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border-radius: 9px;
-      background: #000000;
-      color: #FFF;
-      border: 1px solid rgba(255,255,255,0.18);
+      background: #FFFFFF;
+      color: #000000;
+      border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
       flex-shrink: 0;
     }
     .btn-ai-close {
@@ -2157,8 +2158,9 @@
       flex-shrink: 0;
     }
     .ai-msg-row.bot .ai-msg-avatar {
-      background: #0071E3;
-      color: #FFF;
+      background: #FFFFFF;
+      color: #000000;
+      border: 1px solid rgba(0,0,0,0.14);
     }
     .ai-msg-row.user .ai-msg-avatar {
       background: #1D1D1F;
@@ -2674,11 +2676,12 @@
         width: 48px !important;
         height: 48px !important;
         border-radius: 50% !important;
+        background: #000000 !important;
         padding: 0 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.35) !important;
         z-index: 9995 !important;
         transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease !important;
       }
@@ -2688,8 +2691,10 @@
         pointer-events: none !important;
       }
       .tflow-ai-fab-icon {
-        width: 28px !important;
-        height: 28px !important;
+        width: 30px !important;
+        height: 30px !important;
+        background: #FFFFFF !important;
+        color: #000000 !important;
         box-shadow: none !important;
       }
       .tflow-ai-fab-text {
@@ -2727,7 +2732,7 @@
       }
       .ai-drawer-header {
         padding: 12px 16px max(12px, env(safe-area-inset-top)) 16px !important;
-        background: #1D1D1F !important;
+        background: #000000 !important;
         border-bottom: 1px solid rgba(255,255,255,0.12) !important;
         flex-shrink: 0 !important;
       }
@@ -2735,13 +2740,13 @@
       width: 32px;
       height: 32px;
       border-radius: 9px;
-      background: #000000;
-      color: #FFF;
-      border: 1px solid rgba(255,255,255,0.18);
+      background: #FFFFFF;
+      color: #000000;
+      border: none;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
       flex-shrink: 0;
     }
       .btn-ai-close {
@@ -5276,11 +5281,11 @@
           escalationBadge = '<div style="margin-top:8px; display:inline-flex; align-items:center; gap:6px; padding:4px 10px; background:rgba(230,167,0,0.12); border:1px solid rgba(230,167,0,0.3); border-radius:6px; font-size:11.5px; font-weight:700; color:#B45309;">⚠️ Đã chuyển tiếp Master Admin Thủy Nguyễn duyệt</div>';
         }
 
-        const botAvatarHtml = `<svg width="15" height="15" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="#FFF" stroke-width="12" stroke-linecap="round" fill="none" /><path d="M 50 34 L 50 82" stroke="#FFF" stroke-width="12" stroke-linecap="round" /></svg>`;
+        const botAvatarHtml = `<svg width="16" height="16" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="#000000" stroke-width="12" stroke-linecap="round" fill="none" /><path d="M 50 34 L 50 82" stroke="#000000" stroke-width="12" stroke-linecap="round" /></svg>`;
 
         html += `
           <div class="ai-msg-row ${isBot ? 'bot' : 'user'}">
-            <div class="ai-msg-avatar" style="${isBot ? 'background:#000000; color:#FFF; border:1px solid rgba(255,255,255,0.18);' : 'background:#1D1D1F; color:#FFF;'}">${isBot ? botAvatarHtml : userInitial}</div>
+            <div class="ai-msg-avatar" style="${isBot ? 'background:#FFFFFF; color:#000000; border:1px solid rgba(0,0,0,0.14);' : 'background:#1D1D1F; color:#FFF;'}">${isBot ? botAvatarHtml : userInitial}</div>
             <div class="ai-msg-bubble">
               ${formattedText}
               ${escalationBadge}
@@ -5325,13 +5330,9 @@
       typingDiv.className = 'ai-msg-row bot';
       typingDiv.id = 'aiTypingBubble';
       
-      let typingColor = '#0071E3';
-      if (currentAiDomain === 'creative') typingColor = '#8944AB';
-      else if (currentAiDomain === 'smart_vision') typingColor = '#248A3D';
-
       typingDiv.innerHTML = `
-        <div class="ai-msg-avatar" style="background:${typingColor}; color:#FFF;">TF</div>
-        <div class="ai-typing-indicator" style="padding:10px 14px; background:rgba(0,113,227,0.08); border-radius:14px; display:inline-flex; gap:4px; align-items:center;">
+        <div class="ai-msg-avatar" style="background:#FFFFFF; color:#000000; border:1px solid rgba(0,0,0,0.14);"><svg width="16" height="16" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="#000000" stroke-width="12" stroke-linecap="round" fill="none" /><path d="M 50 34 L 50 82" stroke="#000000" stroke-width="12" stroke-linecap="round" /></svg></div>
+        <div class="ai-typing-indicator" style="padding:10px 14px; background:#F5F5F7; border-radius:14px; display:inline-flex; gap:4px; align-items:center;">
           <span class="ai-typing-dot"></span>
           <span class="ai-typing-dot"></span>
           <span class="ai-typing-dot"></span>
@@ -5482,9 +5483,9 @@
   <!-- T-FLOW AI ASSISTANT FLOATING CHATBOT WIDGET -->
   <div class="tflow-ai-fab" id="tflowAiFab" onclick="toggleTflowAiChat(true)" title="Mở T-Flow Bot">
     <div class="tflow-ai-fab-icon">
-      <svg width="18" height="18" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="#FFF" stroke-width="12" stroke-linecap="round" fill="none" />
-        <path d="M 50 34 L 50 82" stroke="#FFF" stroke-width="12" stroke-linecap="round" />
+      <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="#000000" stroke-width="12" stroke-linecap="round" fill="none" />
+        <path d="M 50 34 L 50 82" stroke="#000000" stroke-width="12" stroke-linecap="round" />
       </svg>
     </div>
     <div class="tflow-ai-fab-text">
@@ -5505,8 +5506,8 @@
       <div class="ai-drawer-header-left">
         <div class="ai-header-avatar">
           <svg width="20" height="20" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="#FFF" stroke-width="12" stroke-linecap="round" fill="none" />
-            <path d="M 50 34 L 50 82" stroke="#FFF" stroke-width="12" stroke-linecap="round" />
+            <path d="M 16 34 C 26 21, 39 21, 50 34 C 61 47, 74 47, 84 34" stroke="#000000" stroke-width="12" stroke-linecap="round" fill="none" />
+            <path d="M 50 34 L 50 82" stroke="#000000" stroke-width="12" stroke-linecap="round" />
           </svg>
         </div>
         <div>
