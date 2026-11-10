@@ -722,28 +722,101 @@
     }
 
     /* ==========================================================================
-       VIEW 2: DẢI SẢN PHẨM (STORE GRID)
+       VIEW 2: DẢI SẢN PHẨM (DJI-STYLE CATEGORY SHELVES & COMPACT STORE GRID)
        ========================================================================== */
     .catalog-section {
       min-height: var(--view-h);
-      padding: clamp(22px, 3.8dvh, 52px) 0 clamp(36px, 6dvh, 84px) 0;
+      background: #F5F5F7;
+      padding: clamp(18px, 3dvh, 40px) 0 clamp(44px, 7dvh, 84px) 0;
     }
+    .catalog-section .section-header-clean {
+      margin-bottom: clamp(12px, 2dvh, 22px);
+    }
+
+    /* Search Pill + Horizontal Category Chips Toolbar */
+    .catalog-toolbar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: clamp(16px, 2.8dvh, 28px);
+    }
+    .catalog-search-box {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      align-items: center;
+    }
+    .catalog-search-input {
+      width: 100%;
+      height: 40px;
+      padding: 0 38px 0 40px;
+      border-radius: 99px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background: #FFFFFF;
+      font-size: 13.5px;
+      font-family: inherit;
+      color: var(--text-main);
+      outline: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .catalog-search-input:focus {
+      border-color: #1D1D1F;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+    .catalog-search-input::placeholder {
+      color: #86868B;
+    }
+    .catalog-search-icon {
+      position: absolute;
+      left: 14px;
+      color: #6E6E73;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+    .catalog-search-clear {
+      position: absolute;
+      right: 10px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: #E5E5EA;
+      color: #1D1D1F;
+      font-size: 14px;
+      line-height: 1;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .catalog-search-clear.visible {
+      display: flex;
+    }
+
     .catalog-filters {
       display: flex;
       justify-content: center;
+      align-items: center;
       gap: 8px;
-      margin-bottom: clamp(18px, 3.2dvh, 38px);
       flex-wrap: wrap;
+      width: 100%;
+      margin-bottom: 0;
     }
     .filter-chip {
-      padding: 8px 18px;
+      padding: 7px 16px;
       border-radius: var(--radius-full);
-      border: 1px solid var(--border);
+      border: 1px solid rgba(0, 0, 0, 0.09);
       background: #FFFFFF;
-      font-size: 13px;
+      font-size: 12.5px;
       font-weight: 600;
       color: var(--text-secondary);
       cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
       transition: all 0.2s var(--ease);
     }
     .filter-chip:hover {
@@ -754,103 +827,429 @@
       background: var(--text-main);
       color: #FFFFFF;
       border-color: var(--text-main);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.14);
     }
 
-    .products-grid-3col {
+    /* Outer Adaptive Shelves Container */
+    .catalog-shelves-wrap {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: clamp(16px, 2.2vw, 28px);
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(14px, 2vw, 22px);
+      align-items: stretch;
     }
-    .store-product-card {
+    .dji-category-shelf {
       background: #FFFFFF;
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      padding: clamp(18px, 2.4dvh, 26px);
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      border-radius: 20px;
+      padding: clamp(16px, 2.4dvh, 24px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: hidden;
+    }
+    .dji-category-shelf.is-wide {
+      grid-column: 1 / -1;
+    }
+
+    /* Category Shelf Header (OSMO MOBILE + Tất cả pill) */
+    .dji-shelf-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: clamp(12px, 1.8dvh, 18px);
+    }
+    .dji-category-shelf:not(.is-wide) .dji-shelf-header {
+      min-height: 78px;
+    }
+    .dji-shelf-heading {
+      min-width: 0;
+    }
+    .dji-shelf-title {
+      font-size: clamp(16px, 1.65vw, 22px);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+      margin: 0;
+      line-height: 1.2;
+    }
+    .dji-category-shelf:not(.is-wide) .dji-shelf-title {
+      font-size: clamp(14.5px, 1.3vw, 17px);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .dji-shelf-desc {
+      font-size: 12.5px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      line-height: 1.38;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .dji-shelf-all-btn {
+      padding: 6px 14px;
+      border-radius: 99px;
+      border: 1px solid rgba(0, 0, 0, 0.22);
+      background: #FFFFFF;
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.2s ease;
+    }
+    .dji-shelf-all-btn:hover {
+      background: #1D1D1F;
+      color: #FFFFFF;
+      border-color: #1D1D1F;
+    }
+
+    /* Inner Track Grid inside each Shelf */
+    .dji-shelf-track {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(12px, 1.5vw, 18px);
+      flex: 1;
+    }
+    .dji-category-shelf.is-col-1 .dji-shelf-track {
+      grid-template-columns: 1fr;
+    }
+    .dji-category-shelf.is-col-2 .dji-shelf-track {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .dji-category-shelf.is-col-4 .dji-shelf-track {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    /* Slide Indicator Dots (visible when carousel track active on mobile) */
+    .dji-carousel-dots {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .dji-carousel-dot {
+      width: 14px;
+      height: 4px;
+      border-radius: 99px;
+      border: none;
+      padding: 0;
+      background: #D2D2D7;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .dji-carousel-dot.active {
+      width: 26px;
+      background: #1D1D1F;
+    }
+
+    /* DJI-Style Product Card */
+    .dji-product-card {
+      background: #FFFFFF;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 14px;
+      padding: 14px 12px 12px 12px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       cursor: pointer;
-      transition: all 0.35s var(--ease);
       position: relative;
+      overflow: hidden;
+      min-width: 0;
+      transition: transform 0.28s var(--ease), box-shadow 0.28s var(--ease), border-color 0.28s var(--ease);
     }
-    .store-product-card:hover {
-      transform: translateY(-6px);
-      box-shadow: var(--shadow-lg);
-      border-color: var(--border-hover);
+    .dji-product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
+      border-color: rgba(0, 0, 0, 0.2);
     }
-    .store-card-img-wrap {
-      height: clamp(150px, 24dvh, 225px);
+    .dji-discount-ribbon {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+      background: #0071E3;
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 0 0 10px 0;
+      letter-spacing: 0.01em;
+      line-height: 1.3;
+    }
+    .dji-discount-ribbon.is-neutral {
+      background: #1D1D1F;
+    }
+    .dji-card-img-wrap {
+      height: clamp(140px, 20dvh, 195px);
+      background: #F9F9FB;
+      border-radius: 10px;
+      padding: 8px;
+      margin-top: 8px;
+      margin-bottom: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: clamp(12px, 1.8dvh, 18px);
       overflow: hidden;
     }
-    .store-card-img-wrap img {
+    .dji-card-img-wrap img {
       max-height: 100%;
       max-width: 100%;
       object-fit: contain;
-      transition: transform 0.5s var(--ease);
+      border-radius: 8px;
+      transition: transform 0.45s var(--ease);
     }
-    .store-product-card:hover .store-card-img-wrap img {
-      transform: scale(1.05);
+    .dji-product-card:hover .dji-card-img-wrap img {
+      transform: scale(1.04);
     }
-    .store-card-tag {
-      font-size: 11px;
+    .dji-card-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      flex: 1;
+      min-width: 0;
+    }
+    .dji-card-title {
+      font-size: clamp(14.5px, 1.3vw, 17px);
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
+      letter-spacing: -0.015em;
+      color: var(--text-main);
+      line-height: 1.32;
+      min-height: 2.64em;
       margin-bottom: 6px;
-    }
-    .store-card-title {
-      font-size: clamp(17px, 1.6vw, 20px);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      margin-bottom: 6px;
-    }
-    .store-card-sub {
-      font-size: 13.5px;
-      color: var(--text-secondary);
-      margin-bottom: 14px;
-      line-height: 1.5;
-      height: 40px;
-      overflow: hidden;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
+      overflow: hidden;
     }
     .store-card-colors {
       display: flex;
-      gap: 6px;
-      margin-bottom: 12px;
+      align-items: center;
+      gap: 5px;
+      min-height: 12px;
+      margin-bottom: 8px;
     }
     .store-mini-dot {
-      width: 12px;
-      height: 12px;
+      width: 11px;
+      height: 11px;
       border-radius: 50%;
-      border: 1px solid rgba(0,0,0,0.15);
+      border: 1px solid rgba(0, 0, 0, 0.16);
     }
-    .store-card-bottom {
+    .dji-card-prices {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+    .dji-card-price {
+      font-size: clamp(15px, 1.4vw, 17.5px);
+      font-weight: 800;
+      color: #0071E3;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .dji-card-orig {
+      font-size: 12px;
+      color: #86868B;
+      text-decoration: line-through;
+      font-variant-numeric: tabular-nums;
+    }
+    .dji-card-footer {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-top: 1px solid var(--border);
-      padding-top: 14px;
-      margin-top: 8px;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 9px;
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
     }
-    .store-price-text {
-      font-size: clamp(16px, 1.5vw, 18px);
-      font-weight: 800;
-      font-family: var(--font-mono);
-    }
-    .store-action-link {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--link);
-      display: flex;
+    .dji-compare-btn {
+      display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      padding: 4px 2px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #6E6E73;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .dji-compare-btn:hover,
+    .dji-compare-btn.active {
+      color: #0071E3;
+    }
+    .dji-compare-circle {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 1.5px solid #8E8E93;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #FFFFFF;
+      background: #FFFFFF;
+      transition: all 0.18s ease;
+    }
+    .dji-compare-btn.active .dji-compare-circle {
+      background: #0071E3;
+      border-color: #0071E3;
+    }
+    .dji-quick-add-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: none;
+      background: #1D1D1F;
+      color: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.18s ease, transform 0.18s ease;
+    }
+    .dji-quick-add-btn:hover {
+      background: #0071E3;
+      transform: scale(1.05);
+    }
+
+    /* Compare Floating Tray & Modal */
+    .compare-tray-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 895;
+      background: rgba(29, 29, 31, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      color: #FFFFFF;
+      border-radius: 99px;
+      padding: 8px 10px 8px 16px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 12px 34px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      max-width: calc(100vw - 24px);
+    }
+    .compare-tray-bar.visible {
+      display: flex;
+    }
+    .compare-tray-info {
+      font-size: 12.5px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .compare-tray-go {
+      background: #0071E3;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 99px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .compare-tray-clear {
+      background: rgba(255, 255, 255, 0.14);
+      color: #FFFFFF;
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-size: 15px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .modal-card.compare-modal-card {
+      width: min(880px, calc(100vw - 24px));
+      max-width: 880px;
+      max-height: 86dvh;
+      overflow-y: auto;
+      padding: 24px 20px;
+    }
+    .compare-table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin-top: 14px;
+    }
+    .compare-table {
+      width: 100%;
+      min-width: 460px;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .compare-table.is-two-cols {
+      min-width: 0;
+      table-layout: fixed;
+    }
+    .compare-prod-col {
+      min-width: 145px;
+    }
+    .compare-table.is-two-cols .compare-prod-col {
+      min-width: 0;
+    }
+    .compare-table th,
+    .compare-table td {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      padding: 10px 10px;
+      text-align: left;
+      vertical-align: top;
+      word-break: break-word;
+    }
+    .compare-table th {
+      width: 135px;
+      color: #6E6E73;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .compare-prod-thumb {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      background: #F5F5F7;
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 6px;
+    }
+    @media (max-width: 640px) {
+      .modal-card.compare-modal-card {
+        width: calc(100vw - 20px) !important;
+        padding: 18px 12px !important;
+        border-radius: 18px !important;
+      }
+      .compare-table {
+        font-size: 11.5px;
+      }
+      .compare-table.is-two-cols th {
+        width: 76px;
+        padding: 8px 6px 8px 2px;
+        font-size: 10.5px;
+      }
+      .compare-table.is-two-cols td {
+        padding: 8px 6px;
+      }
+      .compare-table.is-two-cols .compare-prod-thumb {
+        width: 54px;
+        height: 54px;
+      }
     }
 
     /* ==========================================================================
@@ -2574,9 +2973,14 @@
         grid-template-columns: 1fr 1fr !important;
         gap: 14px !important;
       }
-      .products-grid-3col {
-        grid-template-columns: 1fr 1fr !important;
-        gap: 18px !important;
+      .catalog-shelves-wrap {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 16px !important;
+      }
+      .dji-category-shelf.is-wide .dji-shelf-track,
+      .dji-category-shelf.is-col-4 .dji-shelf-track,
+      .dji-category-shelf.is-col-3 .dji-shelf-track {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
       }
       .detail-top-grid {
         grid-template-columns: 1fr !important;
@@ -3138,12 +3542,185 @@
         gap: 6px !important;
       }
 
-      .products-grid-3col {
-        grid-template-columns: 1fr !important;
-        gap: 14px !important;
+      .catalog-section {
+        padding: 12px 0 max(84px, calc(74px + env(safe-area-inset-bottom))) 0 !important;
       }
-      .store-card-img-wrap {
-        height: 150px !important;
+      .catalog-section .section-header-clean {
+        margin-bottom: 10px !important;
+        text-align: left !important;
+        padding: 0 !important;
+      }
+      .catalog-section .section-header-clean .tag-clean,
+      .catalog-section .section-header-clean .sub-clean {
+        display: none !important;
+      }
+      .catalog-toolbar {
+        gap: 8px !important;
+        margin-bottom: 12px !important;
+        align-items: stretch !important;
+      }
+      .catalog-search-box {
+        max-width: 100% !important;
+      }
+      .catalog-search-input {
+        height: 38px !important;
+        font-size: 16px !important; /* Prevents iOS Safari zoom on focus */
+        padding: 0 36px 0 38px !important;
+      }
+      .catalog-filters {
+        justify-content: flex-start !important;
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        gap: 6px !important;
+        padding-bottom: 2px !important;
+      }
+      .catalog-filters::-webkit-scrollbar {
+        display: none !important;
+      }
+      .filter-chip {
+        padding: 6px 12px !important;
+        font-size: 12px !important;
+      }
+      .catalog-shelves-wrap {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .dji-category-shelf {
+        padding: 14px 12px !important;
+        border-radius: 16px !important;
+      }
+      .dji-shelf-header {
+        margin-bottom: 10px !important;
+      }
+      .dji-shelf-desc {
+        display: none !important;
+      }
+      .dji-shelf-title {
+        font-size: 16px !important;
+      }
+      .dji-shelf-all-btn {
+        padding: 4px 11px !important;
+        font-size: 11.5px !important;
+      }
+      .dji-shelf-track,
+      .dji-category-shelf.is-wide .dji-shelf-track,
+      .dji-category-shelf.is-col-2 .dji-shelf-track,
+      .dji-category-shelf.is-col-3 .dji-shelf-track,
+      .dji-category-shelf.is-col-4 .dji-shelf-track {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 9px !important;
+      }
+      .dji-category-shelf.is-col-1 .dji-shelf-track {
+        grid-template-columns: 1fr !important;
+      }
+      .dji-shelf-track.is-carousel {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        gap: 9px !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+      }
+      .dji-shelf-track.is-carousel::-webkit-scrollbar {
+        display: none !important;
+      }
+      .dji-shelf-track.is-carousel > .dji-product-card {
+        flex: 0 0 calc(50% - 4.5px) !important;
+        scroll-snap-align: start !important;
+      }
+      .dji-carousel-dots.is-active {
+        display: flex !important;
+      }
+      .dji-product-card {
+        padding: 10px 9px 9px 9px !important;
+        border-radius: 12px !important;
+      }
+      .dji-product-card:hover {
+        transform: none !important;
+      }
+      .dji-discount-ribbon {
+        font-size: 10px !important;
+        padding: 2px 8px !important;
+        border-radius: 0 0 8px 0 !important;
+      }
+      .dji-card-img-wrap {
+        height: clamp(108px, 16dvh, 134px) !important;
+        margin-top: 6px !important;
+        margin-bottom: 8px !important;
+        padding: 5px !important;
+      }
+      .dji-card-title {
+        font-size: 13px !important;
+        line-height: 1.3 !important;
+        min-height: 2.6em !important;
+        margin-bottom: 4px !important;
+      }
+      .store-card-colors {
+        margin-bottom: 6px !important;
+        min-height: 10px !important;
+      }
+      .store-mini-dot {
+        width: 10px !important;
+        height: 10px !important;
+      }
+      .dji-card-price {
+        font-size: 14px !important;
+      }
+      .dji-card-orig {
+        font-size: 11px !important;
+      }
+      .dji-card-footer {
+        margin-top: 8px !important;
+        padding-top: 7px !important;
+      }
+      .dji-compare-btn {
+        font-size: 11.5px !important;
+        gap: 4px !important;
+      }
+      .dji-compare-circle {
+        width: 14px !important;
+        height: 14px !important;
+      }
+      .dji-quick-add-btn {
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 8px !important;
+      }
+      .dji-product-card.is-horizontal {
+        display: grid !important;
+        grid-template-columns: 112px minmax(0, 1fr) !important;
+        gap: 10px !important;
+        align-items: stretch !important;
+        padding: 10px !important;
+      }
+      .dji-product-card.is-horizontal .dji-card-img-wrap {
+        width: 112px !important;
+        height: 112px !important;
+        margin: 0 !important;
+        padding: 6px !important;
+      }
+      .dji-product-card.is-horizontal .dji-card-title {
+        min-height: 0 !important;
+      }
+      .dji-product-card.is-horizontal .dji-card-footer {
+        margin-top: 6px !important;
+        padding-top: 6px !important;
+      }
+      .compare-tray-bar {
+        bottom: calc(54px + env(safe-area-inset-bottom)) !important;
+        left: 12px !important;
+        right: 62px !important;
+        transform: none !important;
+        width: auto !important;
+        max-width: none !important;
+        justify-content: space-between !important;
+        padding: 6px 8px 6px 12px !important;
+        gap: 8px !important;
+        border-radius: 14px !important;
       }
       .product-detail-view {
         padding: 12px 0 36px 0 !important;
@@ -3620,6 +4197,32 @@
       }
       .enterprise-footer {
         padding: 20px 0 24px 0 !important;
+      }
+      .catalog-section {
+        padding: 10px 0 36px 0 !important;
+      }
+      .catalog-section .section-header-clean .tag-clean,
+      .catalog-section .section-header-clean .sub-clean {
+        display: none !important;
+      }
+      .catalog-section .section-header-clean {
+        margin-bottom: 8px !important;
+      }
+      .catalog-toolbar {
+        gap: 6px !important;
+        margin-bottom: 10px !important;
+      }
+      .catalog-filters {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        justify-content: flex-start !important;
+        scrollbar-width: none !important;
+      }
+      .catalog-filters::-webkit-scrollbar {
+        display: none !important;
+      }
+      .dji-card-img-wrap {
+        height: 108px !important;
       }
       .tflow-ai-fab {
         bottom: 8px !important;
@@ -4191,6 +4794,29 @@
       .enterprise-footer-grid {
         grid-template-columns: 1fr !important;
       }
+      .dji-category-shelf {
+        padding: 10px 9px !important;
+      }
+      .dji-card-img-wrap {
+        height: 92px !important;
+      }
+      .dji-product-card.is-horizontal {
+        grid-template-columns: 92px minmax(0, 1fr) !important;
+        gap: 8px !important;
+      }
+      .dji-product-card.is-horizontal .dji-card-img-wrap {
+        width: 92px !important;
+        height: 92px !important;
+      }
+      .dji-card-title {
+        font-size: 12px !important;
+      }
+      .dji-card-price {
+        font-size: 13px !important;
+      }
+      .dji-compare-btn {
+        font-size: 10.5px !important;
+      }
     }
 
   
@@ -4517,7 +5143,7 @@
   </main>
 
   <!-- ==========================================================================
-       VIEW 2: DẢI SẢN PHẨM (CATALOG STORE GRID - REQUIREMENT 1 & 6)
+       VIEW 2: DẢI SẢN PHẨM (DJI-STYLE CATEGORY SHELVES STORE)
        ========================================================================== -->
   <main class="view-panel" id="viewCatalog">
     <section class="catalog-section">
@@ -4528,14 +5154,23 @@
           <p class="sub-clean">Khám phá các dòng thiết bị ổn định 3 trục và phụ kiện sáng tạo nội dung hàng đầu.</p>
         </div>
 
-        <!-- Filter Chips (Dynamically rendered from SmartGimbalCatalog.getGroups()) -->
-        <div class="catalog-filters" id="catalogFilterChips">
-          <!-- Populated by renderCatalogFilterChips() -->
+        <!-- Toolbar: Search Pill + Horizontal Category Chips -->
+        <div class="catalog-toolbar">
+          <div class="catalog-search-box">
+            <span class="catalog-search-icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
+            <input type="search" class="catalog-search-input" id="catalogSearchInput" placeholder="Bạn tìm gì hôm nay?" oninput="onCatalogSearchInput(this.value)" aria-label="Tìm kiếm sản phẩm">
+            <button type="button" class="catalog-search-clear" id="catalogSearchClear" onclick="clearCatalogSearch()" aria-label="Xóa từ khóa tìm kiếm">&times;</button>
+          </div>
+          <div class="catalog-filters" id="catalogFilterChips">
+            <!-- Populated by renderCatalogFilterChips() -->
+          </div>
         </div>
 
-        <!-- 3-Column Products Grid -->
-        <div class="products-grid-3col" id="catalogProductsGrid">
-          <!-- Dynamically populated from SmartGimbalCatalog.getProducts() -->
+        <!-- Grouped DJI-Style Category Shelves Container -->
+        <div class="catalog-shelves-wrap" id="catalogProductsGrid">
+          <!-- Dynamically populated by renderCatalogGrid() -->
         </div>
       </div>
     </section>
@@ -4946,6 +5581,28 @@
     </div>
   </div>
 
+  <!-- FLOATING COMPARE BAR & SIDE-BY-SIDE COMPARISON MODAL -->
+  <div class="compare-tray-bar" id="compareTrayBar">
+    <span class="compare-tray-info" id="compareTrayCount">So sánh (0/3)</span>
+    <div style="display:flex; align-items:center; gap:6px;">
+      <button type="button" class="compare-tray-go" onclick="openCompareModal()">So sánh ngay</button>
+      <button type="button" class="compare-tray-clear" onclick="clearCompareProducts()" title="Xóa chọn so sánh" aria-label="Xóa chọn so sánh">&times;</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="compareModal" style="z-index:10010;" onclick="if (event.target === this) closeCompareModal();">
+    <div class="modal-card compare-modal-card">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+        <div>
+          <div class="modal-title" style="margin-bottom:2px;">So Sánh Sản Phẩm</div>
+          <div class="modal-sub" style="margin-bottom:0;">Đối chiếu thông số kỹ thuật, ưu đãi giá và phụ kiện đi kèm.</div>
+        </div>
+        <button type="button" onclick="closeCompareModal()" style="background:#F5F5F7; border:none; width:32px; height:32px; border-radius:50%; font-size:18px; cursor:pointer; color:#1D1D1F; flex-shrink:0;" aria-label="Đóng bảng so sánh">&times;</button>
+      </div>
+      <div class="compare-table-wrap" id="compareModalBody"></div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION -->
   <div class="toast-msg" id="toastMsg">Đã cập nhật giỏ hàng</div>
 
@@ -5019,6 +5676,8 @@
     let currentDetailColorId = 'natural-titanium';
 
     let selectedCatalogFilter = 'all';
+    let catalogSearchQuery = '';
+    let compareProductIds = [];
 
     // Init on DOM ready
     
@@ -5689,6 +6348,7 @@
       } else if (viewName === 'home') {
         loadMvpData();
       }
+      if (typeof syncCompareTrayVisibility === 'function') syncCompareTrayVisibility();
     }
 
     // ==========================================================================
@@ -5855,52 +6515,230 @@
     }
 
     // ==========================================================================
-    // 3. CATALOG STORE GRID (REQUIREMENT 6)
+    // 3. CATALOG STORE GRID (DJI-STYLE CATEGORY SHELVES + SEARCH + COMPARE)
     // ==========================================================================
+    function escapeCatalogHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function normalizeSearchText(str) {
+      return String(str || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D')
+        .toLowerCase()
+        .trim();
+    }
+
+    function onCatalogSearchInput(val) {
+      catalogSearchQuery = val || '';
+      const clearBtn = document.getElementById('catalogSearchClear');
+      if (clearBtn) clearBtn.classList.toggle('visible', catalogSearchQuery.trim().length > 0);
+      renderCatalogGrid();
+    }
+
+    function clearCatalogSearch() {
+      catalogSearchQuery = '';
+      const input = document.getElementById('catalogSearchInput');
+      if (input) input.value = '';
+      const clearBtn = document.getElementById('catalogSearchClear');
+      if (clearBtn) clearBtn.classList.remove('visible');
+      renderCatalogGrid();
+    }
+
+    function getProductPriceMeta(p) {
+      const startingTier = p.tiers && p.tiers[0] ? p.tiers[0] : null;
+      const priceNum = Number(startingTier && startingTier.price != null ? startingTier.price : (p.price || 2490000));
+      const origNum = Number(startingTier && startingTier.origPrice != null ? startingTier.origPrice : (p.origPrice || 0));
+      const priceDisplay = (startingTier && startingTier.priceFormatted)
+        ? startingTier.priceFormatted
+        : SmartGimbalCatalog.formatVND(priceNum);
+      const hasDiscount = origNum > priceNum && priceNum > 0;
+      const discountPct = hasDiscount ? Math.round((1 - priceNum / origNum) * 100) : 0;
+      const origDisplay = hasDiscount ? SmartGimbalCatalog.formatVND(origNum) : '';
+      return { startingTier, priceNum, origNum, priceDisplay, origDisplay, hasDiscount, discountPct };
+    }
+
+    function buildDjiProductCardHtml(p, isHorizontal) {
+      const meta = getProductPriceMeta(p);
+      const safeId = escapeCatalogHtml(p.id);
+      const safeName = escapeCatalogHtml(p.name);
+      const safeImg = (typeof p.img === 'string' && p.img.startsWith('/'))
+        ? p.img
+        : (p.img || '/shared/img/feed_portrait_dusk.jpg');
+
+      let ribbonHtml = '';
+      if (meta.hasDiscount && meta.discountPct > 0) {
+        ribbonHtml = `<div class="dji-discount-ribbon">Giảm ${meta.discountPct}%</div>`;
+      } else if (p.badge) {
+        ribbonHtml = `<div class="dji-discount-ribbon is-neutral">${escapeCatalogHtml(p.badge)}</div>`;
+      }
+
+      let colorsHtml = '';
+      if (p.colors && p.colors.length > 0) {
+        p.colors.forEach(c => {
+          colorsHtml += `<div class="store-mini-dot" style="background:${escapeCatalogHtml(c.hex)};" title="${escapeCatalogHtml(c.name)}"></div>`;
+        });
+      }
+
+      const isCompared = compareProductIds.includes(p.id);
+
+      return `
+        <div class="dji-product-card ${isHorizontal ? 'is-horizontal' : ''}" onclick="openProductDetail('${safeId}')">
+          ${ribbonHtml}
+          <div class="dji-card-img-wrap">
+            <img src="${escapeCatalogHtml(safeImg)}" alt="${safeName}" loading="lazy">
+          </div>
+          <div class="dji-card-body">
+            <div>
+              <div class="dji-card-title">${safeName}</div>
+              <div class="store-card-colors">${colorsHtml}</div>
+              <div class="dji-card-prices">
+                <div class="dji-card-price">${escapeCatalogHtml(meta.priceDisplay)}</div>
+                ${meta.origDisplay ? `<div class="dji-card-orig">${escapeCatalogHtml(meta.origDisplay)}</div>` : ''}
+              </div>
+            </div>
+            <div class="dji-card-footer">
+              <button type="button" class="dji-compare-btn ${isCompared ? 'active' : ''}" onclick="toggleCompareProduct('${safeId}', event)" aria-pressed="${isCompared}">
+                <span class="dji-compare-circle">${isCompared ? '✓' : ''}</span>
+                <span>${isCompared ? 'Đã chọn' : 'So sánh'}</span>
+              </button>
+              <button type="button" class="dji-quick-add-btn" onclick="quickAddCatalogProduct('${safeId}', event)" title="Thêm nhanh vào giỏ hàng" aria-label="Thêm ${safeName} vào giỏ hàng">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+                  <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+                  <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+                  <path d="M17.5 14v7M14 17.5h7"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function syncShelfCarouselDots(trackEl, shelfId) {
+      if (!trackEl) return;
+      const dotsWrap = document.getElementById(`dots-${shelfId}`);
+      if (!dotsWrap) return;
+      const dots = dotsWrap.querySelectorAll('.dji-carousel-dot');
+      if (dots.length <= 1) return;
+      const maxScroll = Math.max(1, trackEl.scrollWidth - trackEl.clientWidth);
+      const ratio = Math.min(1, Math.max(0, trackEl.scrollLeft / maxScroll));
+      const activeIdx = Math.round(ratio * (dots.length - 1));
+      dots.forEach((d, idx) => d.classList.toggle('active', idx === activeIdx));
+    }
+
+    function scrollShelfToSlide(shelfId, slideIdx) {
+      const track = document.getElementById(`track-${shelfId}`);
+      const dotsWrap = document.getElementById(`dots-${shelfId}`);
+      if (!track || !dotsWrap) return;
+      const dotsCount = Math.max(2, dotsWrap.querySelectorAll('.dji-carousel-dot').length);
+      const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
+      const targetLeft = (maxScroll * slideIdx) / (dotsCount - 1);
+      track.scrollTo({ left: targetLeft, behavior: 'smooth' });
+    }
+
     function renderCatalogGrid() {
       const container = document.getElementById('catalogProductsGrid');
-      if (!container) return;
+      if (!container || typeof SmartGimbalCatalog === 'undefined') return;
       container.innerHTML = '';
 
-      const products = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getProducts)
+      const allGroups = SmartGimbalCatalog.getGroups ? SmartGimbalCatalog.getGroups() : [];
+      const baseProducts = SmartGimbalCatalog.getProducts
         ? SmartGimbalCatalog.getProducts(selectedCatalogFilter)
         : [];
 
-      if (!products || products.length === 0) {
-        container.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:48px 20px; color:#86868B; font-size:14px;">Chưa có sản phẩm nào trong danh mục này.</div>';
+      const qNorm = normalizeSearchText(catalogSearchQuery);
+      const filteredProducts = qNorm
+        ? baseProducts.filter(p => {
+            const grp = allGroups.find(g => g.id === p.groupId);
+            const haystack = normalizeSearchText(`${p.name} ${p.sku || ''} ${p.tagline || ''} ${p.subtitle || ''} ${grp ? grp.name : ''}`);
+            return haystack.includes(qNorm);
+          })
+        : baseProducts;
+
+      if (!filteredProducts || filteredProducts.length === 0) {
+        container.innerHTML = `
+          <div class="dji-category-shelf is-wide" style="text-align:center; padding:42px 20px;">
+            <div style="color:#6E6E73; font-size:14.5px; margin-bottom:12px;">Không tìm thấy sản phẩm phù hợp${qNorm ? ` với "${escapeCatalogHtml(catalogSearchQuery.trim())}"` : ''}.</div>
+            <button type="button" class="dji-shelf-all-btn" onclick="clearCatalogSearch(); filterCatalog('all');">Xem tất cả sản phẩm</button>
+          </div>`;
+        syncCompareTrayVisibility();
         return;
       }
 
-      products.forEach(p => {
-        const startingTier = p.tiers && p.tiers[0] ? p.tiers[0] : null;
-        const priceDisplay = startingTier ? (startingTier.priceFormatted || SmartGimbalCatalog.formatVND(startingTier.price)) : (p.price ? SmartGimbalCatalog.formatVND(p.price) : '2.490.000₫');
+      // Group visible products by catalog group order
+      const buckets = [];
+      const seenIds = new Set();
+      allGroups.forEach(g => {
+        const items = filteredProducts.filter(p => p.groupId === g.id);
+        if (items.length > 0) {
+          items.forEach(it => seenIds.add(it.id));
+          buckets.push({ group: g, items });
+        }
+      });
+      const ungrouped = filteredProducts.filter(p => !seenIds.has(p.id));
+      if (ungrouped.length > 0) {
+        buckets.push({ group: { id: 'other', name: 'Sản Phẩm Khác', desc: '' }, items: ungrouped });
+      }
 
-        let colorsHtml = '';
-        if (p.colors && p.colors.length > 0) {
-          p.colors.forEach(c => {
-            colorsHtml += `<div class="store-mini-dot" style="background:${c.hex};" title="${c.name}"></div>`;
-          });
+      const isSingleGroupView = selectedCatalogFilter !== 'all' || qNorm.length > 0;
+
+      buckets.forEach(({ group, items }) => {
+        const shelfEl = document.createElement('section');
+        const count = items.length;
+        const isWide = isSingleGroupView || count >= 2;
+        const colClass = count === 1 ? 'is-col-1' : (count === 2 ? 'is-col-2' : (count >= 4 ? 'is-col-4' : 'is-col-3'));
+        const useMobileCarousel = !isSingleGroupView && count >= 3;
+        const useHorizontalSingle = !isSingleGroupView && count === 1;
+        const safeGroupId = escapeCatalogHtml(group.id);
+        const safeGroupName = escapeCatalogHtml(group.name || '');
+        const safeGroupDesc = escapeCatalogHtml(group.desc || '');
+
+        shelfEl.className = `dji-category-shelf ${isWide ? 'is-wide' : ''} ${colClass}`;
+        if (shelfEl.setAttribute) shelfEl.setAttribute('data-group-id', group.id);
+
+        const headerActionBtn = selectedCatalogFilter === group.id
+          ? `<button type="button" class="dji-shelf-all-btn" onclick="filterCatalog('all', this)">&larr; Tất cả danh mục</button>`
+          : (group.id !== 'other'
+              ? `<button type="button" class="dji-shelf-all-btn" onclick="filterCatalog('${safeGroupId}', this)">Tất cả (${count})</button>`
+              : '');
+
+        const cardsHtml = items.map(p => buildDjiProductCardHtml(p, useHorizontalSingle)).join('');
+
+        let dotsHtml = '';
+        if (useMobileCarousel) {
+          const dotsCount = Math.max(2, count - 1);
+          const dotsBtns = Array.from({ length: dotsCount }, (_, idx) =>
+            `<button type="button" class="dji-carousel-dot ${idx === 0 ? 'active' : ''}" onclick="scrollShelfToSlide('${safeGroupId}', ${idx})" aria-label="Trang ${idx + 1} danh mục ${safeGroupName}"></button>`
+          ).join('');
+          dotsHtml = `<div class="dji-carousel-dots is-active" id="dots-${safeGroupId}">${dotsBtns}</div>`;
         }
 
-        const card = document.createElement('div');
-        card.className = 'store-product-card';
-        card.onclick = () => openProductDetail(p.id);
-        card.innerHTML = `
-          <div class="store-card-img-wrap">
-            <img src="${p.img || '/shared/img/feed_portrait_dusk.jpg'}" alt="${p.name}">
+        shelfEl.innerHTML = `
+          <div class="dji-shelf-header">
+            <div class="dji-shelf-heading">
+              <h3 class="dji-shelf-title">${safeGroupName}</h3>
+              ${safeGroupDesc ? `<div class="dji-shelf-desc">${safeGroupDesc}</div>` : ''}
+            </div>
+            ${headerActionBtn}
           </div>
-          <div>
-            <div class="store-card-title">${p.name}</div>
-            <div class="store-card-sub">${p.tagline || p.subtitle || ''}</div>
-            <div class="store-card-colors">${colorsHtml}</div>
+          <div class="dji-shelf-track ${useMobileCarousel ? 'is-carousel' : ''}" id="track-${safeGroupId}" ${useMobileCarousel ? `onscroll="syncShelfCarouselDots(this, '${safeGroupId}')"` : ''}>
+            ${cardsHtml}
           </div>
-          <div class="store-card-bottom">
-            <div class="store-price-text">${priceDisplay}</div>
-            <div class="store-action-link">Xem Chi Tiết &rarr;</div>
-          </div>
+          ${dotsHtml}
         `;
-        container.appendChild(card);
+        container.appendChild(shelfEl);
       });
+
+      syncCompareTrayVisibility();
     }
 
     function renderCatalogFilterChips() {
@@ -5908,16 +6746,15 @@
       if (!container || typeof SmartGimbalCatalog === 'undefined') return;
       const groups = SmartGimbalCatalog.getGroups();
 
-      // Validate selectedCatalogFilter
       if (selectedCatalogFilter !== 'all' && !groups.some(g => g.id === selectedCatalogFilter)) {
         selectedCatalogFilter = 'all';
       }
 
-      let html = `<button class="filter-chip ${selectedCatalogFilter === 'all' ? 'active' : ''}" onclick="filterCatalog('all', this)">Tất Cả Sản Phẩm</button>`;
+      let html = `<button class="filter-chip ${selectedCatalogFilter === 'all' ? 'active' : ''}" onclick="filterCatalog('all', this)">Tất cả</button>`;
       groups.forEach(g => {
         const isActive = selectedCatalogFilter === g.id ? 'active' : '';
-        const safeName = (g.name || '').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        html += `<button class="filter-chip ${isActive}" onclick="filterCatalog('${g.id}', this)">${safeName}</button>`;
+        const safeName = escapeCatalogHtml(g.name || '');
+        html += `<button class="filter-chip ${isActive}" onclick="filterCatalog('${escapeCatalogHtml(g.id)}', this)">${safeName}</button>`;
       });
       container.innerHTML = html;
     }
@@ -5926,6 +6763,144 @@
       selectedCatalogFilter = groupId;
       renderCatalogFilterChips();
       renderCatalogGrid();
+    }
+
+    function quickAddCatalogProduct(productId, event) {
+      if (event) event.stopPropagation();
+      if (!requireUserAuth('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!')) return;
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+      const prod = SmartGimbalCatalog.getProduct(productId);
+      if (!prod) return;
+      const tierKey = (prod.tiers && prod.tiers[0]) ? (prod.tiers[0].key || prod.tiers[0].id || 'standard') : 'standard';
+      const colorId = (prod.colors && prod.colors[0]) ? prod.colors[0].id : 'space-black';
+      SmartGimbalCatalog.addToCart({
+        productId: prod.id,
+        tierKey: tierKey,
+        colorId: colorId,
+        quantity: 1
+      });
+      if (typeof updateNavCartCount === 'function') updateNavCartCount();
+      showToast(`Đã thêm ${prod.name} vào giỏ hàng`);
+    }
+
+    function toggleCompareProduct(productId, event) {
+      if (event) event.stopPropagation();
+      const idx = compareProductIds.indexOf(productId);
+      if (idx !== -1) {
+        compareProductIds.splice(idx, 1);
+      } else {
+        if (compareProductIds.length >= 3) {
+          compareProductIds.shift();
+          showToast('So sánh tối đa 3 sản phẩm cùng lúc (đã cập nhật danh sách)');
+        }
+        compareProductIds.push(productId);
+      }
+      renderCatalogGrid();
+      syncCompareTrayVisibility();
+    }
+
+    function clearCompareProducts() {
+      compareProductIds = [];
+      renderCatalogGrid();
+      syncCompareTrayVisibility();
+    }
+
+    function syncCompareTrayVisibility() {
+      const tray = document.getElementById('compareTrayBar');
+      const countEl = document.getElementById('compareTrayCount');
+      if (!tray) return;
+      const validIds = compareProductIds.filter(id =>
+        typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getProduct(id)
+      );
+      compareProductIds = validIds;
+      const shouldShow = currentView === 'catalog' && compareProductIds.length > 0;
+      tray.classList.toggle('visible', shouldShow);
+      if (countEl) {
+        countEl.textContent = `So sánh (${compareProductIds.length}/3)`;
+      }
+    }
+
+    function openCompareModal() {
+      if (typeof SmartGimbalCatalog === 'undefined') return;
+      const items = compareProductIds
+        .map(id => SmartGimbalCatalog.getProduct(id))
+        .filter(Boolean);
+      if (items.length < 2) {
+        showToast('Chọn ít nhất 2 sản phẩm để đối chiếu thông số');
+        return;
+      }
+
+      const body = document.getElementById('compareModalBody');
+      const modal = document.getElementById('compareModal');
+      if (!body || !modal) return;
+
+      const groups = SmartGimbalCatalog.getGroups ? SmartGimbalCatalog.getGroups() : [];
+      const specLabels = [];
+      items.forEach(p => {
+        (p.specs || []).forEach(s => {
+          if (s && s.label && !specLabels.includes(s.label)) specLabels.push(s.label);
+        });
+      });
+
+      const headerCols = items.map(p => {
+        const meta = getProductPriceMeta(p);
+        const safeImg = (typeof p.img === 'string' && p.img.startsWith('/'))
+          ? p.img
+          : (p.img || '/shared/img/feed_portrait_dusk.jpg');
+        return `
+          <td class="compare-prod-col">
+            <img src="${escapeCatalogHtml(safeImg)}" alt="${escapeCatalogHtml(p.name)}" class="compare-prod-thumb">
+            <div style="font-weight:800; font-size:13.5px; color:#1D1D1F; margin-bottom:4px; cursor:pointer; line-height:1.3;" onclick="closeCompareModal(); openProductDetail('${escapeCatalogHtml(p.id)}')">${escapeCatalogHtml(p.name)}</div>
+            <div style="font-weight:800; font-size:14px; color:#0071E3;">${escapeCatalogHtml(meta.priceDisplay)}</div>
+            ${meta.origDisplay ? `<div style="font-size:11px; color:#86868B; text-decoration:line-through;">${escapeCatalogHtml(meta.origDisplay)}</div>` : ''}
+          </td>
+        `;
+      }).join('');
+
+      const groupRow = items.map(p => {
+        const grp = groups.find(g => g.id === p.groupId);
+        return `<td>${escapeCatalogHtml(grp ? grp.name : 'T-Flow')}</td>`;
+      }).join('');
+
+      const highlightRow = items.map(p => {
+        const topHighlight = (p.highlights && p.highlights[0]) ? `${p.highlights[0].title}: ${p.highlights[0].desc}` : (p.tagline || '—');
+        return `<td style="font-size:12.5px; color:#424245; line-height:1.45;">${escapeCatalogHtml(topHighlight)}</td>`;
+      }).join('');
+
+      const specsRowsHtml = specLabels.slice(0, 6).map(lbl => {
+        const cells = items.map(p => {
+          const found = (p.specs || []).find(s => s.label === lbl);
+          return `<td style="font-size:12.5px; color:#1D1D1F;">${escapeCatalogHtml(found ? found.val : '—')}</td>`;
+        }).join('');
+        return `<tr><th>${escapeCatalogHtml(lbl)}</th>${cells}</tr>`;
+      }).join('');
+
+      const ctaRow = items.map(p => `
+        <td>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <button type="button" class="btn-dark" style="padding:7px 12px; font-size:12px; justify-content:center;" onclick="closeCompareModal(); openProductDetail('${escapeCatalogHtml(p.id)}')">Xem Chi Tiết</button>
+            <button type="button" class="btn-ghost" style="padding:6px 10px; font-size:11.5px; justify-content:center;" onclick="quickAddCatalogProduct('${escapeCatalogHtml(p.id)}', event)">+ Thêm Giỏ Hàng</button>
+          </div>
+        </td>
+      `).join('');
+
+      body.innerHTML = `
+        <table class="compare-table ${items.length <= 2 ? 'is-two-cols' : 'is-three-cols'}">
+          <tbody>
+            <tr><th>Sản phẩm</th>${headerCols}</tr>
+            <tr><th>Danh mục</th>${groupRow}</tr>
+            <tr><th>Điểm nổi bật</th>${highlightRow}</tr>
+            ${specsRowsHtml}
+            <tr><th>Chọn mua</th>${ctaRow}</tr>
+          </tbody>
+        </table>
+      `;
+      modal.classList.add('open');
+    }
+
+    function closeCompareModal() {
+      const modal = document.getElementById('compareModal');
+      if (modal) modal.classList.remove('open');
     }
 
     // ==========================================================================
