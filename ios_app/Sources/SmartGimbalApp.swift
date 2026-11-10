@@ -94,7 +94,7 @@ struct CapturedMediaItem: Identifiable {
 // =====================================================================
 
 final class SupabaseModuleStore: ObservableObject {
-    @Published var userName: String = "Đặng Anh Dũng"
+    @Published var userName: String = "Thủy Nguyễn (Founder)"
     @Published var userTier: String = "VIP LIFETIME"
     @Published var deviceName: String = "Smart Gimbal S1 Titanium"
     @Published var isOnline: Bool = true
@@ -1602,7 +1602,7 @@ struct TFlowAIChatAssistantView: View {
     @State private var messages: [ChatMessage] = [
         ChatMessage(
             isUser: false,
-            text: "Chào anh Dũng! Em là T-Flow Bot — Trợ lý AI đồng hành cùng Smart Gimbal S1 Titanium. Em có thể hướng dẫn anh các kỹ thuật quay điện ảnh, bật Apple Log 4K/60, hiệu chuẩn động cơ FOC hoặc đồng bộ dữ liệu với Web Admin!"
+            text: "Chào anh Thủy! Em là T-Flow Bot — Trợ lý AI đồng hành cùng Smart Gimbal S1 Titanium. Em có thể hướng dẫn anh các kỹ thuật quay điện ảnh, bật Apple Log 4K/60, hiệu chuẩn động cơ FOC hoặc đồng bộ dữ liệu với Web Admin!"
         )
     ]
     @State private var inputText: String = ""
