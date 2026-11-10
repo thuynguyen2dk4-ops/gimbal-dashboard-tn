@@ -411,9 +411,8 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
                 .paragraphStyle: paragraph
             ]
             let dateStr = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
-            ("T-FLOW S1 PRO
-\(selectedResolution)
-\(dateStr)" as NSString).draw(
+            let snapText = ("T-FLOW S1 PRO • " + selectedResolution + " • " + dateStr) as NSString
+            snapText.draw(
                 in: CGRect(x: 20, y: 160, width: 360, height: 80),
                 withAttributes: attrs
             )
@@ -453,9 +452,8 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
                     .foregroundColor: UIColor.red,
                     .paragraphStyle: paragraph
                 ]
-                ("CLIP 4K PRORES
-\(durationStr)
-\(activeLut)" as NSString).draw(
+                let clipText = ("CLIP 4K PRORES • " + durationStr + " • " + activeLut) as NSString
+                clipText.draw(
                     in: CGRect(x: 20, y: 160, width: 360, height: 80),
                     withAttributes: attrs
                 )
@@ -1725,26 +1723,34 @@ struct TFlowAIChatAssistantView: View {
             let reply: String
             let lower = text.lowerBound(target: text.lowercased())
             if text.contains("Inception") || text.contains("360") {
-                reply = "🎬 Để quay cú máy Inception 360°:
+                reply = """
+🎬 Để quay cú máy Inception 360°:
 1. Tại Tab Camera, chọn chế độ '360°' trên thanh Gimbal.
 2. Cầm gimbal nằm ngang hướng thẳng vào chủ thể.
-3. Gạt cần Joystick ảo sang trái hoặc phải để trục Roll xoay tròn 360° liên tục không điểm dừng!"
+3. Gạt cần Joystick ảo sang trái hoặc phải để trục Roll xoay tròn 360° liên tục không điểm dừng!
+"""
             } else if text.contains("Apple Log") || text.contains("4K/60") {
-                reply = "🎥 Cài đặt Apple Log 4K/60fps:
+                reply = """
+🎥 Cài đặt Apple Log 4K/60fps:
 1. Bật nút 'PRO' trên thanh HUD đỉnh máy ảnh.
 2. Chọn không gian màu 'Apple Log (Flat)'.
-3. ISO cố định ở mức 100, góc mở màn trập 180° (1/120s) để đạt dải nhạy sáng dynamic range 14+ stops tối đa!"
+3. ISO cố định ở mức 100, góc mở màn trập 180° (1/120s) để đạt dải nhạy sáng dynamic range 14+ stops tối đa!
+"""
             } else if text.contains("CoG") || text.contains("Cân bằng") {
-                reply = "⚖️ Tự động cân bằng CoG:
+                reply = """
+⚖️ Tự động cân bằng CoG:
 1. Chuyển sang Tab 'T-Flow Pro'.
 2. Nhấn nút 'Tự Động Cân Bằng Trọng Tâm (CoG)'.
-3. Đặt gimbal đứng yên trong 2 giây để thuật toán FOC quét và triệt tiêu rung sai số ±0.01°."
+3. Đặt gimbal đứng yên trong 2 giây để thuật toán FOC quét và triệt tiêu rung sai số ±0.01°.
+"""
             } else if text.contains("Báo giá") || text.contains("gói") {
-                reply = "📦 Bảng giá 4 gói T-Flow Pro:
+                reply = """
+📦 Bảng giá 4 gói T-Flow Pro:
 • Gói 1: Gimbal Cầm Tay S1 (B2C) — 3.990.000₫
 • Gói 2: Cụm Camera AI & Đèn MagSafe — 1.490.000₫
 • Gói 3: Bo Mạch STM32 Pure FOC 20kHz — 890.000₫
-• Gói 4: Cảm Biến IMU 6 Trục & Encoder 14-bit — 450.000₫"
+• Gói 4: Cảm Biến IMU 6 Trục & Encoder 14-bit — 450.000₫
+"""
             } else {
                 reply = "Dạ em đã ghi nhận yêu cầu của anh. Gimbal S1 Pro của anh đang hoạt động ở trạng thái hoàn hảo với tần số FOC 20kHz và pin 94%!"
             }
