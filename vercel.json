@@ -73,6 +73,22 @@
   ],
   "rewrites": [
     {
+      "source": "/san-pham",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/san-pham/:slug",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/product/:slug",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/danh-gia",
+      "destination": "/index.html"
+    },
+    {
       "source": "/id",
       "destination": "/account"
     },

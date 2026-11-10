@@ -3016,7 +3016,7 @@
         </button>
       </div>
 
-      <button class="btn-nav-primary" onclick="switchView('detail')">Mua Ngay</button>
+      <button class="btn-nav-primary" onclick="openMvpDetail()">Mua Ngay</button>
     </div>
   </nav>
 
@@ -3238,9 +3238,9 @@
       <div class="container">
         <!-- Breadcrumb -->
         <div class="breadcrumb-nav">
-          <a href="javascript:void(0)" onclick="switchView('home')">Trang Chủ</a>
+          <a href="/" onclick="event.preventDefault(); switchView('home')">Trang Chủ</a>
           <span>&rsaquo;</span>
-          <a href="javascript:void(0)" onclick="switchView('catalog')">Dải Sản Phẩm</a>
+          <a href="/san-pham" onclick="event.preventDefault(); switchView('catalog')">Dải Sản Phẩm</a>
           <span>&rsaquo;</span>
           <span id="detailBreadcrumbName">Smart Gimbal S1</span>
         </div>
@@ -3675,10 +3675,10 @@
         <div>
           <h4 style="font-size:14px; font-weight:700; text-transform:uppercase; margin-bottom:18px; color:#FFF; letter-spacing:0.05em;">Sản Phẩm &amp; Dải Thiết Bị</h4>
           <ul style="list-style:none; padding:0; font-size:13.5px; color:#A1A1A6; display:flex; flex-direction:column; gap:12px;">
-            <li><a href="javascript:void(0)" onclick="openProductDetail('tf-g31-pro')" style="color:inherit; text-decoration:none;">T-Flow Pro (Flagship 3 Trục)</a></li>
-            <li><a href="javascript:void(0)" onclick="switchView('catalog')" style="color:inherit; text-decoration:none;">Dải Sản Phẩm</a></li>
-            <li><a href="javascript:void(0)" onclick="openProductDetail('tf-g31-pro')" style="color:inherit; text-decoration:none;">Thông Số Kỹ Thuật Chi Tiết</a></li>
-            <li><a href="javascript:void(0)" onclick="switchView('reviews')" style="color:inherit; text-decoration:none;">Đánh Giá Từ Khách Hàng</a></li>
+            <li><a href="/san-pham/t-flow-pro" onclick="event.preventDefault(); openProductDetail('tf-g31-pro')" style="color:inherit; text-decoration:none;">T-Flow Pro (Flagship 3 Trục)</a></li>
+            <li><a href="/san-pham" onclick="event.preventDefault(); switchView('catalog')" style="color:inherit; text-decoration:none;">Dải Sản Phẩm</a></li>
+            <li><a href="/san-pham/t-flow-pro" onclick="event.preventDefault(); openProductDetail('tf-g31-pro')" style="color:inherit; text-decoration:none;">Thông Số Kỹ Thuật Chi Tiết</a></li>
+            <li><a href="/danh-gia" onclick="event.preventDefault(); switchView('reviews')" style="color:inherit; text-decoration:none;">Đánh Giá Từ Khách Hàng</a></li>
           </ul>
         </div>
 
@@ -3687,7 +3687,7 @@
           <ul style="list-style:none; padding:0; font-size:13.5px; color:#A1A1A6; display:flex; flex-direction:column; gap:12px;">
             <li><a href="/account" style="color:inherit; text-decoration:none;">Cổng Thành Viên (Member Hub)</a></li>
             <li><a href="javascript:void(0)" onclick="handleAdminNavClick()" style="color:#2997FF; font-weight:600; text-decoration:none;">Khóa Quản Trị (Admin Portal)</a></li>
-            <li><a href="javascript:void(0)" onclick="openProductDetail('tf-g31-pro')" style="color:inherit; text-decoration:none;">Chính Sách Bảo Hành 24 Tháng</a></li>
+            <li><a href="/san-pham/t-flow-pro" onclick="event.preventDefault(); openProductDetail('tf-g31-pro')" style="color:inherit; text-decoration:none;">Chính Sách Bảo Hành 24 Tháng</a></li>
           </ul>
         </div>
       </div>
@@ -4164,6 +4164,12 @@
       try { updateNavCartCount(); } catch(e) { console.error('Cart count error:', e); }
       try { renderNavUserSection(); } catch(e) { console.error('User section error:', e); }
       try { renderReviewsList(); } catch(e) { console.error('Reviews error:', e); }
+      try { routeFromCurrentUrl(false); } catch(e) { console.error('Route init error:', e); }
+
+      // Handle browser Back / Forward buttons cleanly
+      window.addEventListener('popstate', () => {
+        try { routeFromCurrentUrl(true); } catch(e) { console.error('Popstate route error:', e); }
+      });
 
       // Listen for user auth updates (login, logout, account switch, Google OAuth)
       if (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.USER_EVENT) {
@@ -4183,17 +4189,17 @@
         loadMvpData();
         renderCatalogFilterChips();
         renderCatalogGrid();
-        if (currentDetailProduct) {
+        if (currentView === 'detail' && currentDetailProduct) {
           const refreshed = SmartGimbalCatalog.getProduct(currentDetailProduct.id);
-          if (refreshed) openProductDetail(refreshed.id, false);
+          if (refreshed) openProductDetail(refreshed.id, false, { skipHistory: true });
         }
       });
 
       // Listen for cart updates
       window.addEventListener(SmartGimbalCatalog.CART_EVENT, () => {
         updateNavCartCount();
-      renderNavUserSection();
-      renderReviewsList();
+        renderNavUserSection();
+        renderReviewsList();
         renderCartDrawer();
       });
 
@@ -4201,14 +4207,137 @@
       window.addEventListener('scroll', handleStickyBuyBar);
     }
 
-
-
     // ==========================================================================
-    // 1. VIEW SWITCHER (MULTI-VIEW ISOLATION)
+    // 1. VIEW SWITCHER & CLEAN PRODUCT URL ROUTING
     // ==========================================================================
     let currentView = 'home';
 
-    function switchView(viewName) {
+    function slugifyProductName(str) {
+      if (!str) return '';
+      return str
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/đ/g, 'd')
+        .replace(/Đ/g, 'D')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    }
+
+    function getProductSlug(prod) {
+      if (!prod) return '';
+      if (prod.slug) return prod.slug;
+      const baseName = (prod.name || '').split('—')[0].trim();
+      const shortSlug = slugifyProductName(baseName);
+      const products = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getProducts)
+        ? SmartGimbalCatalog.getProducts()
+        : [];
+      const dupes = products.filter(p => slugifyProductName((p.name || '').split('—')[0].trim()) === shortSlug);
+      if (dupes.length > 1) {
+        return slugifyProductName(prod.name) || prod.id;
+      }
+      return shortSlug || slugifyProductName(prod.name) || prod.id || '';
+    }
+
+    function findProductBySlugOrId(identifier) {
+      if (!identifier || typeof SmartGimbalCatalog === 'undefined') return null;
+      const clean = decodeURIComponent(String(identifier)).trim().replace(/^\/+|\/+$/g, '').toLowerCase();
+      const flat = clean.replace(/-/g, '');
+      const products = SmartGimbalCatalog.getProducts ? SmartGimbalCatalog.getProducts() : [];
+      return (
+        products.find(p => (p.id || '').toLowerCase() === clean) ||
+        products.find(p => p.slug && p.slug.toLowerCase() === clean) ||
+        products.find(p => getProductSlug(p) === clean) ||
+        products.find(p => slugifyProductName(p.name) === clean) ||
+        products.find(p => p.sku && p.sku.toLowerCase() === clean) ||
+        products.find(p => getProductSlug(p).replace(/-/g, '') === flat) ||
+        null
+      );
+    }
+
+    function updateBrowserUrl(viewName, prod = null, historyMode = 'push') {
+      if (typeof document === 'undefined') return;
+      let targetPath = '/';
+      let targetTitle = 't-flow — mượt mà từng khoảnh khắc | T-Flow Pro Flagship';
+
+      if (viewName === 'catalog') {
+        targetPath = '/san-pham';
+        targetTitle = 'Dải Sản Phẩm — t-flow';
+      } else if (viewName === 'reviews') {
+        targetPath = '/danh-gia';
+        targetTitle = 'Đánh Giá & Hỏi Đáp — t-flow';
+      } else if (viewName === 'detail') {
+        const p = prod || currentDetailProduct || currentMvp || (typeof SmartGimbalCatalog !== 'undefined' ? SmartGimbalCatalog.getMvpProduct() : null);
+        const slug = p ? getProductSlug(p) : 't-flow-pro';
+        targetPath = '/san-pham/' + encodeURIComponent(slug);
+        targetTitle = (p ? p.name : 'T-Flow Pro') + ' — t-flow';
+      }
+
+      document.title = targetTitle;
+      if (historyMode === 'none' || typeof window === 'undefined' || !window.history || !window.history.pushState) return;
+      const useReplace = (historyMode === true || historyMode === 'replace');
+      const currentFull = window.location.pathname + window.location.search;
+      if (currentFull !== targetPath) {
+        const stateObj = {
+          view: viewName,
+          productId: prod ? prod.id : (currentDetailProduct ? currentDetailProduct.id : null)
+        };
+        try {
+          if (useReplace) {
+            window.history.replaceState(stateObj, targetTitle, targetPath);
+          } else {
+            window.history.pushState(stateObj, targetTitle, targetPath);
+          }
+        } catch (e) {}
+      }
+    }
+
+    function routeFromCurrentUrl(fromPopstate = false) {
+      const path = (window.location.pathname || '/').replace(/\/+$/, '') || '/';
+      const params = new URLSearchParams(window.location.search || '');
+      const queryProd = params.get('product') || params.get('sp') || params.get('p');
+
+      if (queryProd) {
+        const p = findProductBySlugOrId(queryProd);
+        if (p) {
+          openProductDetail(p.id, false, { skipHistory: true });
+          if (!fromPopstate) updateBrowserUrl('detail', p, 'replace');
+          return;
+        }
+      }
+
+      if (path.startsWith('/san-pham/') || path.startsWith('/product/')) {
+        const slugOrId = path.split('/').slice(2).join('/');
+        const p = findProductBySlugOrId(slugOrId) || (typeof SmartGimbalCatalog !== 'undefined' ? SmartGimbalCatalog.getMvpProduct() : null);
+        if (p) {
+          openProductDetail(p.id, false, { skipHistory: true });
+          if (!fromPopstate) updateBrowserUrl('detail', p, 'replace');
+          return;
+        }
+      }
+
+      if (path === '/san-pham' || path === '/catalog') {
+        switchView('catalog', { skipHistory: true, skipScroll: true });
+        return;
+      }
+
+      if (path === '/danh-gia' || path === '/reviews') {
+        switchView('reviews', { skipHistory: true, skipScroll: true });
+        return;
+      }
+
+      switchView('home', { skipHistory: true, skipScroll: true });
+    }
+
+    function switchView(viewName, opts = {}) {
+      if (viewName === 'detail' && !opts.fromOpenProductDetail) {
+        const targetProd = currentDetailProduct || currentMvp || (typeof SmartGimbalCatalog !== 'undefined' ? SmartGimbalCatalog.getMvpProduct() : null);
+        if (targetProd) {
+          openProductDetail(targetProd.id, !opts.skipScroll, opts);
+          return;
+        }
+      }
+
       currentView = viewName;
       const views = {
         'home': document.getElementById('viewHome'),
@@ -4240,8 +4369,16 @@
         navBtns[viewName].classList.add('active');
       }
 
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (!opts.skipScroll) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       handleStickyBuyBar();
+
+      updateBrowserUrl(
+        viewName,
+        opts.product || currentDetailProduct,
+        opts.skipHistory ? 'none' : (opts.replaceHistory ? 'replace' : 'push')
+      );
 
       if (viewName === 'catalog') {
         renderCatalogFilterChips();
@@ -4443,8 +4580,8 @@
     // ==========================================================================
     // 4. DEEP APPLE STORE-STYLE PRODUCT DETAIL PAGE (REQUIREMENT 2)
     // ==========================================================================
-    function openProductDetail(productId, shouldScroll = true) {
-      const prod = SmartGimbalCatalog.getProduct(productId) || SmartGimbalCatalog.getMvpProduct();
+    function openProductDetail(productId, shouldScroll = true, opts = {}) {
+      const prod = SmartGimbalCatalog.getProduct(productId) || findProductBySlugOrId(productId) || SmartGimbalCatalog.getMvpProduct();
       if (!prod) return;
 
       currentDetailProduct = prod;
@@ -4602,10 +4739,11 @@
       if (stickyTitle) stickyTitle.textContent = prod.name;
 
       // Switch view smoothly!
-      switchView('detail');
-      if (shouldScroll) {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      switchView('detail', Object.assign({}, opts, {
+        fromOpenProductDetail: true,
+        skipScroll: !shouldScroll || !!opts.skipScroll,
+        product: prod
+      }));
     }
 
     function selectDetailTier(tierKey) {
@@ -5359,7 +5497,7 @@
           escalated: aiResult.escalated,
           actions: (aiResult.actions || []).map(a => {
             if (a.action === 'addCreatorKit') {
-              return { label: a.label, action: "selectDetailTier('tier_creator'); openProductDetail('tflow-pro', true); switchView('detail'); toggleTflowAiChat(false);" };
+              return { label: a.label, action: "openProductDetail('tf-g31-pro', true); selectDetailTier('creator'); toggleTflowAiChat(false);" };
             }
             if (a.view) {
               return { label: a.label, action: `switchView('${a.view}'); toggleTflowAiChat(false);` };

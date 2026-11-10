@@ -128,15 +128,15 @@
         "tagline": "Vững khung hình, Trọn cảm xúc. Đỉnh cao chống rung 3 trục cho Smartphone.",
         "subtitle": "Gimbal 3 trục thông minh cho iPhone và Smartphone cao cấp. Động cơ tải trọng 450g, thuật toán Pure FOC 20kHz, vòng xoay lấy nét Focus Wheel và khung hợp kim hàng không kết hợp sợi Carbon dệt 8 lớp.",
         "badge": "Flagship 2026",
-        "img": "../shared/img/feed_portrait_dusk.jpg",
+        "img": "/shared/img/feed_portrait_dusk.jpg",
         "status": "Đang Mở Bán",
         "totalOrders": 1420,
         "is_flagship": true,
         "gallery": [
-          "../shared/img/feed_portrait_dusk.jpg",
-          "../shared/img/feed_portrait_day.jpg",
-          "../shared/img/feed_person_portrait.jpg",
-          "../shared/img/feed_land_dusk.jpg"
+          "/shared/img/feed_portrait_dusk.jpg",
+          "/shared/img/feed_portrait_day.jpg",
+          "/shared/img/feed_person_portrait.jpg",
+          "/shared/img/feed_land_dusk.jpg"
         ],
         "colors": [
           { "id": "space-black", "name": "Space Black (Đen Không Gian)", "hex": "#1F2022" },
@@ -224,13 +224,13 @@
         "tagline": "Theo dõi chủ thể thông minh độc lập không cần kết nối App qua Bluetooth.",
         "subtitle": "Camera AI cảm biến quang học độc lập nhận diện khuôn mặt và cử chỉ tay ở khoảng cách 5m. Tích hợp đèn LED trợ sáng Bi-Color CRI 96+ đổi nhiệt độ màu 2500K-6500K, hít trực tiếp sau lưng ngàm MagSafe.",
         "badge": "Phụ Kiện AI Mới",
-        "img": "../shared/img/feed_person_portrait.jpg",
+        "img": "/shared/img/feed_person_portrait.jpg",
         "status": "Đang Mở Bán",
         "totalOrders": 520,
         "is_flagship": false,
         "gallery": [
-          "../shared/img/feed_person_portrait.jpg",
-          "../shared/img/feed_portrait_day.jpg"
+          "/shared/img/feed_person_portrait.jpg",
+          "/shared/img/feed_portrait_day.jpg"
         ],
         "colors": [
           { "id": "space-black", "name": "Space Black", "hex": "#1F2022" }
@@ -269,12 +269,12 @@
         "tagline": "Vững chãi trên mọi địa hình, trọng lượng siêu nhẹ từ sợi Carbon 8 lớp.",
         "subtitle": "Chân đế 3 chân mini hợp kim nhôm hàng không và sợi carbon dệt 8 lớp. Ren tiêu chuẩn 1/4 inch tương thích hoàn hảo với T-Flow Pro, máy ảnh mirrorless và rig quay phim.",
         "badge": "Phụ Kiện Chính Hãng",
-        "img": "../shared/img/feed_land_dusk.jpg",
+        "img": "/shared/img/feed_land_dusk.jpg",
         "status": "Đang Mở Bán",
         "totalOrders": 890,
         "is_flagship": false,
         "gallery": [
-          "../shared/img/feed_land_dusk.jpg"
+          "/shared/img/feed_land_dusk.jpg"
         ],
         "colors": [
           { "id": "carbon-black", "name": "Carbon Weave Black", "hex": "#1A1A1A" }
@@ -312,12 +312,12 @@
         "tagline": "Bảo vệ toàn diện chuẩn quân đội cho toàn bộ bộ kit gimbal và phụ kiện.",
         "subtitle": "Vali hợp kim nhôm nguyên khối bo góc kim loại. Khay mút EVA đúc laser định hình chính xác từng vị trí gimbal, đèn, mic và pin sạc. Kháng nước và chống bụi tiêu chuẩn IP67.",
         "badge": "Kháng Nước IP67",
-        "img": "../shared/img/feed_portrait_day.jpg",
+        "img": "/shared/img/feed_portrait_day.jpg",
         "status": "Đang Mở Bán",
         "totalOrders": 310,
         "is_flagship": false,
         "gallery": [
-          "../shared/img/feed_portrait_day.jpg"
+          "/shared/img/feed_portrait_day.jpg"
         ],
         "colors": [
           { "id": "stealth-black", "name": "Stealth Black", "hex": "#242426" },
@@ -357,12 +357,12 @@
         "tagline": "Trái tim xử lý thuật toán động cơ 3 trục siêu êm mượt cho kỹ sư R&D.",
         "subtitle": "Bo mạch chủ vi điều khiển ARM Cortex-M4 32-bit tần số xung nhịp 168MHz. Tích hợp mạch cầu H MOSFET công suất Pure FOC tần số 20kHz triệt tiêu tiếng rít và cổng giao tiếp CAN-Bus/UART.",
         "badge": "Linh Kiện R&D",
-        "img": "../shared/img/feed_land_day.jpg",
+        "img": "/shared/img/feed_land_day.jpg",
         "status": "Sẵn Hàng",
         "totalOrders": 140,
         "is_flagship": false,
         "gallery": [
-          "../shared/img/feed_land_day.jpg"
+          "/shared/img/feed_land_day.jpg"
         ],
         "colors": [
           { "id": "pcb-black", "name": "Matte Black PCB", "hex": "#1C1C1E" }
@@ -401,12 +401,12 @@
         "tagline": "Cảm biến từ trường góc quay 14-bit và gia tốc con quay hồi chuyển 6 trục.",
         "subtitle": "Mô-đun cảm biến độ phân giải 16384 xung/vòng (14-bit) kết hợp IMU 6-DOF bù nhiệt độ. Cung cấp dữ liệu phản hồi góc nghiêng Roll/Pitch/Yaw chính xác đến 0.01 độ cho vòng lặp FOC.",
         "badge": "Độ Nhạy Cao",
-        "img": "../shared/img/feed_person_land.jpg",
+        "img": "/shared/img/feed_person_land.jpg",
         "status": "Sẵn Hàng",
         "totalOrders": 280,
         "is_flagship": false,
         "gallery": [
-          "../shared/img/feed_person_land.jpg"
+          "/shared/img/feed_person_land.jpg"
         ],
         "colors": [
           { "id": "pcb-green", "name": "Industry Green PCB", "hex": "#1B4332" }
@@ -518,8 +518,23 @@
           try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch (e) {}
         }
       }
-      // Normalize tiers ensuring name & label are always populated
+      // Normalize tiers & root-relative image paths
+      var mediaMigrated = false;
+      function normImgPath(url) {
+        if (typeof url === 'string' && url.indexOf('../shared/img/') === 0) {
+          mediaMigrated = true;
+          return url.replace('../shared/img/', '/shared/img/');
+        }
+        return url;
+      }
       (parsed.products || []).forEach(function(p) {
+        if (p.img) p.img = normImgPath(p.img);
+        if (Array.isArray(p.gallery)) {
+          p.gallery = p.gallery.map(normImgPath);
+        }
+        if (Array.isArray(p.overview)) {
+          p.overview.forEach(function(o) { if (o && o.img) o.img = normImgPath(o.img); });
+        }
         if (p.tiers && Array.isArray(p.tiers)) {
           p.tiers.forEach(function(t, idx) {
             if (!t.key && t.id) t.key = t.id;
@@ -533,6 +548,9 @@
           });
         }
       });
+      if (mediaMigrated) {
+        try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch (e) {}
+      }
       return parsed;
     } catch (e) {
       saveCatalog(DEFAULT_CATALOG);
@@ -726,7 +744,7 @@
         price: item.price || 2890000,
         colorId: item.colorId || 'natural-titanium',
         colorName: item.colorName || 'Natural Titanium',
-        img: item.img || '../shared/img/feed_portrait_dusk.jpg',
+        img: item.img || '/shared/img/feed_portrait_dusk.jpg',
         qty: item.qty || 1
       });
     }
