@@ -730,7 +730,7 @@
        VIEW 3: TRANG CHI TIẾT SẢN PHẨM RIÊNG (APPLE STORE BUY PAGE)
        ========================================================================== */
     .product-detail-view {
-      padding: clamp(18px, 3dvh, 42px) 0 clamp(44px, 6dvh, 96px) 0;
+      padding: clamp(22px, 3.8dvh, 42px) 0 clamp(44px, 6dvh, 96px) 0;
     }
 
     /* Top 2 Columns */
@@ -743,7 +743,16 @@
     }
     .sticky-gallery-col {
       position: sticky;
-      top: calc(var(--nav-h) + 16px);
+      --gallery-total-h: clamp(328px, 60.5dvh, 540px);
+      --gallery-eye-offset: min(
+        clamp(76px, 14dvh, 148px),
+        max(
+          clamp(24px, 4dvh, 48px),
+          calc((var(--view-h) - var(--gallery-total-h)) / 2)
+        )
+      );
+      top: calc(var(--nav-h) + var(--gallery-eye-offset));
+      margin-top: max(0px, calc(var(--gallery-eye-offset) - clamp(22px, 3.8dvh, 42px)));
     }
     .gallery-main-frame {
       background: var(--bg-alt);
@@ -761,6 +770,7 @@
       max-height: 100%;
       max-width: 100%;
       object-fit: contain;
+      border-radius: 12px;
       transition: transform 0.4s var(--ease);
       filter: drop-shadow(0 14px 24px rgba(0,0,0,0.08));
     }
@@ -2437,6 +2447,8 @@
       }
       .sticky-gallery-col {
         position: static !important;
+        margin-top: 0 !important;
+        top: auto !important;
       }
       .overview-row {
         grid-template-columns: 1fr !important;
