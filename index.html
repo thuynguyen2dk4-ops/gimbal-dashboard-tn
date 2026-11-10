@@ -2616,13 +2616,14 @@
 
     @media (max-width: 768px) {
       :root {
-        --nav-h: 82px;
-        --view-h: calc(100vh - 82px);
-        --view-h: calc(100dvh - 82px);
+        --nav-h: 46px;
+        --bottom-nav-h: 48px;
+        --view-h: calc(100vh - 94px);
+        --view-h: calc(100dvh - 94px);
       }
 
       /* ========================================================================
-         1. MASTER MOBILE APP BAR & 2-TIER SEGMENTED HEADER
+         1. MASTER MOBILE APP BAR (TOP) & THUMB-FRIENDLY BOTTOM NAVIGATION DOCK
          ======================================================================== */
       .nav-desktop-only {
         display: none !important;
@@ -2630,29 +2631,44 @@
       nav {
         position: sticky !important;
         top: 0 !important;
-        z-index: 900 !important;
-        background: rgba(255, 255, 255, 0.95) !important;
-        backdrop-filter: blur(24px) saturate(180%) !important;
-        -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+        z-index: 890 !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        transform: none !important;
+        filter: none !important;
         border-bottom: 1px solid var(--border) !important;
         box-shadow: 0 2px 10px rgba(0,0,0,0.03) !important;
-        height: auto !important;
-        min-height: unset !important;
+        height: 46px !important;
+        min-height: 46px !important;
         display: flex !important;
-        flex-wrap: wrap !important;
-        padding: 0 !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0 12px !important;
         margin: 0 !important;
+        transition: none !important;
+      }
+      nav::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(24px) saturate(180%);
+        -webkit-backdrop-filter: blur(24px) saturate(180%);
+        z-index: -1;
+        pointer-events: none;
       }
 
-      /* Row 1: Brand Logo + Cart + User Avatar (Height 46px) */
+      /* Top App Bar Row: Brand Logo + Cart + User Avatar (Height 46px) */
       .nav-brand {
-        order: 1 !important;
         height: 46px !important;
-        padding: 0 12px !important;
+        padding: 0 !important;
         display: flex !important;
         align-items: center !important;
         gap: 8px !important;
         flex: 1 !important;
+        min-width: 0 !important;
       }
       .nav-brand > div:first-child {
         width: 28px !important;
@@ -2672,13 +2688,13 @@
       }
 
       .nav-actions {
-        order: 2 !important;
         height: 46px !important;
-        padding: 0 12px !important;
+        padding: 0 !important;
         display: flex !important;
         align-items: center !important;
         gap: 6px !important;
         margin-left: auto !important;
+        flex-shrink: 0 !important;
       }
       .btn-nav-cart {
         padding: 5px 10px !important;
@@ -2705,18 +2721,25 @@
         white-space: nowrap !important;
       }
 
-      /* Row 2: Compact Sticky Segmented Tab Bar (Height 36px, fits 3 tabs in 360px+) */
+      /* Fixed Bottom Navigation Bar (Thumb-Reach Segmented Pill Dock) */
       .nav-links {
-        order: 3 !important;
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        z-index: 890 !important;
         width: 100% !important;
-        flex: 0 0 100% !important;
         display: flex !important;
         align-items: center !important;
         justify-content: space-between !important;
         gap: 6px !important;
-        padding: 2px 12px 6px 12px !important;
+        padding: 6px max(12px, calc((100vw - 520px) / 2)) max(6px, env(safe-area-inset-bottom)) max(12px, calc((100vw - 520px) / 2)) !important;
         margin: 0 !important;
-        border-top: 1px solid rgba(0,0,0,0.05) !important;
+        background: rgba(255, 255, 255, 0.94) !important;
+        backdrop-filter: blur(24px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+        border-top: 1px solid rgba(0,0,0,0.08) !important;
+        box-shadow: 0 -8px 24px rgba(0,0,0,0.06) !important;
         overflow-x: auto !important;
         -webkit-overflow-scrolling: touch !important;
         scrollbar-width: none !important;
@@ -2730,42 +2753,47 @@
       }
       .nav-links li button {
         width: 100% !important;
-        padding: 5px 10px !important;
+        min-height: 36px !important;
+        padding: 6px 10px !important;
         font-size: 12px !important;
         font-weight: 600 !important;
         border-radius: 99px !important;
         white-space: nowrap !important;
         background: #F5F5F7 !important;
         color: #6E6E73 !important;
-        border: 1px solid transparent !important;
+        border: 1px solid rgba(0,0,0,0.04) !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
         transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
       }
       .nav-links li button.active {
         background: #1D1D1F !important;
         color: #FFFFFF !important;
+        border-color: #1D1D1F !important;
         font-weight: 700 !important;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.18) !important;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.18) !important;
       }
 
       /* ========================================================================
          2. HERO FLAGSHIP SHOWCASE (FIT CLEANLY INSIDE MOBILE VIEWPORT)
          ======================================================================== */
       .hero-flagship-showcase {
-        min-height: calc(100dvh - 82px) !important;
+        min-height: var(--view-h) !important;
         display: flex !important;
         align-items: center !important;
-        padding: clamp(10px, 1.6dvh, 18px) 0 !important;
+        padding: clamp(8px, 1.2dvh, 14px) 0 !important;
       }
       .flagship-grid {
         grid-template-columns: 1fr !important;
-        gap: clamp(10px, 1.5dvh, 16px) !important;
+        gap: clamp(8px, 1.2dvh, 14px) !important;
       }
       .flagship-media-box {
         position: relative !important;
         width: 100% !important;
         max-width: 100% !important;
         margin: 0 auto !important;
-        padding: clamp(8px, 1.2dvh, 14px) !important;
+        padding: clamp(6px, 1dvh, 11px) !important;
         background: #FFFFFF !important;
         border: 1px solid var(--border) !important;
         box-shadow: var(--shadow-sm) !important;
@@ -2779,8 +2807,8 @@
       .flagship-media-box img {
         width: auto !important;
         max-width: 100% !important;
-        height: clamp(132px, 23dvh, 230px) !important;
-        max-height: 230px !important;
+        height: clamp(120px, 20.5dvh, 210px) !important;
+        max-height: 210px !important;
         aspect-ratio: auto !important;
         object-fit: contain !important;
         border-radius: 12px !important;
@@ -2815,31 +2843,31 @@
         margin-bottom: 3px !important;
       }
       .flagship-info h1 {
-        font-size: clamp(22px, min(6.2vw, 3.6dvh), 30px) !important;
+        font-size: clamp(22px, min(6vw, 3.4dvh), 28px) !important;
         line-height: 1.12 !important;
         font-weight: 800 !important;
         letter-spacing: -0.03em !important;
-        margin-bottom: 4px !important;
+        margin-bottom: 3px !important;
       }
       .flagship-tagline {
-        font-size: clamp(13px, min(3.7vw, 2.2dvh), 16px) !important;
-        line-height: 1.35 !important;
+        font-size: clamp(13px, min(3.6vw, 2.1dvh), 15.5px) !important;
+        line-height: 1.32 !important;
         font-weight: 600 !important;
         color: #1D1D1F !important;
-        margin-bottom: 4px !important;
+        margin-bottom: 3px !important;
       }
       .flagship-desc {
-        font-size: clamp(11.5px, 3vw, 13px) !important;
-        line-height: 1.42 !important;
+        font-size: clamp(11.5px, 3vw, 12.5px) !important;
+        line-height: 1.38 !important;
         color: #6E6E73 !important;
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
         display: -webkit-box !important;
         -webkit-line-clamp: 3;
         -webkit-box-orient: vertical;
         overflow: hidden;
       }
       .hero-field-label {
-        margin-bottom: 4px !important;
+        margin-bottom: 3px !important;
         font-size: 11px !important;
       }
 
@@ -2847,13 +2875,13 @@
       .hero-tier-selector {
         display: grid !important;
         grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        gap: 6px !important;
+        gap: 5px !important;
         width: 100% !important;
-        margin-bottom: 8px !important;
+        margin-bottom: 6px !important;
       }
       .hero-tier-btn {
         width: 100% !important;
-        padding: 6px 10px !important;
+        padding: 5px 9px !important;
         font-size: 11.5px !important;
         font-weight: 600 !important;
         display: flex !important;
@@ -2862,7 +2890,7 @@
         align-items: flex-start !important;
         gap: 1px !important;
         border-radius: 11px !important;
-        min-height: 40px !important;
+        min-height: 36px !important;
         background: #FFFFFF !important;
         color: #1D1D1F !important;
         border: 1.5px solid rgba(0,0,0,0.1) !important;
@@ -2886,7 +2914,7 @@
       }
 
       .color-swatches-row {
-        margin-bottom: 6px !important;
+        margin-bottom: 5px !important;
         gap: 8px !important;
       }
       .color-dot {
@@ -2901,11 +2929,11 @@
         display: flex !important;
         flex-wrap: wrap !important;
         gap: 8px !important;
-        margin: 4px 0 8px 0 !important;
+        margin: 3px 0 6px 0 !important;
         align-items: baseline !important;
       }
       .hero-price-val {
-        font-size: clamp(22px, 6vw, 27px) !important;
+        font-size: clamp(21px, 5.6vw, 26px) !important;
         font-weight: 800 !important;
         color: #1D1D1F !important;
       }
@@ -2921,24 +2949,24 @@
       .hero-action-buttons {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 8px !important;
+        gap: 6px !important;
         width: 100% !important;
       }
       .hero-action-buttons button {
         width: 100% !important;
-        padding: 8px 10px !important;
+        padding: 7px 10px !important;
         font-size: 13px !important;
         font-weight: 700 !important;
         border-radius: 11px !important;
-        min-height: 40px !important;
+        min-height: 38px !important;
         justify-content: center !important;
       }
       .hero-action-buttons button:nth-child(3) {
         grid-column: 1 / -1 !important;
-        width: calc(100% - 54px) !important;
+        width: calc(100% - 52px) !important;
         justify-self: start !important;
-        min-height: 36px !important;
-        padding: 6px 12px !important;
+        min-height: 34px !important;
+        padding: 5px 12px !important;
         font-size: 12.5px !important;
       }
 
@@ -2962,11 +2990,11 @@
 
       /* 4. Unified Features Bento & Trust Grids - Fit Cleanly in 1 Phone Viewport */
       .features-section {
-        min-height: calc(100dvh - 82px) !important;
+        min-height: var(--view-h) !important;
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
-        padding: clamp(8px, 1.4dvh, 18px) 0 !important;
+        padding: clamp(6px, 1.1dvh, 14px) 0 !important;
       }
       .features-section .section-header-clean {
         margin-bottom: clamp(6px, 1.1dvh, 12px) !important;
@@ -3053,7 +3081,7 @@
         display: none !important;
       }
       .feature-app-phone img {
-        height: clamp(138px, 20.5dvh, 184px) !important;
+        height: clamp(132px, 19.5dvh, 174px) !important;
         width: auto !important;
         border-radius: 12px !important;
         border-width: 2px !important;
@@ -3084,7 +3112,13 @@
       }
 
       .enterprise-footer {
-        padding: 24px 0 max(68px, calc(56px + env(safe-area-inset-bottom))) 0 !important;
+        padding: 24px 0 max(66px, calc(58px + env(safe-area-inset-bottom))) 0 !important;
+      }
+      .toast-msg {
+        bottom: calc(60px + env(safe-area-inset-bottom)) !important;
+      }
+      #tflowCookieBanner {
+        bottom: calc(58px + env(safe-area-inset-bottom)) !important;
       }
       .enterprise-footer-grid,
       .footer-grid-4col {
@@ -3197,12 +3231,12 @@
       /* ========================================================================
          6. COMPACT FLOATING AI WIDGET (NEVER BLOCKS INTERACTIVE BUTTONS)
          ======================================================================== */
-      /* Mobile Sleek AI FAB Button */
+      /* Mobile Sleek AI FAB Button (floats cleanly above bottom navigation bar) */
       .tflow-ai-fab {
-        bottom: 14px !important;
+        bottom: calc(56px + env(safe-area-inset-bottom)) !important;
         right: 12px !important;
-        width: 44px !important;
-        height: 44px !important;
+        width: 42px !important;
+        height: 42px !important;
         border-radius: 50% !important;
         background: #000000 !important;
         padding: 0 !important;
@@ -3219,8 +3253,8 @@
         pointer-events: none !important;
       }
       .tflow-ai-fab-icon {
-        width: 30px !important;
-        height: 30px !important;
+        width: 28px !important;
+        height: 28px !important;
         background: #FFFFFF !important;
         color: #000000 !important;
         box-shadow: none !important;
@@ -3366,9 +3400,30 @@
 
     /* Short Portrait Phones (360x640, 375x667) — Keep every section inside 1 screen */
     @media (max-width: 768px) and (max-height: 690px) {
+      :root {
+        --nav-h: 44px;
+        --bottom-nav-h: 44px;
+        --view-h: calc(100vh - 88px);
+        --view-h: calc(100dvh - 88px);
+      }
+      nav,
+      .nav-brand,
+      .nav-actions {
+        height: 44px !important;
+        min-height: 44px !important;
+      }
+      .nav-links {
+        padding: 4px 10px max(5px, env(safe-area-inset-bottom)) 10px !important;
+        gap: 5px !important;
+      }
+      .nav-links li button {
+        min-height: 33px !important;
+        padding: 4px 8px !important;
+        font-size: 11.5px !important;
+      }
       .hero-flagship-showcase {
         align-items: flex-start !important;
-        padding: 8px 0 10px 0 !important;
+        padding: 6px 0 8px 0 !important;
       }
       .flagship-grid {
         gap: 7px !important;
@@ -3377,8 +3432,8 @@
         padding: 5px !important;
       }
       .flagship-media-box img {
-        height: clamp(102px, 18dvh, 134px) !important;
-        max-height: 134px !important;
+        height: clamp(98px, 17dvh, 128px) !important;
+        max-height: 128px !important;
       }
       .flagship-info h1 {
         font-size: 20px !important;
@@ -3418,17 +3473,17 @@
       }
       .hero-action-buttons button:nth-child(3) {
         min-height: 31px !important;
-        width: calc(100% - 48px) !important;
+        width: calc(100% - 46px) !important;
       }
       .tflow-ai-fab {
-        bottom: 10px !important;
+        bottom: calc(50px + env(safe-area-inset-bottom)) !important;
         right: 10px !important;
-        width: 40px !important;
-        height: 40px !important;
+        width: 38px !important;
+        height: 38px !important;
       }
       .tflow-ai-fab-icon {
-        width: 26px !important;
-        height: 26px !important;
+        width: 24px !important;
+        height: 24px !important;
       }
       .features-section {
         padding: 6px 0 !important;
@@ -3500,7 +3555,7 @@
         display: none !important;
       }
       .feature-app-phone img {
-        height: 124px !important;
+        height: 118px !important;
       }
     }
 
@@ -3508,13 +3563,21 @@
     @media (max-height: 520px) and (max-width: 960px) {
       :root {
         --nav-h: 48px;
+        --bottom-nav-h: 0px;
         --view-h: calc(100vh - 48px);
         --view-h: calc(100dvh - 48px);
       }
       nav {
         height: 48px !important;
+        min-height: 48px !important;
         flex-wrap: nowrap !important;
         padding: 0 12px !important;
+        background: rgba(255, 255, 255, 0.92) !important;
+        backdrop-filter: blur(24px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(24px) saturate(180%) !important;
+      }
+      nav::before {
+        display: none !important;
       }
       .nav-brand {
         order: 1 !important;
@@ -3523,10 +3586,19 @@
         flex: 0 0 auto !important;
       }
       .nav-links {
+        position: static !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        z-index: auto !important;
         order: 2 !important;
         width: auto !important;
         flex: 0 1 auto !important;
         border-top: none !important;
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        box-shadow: none !important;
         padding: 0 8px !important;
         gap: 4px !important;
         justify-content: center !important;
@@ -3536,6 +3608,7 @@
       }
       .nav-links li button {
         width: auto !important;
+        min-height: 28px !important;
         padding: 4px 10px !important;
         font-size: 11.5px !important;
       }
@@ -3544,6 +3617,9 @@
         height: 48px !important;
         padding: 0 !important;
         margin-left: 0 !important;
+      }
+      .enterprise-footer {
+        padding: 20px 0 24px 0 !important;
       }
       .tflow-ai-fab {
         bottom: 8px !important;
@@ -4020,11 +4096,14 @@
 
     /* Ultra-narrow Fold Outer Displays (< 360px, e.g., 320x568) */
     @media (max-width: 359px) {
-      .nav-brand {
+      nav {
         padding: 0 8px !important;
       }
+      .nav-brand {
+        padding: 0 !important;
+      }
       .nav-actions {
-        padding: 0 8px !important;
+        padding: 0 !important;
         gap: 4px !important;
       }
       .btn-nav-cart,
@@ -4033,16 +4112,17 @@
         font-size: 11px !important;
       }
       .nav-links {
-        padding: 2px 8px 6px 8px !important;
+        padding: 4px 8px max(5px, env(safe-area-inset-bottom)) 8px !important;
         gap: 4px !important;
       }
       .nav-links li button {
-        font-size: 11px !important;
-        padding: 4px 6px !important;
+        font-size: 10.5px !important;
+        padding: 4px 5px !important;
+        min-height: 31px !important;
       }
       .flagship-media-box img {
-        height: 88px !important;
-        max-height: 88px !important;
+        height: 82px !important;
+        max-height: 82px !important;
       }
       .flagship-info h1 {
         font-size: 18px !important;
@@ -4105,7 +4185,7 @@
         display: none !important;
       }
       .feature-app-phone img {
-        height: 112px !important;
+        height: 106px !important;
       }
       .trust-grid,
       .enterprise-footer-grid {
