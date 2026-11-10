@@ -126,7 +126,7 @@
         "groupId": "group-gimbal",
         "name": "T-Flow Pro",
         "tagline": "Vững khung hình, Trọn cảm xúc. Đỉnh cao chống rung 3 trục cho Smartphone.",
-        "subtitle": "Gimbal 3 trục thông minh cho iPhone và Smartphone cao cấp. Động cơ tải trọng 450g, thuật toán Pure FOC 20kHz, vòng xoay lấy nét Focus Wheel và khung hợp kim hàng không kết hợp sợi Carbon dệt 8 lớp.",
+        "subtitle": "Chống rung siêu mượt khi vừa đi vừa quay cho iPhone & Smartphone. Hít nam châm MagSafe 1 giây gọn nhẹ, xoay bánh xe thu phóng tiện lợi và pin dùng suốt 18 giờ.",
         "badge": "Flagship 2026",
         "img": "/shared/img/feed_portrait_dusk.jpg",
         "status": "Đang Mở Bán",
@@ -151,7 +151,7 @@
             "price": 2490000,
             "origPrice": 2890000,
             "priceFormatted": "2.490.000₫",
-            "desc": "Trọn bộ gimbal T-Flow Pro, ngàm kẹp từ tính MagSafe N52, cáp sạc USB-C và chân đế Tripod mini."
+            "desc": "Trọn bộ gimbal T-Flow Pro, ngàm hít từ tính MagSafe, cáp sạc USB-C và chân đế Tripod mini."
           },
           {
             "key": "creator",
@@ -184,18 +184,18 @@
         "highlights": [
           {
             "icon": "⚡",
-            "title": "Thuật Toán Pure FOC 20kHz",
-            "desc": "Tần số chuyển mạch 20kHz siêu êm, triệt tiêu hoàn toàn rung giật vi mô và tải trọng cực đại 450g."
+            "title": "Chống Rung Êm Ru Mọi Bước Chân",
+            "desc": "Tự động triệt tiêu rung lắc ngay cả khi bạn chạy bộ, leo cầu thang hay quay trên xe đang di chuyển."
           },
           {
             "icon": "🧲",
-            "title": "Ngàm MagSafe Siêu Hút 45N N52",
-            "desc": "Nam châm Neodymium N52 đa cực lực hút 45N, tháo lắp điện thoại tức thời trong 1 giây."
+            "title": "Hít MagSafe Chắc Chắn Trong 1 Giây",
+            "desc": "Đưa điện thoại vào gần là hít gọn an toàn — gắn vào quay ngay, không tốn công kẹp siết hay cân chỉnh."
           },
           {
             "icon": "🎯",
-            "title": "Vòng Xoay Focus Wheel Cơ Học",
-            "desc": "Căn chỉnh tiêu cự lấy nét mượt mà và zoom quang học vô cấp chuẩn điện ảnh."
+            "title": "Bánh Xe Xoay Thu Phóng Mượt Mà",
+            "desc": "Điều chỉnh zoom cận cảnh và chuyển nét bằng ngón cái, tạo hiệu ứng điện ảnh dễ dàng chỉ với một tay."
           }
         ],
         "specs": [
@@ -534,6 +534,17 @@
         }
         if (Array.isArray(p.overview)) {
           p.overview.forEach(function(o) { if (o && o.img) o.img = normImgPath(o.img); });
+        }
+        if (p.id === 'tf-g31-pro') {
+          var defaultPro = DEFAULT_CATALOG.products[0];
+          if (typeof p.subtitle === 'string' && p.subtitle.indexOf('Động cơ tải trọng 450g, thuật toán Pure FOC 20kHz') !== -1) {
+            p.subtitle = defaultPro.subtitle;
+            mediaMigrated = true;
+          }
+          if (Array.isArray(p.highlights) && p.highlights[0] && p.highlights[0].title === 'Thuật Toán Pure FOC 20kHz') {
+            p.highlights = defaultPro.highlights;
+            mediaMigrated = true;
+          }
         }
         if (p.tiers && Array.isArray(p.tiers)) {
           p.tiers.forEach(function(t, idx) {
