@@ -661,18 +661,8 @@
        VIEW 3: TRANG CHI TIẾT SẢN PHẨM RIÊNG (APPLE STORE BUY PAGE)
        ========================================================================== */
     .product-detail-view {
-      padding: 40px 0 120px 0;
+      padding: 48px 0 120px 0;
     }
-    .breadcrumb-nav {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 32px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .breadcrumb-nav span { color: var(--text-main); font-weight: 600; }
-    .breadcrumb-nav a:hover { color: var(--text-main); }
 
     /* Top 2 Columns */
     .detail-top-grid {
@@ -3236,15 +3226,6 @@
   <main class="view-panel" id="viewProductDetail">
     <section class="product-detail-view">
       <div class="container">
-        <!-- Breadcrumb -->
-        <div class="breadcrumb-nav">
-          <a href="/" onclick="event.preventDefault(); switchView('home')">Trang Chủ</a>
-          <span>&rsaquo;</span>
-          <a href="/san-pham" onclick="event.preventDefault(); switchView('catalog')">Dải Sản Phẩm</a>
-          <span>&rsaquo;</span>
-          <span id="detailBreadcrumbName">Smart Gimbal S1</span>
-        </div>
-
         <!-- TOP 2-COLUMN SECTION: STICKY GALLERY + CONFIGURATOR -->
         <div class="detail-top-grid">
           <!-- Left: Sticky Gallery -->
@@ -4589,8 +4570,6 @@
       currentDetailColorId = (prod.colors && prod.colors[0]) ? prod.colors[0].id : 'carbon-black';
 
       // Heading info
-      const elBreadcrumb = document.getElementById('detailBreadcrumbName');
-      if (elBreadcrumb) elBreadcrumb.textContent = prod.name;
       const elTitle = document.getElementById('detailTitle');
       if (elTitle) elTitle.textContent = prod.name;
       const elTagline = document.getElementById('detailTagline');
