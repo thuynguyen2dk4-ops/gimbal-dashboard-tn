@@ -157,18 +157,6 @@
       transition: color 0.15s ease;
     }
     .btn-nav-link:hover { color: var(--text-main); }
-    .btn-nav-primary {
-      background: var(--text-main);
-      color: #FFFFFF;
-      font-size: 13px;
-      font-weight: 600;
-      padding: 8px 18px;
-      border-radius: var(--radius-full);
-      border: none;
-      cursor: pointer;
-      transition: opacity 0.15s ease;
-    }
-    .btn-nav-primary:hover { opacity: 0.88; }
 
     /* VIEW PANELS (MULTI-VIEW ISOLATION) */
     .view-panel {
@@ -987,47 +975,6 @@
       width: 35%;
       color: var(--text-secondary);
       background: var(--bg-alt);
-    }
-
-    /* Sticky Buy Bar (appears when scrolled past main buy box) */
-    .sticky-buy-bar {
-      position: fixed;
-      top: 64px; left: 0; right: 0;
-      height: 60px;
-      background: rgba(255, 255, 255, 0.94);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      z-index: 450;
-      display: none;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 40px;
-      transform: translateY(-100%);
-      transition: transform 0.25s var(--ease);
-    }
-    .sticky-buy-bar.visible {
-      display: flex;
-      transform: translateY(0);
-    }
-    .sticky-bar-info {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .sticky-bar-info img {
-      width: 36px;
-      height: 36px;
-      object-fit: contain;
-    }
-    .sticky-bar-title {
-      font-size: 14px;
-      font-weight: 700;
-    }
-    .sticky-bar-price {
-      font-size: 15px;
-      font-weight: 800;
-      font-family: var(--font-mono);
     }
 
     /* ==========================================================================
@@ -2430,9 +2377,6 @@
         gap: 8px !important;
         margin-left: auto !important;
       }
-      .btn-nav-primary {
-        display: none !important; /* Mua Ngay is prominent in Hero section */
-      }
       .btn-nav-cart {
         padding: 6px 12px !important;
         font-size: 12px !important;
@@ -3005,25 +2949,8 @@
           Đăng Nhập
         </button>
       </div>
-
-      <button class="btn-nav-primary" onclick="openMvpDetail()">Mua Ngay</button>
     </div>
   </nav>
-
-  <!-- STICKY BUY BAR (VISIBLE ON DETAIL VIEW SCROLL) -->
-  <div class="sticky-buy-bar" id="stickyBuyBar">
-    <div class="sticky-bar-info">
-      <img id="stickyBarImg" src="/shared/img/feed_portrait_dusk.jpg" alt="Thumb">
-      <div>
-        <div class="sticky-bar-title" id="stickyBarTitle">Smart Gimbal S1</div>
-        <div class="sticky-bar-price" id="stickyBarPrice">2.890.000₫</div>
-      </div>
-    </div>
-    <div style="display:flex; gap:10px;">
-      <button class="btn-ghost" style="padding:8px 18px; font-size:13px;" onclick="addCurrentDetailToCart()">Thêm Vào Giỏ</button>
-      <button class="btn-dark" style="padding:8px 18px; font-size:13px;" onclick="buyNowCurrentDetail()">Mua Ngay</button>
-    </div>
-  </div>
 
   <!-- ==========================================================================
        VIEW 1: TRANG CHỦ (HERO FLAGSHIP MVP SHOWCASE + BENTO TECH + APPS)
@@ -4183,9 +4110,6 @@
         renderReviewsList();
         renderCartDrawer();
       });
-
-      // Scroll listener for sticky buy bar
-      window.addEventListener('scroll', handleStickyBuyBar);
     }
 
     // ==========================================================================
@@ -4353,7 +4277,6 @@
       if (!opts.skipScroll) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
-      handleStickyBuyBar();
 
       updateBrowserUrl(
         viewName,
@@ -4711,12 +4634,6 @@
         elWarranty.textContent = prod.warranty;
       }
 
-      // Sticky buy bar setup
-      const stickyImg = document.getElementById('stickyBarImg');
-      if (stickyImg) stickyImg.src = prod.img || '/shared/img/feed_portrait_dusk.jpg';
-      const stickyTitle = document.getElementById('stickyBarTitle');
-      if (stickyTitle) stickyTitle.textContent = prod.name;
-
       // Switch view smoothly!
       switchView('detail', Object.assign({}, opts, {
         fromOpenProductDetail: true,
@@ -4751,7 +4668,6 @@
         document.getElementById('detailCurrentPrice').textContent = tier.priceFormatted;
         document.getElementById('detailOldPrice').textContent = tier.oldPriceFormatted || '';
         document.getElementById('detailGiftTag').textContent = `Tặng kèm: ${tier.gift || 'Phụ kiện chính hãng'}`;
-        document.getElementById('stickyBarPrice').textContent = tier.priceFormatted;
       }
     }
 
@@ -4781,19 +4697,6 @@
       if (!requireUserAuth('Vui lòng đăng nhập để tiến hành mua ngay!')) return;
       addCurrentDetailToCart();
       openCartDrawer();
-    }
-
-    // Sticky buy bar show/hide
-    function handleStickyBuyBar() {
-      const detailView = document.getElementById('viewProductDetail');
-      const stickyBar = document.getElementById('stickyBuyBar');
-      if (!detailView || !stickyBar) return;
-
-      if (detailView.classList.contains('active') && window.scrollY > 480) {
-        stickyBar.classList.add('visible');
-      } else {
-        stickyBar.classList.remove('visible');
-      }
     }
 
     // ==========================================================================
