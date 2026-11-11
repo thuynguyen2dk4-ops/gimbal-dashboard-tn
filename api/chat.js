@@ -64,6 +64,137 @@ Nhiệm vụ trọng tâm:
 const WEB_SYSTEM_PROMPT = SALES_SYSTEM_PROMPT;
 const APP_SYSTEM_PROMPT = CREATIVE_SYSTEM_PROMPT;
 
+const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
+const FALLBACK_GEMINI_MODELS = [
+  'gemini-3.8-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-3.5-flash',
+  'gemini-2.5-flash',
+  'gemini-flash-latest'
+];
+
+function sanitizeErrorText(text) {
+  return String(text || '')
+    .replace(/AIza[A-Za-z0-9_-]+/g, '[REDACTED_KEY]')
+    .replace(/([?&]key=)[^&\s"']+/gi, '$1[REDACTED]')
+    .replace(/(Bearer\s+)[A-Za-z0-9._-]+/gi, '$1[REDACTED]');
+}
+
+function normalizeModelName(rawModel) {
+  const m = (typeof rawModel === 'string') ? rawModel.trim() : '';
+  if (!m || m === 'gemini-1.5-flash' || m === 'gemini-2.0-flash' || m === 'gemini-1.5-pro') {
+    return DEFAULT_GEMINI_MODEL;
+  }
+  return m.replace(/^models\//, '');
+}
+
+function buildModelCandidates(primaryModel) {
+  const list = [primaryModel, ...FALLBACK_GEMINI_MODELS];
+  return [...new Set(list.filter(Boolean))];
+}
+
+function buildFormattedResponse({ answerText, effectiveMode, source, modelUsed }) {
+  const candidateText = (answerText || '').trim();
+  if (effectiveMode === 'app') {
+    try {
+      const parsed = JSON.parse(candidateText);
+      const extractedAnswer = (parsed.answer || parsed.reply || parsed.response || parsed.message || '').trim() || candidateText;
+      return {
+        answer: extractedAnswer,
+        cameraPreset: parsed.cameraPreset || {
+          name: "Cinema Balanced Pro",
+          mode: "VIDEO",
+          resolution: "4K",
+          fps: 30,
+          shutter: "1/60s",
+          iso: 100,
+          ev: "+0.0EV",
+          lut: "REC709",
+          gimbalMode: "FOLLOW"
+        },
+        suggestAction: parsed.suggestAction !== undefined ? !!parsed.suggestAction : true,
+        promptQuestion: parsed.promptQuestion || "Anh có muốn em tự thao tác cài đặt các thông số này không?",
+        escalated: !!parsed.escalated,
+        source,
+        model: modelUsed
+      };
+    } catch (jsonErr) {
+      const match = candidateText.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          const parsed = JSON.parse(match[0]);
+          const extractedAnswer = (parsed.answer || parsed.reply || parsed.response || parsed.message || '').trim() || candidateText;
+          return {
+            answer: extractedAnswer,
+            cameraPreset: parsed.cameraPreset || {
+              name: "Cinema Balanced Pro",
+              mode: "VIDEO",
+              resolution: "4K",
+              fps: 30,
+              shutter: "1/60s",
+              iso: 100,
+              ev: "+0.0EV",
+              lut: "REC709",
+              gimbalMode: "FOLLOW"
+            },
+            suggestAction: parsed.suggestAction !== undefined ? !!parsed.suggestAction : true,
+            promptQuestion: parsed.promptQuestion || "Anh có muốn em tự thao tác cài đặt các thông số này không?",
+            escalated: !!parsed.escalated,
+            source,
+            model: modelUsed
+          };
+        } catch (e) {}
+      }
+
+      return {
+        answer: candidateText + "\n\nAnh có muốn em tự thao tác cài đặt các thông số này không?",
+        cameraPreset: {
+          name: "Cinema Balanced Pro",
+          mode: "VIDEO",
+          resolution: "4K",
+          fps: 30,
+          shutter: "1/60s",
+          iso: 100,
+          ev: "+0.0EV",
+          lut: "TEAL_ORANGE",
+          gimbalMode: "FOLLOW"
+        },
+        suggestAction: true,
+        promptQuestion: "Anh có muốn em tự thao tác cài đặt các thông số này không?",
+        escalated: false,
+        source,
+        model: modelUsed
+      };
+    }
+  }
+
+  const isEscalated = candidateText.includes('[ESCALATE_TO_ADMIN]');
+  const cleanAnswer = candidateText.replace(/\[ESCALATE_TO_ADMIN\]/g, '').trim();
+  const webActions = effectiveMode === 'creative'
+    ? [
+        { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
+        { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' }
+      ]
+    : effectiveMode === 'smart_vision'
+      ? [
+          { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
+          { label: '⚡ Xem Thông Số Kỹ Thuật', view: 'detail' }
+        ]
+      : [
+          { label: 'Xem Bảng Giá 4 Gói', view: 'catalog' },
+          { label: 'Xem Thông Số Kỹ Thuật', view: 'detail' },
+          { label: 'Đặt Mua Ngay', view: 'detail' }
+        ];
+
+  return {
+    answer: cleanAnswer,
+    escalated: isEscalated,
+    actions: webActions,
+    source,
+    model: modelUsed
+  };
+}
+
 export default async function handler(req, res) {
   // CORS setup
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -71,20 +202,35 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,POST');
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, x-gemini-api-key'
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, x-gemini-api-key, Authorization'
   );
 
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
 
-  // GET: Health Check & Cloud Engine Info
+  const reqHeaders = req.headers || {};
+
+  // GET: Health Check & Cloud Engine Info (Never leaks secret values)
   if (req.method === 'GET') {
+    const hasServerGeminiKey = Boolean((process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim());
+    const hasAiGatewayKey = Boolean((process.env.AI_GATEWAY_API_KEY || '').trim());
+    const hasOidcToken = Boolean((reqHeaders['x-vercel-oidc-token'] || process.env.VERCEL_OIDC_TOKEN || '').trim());
+    const configured = hasServerGeminiKey || hasAiGatewayKey;
+    const cloudReady = configured || hasOidcToken;
     return res.status(200).json({
       status: 'active',
       service: 'T-Flow Unified Cloud AI Engine',
       engine: 'Google Gemini AI',
-      defaultModel: 'gemini-3.5-flash',
+      defaultModel: DEFAULT_GEMINI_MODEL,
+      configured,
+      cloudReady,
+      hasServerGeminiKey,
+      hasAiGatewayKey,
+      hasOidcToken,
+      activeProvider: hasServerGeminiKey
+        ? 'google_gemini_cloud'
+        : ((hasAiGatewayKey || hasOidcToken) ? 'vercel_ai_gateway' : 'internal_kb'),
       modes: ['sales', 'creative', 'smart_vision', 'web', 'app'],
       timestamp: new Date().toISOString()
     });
@@ -95,24 +241,22 @@ export default async function handler(req, res) {
   }
 
   try {
-    let { prompt, mode = 'web', history = [], context = {}, apiKey: reqApiKey, model = 'gemini-3.5-flash' } = req.body || {};
+    let { prompt, mode = 'web', history = [], context = {}, apiKey: reqApiKey, model = DEFAULT_GEMINI_MODEL } = req.body || {};
 
     if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Auto map legacy or deprecated model keys to active high-performance model
-    if (!model || model === 'gemini-2.5-flash' || model === 'gemini-1.5-flash' || model === 'gemini-2.0-flash') {
-      model = 'gemini-3.5-flash';
-    }
+    const effectiveMode = (context?.originalMode === 'app' || mode === 'app') ? 'app' : mode;
+    const requestedModel = normalizeModelName(model);
 
     const cleanPrompt = prompt.trim();
-    const reqHeaders = req.headers || {};
-    const effectiveKey = reqApiKey || reqHeaders['x-gemini-api-key'] || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
+    const effectiveKey = String(reqApiKey || reqHeaders['x-gemini-api-key'] || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '').trim();
+    const gatewayToken = String(process.env.AI_GATEWAY_API_KEY || reqHeaders['x-vercel-oidc-token'] || process.env.VERCEL_OIDC_TOKEN || '').trim();
 
-    // IF NO GOOGLE API KEY AVAILABLE IN RUNTIME, USE SMART EMBEDDED KNOWLEDGE BASE ENGINE
-    if (!effectiveKey) {
-      const fallbackResult = generateSmartFallbackResponse(cleanPrompt, mode, context);
+    // IF NO CREDENTIALS AVAILABLE IN RUNTIME, USE SMART EMBEDDED KNOWLEDGE BASE ENGINE
+    if (!effectiveKey && !gatewayToken) {
+      const fallbackResult = generateSmartFallbackResponse(cleanPrompt, effectiveMode, context);
       return res.status(200).json({
         ...fallbackResult,
         source: 'tflow_smart_engine',
@@ -121,12 +265,22 @@ export default async function handler(req, res) {
       });
     }
 
-    // CALL GOOGLE GEMINI API
     // Route system prompt according to the 3 domains
     let systemPrompt = SALES_SYSTEM_PROMPT;
-    if (mode === 'creative' || mode === 'app') {
+    if (effectiveMode === 'creative' || effectiveMode === 'app') {
       systemPrompt = CREATIVE_SYSTEM_PROMPT;
-    } else if (mode === 'smart_vision') {
+      if (effectiveMode === 'app') {
+        systemPrompt += `\n\nĐỊNH DẠNG ĐẦU RA BẮT BUỘC (JSON):
+Trả về JSON hợp lệ theo cấu trúc:
+{
+  "answer": "Giải thích kỹ thuật và lời khuyên súc tích bằng tiếng Việt",
+  "cameraPreset": { "name": "Tên preset", "mode": "VIDEO", "resolution": "4K", "fps": 30, "shutter": "1/60s", "iso": 100, "ev": "+0.0EV", "lut": "REC709", "gimbalMode": "FOLLOW" },
+  "suggestAction": true,
+  "promptQuestion": "Anh có muốn em tự thao tác cài đặt các thông số này không?",
+  "escalated": false
+}`;
+      }
+    } else if (effectiveMode === 'smart_vision') {
       systemPrompt = SMART_VISION_SYSTEM_PROMPT;
     } else {
       systemPrompt = SALES_SYSTEM_PROMPT;
@@ -142,129 +296,167 @@ QUY TẮC PHẢN HỒI QUAN TRỌNG:
 - TUYỆT ĐỐI KHÔNG đọc nguyên văn câu chữ của kịch bản một cách thô cứng hoặc rập khuôn.
 - Hãy TỰ NHIÊN kết hợp các góp ý và chỉ đạo của Admin vào câu trả lời để tư vấn thông minh, linh hoạt, cá nhân hóa cho từng khách hàng!`;
     }
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(effectiveKey)}`;
 
-    const geminiPayload = {
-      contents: [
-        ...history.slice(-4).map(msg => ({
-          role: msg.sender === 'user' ? 'user' : 'model',
-          parts: [{ text: msg.text || '' }]
-        })),
-        {
-          role: 'user',
-          parts: [{ text: cleanPrompt }]
+    const sanitizedHistory = Array.isArray(history)
+      ? history
+          .slice(-4)
+          .filter(msg => msg && typeof msg.text === 'string' && msg.text.trim())
+      : [];
+
+    let lastStatus = null;
+    let lastError = null;
+
+    // 1. PRIMARY: DIRECT GOOGLE GEMINI REST API (if GEMINI_API_KEY / header key exists)
+    if (effectiveKey) {
+      const modelCandidates = buildModelCandidates(requestedModel);
+      const geminiPayload = {
+        contents: [
+          ...sanitizedHistory.map(msg => ({
+            role: msg.sender === 'user' ? 'user' : 'model',
+            parts: [{ text: msg.text.trim() }]
+          })),
+          {
+            role: 'user',
+            parts: [{ text: cleanPrompt }]
+          }
+        ],
+        system_instruction: {
+          parts: [{ text: systemPrompt }]
+        },
+        generationConfig: {
+          temperature: effectiveMode === 'app' ? 0.2 : 0.4,
+          maxOutputTokens: 1024
         }
-      ],
-      system_instruction: {
-        parts: [{ text: systemPrompt }]
-      },
-      generationConfig: {
-        temperature: mode === 'app' ? 0.2 : 0.4,
-        maxOutputTokens: 1024
-      }
-    };
+      };
 
-    if (mode === 'app') {
-      geminiPayload.generationConfig.responseMimeType = 'application/json';
+      if (effectiveMode === 'app') {
+        geminiPayload.generationConfig.responseMimeType = 'application/json';
+      }
+
+      for (const candidateModel of modelCandidates) {
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(candidateModel)}:generateContent`;
+        const apiResponse = await fetch(apiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': effectiveKey
+          },
+          body: JSON.stringify(geminiPayload)
+        });
+
+        if (apiResponse.ok) {
+          const data = await apiResponse.json();
+          const parts = data?.candidates?.[0]?.content?.parts;
+          const candidateText = Array.isArray(parts)
+            ? parts.map(p => p?.text || '').join('').trim()
+            : '';
+
+          if (candidateText) {
+            return res.status(200).json(
+              buildFormattedResponse({
+                answerText: candidateText,
+                effectiveMode,
+                source: 'google_gemini_cloud',
+                modelUsed: candidateModel
+              })
+            );
+          }
+          lastStatus = 502;
+          lastError = 'Empty candidate content returned from Google Gemini API';
+          continue;
+        }
+
+        const rawErrText = await apiResponse.text();
+        lastStatus = apiResponse.status;
+        try {
+          const parsedErr = JSON.parse(rawErrText);
+          lastError = sanitizeErrorText(parsedErr?.error?.message || rawErrText);
+        } catch (e) {
+          lastError = sanitizeErrorText(rawErrText);
+        }
+
+        const isModelLookupMiss =
+          apiResponse.status === 404 ||
+          (apiResponse.status === 400 && /not found|unsupported|unknown model|invalid model/i.test(lastError));
+
+        console.warn(`Google Gemini API Error (${candidateModel}):`, apiResponse.status, lastError.slice(0, 180));
+        if (!isModelLookupMiss) {
+          break;
+        }
+      }
     }
 
-    const apiResponse = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(geminiPayload)
+    // 2. SECONDARY: VERCEL AI GATEWAY (if gateway key or Vercel OIDC token is available)
+    if (!effectiveKey && gatewayToken) {
+      const gatewayModels = [...new Set([`google/${requestedModel}`, 'google/gemini-3.8-flash', 'google/gemini-3-flash', 'google/gemini-2.5-flash'])];
+      const openAiMessages = [
+        { role: 'system', content: systemPrompt },
+        ...sanitizedHistory.map(msg => ({
+          role: msg.sender === 'user' ? 'user' : 'assistant',
+          content: msg.text.trim()
+        })),
+        { role: 'user', content: cleanPrompt }
+      ];
+
+      for (const gwModel of gatewayModels) {
+        const gwResponse = await fetch('https://ai-gateway.vercel.sh/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${gatewayToken}`
+          },
+          body: JSON.stringify({
+            model: gwModel,
+            messages: openAiMessages,
+            temperature: effectiveMode === 'app' ? 0.2 : 0.4,
+            max_tokens: 1024
+          })
+        });
+
+        if (gwResponse.ok) {
+          const gwData = await gwResponse.json();
+          const candidateText = (gwData?.choices?.[0]?.message?.content || '').trim();
+          if (candidateText) {
+            return res.status(200).json(
+              buildFormattedResponse({
+                answerText: candidateText,
+                effectiveMode,
+                source: 'vercel_ai_gateway',
+                modelUsed: gwModel
+              })
+            );
+          }
+          continue;
+        }
+
+        const rawGwErr = await gwResponse.text();
+        lastStatus = gwResponse.status;
+        lastError = sanitizeErrorText(rawGwErr).slice(0, 220);
+        console.warn(`Vercel AI Gateway Error (${gwModel}):`, gwResponse.status, lastError);
+        if (gwResponse.status !== 404) {
+          break;
+        }
+      }
+    }
+
+    // 3. RESILIENT FALLBACK TO INTERNAL VERIFIED KNOWLEDGE BASE
+    const fallbackResult = generateSmartFallbackResponse(cleanPrompt, effectiveMode, context);
+    return res.status(200).json({
+      ...fallbackResult,
+      source: 'tflow_smart_engine_fallback',
+      apiStatus: lastStatus,
+      apiError: lastError ? lastError.slice(0, 180) : null,
+      note: 'Google API trả về mã phản hồi ngoài mong đợi, đã tự động kích hoạt bộ tri thức kiểm định an toàn.'
     });
 
-    if (!apiResponse.ok) {
-      const errText = await apiResponse.text();
-      console.warn('Google Gemini API Error:', apiResponse.status, errText);
-      // Fallback seamlessly to ensure zero interruption
-      const fallbackResult = generateSmartFallbackResponse(cleanPrompt, mode, context);
-      return res.status(200).json({
-        ...fallbackResult,
-        source: 'tflow_smart_engine_fallback',
-        apiStatus: apiResponse.status,
-        note: 'Google API trả về mã phản hồi ngoài mong đợi, đã tự động kích hoạt bộ tri thức kiểm định an toàn.'
-      });
-    }
-
-    const data = await apiResponse.json();
-    const candidateText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    if (mode === 'app') {
-      try {
-        let parsed = JSON.parse(candidateText.trim());
-        return res.status(200).json({
-          answer: parsed.answer,
-          cameraPreset: parsed.cameraPreset,
-          suggestAction: !!parsed.suggestAction,
-          promptQuestion: parsed.promptQuestion || "Anh có muốn em tự thao tác cài đặt các thông số này không?",
-          escalated: !!parsed.escalated,
-          source: 'google_gemini_cloud',
-          model: model
-        });
-      } catch (jsonErr) {
-        // Safe regex extraction for json inside markdown
-        const match = candidateText.match(/\{[\s\S]*\}/);
-        if (match) {
-          try {
-            const parsed = JSON.parse(match[0]);
-            return res.status(200).json({
-              answer: parsed.answer,
-              cameraPreset: parsed.cameraPreset,
-              suggestAction: !!parsed.suggestAction,
-              promptQuestion: parsed.promptQuestion || "Anh có muốn em tự thao tác cài đặt các thông số này không?",
-              escalated: !!parsed.escalated,
-              source: 'google_gemini_cloud',
-              model: model
-            });
-          } catch (e) {}
-        }
-
-        return res.status(200).json({
-          answer: candidateText + "\n\nAnh có muốn em tự thao tác cài đặt các thông số này không?",
-          cameraPreset: {
-            name: "Cinema Balanced Pro",
-            mode: "VIDEO",
-            resolution: "4K",
-            fps: 30,
-            shutter: "1/60s",
-            iso: 100,
-            ev: "+0.0EV",
-            lut: "TEAL_ORANGE",
-            gimbalMode: "FOLLOW"
-          },
-          suggestAction: true,
-          promptQuestion: "Anh có muốn em tự thao tác cài đặt các thông số này không?",
-          escalated: false,
-          source: 'google_gemini_cloud',
-          model: model
-        });
-      }
-    } else {
-      // WEB MODE
-      const isEscalated = candidateText.includes('[ESCALATE_TO_ADMIN]');
-      const cleanAnswer = candidateText.replace(/\[ESCALATE_TO_ADMIN\]/g, '').trim();
-
-      return res.status(200).json({
-        answer: cleanAnswer,
-        escalated: isEscalated,
-        actions: [
-          { label: 'Xem Bảng Giá 4 Gói', view: 'catalog' },
-          { label: 'Xem Thông Số Kỹ Thuật', view: 'detail' },
-          { label: 'Đặt Mua Ngay', view: 'detail' }
-        ],
-        source: 'google_gemini_cloud',
-        model: model
-      });
-    }
-
   } catch (err) {
-    console.error('Server error handling AI query:', err);
-    const fallbackResult = generateSmartFallbackResponse(req.body?.prompt || '', req.body?.mode || 'web', req.body?.context);
+    console.error('Server error handling AI query:', sanitizeErrorText(err?.message));
+    const rawFallbackMode = req.body?.context?.originalMode === 'app' ? 'app' : (req.body?.mode || 'web');
+    const fallbackResult = generateSmartFallbackResponse(req.body?.prompt || '', rawFallbackMode, req.body?.context);
     return res.status(200).json({
       ...fallbackResult,
       source: 'tflow_smart_engine_rescue',
-      error: err.message
+      error: sanitizeErrorText(err?.message)
     });
   }
 }
@@ -287,7 +479,7 @@ function generateSmartFallbackResponse(query, mode, context) {
                 "• **Góc máy sát đất (Low-Angle)**: Kết hợp tay cầm đảo ngược để quay ngang tầm mắt thú cưng sống động như phim tài liệu.",
         escalated: false,
         actions: [
-          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
           { label: '📦 Xem Cụm Camera AI', view: 'detail' }
         ]
       };
@@ -302,7 +494,7 @@ function generateSmartFallbackResponse(query, mode, context) {
                 "• **Dự đoán gia tốc Kalman Filter**: Lia trước một nhịp theo hướng bước đi, chuyển động mượt như ray trượt dolly.",
         escalated: false,
         actions: [
-          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
           { label: '⚡ Tìm Hiểu Động Cơ FOC', view: 'detail' }
         ]
       };
@@ -317,7 +509,7 @@ function generateSmartFallbackResponse(query, mode, context) {
                 "• **Giữ vững quy tắc 1/3**: Gimbal tự động điều chỉnh 3 trục giữ vật thể luôn ở tâm điểm vàng thu hút thị giác.",
         escalated: false,
         actions: [
-          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
           { label: '📦 Xem Dải Sản Phẩm', view: 'catalog' }
         ]
       };
@@ -332,7 +524,7 @@ function generateSmartFallbackResponse(query, mode, context) {
                 "• **Nội suy Zoom êm ái**: Khung hình mở rộng mượt mà không bị giật khựng.",
         escalated: false,
         actions: [
-          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
           { label: '⚡ Xem Chi Tiết Kỹ Thuật', view: 'detail' }
         ]
       };
@@ -347,7 +539,7 @@ function generateSmartFallbackResponse(query, mode, context) {
                 "• 🤙 **Cử chỉ OK**: Tự động xoay chuyển giữa khung hình ngang (16:9 YouTube) và khung hình dọc (9:16 TikTok/Reels) trong 0.8s.",
         escalated: false,
         actions: [
-          { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+          { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
           { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' }
         ]
       };
@@ -364,8 +556,54 @@ function generateSmartFallbackResponse(query, mode, context) {
               "Anh/chị muốn thử nghiệm tính năng nào trên kính ngắm camera ạ?",
       escalated: false,
       actions: [
-        { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
         { label: '📦 Xem Cụm Camera AI', view: 'detail' }
+      ]
+    };
+  }
+
+  // =========================================================================
+  // CREATIVE MODE (WEB FILMMAKING & EDITING COPILOT)
+  // =========================================================================
+  if (mode === 'creative') {
+    if (q.includes('apple log') || q.includes('lut') || q.includes('cube') || q.includes('prores') || q.includes('màu')) {
+      return {
+        answer: "🎨 **Quy Trình Quay Apple Log ProRes 4K & Nạp 3D LUT `.cube`:**\n\n" +
+                "• **Trên App T-Flow Pro**: Bật nút `PRO` trên HUD → chọn **Apple Log (Flat)**, giữ **ISO 100** và tốc độ màn trập **180° (1/48s cho 24fps hoặc 1/120s cho 60fps)**.\n" +
+                "• **Xem trước thời gian thực (Live LUT)**: Nạp file `.cube` Rec.709 / Teal & Orange để giám sát ánh sáng chính xác ngoài trời mà vẫn giữ nguyên file Log gốc 10-bit.\n" +
+                "• **Hậu kỳ**: Kéo file vào CapCut / DaVinci Resolve / Premiere, áp LUT chuyển đổi rồi tinh chỉnh Lift/Gamma/Gain.",
+        escalated: false,
+        actions: [
+          { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
+          { label: '📦 Xem Gói Master Class', view: 'catalog' }
+        ]
+      };
+    }
+
+    if (q.includes('inception') || q.includes('360') || q.includes('ninja') || q.includes('bước chân') || q.includes('z-axis') || q.includes('lia')) {
+      return {
+        answer: "🎬 **Kỹ Thuật Lia Máy Điện Ảnh & Ninja Walk (Triệt Tiêu Rung Bước Chân):**\n\n" +
+                "• **Ninja Walk**: Hơi chùng gối 10–15°, bước gót-đến-mũi bàn chân êm ái, cổ tay thả lỏng để động cơ Pure FOC 20kHz tự triệt tiêu dao động dọc Z-axis.\n" +
+                "• **Inception 360° Roll**: Đặt gimbal chế độ `FPV / 360°`, hướng ống kính dọc thân tay cầm và gạt Joystick trái/phải đều tay.\n" +
+                "• **Quy tắc 180° Shutter**: Luôn giữ Shutter Speed = `1 / (2 × FPS)` để chuyển động có độ nhòe điện ảnh tự nhiên.",
+        escalated: false,
+        actions: [
+          { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
+          { label: '⚡ Xem Thông Số FOC 20kHz', view: 'detail' }
+        ]
+      };
+    }
+
+    return {
+      answer: "🎬 **Cố Vấn Đạo Diễn & Hậu Kỳ T-Flow Creative Studio:**\n\n" +
+              "• **Thông số chuẩn điện ảnh**: 4K 24fps (Shutter 1/48s) hoặc 4K 60fps Action (Shutter 1/120s), chế độ gimbal `PF / FOLLOW`.\n" +
+              "• **Chống rung 3 trục Pure FOC 20kHz**: Kết hợp bước đi Ninja Walk giúp lia máy mượt như dolly.\n" +
+              "• **Hậu kỳ Apple Log & 3D LUT `.cube`**: Hỗ trợ xem trước Rec.709 và đồng bộ mic 2.4GHz dễ dàng trong CapCut / Premiere / DaVinci Resolve.\n\n" +
+              "Bạn đang chuẩn bị quay bối cảnh nào (hoàng hôn, chuyển động nhanh, vlog hay review sản phẩm)?",
+      escalated: false,
+      actions: [
+        { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
+        { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' }
       ]
     };
   }
@@ -526,7 +764,7 @@ function generateSmartFallbackResponse(query, mode, context) {
               "Toàn bộ thuật toán xử lý trên Cloud AI, không làm nóng máy hay hao pin điện thoại của anh/chị ạ!",
       escalated: false,
       actions: [
-        { label: '📸 Trải Nghiệm App Simulator', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '📸 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
         { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' },
         { label: '⚡ Chi Tiết Kỹ Thuật', view: 'detail' }
       ]
@@ -540,10 +778,10 @@ function generateSmartFallbackResponse(query, mode, context) {
               "• **Cách thức hoạt động:** Khi AI Cloud quét thấy trong khung hình xuất hiện từ **2-3 người trở lên** hoặc có người đứng sát viền mép mà cam góc hẹp 1x không bao trùm hết, hệ thống sẽ **tự động chuyển sang Camera Góc Siêu Rộng 0.5x (FOV 120°)** hoàn toàn tự động!\n" +
               "• **Tự căn giữa nhóm:** Gimbal tự tính toán tâm trọng lực (Centroid) của tất cả mọi người để không ai bị lọt ra ngoài mép khung hình.\n" +
               "• **Tự thu về 1x khi ít người:** Khi mọi người rời đi chỉ còn 1 người, sau 3 giây hệ thống sẽ tự động zoom mượt về camera chính 1x.\n\n" +
-              "Anh/chị có thể mở thử ngay tại **Trình giả lập App T-Flow** để xem AI tự kích hoạt ống kính 0.5x nhé!",
+              "Anh/chị có thể mở thử ngay tại **T-Flow Live Studio** để xem giao diện mô phỏng nhé!",
       escalated: false,
       actions: [
-        { label: '📸 Thử Ngay Trên App Simulator', action: "window.open('mobile_app.html', '_blank')" },
+        { label: '📸 Mở Studio Preview', action: "window.open('/studio', '_blank')" },
         { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' }
       ]
     };
@@ -631,7 +869,7 @@ function generateSmartFallbackResponse(query, mode, context) {
     actions: [
       { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' },
       { label: '⚡ Xem Chi Tiết Kỹ Thuật', view: 'detail' },
-      { label: '🎯 Thử Kính Ngắm App AI', action: "window.open('mobile_app.html', '_blank')" }
+      { label: '🎯 Mở Studio Preview', action: "window.open('/studio', '_blank')" }
     ]
   };
 }

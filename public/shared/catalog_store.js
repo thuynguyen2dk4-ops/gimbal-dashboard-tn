@@ -2447,10 +2447,10 @@
   }
 
   // =========================================================================
-  // --- T-FLOW UNIFIED CLOUD AI ENGINE (GOOGLE GEMINI 3.5 FLASH) ---
+  // --- T-FLOW UNIFIED CLOUD AI ENGINE (GOOGLE GEMINI 3.8 FLASH) ---
   // =========================================================================
   var DEFAULT_GEMINI_API_KEY = '';
-  var DEFAULT_AI_MODEL = 'gemini-3.5-flash';
+  var DEFAULT_AI_MODEL = 'gemini-3.8-flash';
   var AI_CLOUD_CONFIG_KEY = 'tflow_cloud_ai_config';
 
   function getCloudAiConfig() {
@@ -2468,7 +2468,7 @@
       var parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== 'object') return def;
       parsed.apiKey = (typeof parsed.apiKey === 'string') ? parsed.apiKey.trim() : '';
-      if (!parsed.model || parsed.model === 'gemini-2.5-flash' || parsed.model === 'gemini-1.5-flash') {
+      if (!parsed.model || parsed.model === 'gemini-1.5-flash' || parsed.model === 'gemini-2.0-flash' || parsed.model === 'gemini-1.5-pro') {
         parsed.model = DEFAULT_AI_MODEL;
       }
       return Object.assign({}, def, parsed);
@@ -2493,43 +2493,59 @@
     var targetModel = model || DEFAULT_AI_MODEL;
     var startTime = Date.now();
     var cfg = getCloudAiConfig();
-    var keyToTest = apiKey || cfg.apiKey || '';
+    var keyToTest = (apiKey || cfg.apiKey || '').trim();
 
     // Step 1: Test via /api/chat serverless function
     try {
+      var reqHeaders = { 'Content-Type': 'application/json' };
+      if (keyToTest) reqHeaders['x-gemini-api-key'] = keyToTest;
+      var payloadBody = {
+        prompt: 'Ping kiểm tra kết nối Google Cloud AI T-Flow',
+        mode: 'web',
+        model: targetModel
+      };
+      if (keyToTest) payloadBody.apiKey = keyToTest;
+
       var res = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-gemini-api-key': keyToTest
-        },
-        body: JSON.stringify({
-          prompt: 'Ping kiểm tra kết nối Google Cloud AI T-Flow',
-          mode: 'web',
-          apiKey: keyToTest,
-          model: targetModel
-        })
+        headers: reqHeaders,
+        body: JSON.stringify(payloadBody)
       });
       if (res.ok) {
         var data = await res.json();
         var latency = Date.now() - startTime;
-        return {
-          success: true,
-          latencyMs: latency,
-          model: data.model || targetModel,
-          source: data.source || 'vercel_serverless',
-          message: 'Kết nối Google Cloud AI thành công qua Vercel Serverless (' + latency + 'ms)'
-        };
+        var isLiveCloud = data && (data.source === 'google_gemini_cloud' || data.source === 'vercel_ai_gateway');
+        if (isLiveCloud) {
+          return {
+            success: true,
+            latencyMs: latency,
+            model: data.model || targetModel,
+            source: data.source,
+            message: 'Kết nối Cloud AI thành công qua Vercel Serverless (' + latency + 'ms)'
+          };
+        }
+        if (!keyToTest) {
+          return {
+            success: false,
+            latencyMs: latency,
+            source: (data && data.source) || 'tflow_smart_engine',
+            apiStatus: (data && data.apiStatus) || null,
+            error: (data && (data.apiError || data.note)) || 'Serverless /api/chat chưa kết nối được Google Gemini Cloud (đang dùng tri thức nội bộ).'
+          };
+        }
       }
     } catch (e) {}
 
     // Step 2: Direct call to Google Gemini REST API if key is present
     if (keyToTest) {
       try {
-        var directUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(targetModel) + ':generateContent?key=' + encodeURIComponent(keyToTest);
+        var directUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(targetModel) + ':generateContent';
         var gRes = await fetch(directUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': keyToTest
+          },
           body: JSON.stringify({
             contents: [{ parts: [{ text: 'Ping' }] }]
           })
@@ -2761,27 +2777,29 @@
     var name = currentUserObj ? currentUserObj.name : (mode === 'creative' ? 'Nhà sáng tạo' : 'Quý khách');
 
     var cfg = getCloudAiConfig();
-    var effectiveKey = cfg.apiKey || '';
-    var effectiveModel = cfg.model || 'gemini-3.5-flash';
+    var effectiveKey = (cfg.apiKey || '').trim();
+    var effectiveModel = cfg.model || DEFAULT_AI_MODEL;
+    var reqContext = Object.assign({}, context, { originalMode: rawMode });
 
     var finalResult = null;
 
     // STEP 1: Attempt Serverless /api/chat call
     try {
+      var headers = { 'Content-Type': 'application/json' };
+      if (effectiveKey) headers['x-gemini-api-key'] = effectiveKey;
+      var reqPayload = {
+        prompt: prompt,
+        mode: mode,
+        history: history,
+        context: reqContext,
+        model: effectiveModel
+      };
+      if (effectiveKey) reqPayload.apiKey = effectiveKey;
+
       var res = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-gemini-api-key': effectiveKey
-        },
-        body: JSON.stringify({
-          prompt: prompt,
-          mode: mode,
-          history: history,
-          context: context,
-          apiKey: effectiveKey,
-          model: effectiveModel
-        })
+        headers: headers,
+        body: JSON.stringify(reqPayload)
       });
 
       if (res.ok) {
