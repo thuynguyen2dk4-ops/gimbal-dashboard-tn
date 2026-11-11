@@ -5913,23 +5913,23 @@
 
       try {
         const popup = window.open(
-          '/google_auth.html',
+          '/auth/google/',
           'GoogleAccountsOAuth',
           `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
         );
 
         if (!popup || popup.closed || typeof popup.closed === 'undefined') {
           // If popup is blocked by browser, redirect smoothly
-          window.location.href = '/google_auth.html';
+          window.location.href = '/auth/google/';
         } else if (popup && popup.focus) {
           popup.focus();
         }
       } catch (e) {
-        window.location.href = '/google_auth.html';
+        window.location.href = '/auth/google/';
       }
     }
 
-    // Listen for Google OAuth success message from authentic google_auth.html popup
+    // Listen for Google OAuth success message from /auth/google/ popup
     window.addEventListener('message', function(event) {
       if (event.data && event.data.type === 'GOOGLE_OAUTH_SUCCESS') {
         const googleUser = event.data.user;
@@ -5943,7 +5943,7 @@
       }
     });
 
-    // Check if user just redirected back from google_auth.html
+    // Check if user just redirected back from /auth/google/
     try {
       const redirectedUserStr = localStorage.getItem('tflow_google_auth_redirect_user');
       if (redirectedUserStr) {

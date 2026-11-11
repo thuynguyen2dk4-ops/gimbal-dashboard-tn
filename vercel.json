@@ -69,6 +69,11 @@
       "source": "/app/",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/google_auth.html",
+      "destination": "/auth/google/",
+      "permanent": true
     }
   ],
   "rewrites": [

@@ -8,15 +8,53 @@
 
 /* Begin PBXBuildFile section */
 		AA11002029B7F10000000001 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA11002129B7F10000000001 /* Assets.xcassets */; };
-		AA11000129B7F10000000001 /* SmartGimbalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11000229B7F10000000001 /* SmartGimbalApp.swift */; };
 		AA11000329B7F10000000001 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AA11000429B7F10000000001 /* Info.plist */; };
+		AA11010329B7F10000000001 /* SmartGimbalApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11010229B7F10000000001 /* SmartGimbalApp.swift */; };
+		AA11010529B7F10000000001 /* MainTabShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11010429B7F10000000001 /* MainTabShellView.swift */; };
+		AA11010829B7F10000000001 /* GimbalModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11010729B7F10000000001 /* GimbalModels.swift */; };
+		AA11011129B7F10000000001 /* SupabaseModuleStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11011029B7F10000000001 /* SupabaseModuleStore.swift */; };
+		AA11011329B7F10000000001 /* BLEGimbalManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11011229B7F10000000001 /* BLEGimbalManager.swift */; };
+		AA11011529B7F10000000001 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11011429B7F10000000001 /* CameraService.swift */; };
+		AA11011829B7F10000000001 /* TFlowBrandLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11011729B7F10000000001 /* TFlowBrandLogo.swift */; };
+		AA11012029B7F10000000001 /* AspectLetterboxMaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11011929B7F10000000001 /* AspectLetterboxMaskView.swift */; };
+		AA11012229B7F10000000001 /* TelemetryMetersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11012129B7F10000000001 /* TelemetryMetersView.swift */; };
+		AA11012629B7F10000000001 /* CameraStudioNativeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11012529B7F10000000001 /* CameraStudioNativeView.swift */; };
+		AA11012829B7F10000000001 /* NativeCameraPreviewRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11012729B7F10000000001 /* NativeCameraPreviewRepresentable.swift */; };
+		AA11013029B7F10000000001 /* AspectPickerSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11012929B7F10000000001 /* AspectPickerSheetView.swift */; };
+		AA11013229B7F10000000001 /* QuickSettingsSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11013129B7F10000000001 /* QuickSettingsSheetView.swift */; };
+		AA11013429B7F10000000001 /* MediaGallerySheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11013329B7F10000000001 /* MediaGallerySheetView.swift */; };
+		AA11013729B7F10000000001 /* GimbalDeviceHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11013629B7F10000000001 /* GimbalDeviceHubView.swift */; };
+		AA11013929B7F10000000001 /* AutoCalibrationModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11013829B7F10000000001 /* AutoCalibrationModalView.swift */; };
+		AA11014229B7F10000000001 /* TFlowAIChatAssistantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11014129B7F10000000001 /* TFlowAIChatAssistantView.swift */; };
+		AA11014529B7F10000000001 /* UserProfilePermissionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11014429B7F10000000001 /* UserProfilePermissionsView.swift */; };
+		AA11014729B7F10000000001 /* ModuleDetailInspectorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11014629B7F10000000001 /* ModuleDetailInspectorSheet.swift */; };
+		AA11014929B7F10000000001 /* SubscriptionPaywallSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA11014829B7F10000000001 /* SubscriptionPaywallSheetView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		AA11002129B7F10000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA11000529B7F10000000001 /* SmartGimbalPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartGimbalPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		AA11000229B7F10000000001 /* SmartGimbalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGimbalApp.swift; sourceTree = "<group>"; };
 		AA11000429B7F10000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA11010229B7F10000000001 /* SmartGimbalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGimbalApp.swift; sourceTree = "<group>"; };
+		AA11010429B7F10000000001 /* MainTabShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabShellView.swift; sourceTree = "<group>"; };
+		AA11010729B7F10000000001 /* GimbalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GimbalModels.swift; sourceTree = "<group>"; };
+		AA11011029B7F10000000001 /* SupabaseModuleStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseModuleStore.swift; sourceTree = "<group>"; };
+		AA11011229B7F10000000001 /* BLEGimbalManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEGimbalManager.swift; sourceTree = "<group>"; };
+		AA11011429B7F10000000001 /* CameraService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraService.swift; sourceTree = "<group>"; };
+		AA11011729B7F10000000001 /* TFlowBrandLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFlowBrandLogo.swift; sourceTree = "<group>"; };
+		AA11011929B7F10000000001 /* AspectLetterboxMaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspectLetterboxMaskView.swift; sourceTree = "<group>"; };
+		AA11012129B7F10000000001 /* TelemetryMetersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TelemetryMetersView.swift; sourceTree = "<group>"; };
+		AA11012529B7F10000000001 /* CameraStudioNativeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraStudioNativeView.swift; sourceTree = "<group>"; };
+		AA11012729B7F10000000001 /* NativeCameraPreviewRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeCameraPreviewRepresentable.swift; sourceTree = "<group>"; };
+		AA11012929B7F10000000001 /* AspectPickerSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AspectPickerSheetView.swift; sourceTree = "<group>"; };
+		AA11013129B7F10000000001 /* QuickSettingsSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickSettingsSheetView.swift; sourceTree = "<group>"; };
+		AA11013329B7F10000000001 /* MediaGallerySheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaGallerySheetView.swift; sourceTree = "<group>"; };
+		AA11013629B7F10000000001 /* GimbalDeviceHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GimbalDeviceHubView.swift; sourceTree = "<group>"; };
+		AA11013829B7F10000000001 /* AutoCalibrationModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoCalibrationModalView.swift; sourceTree = "<group>"; };
+		AA11014129B7F10000000001 /* TFlowAIChatAssistantView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFlowAIChatAssistantView.swift; sourceTree = "<group>"; };
+		AA11014429B7F10000000001 /* UserProfilePermissionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfilePermissionsView.swift; sourceTree = "<group>"; };
+		AA11014629B7F10000000001 /* ModuleDetailInspectorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModuleDetailInspectorSheet.swift; sourceTree = "<group>"; };
+		AA11014829B7F10000000001 /* SubscriptionPaywallSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPaywallSheetView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,11 +79,102 @@
 		AA11000829B7F10000000001 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				AA11010129B7F10000000001 /* App */,
+				AA11010629B7F10000000001 /* Models */,
+				AA11010929B7F10000000001 /* Services */,
+				AA11011629B7F10000000001 /* Components */,
+				AA11012329B7F10000000001 /* Views */,
 				AA11002129B7F10000000001 /* Assets.xcassets */,
-				AA11000229B7F10000000001 /* SmartGimbalApp.swift */,
 				AA11000429B7F10000000001 /* Info.plist */,
 			);
 			path = Sources;
+			sourceTree = "<group>";
+		};
+		AA11010129B7F10000000001 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				AA11010229B7F10000000001 /* SmartGimbalApp.swift */,
+				AA11010429B7F10000000001 /* MainTabShellView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		AA11010629B7F10000000001 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AA11010729B7F10000000001 /* GimbalModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AA11010929B7F10000000001 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AA11011029B7F10000000001 /* SupabaseModuleStore.swift */,
+				AA11011229B7F10000000001 /* BLEGimbalManager.swift */,
+				AA11011429B7F10000000001 /* CameraService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AA11011629B7F10000000001 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				AA11011729B7F10000000001 /* TFlowBrandLogo.swift */,
+				AA11011929B7F10000000001 /* AspectLetterboxMaskView.swift */,
+				AA11012129B7F10000000001 /* TelemetryMetersView.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		AA11012429B7F10000000001 /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				AA11012529B7F10000000001 /* CameraStudioNativeView.swift */,
+				AA11012729B7F10000000001 /* NativeCameraPreviewRepresentable.swift */,
+				AA11012929B7F10000000001 /* AspectPickerSheetView.swift */,
+				AA11013129B7F10000000001 /* QuickSettingsSheetView.swift */,
+				AA11013329B7F10000000001 /* MediaGallerySheetView.swift */,
+			);
+			path = Camera;
+			sourceTree = "<group>";
+		};
+		AA11013529B7F10000000001 /* Gimbal */ = {
+			isa = PBXGroup;
+			children = (
+				AA11013629B7F10000000001 /* GimbalDeviceHubView.swift */,
+				AA11013829B7F10000000001 /* AutoCalibrationModalView.swift */,
+			);
+			path = Gimbal;
+			sourceTree = "<group>";
+		};
+		AA11014029B7F10000000001 /* Assistant */ = {
+			isa = PBXGroup;
+			children = (
+				AA11014129B7F10000000001 /* TFlowAIChatAssistantView.swift */,
+			);
+			path = Assistant;
+			sourceTree = "<group>";
+		};
+		AA11014329B7F10000000001 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				AA11014429B7F10000000001 /* UserProfilePermissionsView.swift */,
+				AA11014629B7F10000000001 /* ModuleDetailInspectorSheet.swift */,
+				AA11014829B7F10000000001 /* SubscriptionPaywallSheetView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		AA11012329B7F10000000001 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AA11012429B7F10000000001 /* Camera */,
+				AA11013529B7F10000000001 /* Gimbal */,
+				AA11014029B7F10000000001 /* Assistant */,
+				AA11014329B7F10000000001 /* Profile */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		AA11000929B7F10000000001 /* Products */ = {
@@ -126,7 +255,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AA11000129B7F10000000001 /* SmartGimbalApp.swift in Sources */,
+				AA11010329B7F10000000001 /* SmartGimbalApp.swift in Sources */,
+				AA11010529B7F10000000001 /* MainTabShellView.swift in Sources */,
+				AA11010829B7F10000000001 /* GimbalModels.swift in Sources */,
+				AA11011129B7F10000000001 /* SupabaseModuleStore.swift in Sources */,
+				AA11011329B7F10000000001 /* BLEGimbalManager.swift in Sources */,
+				AA11011529B7F10000000001 /* CameraService.swift in Sources */,
+				AA11011829B7F10000000001 /* TFlowBrandLogo.swift in Sources */,
+				AA11012029B7F10000000001 /* AspectLetterboxMaskView.swift in Sources */,
+				AA11012229B7F10000000001 /* TelemetryMetersView.swift in Sources */,
+				AA11012629B7F10000000001 /* CameraStudioNativeView.swift in Sources */,
+				AA11012829B7F10000000001 /* NativeCameraPreviewRepresentable.swift in Sources */,
+				AA11013029B7F10000000001 /* AspectPickerSheetView.swift in Sources */,
+				AA11013229B7F10000000001 /* QuickSettingsSheetView.swift in Sources */,
+				AA11013429B7F10000000001 /* MediaGallerySheetView.swift in Sources */,
+				AA11013729B7F10000000001 /* GimbalDeviceHubView.swift in Sources */,
+				AA11013929B7F10000000001 /* AutoCalibrationModalView.swift in Sources */,
+				AA11014229B7F10000000001 /* TFlowAIChatAssistantView.swift in Sources */,
+				AA11014529B7F10000000001 /* UserProfilePermissionsView.swift in Sources */,
+				AA11014729B7F10000000001 /* ModuleDetailInspectorSheet.swift in Sources */,
+				AA11014929B7F10000000001 /* SubscriptionPaywallSheetView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

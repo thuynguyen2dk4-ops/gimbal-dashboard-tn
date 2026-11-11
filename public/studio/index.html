@@ -413,9 +413,9 @@
     <div class="view-tabs">
       
       <button class="v-tab active" id="tabStore" onclick="setStudioMode('store')">Web Cửa Hàng</button>
+      <button class="v-tab" id="tabCatalog" onclick="setStudioMode('catalog')">Dải Sản Phẩm</button>
       <button class="v-tab" id="tabAdmin" onclick="setStudioMode('admin')">Web Admin CMS</button>
       <button class="v-tab" id="tabUser" onclick="setStudioMode('user')">Cổng Khách Hàng</button>
-      <button class="v-tab" id="tabMobile" onclick="setStudioMode('mobile')">App Camera AI (iPhone)</button>
     </div>
 
     <!-- ACTIONS -->
@@ -423,7 +423,7 @@
       <button class="btn-reload" onclick="toggleCodePane()" id="btnToggleCode">Ẩn/Hiện Cửa Sổ Code</button>
       <button class="btn-reload" onclick="reloadPreviews()">Làm Mới (Reload)</button>
       <button class="btn-qr" onclick="openQrModal()">
-        <span>📱 Cài & Test App Trên iPhone Thật (HTTPS QR)</span>
+        <span>📱 Mở QR Truy Cập Nhanh Trên iPhone</span>
       </button>
     </div>
   </div>
@@ -434,15 +434,15 @@
     <div class="code-pane" id="codePane">
       <div class="code-header">
         <div class="file-tabs">
-          <button class="f-tab active" onclick="loadCodeFile('index.html', this)">web/index.html</button>
-          <button class="f-tab" onclick="loadCodeFile('admin_dashboard.html', this)">web/admin_dashboard.html</button>
-          <button class="f-tab" onclick="loadCodeFile('user_dashboard.html', this)">web/user_dashboard.html</button>
-          <button class="f-tab" onclick="loadCodeFile('mobile_app.html', this)">web/mobile_app.html</button>
+          <button class="f-tab active" onclick="loadCodeFile('/index.html', this)">index.html</button>
           <button class="f-tab" onclick="loadCodeFile('/shared/catalog_store.js', this)">shared/catalog_store.js</button>
+          <button class="f-tab" onclick="loadCodeFile('/admin/index.html', this)">admin/index.html</button>
+          <button class="f-tab" onclick="loadCodeFile('/account/index.html', this)">account/index.html</button>
+          <button class="f-tab" onclick="loadCodeFile('/profile/index.html', this)">profile/index.html</button>
         </div>
       </div>
       <div class="code-toolbar">
-        <span id="codeFileInfo">Đang xem: web/index.html</span>
+        <span id="codeFileInfo">Đang xem: /index.html</span>
         <input type="text" class="code-search" id="codeSearchInput" placeholder="Tìm trong code (Enter)..." onkeyup="searchInCode(event)">
       </div>
       <div class="code-body" id="codeContainer">
@@ -450,17 +450,18 @@
       </div>
     </div>
 
-    <!-- RIGHT: LIVE INTERACTIVE WEB + MOBILE PREVIEW -->
+    <!-- RIGHT: LIVE INTERACTIVE WEB PREVIEW -->
     <div class="preview-pane">
       <div class="preview-bar">
         <div style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600; color:#8b949e;">
           <span>Màn hình tương tác trực tiếp:</span>
-          <button class="btn-reload" style="padding:3px 9px;" onclick="setMainIframe('index.html')">Trang Chủ & Dải SP</button>
-          <button class="btn-reload" style="padding:3px 9px;" onclick="setMainIframe('admin_dashboard.html')">Admin CMS</button>
-          <button class="btn-reload" style="padding:3px 9px;" onclick="setMainIframe('user_dashboard.html')">Cổng Khách Hàng</button>
+          <button class="btn-reload" style="padding:3px 9px;" onclick="setMainIframe('/', '/index.html')">Trang Chủ</button>
+          <button class="btn-reload" style="padding:3px 9px;" onclick="setMainIframe('/san-pham', '/index.html')">Dải Sản Phẩm</button>
+          <button class="btn-reload" style="padding:3px 9px;" onclick="setMainIframe('/admin/', '/admin/index.html')">Admin CMS</button>
+          <button class="btn-reload" style="padding:3px 9px;" onclick="setMainIframe('/account/', '/account/index.html')">Cổng Khách Hàng</button>
         </div>
         <div class="url-box">
-          <span id="currentPreviewUrl">https://t-flow.tech/web/index.html</span>
+          <span id="currentPreviewUrl">https://t-flow-tech.vercel.app/</span>
           <a href="/" id="openNewTabLink" target="_blank" style="color:#8b949e; text-decoration:none; font-size:11px;">Mở toàn màn hình ↗</a>
         </div>
       </div>
@@ -470,22 +471,22 @@
         <div class="phone-dock" id="phoneDock">
           <div style="font-size:11.5px; font-weight:600; color:#8b949e; margin-bottom:8px; display:flex; align-items:center; gap:8px;">
             <span style="width:8px;height:8px;border-radius:50%;background:#3fb950;"></span>
-            <span>iPhone 16 Pro — Camera Cloud AI Simulator</span>
+            <span>iPhone Mobile Preview</span>
           </div>
-          <iframe src="/app" id="mobilePreviewIframe" allow="camera; microphone; accelerometer; gyroscope"></iframe>
+          <iframe src="/" id="mobilePreviewIframe"></iframe>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: QR CODE FOR REAL IPHONE HTTPS TESTING -->
+  <!-- MODAL: QR CODE FOR IPHONE WEB TESTING -->
   <div class="modal-backdrop" id="qrModal">
     <div class="qr-card">
       <div style="display:flex; justify-content:space-between; align-items:flex-start;">
         <div>
-          <h2 style="font-size:19px; font-weight:700; color:#fff;">Cài & Chạy Thử App Trực Tiếp Trên iPhone Của Anh</h2>
+          <h2 style="font-size:19px; font-weight:700; color:#fff;">Mở Nhanh Web T-Flow Trực Tiếp Trên iPhone</h2>
           <p style="font-size:13px; color:#8b949e; margin-top:4px;">
-            Vì iPhone không dùng được <code>localhost</code> và Safari bắt buộc phải có chứng chỉ bảo mật <strong>HTTPS</strong> mới cho phép bật Camera thật, em đã dựng sẵn đường truyền <strong>Public HTTPS Tunnel</strong> nối thẳng vào máy tính của anh:
+            Quét mã QR dưới đây bằng Camera iPhone để kiểm tra giao diện mobile thực tế trên chứng chỉ bảo mật <strong>HTTPS Vercel</strong>:
           </p>
         </div>
         <button class="btn-reload" onclick="closeQrModal()">Đóng ✕</button>
@@ -493,33 +494,33 @@
 
       <div class="qr-grid">
         <div class="qr-box">
-          <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://t-flow.tech/web/mobile_app.html" alt="QR Code iPhone App">
+          <img src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https://t-flow-tech.vercel.app/san-pham" alt="QR Code T-Flow Store">
           <span style="color:#0d1117; font-size:11px; font-weight:700; margin-top:8px;">QUÉT BẰNG CAMERA IPHONE</span>
         </div>
 
         <div class="step-list">
           <div class="step-item">
             <strong>Bước 1: Mở Camera iPhone quét mã QR bên cạnh</strong>
-            Không cần chung mạng Wi-Fi (dùng 4G/5G hay Wi-Fi đều được). Nhấn vào thông báo hiện lên để mở trong trình duyệt <strong>Safari</strong>.
+            Mở liên kết trực tiếp trong trình duyệt <strong>Safari</strong> trên iPhone qua 4G/5G hoặc Wi-Fi.
           </div>
           <div class="step-item">
-            <strong>Bước 2: Đưa App ra Màn hình chính như App Native (PWA)</strong>
-            Trên Safari iPhone, anh bấm nút <strong>Chia sẻ (Share ở thanh dưới cùng)</strong> &rarr; Chọn <strong>"Thêm vào MH chính" (Add to Home Screen)</strong> &rarr; Bấm <strong>Thêm</strong>. App <em>Smart Gimbal</em> sẽ nằm ngay trên màn hình chính iPhone của anh, mở lên full-screen không còn thanh địa chỉ web!
+            <strong>Bước 2: Kiểm tra Storefront & Dải Sản Phẩm</strong>
+            Thử cuộn thanh danh mục ngang, nút So Sánh sản phẩm, thanh điều hướng mobile dock dưới đáy và trợ lý T-Flow Bot.
           </div>
           <div class="step-item">
-            <strong>Bước 3: Cấp quyền Camera & Test đồng bộ Admin Realtime</strong>
-            Bấm <em>Cho phép (Allow)</em> khi App hỏi quyền Camera. Khi anh gạt tắt/bật <em>Module 1: AI Vision</em> trên màn hình Admin máy tính, App trên tay anh sẽ khóa/mở khung xanh lá ngay tức thì qua Supabase!
+            <strong>Bước 3: Đồng bộ quản trị qua Admin CMS</strong>
+            Mọi cập nhật giá/sản phẩm ở <code>/admin</code> sẽ đồng bộ trực tiếp vào <code>catalog_store.js</code>.
           </div>
         </div>
       </div>
 
       <div class="public-link-pill">
-        <span>Link HTTPS cho iPhone: <strong>https://t-flow.tech/web/mobile_app.html</strong></span>
-        <button class="btn-reload" onclick="navigator.clipboard.writeText('https://t-flow.tech/web/mobile_app.html'); this.textContent='Đã chép!';">Copy Link</button>
+        <span>Link Dải Sản Phẩm: <strong>https://t-flow-tech.vercel.app/san-pham</strong></span>
+        <button class="btn-reload" onclick="navigator.clipboard.writeText('https://t-flow-tech.vercel.app/san-pham'); this.textContent='Đã chép!';">Copy Link</button>
       </div>
       <div class="public-link-pill" style="margin-top:8px;">
-        <span>Link HTTPS cho Web Cửa Hàng: <strong>https://t-flow.tech/web/index.html</strong></span>
-        <button class="btn-reload" onclick="navigator.clipboard.writeText('https://t-flow.tech/web/index.html'); this.textContent='Đã chép!';">Copy Link</button>
+        <span>Link Trang Chủ: <strong>https://t-flow-tech.vercel.app/</strong></span>
+        <button class="btn-reload" onclick="navigator.clipboard.writeText('https://t-flow-tech.vercel.app/'); this.textContent='Đã chép!';">Copy Link</button>
       </div>
     </div>
   </div>
@@ -528,7 +529,7 @@
     let currentCodeLines = [];
 
     window.addEventListener('DOMContentLoaded', () => {
-      loadCodeFile('index.html', document.querySelector('.f-tab'));
+      loadCodeFile('/index.html', document.querySelector('.f-tab'));
     });
 
     async function loadCodeFile(relPath, btnEl) {
@@ -588,19 +589,20 @@
       pane.classList.toggle('collapsed');
     }
 
-    function setMainIframe(page) {
+    function setMainIframe(routePath, sourcePath) {
       const iframe = document.getElementById('mainPreviewIframe');
-      iframe.src = page;
-      document.getElementById('currentPreviewUrl').textContent = 'https://t-flow.tech/web/' + page;
-      document.getElementById('openNewTabLink').href = page;
+      iframe.src = routePath;
+      document.getElementById('currentPreviewUrl').textContent = 'https://t-flow-tech.vercel.app' + routePath;
+      document.getElementById('openNewTabLink').href = routePath;
 
-      // Also sync code viewer to the selected page
-      const tabs = document.querySelectorAll('.f-tab');
-      tabs.forEach(t => {
-        if (t.textContent.includes(page)) {
-          loadCodeFile(page, t);
-        }
-      });
+      if (sourcePath) {
+        const tabs = document.querySelectorAll('.f-tab');
+        tabs.forEach(t => {
+          if (t.getAttribute('onclick') && t.getAttribute('onclick').includes(sourcePath)) {
+            loadCodeFile(sourcePath, t);
+          }
+        });
+      }
     }
 
     function setStudioMode(mode) {
@@ -608,38 +610,34 @@
       const dock = document.getElementById('phoneDock');
       const mainIframe = document.getElementById('mainPreviewIframe');
 
-      if (mode === 'split') {
-        document.getElementById('tabSplit').classList.add('active');
-        mainIframe.style.display = 'block';
-        dock.classList.add('visible');
-      } else if (mode === 'store') {
+      if (mode === 'store') {
         document.getElementById('tabStore').classList.add('active');
         mainIframe.style.display = 'block';
         dock.classList.remove('visible');
-        setMainIframe('index.html');
+        setMainIframe('/', '/index.html');
+      } else if (mode === 'catalog') {
+        document.getElementById('tabCatalog').classList.add('active');
+        mainIframe.style.display = 'block';
+        dock.classList.remove('visible');
+        setMainIframe('/san-pham', '/index.html');
       } else if (mode === 'admin') {
         document.getElementById('tabAdmin').classList.add('active');
         mainIframe.style.display = 'block';
         dock.classList.remove('visible');
-        setMainIframe('admin_dashboard.html');
+        setMainIframe('/admin/', '/admin/index.html');
       } else if (mode === 'user') {
         document.getElementById('tabUser').classList.add('active');
         mainIframe.style.display = 'block';
         dock.classList.remove('visible');
-        setMainIframe('user_dashboard.html');
-      } else if (mode === 'mobile') {
-        document.getElementById('tabMobile').classList.add('active');
-        mainIframe.style.display = 'block';
-        dock.classList.remove('visible');
-        setMainIframe('mobile_app.html');
+        setMainIframe('/account/', '/account/index.html');
       }
     }
 
     function reloadPreviews() {
       const mainIframe = document.getElementById('mainPreviewIframe');
       const mobIframe = document.getElementById('mobilePreviewIframe');
-      mainIframe.contentWindow.location.reload();
-      mobIframe.contentWindow.location.reload();
+      if (mainIframe && mainIframe.contentWindow) mainIframe.contentWindow.location.reload();
+      if (mobIframe && mobIframe.contentWindow) mobIframe.contentWindow.location.reload();
     }
 
     function openQrModal() {
