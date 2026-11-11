@@ -35,8 +35,8 @@ struct CameraStudioNativeView: View {
     var body: some View {
         GeometryReader { geo in
             ZStack {
-                // 1. Live AVFoundation Video Layer
-                NativeCameraPreviewRepresentable()
+                // 1. Live AVFoundation Video Layer (Shared Session)
+                NativeCameraPreviewRepresentable(session: camera.captureSession, isFrontCamera: camera.isFrontCamera)
                     .ignoresSafeArea()
                     .onTapGesture { location in
                         focusPoint = location
@@ -68,10 +68,22 @@ struct CameraStudioNativeView: View {
                         .transition(.scale.combined(with: .opacity))
                 }
 
-                // 5. Minimalist Rule of Thirds Grid (Subtle 12% Opacity)
-                RuleOfThirdsGridView()
-                    .allowsHitTesting(false)
-                    .ignoresSafeArea()
+                // 5. Viewfinder Assist Overlays (Bound to CameraService)
+                if camera.gridEnabled {
+                    RuleOfThirdsGridView()
+                        .allowsHitTesting(false)
+                        .ignoresSafeArea()
+                }
+                if camera.zebraEnabled {
+                    ZebraStripesOverlayView()
+                        .allowsHitTesting(false)
+                        .ignoresSafeArea()
+                }
+                if camera.peakingEnabled {
+                    FocusPeakingOverlayView()
+                        .allowsHitTesting(false)
+                        .ignoresSafeArea()
+                }
 
                 // 6. AI Vision Target Reticle (Screen 04)
                 if store.isOnline && store.isAiVisionAllowed && isAiActive, let face = camera.detectedFaceRect {
@@ -104,15 +116,10 @@ struct CameraStudioNativeView: View {
                     }
                     .position(x: bx + bw / 2, y: by + bh / 2)
                     .animation(.spring(response: 0.2, dampingFraction: 0.8), value: face)
-                    .onAppear {
-                        let dx = Double(face.midX - 0.5)
-                        let dy = Double(face.midY - 0.5)
-                        ble.sendTrackingError(dx: dx, dy: dy)
-                    }
                 }
 
                 // 7. Pro Cinema HUD Overlay (RGB Histogram & Audio VU Meter)
-                if showProHud {
+                if showProHud && store.isProResAllowed {
                     VStack {
                         HStack(alignment: .top) {
                             // RGB Histogram
@@ -126,21 +133,28 @@ struct CameraStudioNativeView: View {
                         .padding(.horizontal, 16)
                         .padding(.top, 56)
 
-                        // Exposure readouts strip
-                        HStack(spacing: 12) {
-                            Text("f/1.8")
-                            Text(camera.shutterSpeed)
-                            Text("ISO \(camera.iso)")
-                            Text("\(camera.wbKelvin)K")
-                            Text(String(format: "%+.1f EV", camera.ev))
-                            Text(camera.activeLut)
+                        // Exposure readouts strip (Tap to open Pro Manual Controls)
+                        Button(action: {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            showProControls = true
+                        }) {
+                            HStack(spacing: 12) {
+                                Text("f/1.8")
+                                Text(camera.shutterSpeed)
+                                Text("ISO \(camera.iso)")
+                                Text("\(camera.wbKelvin)K")
+                                Text(String(format: "%+.1f EV", camera.ev))
+                                Text(camera.activeLut)
+                                Image(systemName: "slider.horizontal.3")
+                                    .font(.system(size: 9, weight: .bold))
+                            }
+                            .font(.system(size: 10, weight: .bold, design: .monospaced))
+                            .foregroundColor(Color(red: 0.98, green: 0.72, blue: 0.10))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 5)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Capsule())
                         }
-                        .font(.system(size: 10, weight: .bold, design: .monospaced))
-                        .foregroundColor(Color(red: 0.98, green: 0.72, blue: 0.10))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 5)
-                        .background(.ultraThinMaterial)
-                        .clipShape(Capsule())
                         .padding(.top, 4)
 
                         Spacer()
@@ -156,7 +170,7 @@ struct CameraStudioNativeView: View {
                             Text("REC \(camera.recordingDuration)")
                                 .font(.system(size: 11, weight: .black, design: .monospaced))
                                 .foregroundColor(.white)
-                            Text("• 4K PRORES HQ")
+                            Text("• \(camera.selectedResolution) \(store.isProResAllowed ? "PRORES HQ" : "HD")")
                                 .font(.system(size: 10, weight: .bold))
                                 .foregroundColor(.white.opacity(0.8))
                         }
@@ -231,41 +245,61 @@ struct CameraStudioNativeView: View {
                             .clipShape(Capsule())
                         }
 
-                        // Resolution / FPS Toggle
+                        // Resolution / FPS Toggle (4K ProRes gated on store.isProResAllowed)
                         Button(action: {
                             UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            if camera.selectedResolution == "4K • 60" {
-                                camera.selectedResolution = "1080 • 120"
-                            } else if camera.selectedResolution == "1080 • 120" {
-                                camera.selectedResolution = "4K • 30"
+                            if store.isProResAllowed {
+                                if camera.selectedResolution == "4K • 60" {
+                                    camera.selectedResolution = "1080 • 120"
+                                } else if camera.selectedResolution == "1080 • 120" {
+                                    camera.selectedResolution = "4K • 30"
+                                } else {
+                                    camera.selectedResolution = "4K • 60"
+                                }
+                                ble.showToast("Độ phân giải: \(camera.selectedResolution)")
                             } else {
-                                camera.selectedResolution = "4K • 60"
+                                camera.selectedResolution = (camera.selectedResolution == "1080 • 60") ? "1080 • 30" : "1080 • 60"
+                                ble.showToast("🔒 4K ProRes đã khóa ở gói \(store.userTier) • Dùng \(camera.selectedResolution)")
                             }
-                            ble.showToast("Độ phân giải: \(camera.selectedResolution)")
                         }) {
-                            Text(camera.selectedResolution)
-                                .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                .foregroundColor(Color(red: 0.98, green: 0.72, blue: 0.10))
-                                .padding(.horizontal, 9)
-                                .padding(.vertical, 6)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Capsule())
+                            HStack(spacing: 4) {
+                                if !store.isProResAllowed {
+                                    Image(systemName: "lock.fill").font(.system(size: 9))
+                                }
+                                Text(camera.selectedResolution)
+                                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                            }
+                            .foregroundColor(store.isProResAllowed ? Color(red: 0.98, green: 0.72, blue: 0.10) : .white.opacity(0.65))
+                            .padding(.horizontal, 9)
+                            .padding(.vertical, 6)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Capsule())
                         }
 
-                        // Pro HUD Toggle
+                        // Pro HUD Toggle (Gated on store.isProResAllowed)
                         Button(action: {
-                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                showProHud.toggle()
+                            if store.isProResAllowed {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                withAnimation(.easeInOut(duration: 0.2)) {
+                                    showProHud.toggle()
+                                }
+                            } else {
+                                UINotificationFeedbackGenerator().notificationOccurred(.warning)
+                                ble.showToast("🔒 Cần mở khóa Module Apple Log & ProRes để bật PRO HUD")
                             }
                         }) {
-                            Text("PRO")
-                                .font(.system(size: 11, weight: .black))
-                                .foregroundColor(showProHud ? Color.black : Color.white)
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 6)
-                                .background(showProHud ? Color.white : Color.white.opacity(0.18))
-                                .clipShape(Capsule())
+                            HStack(spacing: 3) {
+                                if !store.isProResAllowed {
+                                    Image(systemName: "lock.fill").font(.system(size: 9))
+                                }
+                                Text("PRO")
+                                    .font(.system(size: 11, weight: .black))
+                            }
+                            .foregroundColor(showProHud && store.isProResAllowed ? Color.black : (store.isProResAllowed ? Color.white : Color.white.opacity(0.55)))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 6)
+                            .background(showProHud && store.isProResAllowed ? Color.white : Color.white.opacity(0.18))
+                            .clipShape(Capsule())
                         }
 
                         // Quick Settings (3 dots)
@@ -308,17 +342,36 @@ struct CameraStudioNativeView: View {
                         .background(.ultraThinMaterial)
                         .clipShape(Capsule())
 
-                        // Camera Mode Carousel
+                        // Camera Mode Carousel (Permission-Gated)
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 18) {
                                 ForEach(camModes, id: \.self) { m in
+                                    let isLocked = (m == "TIMELAPSE" && !store.isMotionlapseAllowed)
+                                        || (m == "PRO CINEMA" && !store.isProResAllowed)
+
                                     Button(action: {
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                        selectedCamMode = m
+                                        if isLocked {
+                                            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+                                            let modName = (m == "TIMELAPSE") ? "Motionlapse Waypoint" : "Apple Log & ProRes"
+                                            ble.showToast("🔒 Cần mở khóa Module \(modName) để dùng \(m)")
+                                        } else {
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                            selectedCamMode = m
+                                        }
                                     }) {
-                                        Text(m)
-                                            .font(.system(size: 12, weight: selectedCamMode == m ? .bold : .medium))
-                                            .foregroundColor(selectedCamMode == m ? Color(red: 0.98, green: 0.72, blue: 0.10) : .white.opacity(0.6))
+                                        HStack(spacing: 4) {
+                                            if isLocked {
+                                                Image(systemName: "lock.fill")
+                                                    .font(.system(size: 9))
+                                            }
+                                            Text(m)
+                                                .font(.system(size: 12, weight: selectedCamMode == m ? .bold : .medium))
+                                        }
+                                        .foregroundColor(
+                                            isLocked
+                                                ? .white.opacity(0.35)
+                                                : (selectedCamMode == m ? Color(red: 0.98, green: 0.72, blue: 0.10) : .white.opacity(0.6))
+                                        )
                                     }
                                 }
                             }
@@ -368,7 +421,7 @@ struct CameraStudioNativeView: View {
                                             .frame(width: 28, height: 28)
                                     } else {
                                         Circle()
-                                            .fill(selectedCamMode.contains("PHOTO") ? Color.white : Color.red)
+                                            .fill((selectedCamMode.contains("PHOTO") || selectedCamMode.contains("PORTRAIT")) ? Color.white : Color.red)
                                             .frame(width: 58, height: 58)
                                     }
                                 }
@@ -394,17 +447,55 @@ struct CameraStudioNativeView: View {
                     .padding(.bottom, 16)
                 }
             }
+            .onAppear {
+                camera.setupSession()
+                enforceModulePermissions()
+            }
+            .onChange(of: store.modules) { _ in
+                enforceModulePermissions()
+            }
+            .onChange(of: camera.detectedFaceRect) { newFace in
+                guard store.isOnline, store.isAiVisionAllowed, isAiActive, let face = newFace else { return }
+                let dx = Double(face.midX - 0.5)
+                let dy = Double(face.midY - 0.5)
+                ble.sendTrackingError(dx: dx, dy: dy)
+            }
             .sheet(isPresented: $showAspectPicker) {
                 AspectPickerSheetView(selectedRatio: $camera.selectedAspectRatio)
                     .presentationDetents([.fraction(0.35)])
             }
             .sheet(isPresented: $showQuickMenu) {
-                QuickSettingsSheetView(camera: camera)
-                    .presentationDetents([.fraction(0.45)])
+                QuickSettingsSheetView(camera: camera, store: store)
+                    .presentationDetents([.fraction(0.5)])
+            }
+            .sheet(isPresented: $showProControls) {
+                ProManualControlsSheetView(camera: camera, store: store)
+                    .presentationDetents([.fraction(0.62), .large])
             }
             .sheet(isPresented: $showGallerySheet) {
                 MediaGallerySheetView(camera: camera)
             }
+        }
+    }
+
+    private func enforceModulePermissions() {
+        if !store.isProResAllowed {
+            showProHud = false
+            if camera.selectedResolution.contains("4K") {
+                camera.selectedResolution = "1080 • 60"
+            }
+            if selectedCamMode == "PRO CINEMA" {
+                selectedCamMode = "PHOTO"
+            }
+            if camera.activeLut == "Apple Log (Flat)" {
+                camera.activeLut = "Standard Rec.709"
+            }
+        } else if !store.is3DLutAllowed && camera.activeLut != "Standard Rec.709" {
+            camera.activeLut = "Standard Rec.709"
+        }
+
+        if !store.isMotionlapseAllowed && selectedCamMode == "TIMELAPSE" {
+            selectedCamMode = store.isProResAllowed ? "VIDEO 4K/60" : "PHOTO"
         }
     }
 }

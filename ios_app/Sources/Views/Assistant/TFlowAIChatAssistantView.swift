@@ -135,35 +135,42 @@ struct TFlowAIChatAssistantView: View {
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
             let reply: String
-            let lower = text.lowerBound(target: text.lowercased())
-            if text.contains("Inception") || text.contains("360") {
+            let lower = text.lowercased()
+            if lower.contains("inception") || lower.contains("360") {
                 reply = """
 🎬 Để quay cú máy Inception 360°:
 1. Tại Tab Camera, chọn chế độ '360°' trên thanh Gimbal.
 2. Cầm gimbal nằm ngang hướng thẳng vào chủ thể.
 3. Gạt cần Joystick ảo sang trái hoặc phải để trục Roll xoay tròn 360° liên tục không điểm dừng!
 """
-            } else if text.contains("Apple Log") || text.contains("4K/60") {
+            } else if lower.contains("apple log") || lower.contains("4k/60") || lower.contains("prores") {
                 reply = """
 🎥 Cài đặt Apple Log 4K/60fps:
 1. Bật nút 'PRO' trên thanh HUD đỉnh máy ảnh.
 2. Chọn không gian màu 'Apple Log (Flat)'.
 3. ISO cố định ở mức 100, góc mở màn trập 180° (1/120s) để đạt dải nhạy sáng dynamic range 14+ stops tối đa!
 """
-            } else if text.contains("CoG") || text.contains("Cân bằng") {
+            } else if lower.contains("cog") || lower.contains("cân bằng") || lower.contains("trọng tâm") {
                 reply = """
 ⚖️ Tự động cân bằng CoG:
 1. Chuyển sang Tab 'T-Flow Pro'.
 2. Nhấn nút 'Tự Động Cân Bằng Trọng Tâm (CoG)'.
 3. Đặt gimbal đứng yên trong 2 giây để thuật toán FOC quét và triệt tiêu rung sai số ±0.01°.
 """
-            } else if text.contains("Báo giá") || text.contains("gói") {
+            } else if lower.contains("magsafe") || lower.contains("45n") || lower.contains("n52") || lower.contains("ngàm") || lower.contains("nam châm") {
                 reply = """
-📦 Bảng giá 4 gói T-Flow Pro:
-• Gói 1: Gimbal Cầm Tay S1 (B2C) — 3.990.000₫
-• Gói 2: Cụm Camera AI & Đèn MagSafe — 1.490.000₫
-• Gói 3: Bo Mạch STM32 Pure FOC 20kHz — 890.000₫
-• Gói 4: Cảm Biến IMU 6 Trục & Encoder 14-bit — 450.000₫
+🧲 Hệ thống ngàm MagSafe Snap-Lock Ultra-Hold:
+• Sử dụng 32 lõi nam châm vĩnh cửu Neodymium N52 lực hút định danh 45N (tương đương chịu tải 2.8kg - 4.5kg).
+• Cơ chế khóa chốt cơ học kép Snap-Lock chống văng điện thoại khi chạy bộ, quay thể thao hay lia máy tốc độ cao.
+• Tương thích trực tiếp iPhone 12–16 Pro Max (không cần kẹp siết) và Android qua vòng từ tính siêu mỏng tặng kèm!
+"""
+            } else if lower.contains("báo giá") || lower.contains("gói") || lower.contains("giá") || lower.contains("cấu hình") {
+                reply = """
+📦 Bảng giá 4 cấu hình T-Flow Pro chính hãng:
+• Standard Edition — 2.490.000₫ (Gimbal FOC 20kHz, ngàm MagSafe 45N N52, mini tripod)
+• Creator Kit — 3.190.000₫ (Thêm đèn Fill Light RGB CRI 96+ & túi chống sốc EVA)
+• Cinematic Pro — 3.990.000₫ (Thêm Micro kép 2.4GHz chống ồn AI & tạ đối trọng Pro Max)
+• Master Edition — 5.490.000₫ (Full phụ kiện, vali nhôm hàng không & khóa học MasterClass)
 """
             } else {
                 reply = "Dạ em đã ghi nhận yêu cầu của anh. Gimbal S1 Pro của anh đang hoạt động ở trạng thái hoàn hảo với tần số FOC 20kHz và pin 94%!"
@@ -172,8 +179,4 @@ struct TFlowAIChatAssistantView: View {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
         }
     }
-}
-
-extension String {
-    func lowerBound(target: String) -> String { self.lowercased() }
 }

@@ -14,21 +14,37 @@ import UIKit
 // =====================================================================
 
 struct NativeCameraPreviewRepresentable: UIViewControllerRepresentable {
+    let session: AVCaptureSession
+    let isFrontCamera: Bool
+
     func makeUIViewController(context: Context) -> CameraViewController {
-        return CameraViewController()
+        return CameraViewController(session: session, isFrontCamera: isFrontCamera)
     }
 
-    func updateUIViewController(_ uiViewController: CameraViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: CameraViewController, context: Context) {
+        uiViewController.updateMirroring(isFrontCamera: isFrontCamera)
+    }
 }
 
 final class CameraViewController: UIViewController {
-    private let captureSession = AVCaptureSession()
+    private let captureSession: AVCaptureSession
+    private var initialFrontCamera: Bool
     private var previewLayer: AVCaptureVideoPreviewLayer?
+
+    init(session: AVCaptureSession, isFrontCamera: Bool) {
+        self.captureSession = session
+        self.initialFrontCamera = isFrontCamera
+        super.init(nibName: nil, bundle: nil)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
-        setupCamera()
+        bindPreviewLayer()
     }
 
     override func viewDidLayoutSubviews() {
@@ -36,33 +52,19 @@ final class CameraViewController: UIViewController {
         previewLayer?.frame = view.bounds
     }
 
-    private func setupCamera() {
-        captureSession.beginConfiguration()
-        if captureSession.canSetSessionPreset(.hd4K3840x2160) {
-            captureSession.sessionPreset = .hd4K3840x2160
-        } else if captureSession.canSetSessionPreset(.hd1920x1080) {
-            captureSession.sessionPreset = .hd1920x1080
-        } else {
-            captureSession.sessionPreset = .high
-        }
-
-        guard let videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back),
-              let videoInput = try? AVCaptureDeviceInput(device: videoDevice),
-              captureSession.canAddInput(videoInput) else {
-            captureSession.commitConfiguration()
-            return
-        }
-        captureSession.addInput(videoInput)
-        captureSession.commitConfiguration()
-
+    private func bindPreviewLayer() {
         let layer = AVCaptureVideoPreviewLayer(session: captureSession)
         layer.videoGravity = .resizeAspectFill
         layer.frame = view.bounds
         view.layer.addSublayer(layer)
         self.previewLayer = layer
+        updateMirroring(isFrontCamera: initialFrontCamera)
+    }
 
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            self?.captureSession.startRunning()
-        }
+    func updateMirroring(isFrontCamera: Bool) {
+        initialFrontCamera = isFrontCamera
+        guard let conn = previewLayer?.connection, conn.isVideoMirroringSupported else { return }
+        conn.automaticallyAdjustsVideoMirroring = false
+        conn.isVideoMirrored = isFrontCamera
     }
 }

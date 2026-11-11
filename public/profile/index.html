@@ -823,6 +823,7 @@
           <div class="form-group">
             <label for="inputDeviceModel">Model Gimbal Đang Sử Dụng</label>
             <select class="form-control" id="inputDeviceModel">
+              <option value="T-Flow Pro (TF-G31-PRO)">T-Flow Pro (TF-G31-PRO — Flagship)</option>
               <option value="T-Flow S1 Titanium">T-Flow S1 Titanium (3 Trục Chuẩn Flagship)</option>
               <option value="T-Flow S2 Cinema">T-Flow S2 Cinema (Động Cơ FOC Siêu Tải 20kHz)</option>
               <option value="T-Flow S1 Air">T-Flow S1 Air (Siêu Nhẹ &bull; Bỏ Túi Creator)</option>
@@ -1029,8 +1030,18 @@
       document.getElementById('inputDistrict').value = currentUser.district || '';
       document.getElementById('inputShippingNotes').value = currentUser.shippingNotes || '';
 
-      if (currentUser.device) {
-        document.getElementById('inputDeviceModel').value = currentUser.device;
+      const devModel = currentUser.device || currentUser.registeredDevice;
+      if (devModel) {
+        const devSelect = document.getElementById('inputDeviceModel');
+        if (devSelect) {
+          if (!Array.from(devSelect.options).some(opt => opt.value === devModel)) {
+            const extraOpt = document.createElement('option');
+            extraOpt.value = devModel;
+            extraOpt.textContent = devModel;
+            devSelect.appendChild(extraOpt);
+          }
+          devSelect.value = devModel;
+        }
       }
       document.getElementById('inputSerial').value = currentUser.serial || '';
       document.getElementById('inputCameraSetup').value = currentUser.cameraSetup || '';
@@ -1196,6 +1207,7 @@
         district: document.getElementById('inputDistrict').value.trim(),
         shippingNotes: document.getElementById('inputShippingNotes').value.trim(),
         device: document.getElementById('inputDeviceModel').value,
+        registeredDevice: document.getElementById('inputDeviceModel').value,
         serial: document.getElementById('inputSerial').value.trim().toUpperCase(),
         cameraSetup: document.getElementById('inputCameraSetup').value.trim(),
         preferences: {

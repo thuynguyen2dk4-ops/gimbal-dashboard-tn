@@ -22,6 +22,29 @@ final class SupabaseModuleStore: ObservableObject {
     @Published var lastSyncTime: String = "Vừa xong"
     @Published var modules: [Bool] = [true, true, true, true, true, true, true]
 
+    private let tierStorageKey = "tflow_user_tier_v1"
+    private let modulesStorageKey = "tflow_user_modules_v1"
+
+    init() {
+        loadPersistedState()
+    }
+
+    private func loadPersistedState() {
+        let defaults = UserDefaults.standard
+        if let savedTier = defaults.string(forKey: tierStorageKey), !savedTier.isEmpty {
+            userTier = savedTier
+        }
+        if let savedModules = defaults.array(forKey: modulesStorageKey) as? [Bool], savedModules.count == 7 {
+            modules = savedModules
+        }
+    }
+
+    private func persistState() {
+        let defaults = UserDefaults.standard
+        defaults.set(userTier, forKey: tierStorageKey)
+        defaults.set(modules, forKey: modulesStorageKey)
+    }
+
     var isAiVisionAllowed: Bool { modules.indices.contains(0) ? modules[0] : true }
     var isProResAllowed: Bool { modules.indices.contains(1) ? modules[1] : true }
     var isMotionlapseAllowed: Bool { modules.indices.contains(2) ? modules[2] : true }
@@ -33,6 +56,7 @@ final class SupabaseModuleStore: ObservableObject {
     func toggleModule(at index: Int) {
         guard modules.indices.contains(index) else { return }
         modules[index].toggle()
+        persistState()
         syncWithCloud()
     }
 
@@ -45,10 +69,12 @@ final class SupabaseModuleStore: ObservableObject {
         } else {
             modules = [true, true, true, true, true, true, true]
         }
+        persistState()
         syncWithCloud()
     }
 
     func syncWithCloud() {
+        persistState()
         isSyncing = true
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in

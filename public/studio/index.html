@@ -528,7 +528,20 @@
   <script>
     let currentCodeLines = [];
 
+    function hasWebGLSupport() {
+      try {
+        if (!window.WebGLRenderingContext) return false;
+        const c = document.createElement('canvas');
+        return !!(c.getContext('webgl2') || c.getContext('webgl') || c.getContext('experimental-webgl'));
+      } catch (e) {
+        return false;
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      if (!hasWebGLSupport()) {
+        console.warn('[T-Flow Studio] Trình duyệt hiện không bật WebGL; chế độ xem trước 2D/iframe vẫn hoạt động bình thường.');
+      }
       loadCodeFile('/index.html', document.querySelector('.f-tab'));
     });
 

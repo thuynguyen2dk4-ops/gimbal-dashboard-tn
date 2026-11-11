@@ -37,11 +37,19 @@ final class BLEGimbalManager: NSObject, ObservableObject, CBCentralManagerDelega
 
     private var centralManager: CBCentralManager?
     private var simulatedTimer: AnyCancellable?
+    private var calibrationTimer: Timer?
 
     override init() {
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
         startTelemetrySimulation()
+    }
+
+    deinit {
+        calibrationTimer?.invalidate()
+        calibrationTimer = nil
+        simulatedTimer?.cancel()
+        simulatedTimer = nil
     }
 
     private func startTelemetrySimulation() {
@@ -79,12 +87,14 @@ final class BLEGimbalManager: NSObject, ObservableObject, CBCentralManagerDelega
     }
 
     func startCoGCalibration() {
+        calibrationTimer?.invalidate()
+        calibrationTimer = nil
         isCalibrating = true
         calibrationProgress = 0.0
         calibrationStepText = "Đang đo góc lệch trọng tâm tải trọng..."
         UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
 
-        Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] timer in
+        calibrationTimer = Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { [weak self] timer in
             guard let self = self else { timer.invalidate(); return }
             self.calibrationProgress += 0.02
 
@@ -98,14 +108,15 @@ final class BLEGimbalManager: NSObject, ObservableObject, CBCentralManagerDelega
                 self.calibrationStepText = "Bước 4/4: Khóa điểm Zero Điểm Cân Bằng Hoàn Hảo..."
             } else {
                 timer.invalidate()
+                self.calibrationTimer = nil
                 self.calibrationProgress = 1.0
                 self.calibrationStepText = "Hoàn tất! Sai số trọng tâm: ±0.01° (Zero Drift)"
                 self.rollAngle = 0.00
                 self.pitchAngle = 0.00
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                    self.isCalibrating = false
-                    self.showCalibrationModal = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
+                    self?.isCalibrating = false
+                    self?.showCalibrationModal = false
                 }
             }
         }

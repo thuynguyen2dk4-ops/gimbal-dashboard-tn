@@ -121,3 +121,59 @@ struct RuleOfThirdsGridView: View {
         }
     }
 }
+
+struct ZebraStripesOverlayView: View {
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .topTrailing) {
+                Canvas { context, size in
+                    let spacing: CGFloat = 12
+                    var x: CGFloat = -size.height
+                    while x < size.width + size.height {
+                        var path = Path()
+                        path.move(to: CGPoint(x: x, y: 0))
+                        path.addLine(to: CGPoint(x: x + size.height * 0.45, y: size.height))
+                        context.stroke(path, with: .color(Color.yellow.opacity(0.14)), lineWidth: 2)
+                        x += spacing
+                    }
+                }
+                Text("ZEBRA 95% IRE")
+                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                    .foregroundColor(.yellow)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.black.opacity(0.65))
+                    .clipShape(Capsule())
+                    .padding(.top, 96)
+                    .padding(.trailing, 16)
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+        }
+    }
+}
+
+struct FocusPeakingOverlayView: View {
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .topLeading) {
+                RoundedRectangle(cornerRadius: 16)
+                    .strokeBorder(
+                        style: StrokeStyle(lineWidth: 1.5, dash: [8, 6])
+                    )
+                    .foregroundColor(Color.cyan.opacity(0.45))
+                    .padding(14)
+
+                Text("PEAKING CYAN")
+                    .font(.system(size: 9, weight: .bold, design: .monospaced))
+                    .foregroundColor(.cyan)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Color.black.opacity(0.65))
+                    .clipShape(Capsule())
+                    .padding(.top, 96)
+                    .padding(.leading, 16)
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
+        }
+    }
+}

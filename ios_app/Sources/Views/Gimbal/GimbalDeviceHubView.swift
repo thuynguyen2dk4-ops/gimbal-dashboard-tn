@@ -14,6 +14,7 @@ import UIKit
 
 struct GimbalDeviceHubView: View {
     @EnvironmentObject var ble: BLEGimbalManager
+    @EnvironmentObject var store: SupabaseModuleStore
     @State private var joystickDragOffset: CGSize = .zero
 
     var body: some View {
@@ -70,14 +71,36 @@ struct GimbalDeviceHubView: View {
 
                     // 3-AXIS REALTIME FOC ANGLE GAUGES (Pan, Tilt, Roll)
                     VStack(alignment: .leading, spacing: 14) {
-                        Text("GÓC QUAY 3 TRỤC THỜI GIAN THỰC (50Hz IMU)")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(.white.opacity(0.6))
+                        HStack {
+                            Text("GÓC QUAY 3 TRỤC THỜI GIAN THỰC (50Hz IMU)")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(.white.opacity(0.6))
+                            Spacer()
+                            if !store.isRawTelemetryAllowed {
+                                Label("Đã Khóa", systemImage: "lock.fill")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(.red)
+                            }
+                        }
 
-                        HStack(spacing: 12) {
-                            AxisAngleCard(axis: "ROLL", angle: String(format: "%.2f°", ble.rollAngle), status: "Chuẩn Cân", color: .green)
-                            AxisAngleCard(axis: "TILT", angle: String(format: "%+.1f°", ble.pitchAngle), status: "Góc Chụp", color: Color(red: 0.98, green: 0.72, blue: 0.10))
-                            AxisAngleCard(axis: "PAN", angle: String(format: "%.1f°", ble.panAngle), status: "Quay 360°", color: .cyan)
+                        if store.isRawTelemetryAllowed {
+                            HStack(spacing: 12) {
+                                AxisAngleCard(axis: "ROLL", angle: String(format: "%.2f°", ble.rollAngle), status: "Chuẩn Cân", color: .green)
+                                AxisAngleCard(axis: "TILT", angle: String(format: "%+.1f°", ble.pitchAngle), status: "Góc Chụp", color: Color(red: 0.98, green: 0.72, blue: 0.10))
+                                AxisAngleCard(axis: "PAN", angle: String(format: "%.1f°", ble.panAngle), status: "Quay 360°", color: .cyan)
+                            }
+                        } else {
+                            HStack(spacing: 10) {
+                                Image(systemName: "lock.shield.fill")
+                                    .foregroundColor(.red)
+                                Text("Cần mở khóa Module '500Hz Gyro Raw Telemetry' tại Tab Tài Khoản (gói hiện tại: \(store.userTier)) để xem số liệu góc IMU.")
+                                    .font(.system(size: 11.5, weight: .medium))
+                                    .foregroundColor(.white.opacity(0.75))
+                            }
+                            .padding(14)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(Color.white.opacity(0.06))
+                            .cornerRadius(14)
                         }
                     }
 
@@ -189,14 +212,30 @@ struct GimbalDeviceHubView: View {
 
                     // 3-AXIS MOTOR TORQUE LIMITS
                     VStack(alignment: .leading, spacing: 14) {
-                        Text("LỰC KÉO ĐỘNG CƠ PURE FOC (TORQUE)")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(.white.opacity(0.6))
+                        HStack {
+                            Text("LỰC KÉO ĐỘNG CƠ PURE FOC (TORQUE)")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(.white.opacity(0.6))
+                            Spacer()
+                            if !store.isFocTuningAllowed {
+                                Label("Đã Khóa", systemImage: "lock.fill")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(.red)
+                            }
+                        }
 
                         VStack(spacing: 12) {
                             TorqueSliderRow(title: "Pan Motor (Yaw Axis)", value: $ble.panTorque)
                             TorqueSliderRow(title: "Tilt Motor (Pitch Axis)", value: $ble.tiltTorque)
                             TorqueSliderRow(title: "Roll Motor (Horizon Axis)", value: $ble.rollTorque)
+                        }
+                        .disabled(!store.isFocTuningAllowed)
+                        .opacity(store.isFocTuningAllowed ? 1.0 : 0.45)
+
+                        if !store.isFocTuningAllowed {
+                            Text("🔒 Cần mở khóa Module 'FOC Motor Micro-Tuning' tại Tab Tài Khoản (gói \(store.userTier)) để tinh chỉnh lực kéo động cơ.")
+                                .font(.system(size: 11))
+                                .foregroundColor(.red.opacity(0.9))
                         }
                     }
                     .padding(18)

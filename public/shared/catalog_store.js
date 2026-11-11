@@ -666,6 +666,14 @@
     var idx = cat.groups.findIndex(function (g) { return g.id === groupId; });
     if (idx === -1) return false;
     cat.groups.splice(idx, 1);
+    var fallbackGroupId = (cat.groups[0] && cat.groups[0].id) ? cat.groups[0].id : 'other';
+    if (Array.isArray(cat.products)) {
+      cat.products.forEach(function (p) {
+        if (p && p.groupId === groupId) {
+          p.groupId = fallbackGroupId;
+        }
+      });
+    }
     saveCatalog(cat);
     return true;
   }
@@ -746,25 +754,76 @@
   // ==========================================================================
   // 4. SHOPPING CART API
   // ==========================================================================
+  function normalizeCartItem(rawItem) {
+    if (!rawItem || typeof rawItem !== 'object') return null;
+    var prod = rawItem.productId ? getProduct(rawItem.productId) : null;
+    var tierKey = rawItem.tierKey || 'standard';
+    var tierObj = null;
+    if (prod && Array.isArray(prod.tiers)) {
+      tierObj = prod.tiers.find(function (t) { return t.key === tierKey || t.id === tierKey; }) || prod.tiers[0] || null;
+    }
+    var colorId = rawItem.colorId || (prod && prod.colors && prod.colors[0] ? prod.colors[0].id : 'natural-titanium');
+    var colorObj = (prod && Array.isArray(prod.colors))
+      ? (prod.colors.find(function (c) { return c.id === colorId; }) || prod.colors[0] || null)
+      : null;
+
+    var resolvedId = rawItem.cartId || rawItem.id || ('cart-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4));
+    var resolvedName = rawItem.productName || rawItem.name || (prod ? prod.name : 'T-Flow Pro');
+    var resolvedTier = rawItem.tierLabel || rawItem.tierName || (tierObj ? (tierObj.label || tierObj.name) : 'Standard Edition');
+    var resolvedColorName = rawItem.colorName || (colorObj ? colorObj.name : colorId);
+    var resolvedPrice = Number(rawItem.price);
+    if (!Number.isFinite(resolvedPrice) || resolvedPrice <= 0) {
+      resolvedPrice = tierObj && Number.isFinite(Number(tierObj.price)) ? Number(tierObj.price) : ((prod && Number(prod.price)) || 2490000);
+    }
+    var rawQty = (rawItem.quantity !== undefined && rawItem.quantity !== null) ? rawItem.quantity : rawItem.qty;
+    var resolvedQty = parseInt(rawQty, 10);
+    if (isNaN(resolvedQty) || resolvedQty < 1) resolvedQty = 1;
+    if (resolvedQty > 999) resolvedQty = 999;
+
+    var resolvedImg = rawItem.img || (prod ? prod.img : '/shared/img/tflow_pro_main.png');
+    if (typeof resolvedImg === 'string' && (resolvedImg.indexOf('../shared/img/') === 0 || /(?:feed_|thumb_)/i.test(resolvedImg))) {
+      var matchDef = (DEFAULT_CATALOG.products || []).find(function(dp) { return dp.id === rawItem.productId; });
+      resolvedImg = matchDef ? matchDef.img : '/shared/img/tflow_pro_main.png';
+    }
+
+    return {
+      id: resolvedId,
+      cartId: resolvedId,
+      productId: rawItem.productId || (prod ? prod.id : 'tf-g31-pro'),
+      name: resolvedName,
+      productName: resolvedName,
+      tierKey: tierKey,
+      tierName: resolvedTier,
+      tierLabel: resolvedTier,
+      price: resolvedPrice,
+      colorId: colorId,
+      colorName: resolvedColorName,
+      img: resolvedImg,
+      qty: resolvedQty,
+      quantity: resolvedQty
+    };
+  }
+
   function getCart() {
     if (typeof localStorage === 'undefined') return [];
     try {
       var raw = localStorage.getItem(CART_KEY);
       var list = raw ? JSON.parse(raw) : [];
-      if (Array.isArray(list) && list.length > 0) {
-        var cartDirty = false;
-        list.forEach(function(item) {
-          if (item && typeof item.img === 'string' && (item.img.indexOf('../shared/img/') === 0 || /(?:feed_|thumb_)/i.test(item.img))) {
-            var matchDef = (DEFAULT_CATALOG.products || []).find(function(dp) { return dp.id === item.productId; });
-            item.img = matchDef ? matchDef.img : '/shared/img/tflow_pro_main.png';
-            cartDirty = true;
-          }
-        });
-        if (cartDirty) {
-          try { localStorage.setItem(CART_KEY, JSON.stringify(list)); } catch (err) {}
+      if (!Array.isArray(list)) return [];
+      var cartDirty = false;
+      var normalized = [];
+      list.forEach(function(item) {
+        var norm = normalizeCartItem(item);
+        if (!norm) { cartDirty = true; return; }
+        if (!item.cartId || !item.productName || !item.tierLabel || item.quantity === undefined || item.img !== norm.img || Number(item.price) !== norm.price) {
+          cartDirty = true;
         }
+        normalized.push(norm);
+      });
+      if (cartDirty) {
+        try { localStorage.setItem(CART_KEY, JSON.stringify(normalized)); } catch (err) {}
       }
-      return list;
+      return normalized;
     } catch (e) {
       return [];
     }
@@ -782,46 +841,93 @@
   }
 
   function addToCart(item) {
+    if (!item || typeof item !== 'object') return getCart();
     var cart = getCart();
+    var reqQty = parseInt(item.quantity !== undefined ? item.quantity : (item.qty !== undefined ? item.qty : 1), 10);
+    if (isNaN(reqQty) || reqQty < 1) reqQty = 1;
+    if (reqQty > 999) reqQty = 999;
+
+    var targetTierKey = item.tierKey || 'standard';
+    var prod = item.productId ? getProduct(item.productId) : null;
+    var defaultColor = (prod && prod.colors && prod.colors[0]) ? prod.colors[0].id : 'natural-titanium';
+    var targetColorId = item.colorId || defaultColor;
+
     var existingIdx = cart.findIndex(function (i) {
       return i.productId === item.productId &&
-             i.tierKey === item.tierKey &&
-             i.colorId === item.colorId;
+             i.tierKey === targetTierKey &&
+             i.colorId === targetColorId;
     });
 
     if (existingIdx !== -1) {
-      cart[existingIdx].qty += (item.qty || 1);
+      var nextQty = Math.min(999, (parseInt(cart[existingIdx].quantity || cart[existingIdx].qty || 1, 10) || 1) + reqQty);
+      cart[existingIdx].qty = nextQty;
+      cart[existingIdx].quantity = nextQty;
     } else {
-      cart.push({
-        id: 'cart-' + Date.now(),
-        productId: item.productId,
-        name: item.name || 'T-Flow Pro',
-        tierKey: item.tierKey || 'standard',
-        tierName: item.tierName || 'Standard Kit',
-        price: item.price || 2890000,
-        colorId: item.colorId || 'natural-titanium',
-        colorName: item.colorName || 'Natural Titanium',
-        img: item.img || '/shared/img/tflow_pro_main.png',
-        qty: item.qty || 1
-      });
+      var built = normalizeCartItem(Object.assign({}, item, {
+        tierKey: targetTierKey,
+        colorId: targetColorId,
+        qty: reqQty,
+        quantity: reqQty
+      }));
+      if (built) cart.push(built);
     }
     saveCart(cart);
     return cart;
   }
 
   function updateCartQty(cartItemId, delta) {
+    var parsedDelta = parseInt(delta, 10);
+    if (isNaN(parsedDelta)) return getCart();
     var cart = getCart();
-    var idx = cart.findIndex(function (i) { return i.id === cartItemId; });
+    var idx = cart.findIndex(function (i) { return i.id === cartItemId || i.cartId === cartItemId; });
     if (idx === -1) return cart;
-    cart[idx].qty += delta;
-    if (cart[idx].qty <= 0) cart.splice(idx, 1);
+    var curQty = parseInt(cart[idx].quantity !== undefined ? cart[idx].quantity : cart[idx].qty, 10);
+    if (isNaN(curQty)) curQty = 1;
+    var nextQty = curQty + parsedDelta;
+    if (isNaN(nextQty) || nextQty <= 0) {
+      cart.splice(idx, 1);
+    } else {
+      nextQty = Math.min(999, nextQty);
+      cart[idx].qty = nextQty;
+      cart[idx].quantity = nextQty;
+    }
+    saveCart(cart);
+    return cart;
+  }
+
+  function updateCartQuantity(itemIdOrProductId, variantOrQty, maybeQty) {
+    var cart = getCart();
+    var targetVariant = null;
+    var rawQty = variantOrQty;
+    if (maybeQty !== undefined) {
+      targetVariant = variantOrQty;
+      rawQty = maybeQty;
+    }
+    var qty = parseInt(rawQty, 10);
+    if (isNaN(qty)) return cart;
+
+    var idx = cart.findIndex(function (i) {
+      if (targetVariant !== null) {
+        return i.productId === itemIdOrProductId && (i.tierKey === targetVariant || i.colorId === targetVariant);
+      }
+      return i.id === itemIdOrProductId || i.cartId === itemIdOrProductId || i.productId === itemIdOrProductId;
+    });
+    if (idx === -1) return cart;
+
+    if (qty <= 0) {
+      cart.splice(idx, 1);
+    } else {
+      var clamped = Math.min(999, qty);
+      cart[idx].qty = clamped;
+      cart[idx].quantity = clamped;
+    }
     saveCart(cart);
     return cart;
   }
 
   function removeFromCart(cartItemId) {
     var cart = getCart();
-    cart = cart.filter(function (i) { return i.id !== cartItemId; });
+    cart = cart.filter(function (i) { return i.id !== cartItemId && i.cartId !== cartItemId; });
     saveCart(cart);
     return cart;
   }
@@ -833,12 +939,20 @@
 
   function getCartCount() {
     var cart = getCart();
-    return cart.reduce(function (sum, item) { return sum + (item.qty || 1); }, 0);
+    return cart.reduce(function (sum, item) {
+      var q = parseInt(item.quantity !== undefined ? item.quantity : item.qty, 10);
+      return sum + (isNaN(q) || q < 1 ? 0 : q);
+    }, 0);
   }
 
   function getCartTotal() {
     var cart = getCart();
-    return cart.reduce(function (sum, item) { return sum + ((item.price || 0) * (item.qty || 1)); }, 0);
+    return cart.reduce(function (sum, item) {
+      var p = Number(item.price);
+      var q = parseInt(item.quantity !== undefined ? item.quantity : item.qty, 10);
+      if (!Number.isFinite(p) || isNaN(q) || q < 1) return sum;
+      return sum + (p * q);
+    }, 0);
   }
 
   // ==========================================================================
@@ -856,8 +970,10 @@
 
   function createOrder(orderData) {
     var orders = getOrders();
+    var generatedOrderId = (orderData && (orderData.orderId || orderData.id)) || ('TF-' + Math.floor(100000 + Math.random() * 900000));
     var newOrder = Object.assign({
-      id: 'TF-' + Math.floor(100000 + Math.random() * 900000),
+      id: generatedOrderId,
+      orderId: generatedOrderId,
       createdAt: new Date().toISOString(),
       status: 'Chờ Xác Nhận'
     }, orderData);
@@ -1117,8 +1233,13 @@
       return { success: false, message: 'Tài khoản không tồn tại. Vui lòng đăng ký tài khoản mới.' };
     }
 
-    if (found.password && password && found.password !== password) {
-      return { success: false, message: 'Mật khẩu không chính xác. Vui lòng thử lại.' };
+    if (found.password) {
+      if (!password) {
+        return { success: false, message: 'Vui lòng nhập mật khẩu.' };
+      }
+      if (String(password) !== found.password) {
+        return { success: false, message: 'Mật khẩu không chính xác. Vui lòng thử lại.' };
+      }
     }
 
     var isAdmin = isUserAdmin(found);
@@ -1424,6 +1545,22 @@
     return { success: true, reviews: filtered };
   }
 
+  function getAverageRating(reviews) {
+    var list = Array.isArray(reviews) ? reviews : getReviews();
+    if (!Array.isArray(list) || list.length === 0) return '5.0';
+    var sum = 0;
+    var count = 0;
+    list.forEach(function (r) {
+      var val = parseFloat(r && r.rating);
+      if (Number.isFinite(val) && val > 0) {
+        sum += Math.max(1, Math.min(5, val));
+        count++;
+      }
+    });
+    if (count === 0) return '5.0';
+    return (sum / count).toFixed(1);
+  }
+
   // ==========================================================================
   // 8. CSV EXPORT & IMPORT API
   // ==========================================================================
@@ -1538,6 +1675,7 @@
   var AI_CONVERSATIONS_KEY = 'tflow_ai_conversations_v2';
   var AI_PENDING_KEY = 'tflow_ai_pending_questions_v2';
   var AI_KB_KEY = 'tflow_ai_knowledge_base_v2';
+  var AI_KB_DELETED_KEY = 'tflow_ai_kb_deleted_v1';
   var AI_EVENT = 'tflow_ai_updated_event';
 
   var DEFAULT_AI_KNOWLEDGE_BASE = [
@@ -1974,19 +2112,41 @@
       updatedAt: '2026-11-09T08:00:00Z'
     }
   ];  // --- KNOWLEDGE BASE ACCESS & CRUD ---
+  function getDeletedAiKbIds() {
+    if (typeof localStorage === 'undefined') return [];
+    try {
+      var raw = localStorage.getItem(AI_KB_DELETED_KEY);
+      var parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveDeletedAiKbIds(ids) {
+    if (typeof localStorage === 'undefined') return;
+    try {
+      localStorage.setItem(AI_KB_DELETED_KEY, JSON.stringify(ids || []));
+    } catch (e) {}
+  }
+
   function getAiKnowledgeBase() {
     if (typeof localStorage === 'undefined') return DEFAULT_AI_KNOWLEDGE_BASE.slice();
+    var deletedIds = getDeletedAiKbIds();
+    var deletedMap = {};
+    deletedIds.forEach(function(id) { deletedMap[id] = true; });
+
     try {
       var saved = localStorage.getItem(AI_KB_KEY);
-      if (saved) {
+      if (saved !== null) {
         var parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          // Self-heal: ensure all official entries across the 3 domains are present
+        if (Array.isArray(parsed)) {
+          // Self-heal only missing official entries NOT explicitly deleted by Admin
           var idMap = {};
-          parsed.forEach(function(p) { idMap[p.id] = true; });
+          parsed.forEach(function(p) { if (p && p.id) idMap[p.id] = true; });
           var modified = false;
           DEFAULT_AI_KNOWLEDGE_BASE.forEach(function(def) {
-            if (!idMap[def.id]) {
+            if (!idMap[def.id] && !deletedMap[def.id]) {
               parsed.push(def);
               modified = true;
             }
@@ -2000,11 +2160,9 @@
     } catch (e) {
       console.warn('Error reading AI knowledge base:', e);
     }
-    // Default fallback
-    if (typeof localStorage !== 'undefined') {
-      try { localStorage.setItem(AI_KB_KEY, JSON.stringify(DEFAULT_AI_KNOWLEDGE_BASE)); } catch (e) {}
-    }
-    return DEFAULT_AI_KNOWLEDGE_BASE.slice();
+    var initialList = DEFAULT_AI_KNOWLEDGE_BASE.filter(function(def) { return !deletedMap[def.id]; });
+    try { localStorage.setItem(AI_KB_KEY, JSON.stringify(initialList)); } catch (e) {}
+    return initialList;
   }
 
   function saveAiKnowledgeBase(kbList) {
@@ -2022,6 +2180,9 @@
     if (!item.id) {
       item.id = 'kb_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
     }
+    var deletedIds = getDeletedAiKbIds().filter(function(did) { return did !== item.id; });
+    saveDeletedAiKbIds(deletedIds);
+
     item.updatedAt = new Date().toISOString();
     var idx = kb.findIndex(function(k) { return k.id === item.id; });
     if (idx >= 0) {
@@ -2034,8 +2195,14 @@
   }
 
   function deleteAiKnowledge(id) {
-    var kb = getAiKnowledgeBase();
-    kb = kb.filter(function(k) { return k.id !== id; });
+    if (!id) return false;
+    var sid = String(id);
+    var deletedIds = getDeletedAiKbIds();
+    if (deletedIds.indexOf(sid) === -1) {
+      deletedIds.push(sid);
+      saveDeletedAiKbIds(deletedIds);
+    }
+    var kb = getAiKnowledgeBase().filter(function(k) { return String(k.id) !== sid; });
     saveAiKnowledgeBase(kb);
     return true;
   }
@@ -2282,7 +2449,7 @@
   // =========================================================================
   // --- T-FLOW UNIFIED CLOUD AI ENGINE (GOOGLE GEMINI 3.5 FLASH) ---
   // =========================================================================
-  var DEFAULT_GEMINI_API_KEY = 'AIzaSyDluWTvQMgGmw2yceO27urpn4UBOZ1LQF0';
+  var DEFAULT_GEMINI_API_KEY = '';
   var DEFAULT_AI_MODEL = 'gemini-3.5-flash';
   var AI_CLOUD_CONFIG_KEY = 'tflow_cloud_ai_config';
 
@@ -2299,9 +2466,8 @@
       var raw = localStorage.getItem(AI_CLOUD_CONFIG_KEY);
       if (!raw) return def;
       var parsed = JSON.parse(raw);
-      if (!parsed.apiKey || !parsed.apiKey.trim()) {
-        parsed.apiKey = def.apiKey;
-      }
+      if (!parsed || typeof parsed !== 'object') return def;
+      parsed.apiKey = (typeof parsed.apiKey === 'string') ? parsed.apiKey.trim() : '';
       if (!parsed.model || parsed.model === 'gemini-2.5-flash' || parsed.model === 'gemini-1.5-flash') {
         parsed.model = DEFAULT_AI_MODEL;
       }
@@ -2324,7 +2490,7 @@
   }
 
   async function testCloudAiConnection(apiKey, model) {
-    var targetModel = model || 'gemini-2.5-flash';
+    var targetModel = model || DEFAULT_AI_MODEL;
     var startTime = Date.now();
     var cfg = getCloudAiConfig();
     var keyToTest = apiKey || cfg.apiKey || '';
@@ -2575,7 +2741,7 @@
           });
         }
       });
-      var kbList = getAiKnowledge() || [];
+      var kbList = getAiKnowledgeBase() || [];
       kbList.forEach(function(k) {
         if (k.adminComment || k.directive) {
           allDirectives.push({
@@ -2722,6 +2888,7 @@
     saveCart: saveCart,
     addToCart: addToCart,
     updateCartQty: updateCartQty,
+    updateCartQuantity: updateCartQuantity,
     removeFromCart: removeFromCart,
     clearCart: clearCart,
     getCartCount: getCartCount,
@@ -2746,6 +2913,7 @@
     getReviews: getReviews,
     addReview: addReview,
     deleteReview: deleteReview,
+    getAverageRating: getAverageRating,
 
     // CSV
     exportProductsCSV: exportProductsCSV,
@@ -2755,9 +2923,11 @@
     AI_CONVERSATIONS_KEY: AI_CONVERSATIONS_KEY,
     AI_PENDING_KEY: AI_PENDING_KEY,
     AI_KB_KEY: AI_KB_KEY,
+    AI_KB_DELETED_KEY: AI_KB_DELETED_KEY,
     AI_EVENT: AI_EVENT,
     DEFAULT_AI_KNOWLEDGE_BASE: DEFAULT_AI_KNOWLEDGE_BASE,
     getAiKnowledgeBase: getAiKnowledgeBase,
+    getAiKnowledge: getAiKnowledgeBase,
     saveAiKnowledgeBase: saveAiKnowledgeBase,
     addOrUpdateAiKnowledge: addOrUpdateAiKnowledge,
     trainConversationDirectly: trainConversationDirectly,

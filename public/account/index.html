@@ -750,17 +750,17 @@
         <button class="auth-tab-btn" id="tabBtnRegister" onclick="switchAuthTab('register')">Đăng Ký Tài Khoản</button>
       </div>
       <!-- 1. FORM ĐĂNG NHẬP (CHUẨN HÓA BÌNH THƯỜNG + CƠ CHẾ GOOGLE) -->
-      <div id="loginForm">
+      <form id="loginForm" onsubmit="return handleLoginSubmit(event)">
         <div class="form-group">
           <label>Email Hoặc Số Điện Thoại</label>
-          <input type="text" class="form-control" id="loginEmail" placeholder="ví dụ: khachhang@gmail.com hoặc 0908888888">
+          <input type="text" class="form-control" id="loginEmail" autocomplete="username" placeholder="ví dụ: khachhang@gmail.com hoặc 0908888888">
         </div>
         <div class="form-group">
           <label>Mật Khẩu</label>
-          <input type="password" class="form-control" id="loginPassword" placeholder="Nhập mật khẩu của bạn">
+          <input type="password" class="form-control" id="loginPassword" autocomplete="current-password" placeholder="Nhập mật khẩu của bạn">
         </div>
 
-        <button class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:8px;" onclick="handleLoginSubmit()">Đăng Nhập Vào Cổng Khách Hàng</button>
+        <button type="submit" class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:8px;">Đăng Nhập Vào Cổng Khách Hàng</button>
 
         <!-- DIVIDER HOẶC TIẾP TỤC VỚI GOOGLE -->
         <div style="display:flex; align-items:center; gap:12px; margin:20px 0 16px 0;">
@@ -774,33 +774,33 @@
           <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
           Đăng nhập bằng tài khoản Google
         </button>
-      </div>
+      </form>
 
       <!-- 2. FORM ĐĂNG KÝ TÀI KHOẢN (CHUẨN HÓA BÌNH THƯỜNG) -->
-      <div id="registerForm" style="display:none;">
+      <form id="registerForm" style="display:none;" onsubmit="return handleRegisterSubmit(event)">
         <div class="form-group">
           <label>Họ và Tên</label>
-          <input type="text" class="form-control" id="regName" placeholder="Ví dụ: Lê Minh Hoàng">
+          <input type="text" class="form-control" id="regName" autocomplete="name" placeholder="Ví dụ: Lê Minh Hoàng">
         </div>
         <div class="form-group">
           <label>Địa Chỉ Email</label>
-          <input type="email" class="form-control" id="regEmail" placeholder="hoang.film@gmail.com">
+          <input type="email" class="form-control" id="regEmail" autocomplete="email" placeholder="hoang.film@gmail.com">
         </div>
         <div class="form-group">
           <label>Số Điện Thoại</label>
-          <input type="tel" class="form-control" id="regPhone" placeholder="0918 888 999">
+          <input type="tel" class="form-control" id="regPhone" autocomplete="tel" placeholder="0918 888 999">
         </div>
         <div class="form-group">
           <label>Mật Khẩu Khởi Tạo</label>
-          <input type="password" class="form-control" id="regPassword" placeholder="Tối thiểu 6 ký tự">
+          <input type="password" class="form-control" id="regPassword" autocomplete="new-password" placeholder="Tối thiểu 6 ký tự">
         </div>
         <div class="form-group">
           <label>Mã Serial Thiết Bị (Tùy Chọn)</label>
           <input type="text" class="form-control" id="regSerial" placeholder="TF-G31-PRO-XXXX">
         </div>
 
-        <button class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:12px;" onclick="handleRegisterSubmit()">Tạo Tài Khoản &amp; Đăng Nhập</button>
-      </div>
+        <button type="submit" class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:12px;">Tạo Tài Khoản &amp; Đăng Nhập</button>
+      </form>
     </div>
 
     <div id="userDashboardMain" style="display:none;">
@@ -1182,20 +1182,20 @@
 
       if (!currentUser) {
         // Show Auth Gate, Hide Dashboard
-        authGate.style.display = 'block';
-        mainDash.style.display = 'none';
-        bleBox.style.display = 'none';
-        btnLogout.style.display = 'none';
+        if (authGate) authGate.style.display = 'block';
+        if (mainDash) mainDash.style.display = 'none';
+        if (bleBox) bleBox.style.display = 'none';
+        if (btnLogout) btnLogout.style.display = 'none';
         const sessBadge = document.getElementById('navSessionStatusBadge');
         if (sessBadge) sessBadge.style.display = 'none';
         return;
       }
 
       // Hide Auth Gate, Show Dashboard
-      authGate.style.display = 'none';
-      mainDash.style.display = 'block';
+      if (authGate) authGate.style.display = 'none';
+      if (mainDash) mainDash.style.display = 'block';
       if (bleBox) bleBox.style.display = 'none';
-      btnLogout.style.display = 'inline-flex';
+      if (btnLogout) btnLogout.style.display = 'inline-flex';
 
       renderUserProfile();
       renderModulesGrid();
@@ -1243,10 +1243,13 @@
     }
 
     function renderDeviceInfo() {
-      document.getElementById('deviceModel').textContent = currentUser.device || 'T-Flow S1';
-      document.getElementById('deviceSerial').textContent = currentUser.serial || 'SG-S1-VN-2025-XXXX';
+      const devName = currentUser.device || currentUser.registeredDevice || 'T-Flow Pro (TF-G31-PRO)';
+      const batteryVal = (currentUser.battery !== undefined && currentUser.battery !== null) ? currentUser.battery : 98;
+      const fwVal = currentUser.firmware || currentUser.fw || 'FW-TF-G31-v1.2.0 (Mới nhất)';
+      document.getElementById('deviceModel').textContent = devName;
+      document.getElementById('deviceSerial').textContent = currentUser.serial || 'TF-G31-PRO-VN';
       document.getElementById('deviceWarranty').textContent = `Còn ${currentUser.warrantyDays || 365} Ngày (1 Đổi 1)`;
-      document.getElementById('deviceBattery').textContent = `${currentUser.battery || 95}% &bull; ${currentUser.firmware || 'v2.4.1 Mới Nhất'}`;
+      document.getElementById('deviceBattery').textContent = `${batteryVal}% • ${fwVal}`;
     }
 
     function renderOrdersHistory() {
@@ -1268,9 +1271,9 @@
 
       orders.forEach(ord => {
         const tr = document.createElement('tr');
-        const itemsSummary = (ord.items || []).map(i => `${i.productName} (${i.tierLabel}) x${i.quantity}`).join('<br>');
+        const itemsSummary = (ord.items || []).map(i => `${i.productName || i.name || 'T-Flow Pro'} (${i.tierLabel || i.tierName || 'Tiêu Chuẩn'}) x${i.quantity || i.qty || 1}`).join('<br>');
         tr.innerHTML = `
-          <td><b style="font-family:var(--font-mono);">${ord.orderId}</b></td>
+          <td><b style="font-family:var(--font-mono);">${ord.orderId || ord.id || 'TF-ORDER'}</b></td>
           <td style="color:var(--text-secondary);">${ord.dateFormatted || ord.createdAt.split('T')[0]}</td>
           <td>${itemsSummary || 'Sản phẩm T-Flow'}</td>
           <td><b style="font-family:var(--font-mono);">${ord.totalFormatted || SmartGimbalCatalog.formatVND(ord.total)}</b></td>
@@ -1297,27 +1300,44 @@
     }
 
     
+    function showNotification(msg) {
+      if (!msg) return;
+      console.info('[T-Flow Account]', msg);
+    }
+
     function loginUserPortalWithGmail(email, name) {
       if (typeof SmartGimbalCatalog !== 'undefined') {
         const res = SmartGimbalCatalog.loginWithGmail(email, name);
         if (res.success) {
           loadUserData();
-          // Check if admin, show admin banner
           updatePortalAdminBanner();
         }
       }
     }
 
     function handlePortalGmailSubmit() {
-      const email = (document.getElementById('loginPortalEmail').value || '').trim();
+      const input = document.getElementById('loginPortalEmail');
+      const email = ((input && input.value) || '').trim();
       if (!email || !email.includes('@')) {
         alert('Vui lòng nhập email hợp lệ!');
+        if (input) input.focus();
         return;
       }
       loginUserPortalWithGmail(email);
     }
 
-        function updatePortalAdminBanner() {
+    function handleOtherGoogleSubmit() {
+      const input = document.getElementById('loginPortalOtherEmail');
+      const email = ((input && input.value) || '').trim();
+      if (!email || !email.includes('@')) {
+        alert('Vui lòng nhập địa chỉ email Google hợp lệ!');
+        if (input) input.focus();
+        return;
+      }
+      loginUserPortalWithGmail(email);
+    }
+
+    function updatePortalAdminBanner() {
       if (typeof SmartGimbalCatalog === 'undefined') return;
       const user = SmartGimbalCatalog.getCurrentUser();
       const isAdmin = user && SmartGimbalCatalog.isUserAdmin(user);
@@ -1341,13 +1361,16 @@
       }
     }
 
-    
-    function handleLoginSubmit() {
-      const email = (document.getElementById('loginEmail').value || '').trim();
-      const pass = (document.getElementById('loginPassword').value || '').trim();
+    function handleLoginSubmit(event) {
+      if (event && event.preventDefault) event.preventDefault();
+      const emailInput = document.getElementById('loginEmail');
+      const passInput = document.getElementById('loginPassword');
+      const email = ((emailInput && emailInput.value) || '').trim();
+      const pass = ((passInput && passInput.value) || '').trim();
       if (!email) {
         alert('Vui lòng nhập Email hoặc Số điện thoại!');
-        return;
+        if (emailInput) emailInput.focus();
+        return false;
       }
       if (typeof SmartGimbalCatalog !== 'undefined') {
         const res = SmartGimbalCatalog.loginUser(email, pass);
@@ -1355,93 +1378,12 @@
           loadUserData();
         } else {
           alert(res.message);
+          if (passInput && res.message && res.message.toLowerCase().includes('mật khẩu')) {
+            passInput.focus();
+          }
         }
       }
-    }
-
-    function handleRegisterSubmit() {
-      const name = (document.getElementById('regName').value || '').trim();
-      const email = (document.getElementById('regEmail').value || '').trim();
-      const phone = (document.getElementById('regPhone').value || '').trim();
-      const pass = (document.getElementById('regPassword').value || '').trim();
-      const serial = (document.getElementById('regSerial').value || '').trim();
-
-      if (!name || !email) {
-        alert('Vui lòng điền đầy đủ Họ Tên và Email!');
-        return;
-      }
-      if (typeof SmartGimbalCatalog !== 'undefined') {
-        const res = SmartGimbalCatalog.registerUser({
-          name: name,
-          email: email,
-          phone: phone,
-          password: pass,
-          serial: serial
-        });
-        if (res.success) {
-          alert('Tạo tài khoản thành công!');
-          loadUserData();
-        } else {
-          alert(res.message);
-        }
-      }
-    }
-
-    function loginUserPortalWithGmail(email, name) {
-      if (typeof SmartGimbalCatalog !== 'undefined') {
-        const res = SmartGimbalCatalog.loginWithGmail(email, name);
-        if (res.success) {
-          loadUserData();
-        }
-      }
-    }
-
-    function handleOtherGoogleSubmit() {
-      const email = (document.getElementById('loginPortalOtherEmail').value || '').trim();
-      if (!email || !email.includes('@')) {
-        alert('Vui lòng nhập địa chỉ email Google hợp lệ!');
-        return;
-      }
-      loginUserPortalWithGmail(email);
-    }
-
-        function updatePortalAdminBanner() {
-      if (typeof SmartGimbalCatalog === 'undefined') return;
-      const user = SmartGimbalCatalog.getCurrentUser();
-      const isAdmin = user && SmartGimbalCatalog.isUserAdmin(user);
-
-      // 1. Top Navbar Admin Button (ONLY FOR MASTER ADMIN)
-      const navAdmin = document.getElementById('navAdminCmsBtn');
-      if (navAdmin) {
-        navAdmin.style.display = isAdmin ? 'inline-flex' : 'none';
-      }
-
-      // 2. Footer Admin Link (ONLY FOR MASTER ADMIN)
-      const footerAdmin = document.getElementById('footerAdminCmsLink');
-      if (footerAdmin) {
-        footerAdmin.style.display = isAdmin ? 'list-item' : 'none';
-      }
-
-      // 3. Admin Banner (ONLY FOR MASTER ADMIN)
-      const adminBanner = document.getElementById('portalAdminBanner');
-      if (adminBanner) {
-        adminBanner.style.display = isAdmin ? 'flex' : 'none';
-      }
-    }
-
-    function _old_handleLoginSubmit() {
-      const email = document.getElementById('loginEmail').value.trim();
-      const pass = document.getElementById('loginPassword').value;
-      if (!email) {
-        alert('Vui lòng nhập Email hoặc Số điện thoại!');
-        return;
-      }
-      const res = SmartGimbalCatalog.loginUser(email, pass);
-      if (res.success) {
-        loadUserData();
-      } else {
-        alert(res.message);
-      }
+      return false;
     }
 
     function quickLoginDemo(email) {
@@ -1451,31 +1393,47 @@
       setTimeout(initGoogleOneTap, 600);
     }
 
-    function handleRegisterSubmit() {
-      const name = document.getElementById('regName').value.trim();
-      const email = document.getElementById('regEmail').value.trim();
-      const phone = document.getElementById('regPhone').value.trim();
-      const serial = document.getElementById('regSerial').value.trim();
+    function handleRegisterSubmit(event) {
+      if (event && event.preventDefault) event.preventDefault();
+      const nameInput = document.getElementById('regName');
+      const emailInput = document.getElementById('regEmail');
+      const phoneInput = document.getElementById('regPhone');
+      const passInput = document.getElementById('regPassword');
+      const serialInput = document.getElementById('regSerial');
 
-      if (!name || !email) {
-        alert('Vui lòng nhập Họ tên và Email!');
-        return;
+      const name = ((nameInput && nameInput.value) || '').trim();
+      const email = ((emailInput && emailInput.value) || '').trim();
+      const phone = ((phoneInput && phoneInput.value) || '').trim();
+      const pass = ((passInput && passInput.value) || '').trim();
+      const serial = ((serialInput && serialInput.value) || '').trim();
+
+      if (!name) {
+        alert('Vui lòng nhập Họ và Tên!');
+        if (nameInput) nameInput.focus();
+        return false;
       }
-
-      const res = SmartGimbalCatalog.registerUser({
-        name: name,
-        email: email,
-        phone: phone,
-        serial: serial,
-        tier: 'Basic Creator'
-      });
-
-      if (res.success) {
-        loadUserData();
-        alert(`Chúc mừng ${name}! Tài khoản của bạn đã được khởi tạo thành công.`);
-      } else {
-        alert(res.message);
+      if (!email) {
+        alert('Vui lòng nhập địa chỉ Email!');
+        if (emailInput) emailInput.focus();
+        return false;
       }
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        const res = SmartGimbalCatalog.registerUser({
+          name: name,
+          email: email,
+          phone: phone,
+          password: pass,
+          serial: serial,
+          tier: 'Basic Creator'
+        });
+        if (res.success) {
+          loadUserData();
+          alert(`Chúc mừng ${name}! Tài khoản của bạn đã được khởi tạo thành công.`);
+        } else {
+          alert(res.message);
+        }
+      }
+      return false;
     }
 
     function logoutUser() {
@@ -1654,7 +1612,7 @@
                 .then(profile => {
                   if (profile && profile.email) {
                     SmartGimbalCatalog.loginWithGmail(profile.email, profile.name || profile.email);
-                    checkUserAuth();
+                    loadUserData();
                     if (typeof showNotification === 'function') {
                       showNotification('✓ Đăng nhập Google thành công (' + profile.email + ')');
                     }
@@ -1699,7 +1657,7 @@
         const googleUser = event.data.user;
         if (googleUser && googleUser.email && typeof SmartGimbalCatalog !== 'undefined') {
           SmartGimbalCatalog.loginWithGmail(googleUser.email, googleUser.name);
-          checkUserAuth();
+          loadUserData();
         }
       }
     });

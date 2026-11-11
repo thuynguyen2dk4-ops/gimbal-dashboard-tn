@@ -1518,7 +1518,7 @@
                 Google AI Studio API Key (Gemini)
               </label>
               <div style="position:relative; display:flex; align-items:center;">
-                <input type="password" id="cloudAiApiKeyInput" placeholder="Dán mã API Key dạng AIzaSy..." style="width:100%; padding:10px 40px 10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px; font-family:monospace; outline:none;">
+                <input type="password" id="cloudAiApiKeyInput" placeholder="Dán mã Gemini API Key từ Google AI Studio..." style="width:100%; padding:10px 40px 10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px; font-family:monospace; outline:none;">
                 <button type="button" onclick="toggleAiKeyVisibility()" style="position:absolute; right:10px; background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:14px;">👁️</button>
               </div>
               <div style="font-size:11px; color:var(--text-secondary); margin-top:5px;">
@@ -1819,9 +1819,10 @@
             <div style="font-size:12px; color:#166534; margin-bottom:12px;">
               Động cơ AI Đám Mây xử lý tư vấn bán hàng và đạo diễn quay chụp trên Mobile App:
             </div>
-            <div style="display:flex; gap:10px;">
-              <input type="text" readonly value="AIzaSyDluWTvQMgGmw2yceO27urpn4UBOZ1LQF0" style="flex:1; padding:10px 14px; border:1px solid #86EFAC; border-radius:10px; font-size:12.5px; font-family:monospace; background:#FFF;">
-              <button class="btn btn-outline" onclick="switchAdminView('ai'); switchAiTab('config');">Quản Lý Tại Tab AI</button>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <input type="password" id="settingsGeminiKeyDisplay" readonly autocomplete="off" placeholder="Đang dùng GEMINI_API_KEY của Vercel hoặc chưa cấu hình" style="flex:1; min-width:240px; padding:10px 14px; border:1px solid #86EFAC; border-radius:10px; font-size:12.5px; font-family:monospace; background:#FFF;">
+              <button type="button" class="btn btn-outline" onclick="toggleSettingsAiKeyVisibility()">Hiện / Ẩn</button>
+              <button type="button" class="btn btn-outline" onclick="switchAdminView('ai'); switchAiTab('config');">Quản Lý Tại Tab AI</button>
             </div>
           </div>
         </div>
@@ -2288,6 +2289,8 @@
 
       if (viewId === 'ai' && typeof initAiTrainingDashboard === 'function') {
         initAiTrainingDashboard();
+      } else if (viewId === 'settings' && typeof loadCloudAiConfigUI === 'function') {
+        loadCloudAiConfigUI();
       }
 
       try {
@@ -2313,74 +2316,20 @@
     // Temporary storage for tiers in publishing form
     let formTiersBuffer = [];
 
-    
-    // ==========================================================================
-    // ADMIN REVIEWS MODERATION ENGINE
-    // ==========================================================================
-    function renderAdminReviewsTable() {
-      const tbody = document.getElementById('adminReviewsTableBody');
-      const badge = document.getElementById('adminReviewsCountBadge');
-      if (!tbody || typeof SmartGimbalCatalog === 'undefined') return;
-
-      const reviews = SmartGimbalCatalog.getReviews() || [];
-      if (badge) badge.textContent = reviews.length + ' Đánh Giá Thực Tế';
-
-      if (reviews.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:32px; color:var(--text-secondary);">Chưa có đánh giá nào từ khách hàng.</td></tr>';
-        return;
-      }
-
-      let html = '';
-      reviews.forEach(r => {
-        let starsStr = '';
-        for (let i = 0; i < 5; i++) {
-          starsStr += (i < r.rating) ? '★' : '☆';
-        }
-
-        html += `
-          <tr>
-            <td>
-              <div style="font-weight:700; color:var(--text-main);">${r.author || 'Khách Hàng'}</div>
-              <div style="font-size:11.5px; color:var(--text-secondary);">${r.email || r.date || ''}</div>
-              ${r.verified ? '<span style="font-size:10px; font-weight:700; background:rgba(52,199,89,0.12); color:#28CD41; padding:1px 6px; border-radius:99px;">✓ Mua Chính Hãng</span>' : ''}
-            </td>
-            <td>
-              <span style="color:#FFB800; font-size:15px; font-weight:700;">${starsStr}</span>
-              <span style="font-size:12px; font-weight:700; margin-left:4px;">(${r.rating}/5)</span>
-            </td>
-            <td>
-              <span style="font-size:12px; font-weight:600; background:#F5F5F7; padding:4px 8px; border-radius:6px;">${r.package || 'T-Flow Pro'}</span>
-            </td>
-            <td>
-              <div style="font-weight:700; font-size:13px; color:var(--text-main); margin-bottom:3px;">${r.title || ''}</div>
-              <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.4;">"${r.comment || ''}"</div>
-              <div style="margin-top:4px; display:flex; gap:4px; flex-wrap:wrap;">
-                ${(r.tags || []).map(t => `<span style="font-size:10.5px; background:rgba(0,0,0,0.04); color:var(--text-secondary); padding:2px 6px; border-radius:4px;">#${t}</span>`).join('')}
-              </div>
-            </td>
-            <td style="text-align:right;">
-              <button onclick="handleDeleteReview('${r.id}')" style="background:none; border:1px solid #FF3B30; color:#FF3B30; padding:4px 10px; border-radius:6px; font-size:11.5px; font-weight:600; cursor:pointer;">
-                Xóa
-              </button>
-            </td>
-          </tr>
-        `;
-      });
-
-      tbody.innerHTML = html;
-    }
-
-    function handleDeleteReview(reviewId) {
-      if (!confirm('Bạn có chắc chắn muốn xóa đánh giá này khỏi hệ thống?')) return;
-      if (typeof SmartGimbalCatalog !== 'undefined') {
-        SmartGimbalCatalog.deleteReview(reviewId);
-        renderAdminReviewsTable();
-      }
-    }
-
     window.addEventListener('DOMContentLoaded', () => {
       initAdmin();
     });
+
+    function applyAdminHashRoute() {
+      const curHash = (window.location.hash || '').replace('#', '').toLowerCase();
+      if (curHash === 'config' || curHash === 'settings') {
+        switchAdminView('settings');
+      } else if (['ai', 'overview', 'groups', 'products', 'users', 'reviews'].includes(curHash)) {
+        switchAdminView(curHash);
+      } else {
+        switchAdminView('ai'); // Default directly to AI Training Center as requested!
+      }
+    }
 
     function initAdmin() {
       if (typeof SmartGimbalCatalog === 'undefined') {
@@ -2394,14 +2343,10 @@
         loadCatalog();
         renderAll();
       });
+      window.addEventListener('hashchange', applyAdminHashRoute);
 
       // Default or hash-based view
-      const curHash = (window.location.hash || '').replace('#', '');
-      if (curHash === 'overview' || curHash === 'groups' || curHash === 'products' || curHash === 'users' || curHash === 'reviews' || curHash === 'settings') {
-        switchAdminView(curHash);
-      } else {
-        switchAdminView('ai'); // Default directly to AI Training Center as requested!
-      }
+      applyAdminHashRoute();
 
     }
 
@@ -2436,7 +2381,18 @@
     // 2. KHỐI QUẢN LÝ NHÓM SẢN PHẨM (DYNAMIC GROUPS CRUD)
     function renderGroupsManager() {
       const container = document.getElementById('groupsListGrid');
+      if (!container || !currentCatalog) return;
       container.innerHTML = '';
+
+      if (!container.dataset.deleteBound) {
+        container.addEventListener('click', (e) => {
+          const btn = e.target.closest('.btn-delete-group');
+          if (!btn) return;
+          const groupId = btn.dataset.id;
+          if (groupId) confirmDeleteGroup(groupId);
+        });
+        container.dataset.deleteBound = '1';
+      }
 
       currentCatalog.groups.forEach(g => {
         const prodCount = currentCatalog.products.filter(p => p.groupId === g.id).length;
@@ -2451,8 +2407,8 @@
             <div class="group-card-desc">${g.desc || 'Chưa có mô tả'}</div>
           </div>
           <div class="group-card-actions">
-            <button class="btn btn-outline" style="flex:1; padding:5px 0; font-size:12px;" onclick="openEditGroupModal('${g.id}')">Sửa Tên Nhóm</button>
-            <button class="btn btn-outline" style="padding:5px 12px; font-size:12px; color:#DC3545;" onclick="confirmDeleteGroup('${g.id}')">Xóa</button>
+            <button type="button" class="btn btn-outline" style="flex:1; padding:5px 0; font-size:12px;" onclick="openEditGroupModal('${g.id}')">Sửa Tên Nhóm</button>
+            <button type="button" class="btn btn-outline btn-delete-group" data-id="${g.id}" style="padding:5px 12px; font-size:12px; color:#DC3545;">Xóa</button>
           </div>
         `;
         container.appendChild(card);
@@ -2512,11 +2468,15 @@
       if (!g) return;
       if (confirm(`Bạn có chắc chắn muốn xóa nhóm [${g.name}]?\nCác sản phẩm trong nhóm này sẽ tự động chuyển sang nhóm mặc định.`)) {
         SmartGimbalCatalog.deleteGroup(groupId);
+        if (selectedTableFilter === groupId) {
+          selectedTableFilter = 'all';
+        }
         loadCatalog();
         renderAll();
         showToast('Đã xóa nhóm sản phẩm');
       }
     }
+    window.deleteProductGroup = confirmDeleteGroup;
 
     // 3. DYNAMIC FILTER PILLS
     function renderFilterPills() {
@@ -2656,7 +2616,8 @@
       document.getElementById('formProdGallery3').value = '/shared/img/tflow_pro_body.png';
       document.getElementById('formProdGallery4').value = '/shared/img/tflow_pro_cutaway.png';
 
-      renderGroupSelectOptions('cat-phone');
+      const defaultGroupId = (currentCatalog && currentCatalog.groups && currentCatalog.groups[0]) ? currentCatalog.groups[0].id : 'group-gimbal';
+      renderGroupSelectOptions(defaultGroupId);
 
       formTiersBuffer = [
         {
@@ -2683,7 +2644,8 @@
 
       document.getElementById('productModalTitle').textContent = `Chỉnh Sửa Bài Đăng: ${prod.name}`;
       document.getElementById('formProdId').value = prod.id;
-      renderGroupSelectOptions(prod.groupId || 'cat-phone');
+      const fallbackGroupId = (currentCatalog && currentCatalog.groups && currentCatalog.groups[0]) ? currentCatalog.groups[0].id : 'group-gimbal';
+      renderGroupSelectOptions(prod.groupId || fallbackGroupId);
       document.getElementById('formProdName').value = prod.name;
       document.getElementById('formProdTagline').value = prod.tagline || prod.subtitle || '';
       document.getElementById('formProdStatus').value = prod.status || 'Đang Mở Bán';
@@ -2987,7 +2949,7 @@
             <div>${u.email}</div>
             <div style="font-size:11.5px; color:var(--text-muted);">${u.phone || ''}</div>
           </td>
-          <td>${u.device || 'T-Flow T-Flow Pro'}</td>
+          <td>${u.device || u.registeredDevice || 'Smart Gimbal S1 Titanium'}</td>
           <td><span class="badge-mvp" style="background:#555;">${u.tier || 'Basic Creator'}</span></td>
           <td><b>${activeCount}/7</b> module kích hoạt</td>
           <td style="text-align:right;">
@@ -3002,9 +2964,10 @@
       const user = SmartGimbalCatalog.getUsers().find(u => u.id === userId);
       if (!user) return;
 
+      const devDisplay = user.device || user.registeredDevice || user.deviceName || user.phone || 'Smart Gimbal S1 Titanium';
       document.getElementById('drawerUserId').value = user.id;
       document.getElementById('drawerUserName').textContent = user.name;
-      document.getElementById('drawerUserEmail').textContent = `${user.email} &bull; ${user.device}`;
+      document.getElementById('drawerUserEmail').textContent = `${user.email} • ${devDisplay}`;
       document.getElementById('drawerUserTier').value = user.tier || 'Basic Creator';
 
       const container = document.getElementById('drawerModulesList');
@@ -3104,6 +3067,10 @@
       setTimeout(() => {
         t.classList.remove('show');
       }, 2500);
+    }
+
+    function showNotification(msg) {
+      showToast(msg);
     }
   
     // ==========================================================================
@@ -3354,10 +3321,14 @@
       if (typeof SmartGimbalCatalog === 'undefined' || !SmartGimbalCatalog.getCloudAiConfig) return;
       const cfg = SmartGimbalCatalog.getCloudAiConfig();
       const keyInput = document.getElementById('cloudAiApiKeyInput');
+      const settingsKeyDisplay = document.getElementById('settingsGeminiKeyDisplay');
       const modelSelect = document.getElementById('cloudAiModelSelect');
       const badge = document.getElementById('cloudAiStatusBadge');
 
       if (keyInput) keyInput.value = cfg.apiKey || '';
+      if (settingsKeyDisplay) {
+        settingsKeyDisplay.value = cfg.apiKey || '';
+      }
       if (modelSelect && cfg.model) modelSelect.value = cfg.model;
 
       if (badge) {
@@ -3377,6 +3348,12 @@
 
     function toggleAiKeyVisibility() {
       const input = document.getElementById('cloudAiApiKeyInput');
+      if (!input) return;
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    function toggleSettingsAiKeyVisibility() {
+      const input = document.getElementById('settingsGeminiKeyDisplay');
       if (!input) return;
       input.type = input.type === 'password' ? 'text' : 'password';
     }
@@ -3784,13 +3761,15 @@
       else target = 'sales';
       document.getElementById('adminCommentTarget').value = target;
 
-      // Auto topic
-      document.getElementById('adminCommentTopic').value = 'Giải đáp: ' + (c.query || '').substring(0, 45);
+      // Auto topic (null-guarded)
+      const topicEl = document.getElementById('adminCommentTopic');
+      if (topicEl) topicEl.value = 'Giải đáp: ' + (c.query || '').substring(0, 45);
 
-      // Auto keywords
+      // Auto keywords (null-guarded)
       const cleanQ = (c.query || '').toLowerCase().replace(/[^a-zA-Z0-9À-ỹ ]/g, ' ');
       const words = cleanQ.split(/\s+/).filter(w => w.length > 2);
-      document.getElementById('adminCommentKeywords').value = words.join(', ');
+      const kwEl = document.getElementById('adminCommentKeywords');
+      if (kwEl) kwEl.value = words.join(', ');
 
       // Only show previous admin comment if already entered, DO NOT fill the old AI text!
       document.getElementById('adminCommentOfficialAnswer').value = c.adminComment || '';
@@ -3885,13 +3864,18 @@
     }
 
     function handleDeleteKnowledge(id) {
+      if (!id) return;
       if (!confirm('Bạn có chắc chắn muốn xóa tri thức này khỏi bộ nhớ của AI?')) return;
       if (typeof SmartGimbalCatalog !== 'undefined') {
         SmartGimbalCatalog.deleteAiKnowledge(id);
         updateAiStats();
         renderAiKbTable();
+        showToast('Đã xóa tri thức AI khỏi cơ sở dữ liệu');
       }
     }
+    window.deleteAiItem = handleDeleteKnowledge;
+    window.handleDeleteKnowledge = handleDeleteKnowledge;
+    window.handleRemoveAiKnowledge = handleDeleteKnowledge;
 
     function clearAiLogsConfirm() {
       if (!confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử test hội thoại?')) return;

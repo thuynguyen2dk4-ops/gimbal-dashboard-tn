@@ -95,7 +95,6 @@ export default async function handler(req, res) {
   }
 
   try {
-    const DEFAULT_SERVER_GEMINI_KEY = 'AIzaSyDluWTvQMgGmw2yceO27urpn4UBOZ1LQF0';
     let { prompt, mode = 'web', history = [], context = {}, apiKey: reqApiKey, model = 'gemini-3.5-flash' } = req.body || {};
 
     if (!prompt || typeof prompt !== 'string' || !prompt.trim()) {
@@ -109,7 +108,7 @@ export default async function handler(req, res) {
 
     const cleanPrompt = prompt.trim();
     const reqHeaders = req.headers || {};
-    const effectiveKey = reqApiKey || reqHeaders['x-gemini-api-key'] || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || DEFAULT_SERVER_GEMINI_KEY;
+    const effectiveKey = reqApiKey || reqHeaders['x-gemini-api-key'] || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || '';
 
     // IF NO GOOGLE API KEY AVAILABLE IN RUNTIME, USE SMART EMBEDDED KNOWLEDGE BASE ENGINE
     if (!effectiveKey) {

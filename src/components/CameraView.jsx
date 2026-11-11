@@ -1,10 +1,25 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Bluetooth, X, Zap, ZapOff, Grid, SwitchCamera, ScanFace, Image as ImageIcon, Download } from 'lucide-react';
-import '@tensorflow/tfjs-core';
+import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-converter';
-import '@tensorflow/tfjs-backend-webgl'; 
+import '@tensorflow/tfjs-backend-webgl';
 import * as blazeface from '@tensorflow-models/blazeface';
 import { dict } from '../locales/dictionary';
+
+function hasWebGLSupport() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return false;
+  try {
+    if (!window.WebGLRenderingContext) return false;
+    const canvas = document.createElement('canvas');
+    return !!(
+      canvas.getContext('webgl2') ||
+      canvas.getContext('webgl') ||
+      canvas.getContext('experimental-webgl')
+    );
+  } catch (e) {
+    return false;
+  }
+}
 
 // --- LÕI DATABASE TẠM THỜI (INDEXED-DB) ---
 const initDB = () => {
@@ -148,23 +163,41 @@ export const CameraView = ({
     else handleRecordVideo();
   };
 
+  useEffect(() => {
+    return () => {
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
   const toggleAiTracking = async () => {
     if (isAiEnabled) {
       setIsAiEnabled(false);
       if (requestRef.current) cancelAnimationFrame(requestRef.current);
-      const ctx = canvasRef.current.getContext('2d');
-      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      if (canvasRef.current) {
+        const ctx = canvasRef.current.getContext('2d');
+        if (ctx) ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      }
       return;
     }
-    
+
     setIsModelLoading(true); // Bắt đầu xoay icon loading
     try {
+      if (!hasWebGLSupport()) {
+        console.warn('WebGL không khả dụng trên trình duyệt/thiết bị này.');
+        alert('Thiết bị hoặc trình duyệt hiện không hỗ trợ WebGL cho tính năng nhận diện khuôn mặt AI.');
+        setIsModelLoading(false);
+        return;
+      }
+      await tf.setBackend('webgl');
+      await tf.ready();
       detectorRef.current = await blazeface.load();
       setIsAiEnabled(true);
-      setZoom('1.5x'); 
-      detectFaces(); 
+      setZoom('1.5x');
+      detectFaces();
     } catch (error) {
       console.error("Lỗi tải AI:", error);
+      alert('Không thể khởi tạo mô hình nhận diện AI trên thiết bị này.');
     }
     setIsModelLoading(false); // Dừng xoay icon loading
   };

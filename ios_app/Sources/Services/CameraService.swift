@@ -37,16 +37,38 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     @Published var audioLevelL: Double = 0.42
     @Published var audioLevelR: Double = 0.48
 
+    // Quick Settings Viewfinder Overlays (Shared across Camera HUD & Quick Settings)
+    @Published var gridEnabled: Bool = true
+    @Published var zebraEnabled: Bool = false
+    @Published var peakingEnabled: Bool = false
+    @Published var antiFlicker: String = "50Hz"
+
     let captureSession = AVCaptureSession()
+    private let sessionQueue = DispatchQueue(label: "tflow.camera.session.queue")
+    private let visionQueue = DispatchQueue(label: "tflow.camera.video.processing")
+    private var isSessionConfigured: Bool = false
+    private var activePositionFront: Bool = false
     private var currentVideoInput: AVCaptureDeviceInput?
     private var videoOutput: AVCaptureVideoDataOutput?
     private var recordingTimer: Timer?
+    private var vuTimer: Timer?
     private var recordingSecondsCount: Int = 0
 
     override init() {
         super.init()
         setupMockThumbnails()
         startAudioVUAnimation()
+    }
+
+    deinit {
+        vuTimer?.invalidate()
+        recordingTimer?.invalidate()
+        let session = captureSession
+        sessionQueue.async {
+            if session.isRunning {
+                session.stopRunning()
+            }
+        }
     }
 
     private func setupMockThumbnails() {
@@ -76,7 +98,8 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     }
 
     private func startAudioVUAnimation() {
-        Timer.scheduledTimer(withTimeInterval: 0.12, repeats: true) { [weak self] _ in
+        vuTimer?.invalidate()
+        vuTimer = Timer.scheduledTimer(withTimeInterval: 0.12, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             self.audioLevelL = min(1.0, max(0.08, self.audioLevelL + Double.random(in: -0.15...0.15)))
             self.audioLevelR = min(1.0, max(0.08, self.audioLevelR + Double.random(in: -0.15...0.15)))
@@ -84,38 +107,49 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     }
 
     func setupSession() {
-        captureSession.beginConfiguration()
-        if captureSession.canSetSessionPreset(.hd4K3840x2160) {
-            captureSession.sessionPreset = .hd4K3840x2160
-        } else if captureSession.canSetSessionPreset(.hd1920x1080) {
-            captureSession.sessionPreset = .hd1920x1080
-        } else {
-            captureSession.sessionPreset = .high
-        }
+        let wantFront = isFrontCamera
+        sessionQueue.async { [weak self] in
+            guard let self = self else { return }
+            if !self.isSessionConfigured {
+                self.captureSession.beginConfiguration()
+                if self.captureSession.canSetSessionPreset(.hd4K3840x2160) {
+                    self.captureSession.sessionPreset = .hd4K3840x2160
+                } else if self.captureSession.canSetSessionPreset(.hd1920x1080) {
+                    self.captureSession.sessionPreset = .hd1920x1080
+                } else {
+                    self.captureSession.sessionPreset = .high
+                }
 
-        let position: AVCaptureDevice.Position = isFrontCamera ? .front : .back
-        let deviceType: AVCaptureDevice.DeviceType = isFrontCamera ? .builtInTrueDepthCamera : .builtInWideAngleCamera
-        let device = AVCaptureDevice.default(deviceType, for: .video, position: position) ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position)
+                let position: AVCaptureDevice.Position = wantFront ? .front : .back
+                let deviceType: AVCaptureDevice.DeviceType = wantFront ? .builtInTrueDepthCamera : .builtInWideAngleCamera
+                let device = AVCaptureDevice.default(deviceType, for: .video, position: position)
+                    ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position)
 
-        if let device = device, let input = try? AVCaptureDeviceInput(device: device), captureSession.canAddInput(input) {
-            captureSession.addInput(input)
-            currentVideoInput = input
-        }
+                if let device = device,
+                   let input = try? AVCaptureDeviceInput(device: device),
+                   self.captureSession.canAddInput(input) {
+                    self.captureSession.addInput(input)
+                    self.currentVideoInput = input
+                }
 
-        let output = AVCaptureVideoDataOutput()
-        output.alwaysDiscardsLateVideoFrames = true
-        output.setSampleBufferDelegate(self, queue: DispatchQueue(label: "camera.video.processing"))
-        if captureSession.canAddOutput(output) {
-            captureSession.addOutput(output)
-            videoOutput = output
-        }
+                let output = AVCaptureVideoDataOutput()
+                output.alwaysDiscardsLateVideoFrames = true
+                output.setSampleBufferDelegate(self, queue: self.visionQueue)
+                if self.captureSession.canAddOutput(output) {
+                    self.captureSession.addOutput(output)
+                    self.videoOutput = output
+                }
 
-        captureSession.commitConfiguration()
+                self.activePositionFront = wantFront
+                self.captureSession.commitConfiguration()
+                self.isSessionConfigured = true
+            }
 
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            self?.captureSession.startRunning()
+            if !self.captureSession.isRunning {
+                self.captureSession.startRunning()
+            }
             DispatchQueue.main.async {
-                self?.isSessionRunning = true
+                self.isSessionRunning = self.captureSession.isRunning
             }
         }
     }
@@ -123,21 +157,35 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     func switchCamera() {
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
         isFrontCamera.toggle()
+        let nextFront = isFrontCamera
 
-        captureSession.beginConfiguration()
-        if let current = currentVideoInput {
-            captureSession.removeInput(current)
+        sessionQueue.async { [weak self] in
+            guard let self = self else { return }
+            if !self.isSessionConfigured {
+                self.activePositionFront = nextFront
+                return
+            }
+
+            self.captureSession.beginConfiguration()
+            if let current = self.currentVideoInput {
+                self.captureSession.removeInput(current)
+                self.currentVideoInput = nil
+            }
+
+            let newPosition: AVCaptureDevice.Position = nextFront ? .front : .back
+            let deviceType: AVCaptureDevice.DeviceType = nextFront ? .builtInTrueDepthCamera : .builtInWideAngleCamera
+            let newDevice = AVCaptureDevice.default(deviceType, for: .video, position: newPosition)
+                ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: newPosition)
+
+            if let dev = newDevice,
+               let newInput = try? AVCaptureDeviceInput(device: dev),
+               self.captureSession.canAddInput(newInput) {
+                self.captureSession.addInput(newInput)
+                self.currentVideoInput = newInput
+            }
+            self.activePositionFront = nextFront
+            self.captureSession.commitConfiguration()
         }
-
-        let newPosition: AVCaptureDevice.Position = isFrontCamera ? .front : .back
-        let deviceType: AVCaptureDevice.DeviceType = isFrontCamera ? .builtInTrueDepthCamera : .builtInWideAngleCamera
-        let newDevice = AVCaptureDevice.default(deviceType, for: .video, position: newPosition) ?? AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: newPosition)
-
-        if let dev = newDevice, let newInput = try? AVCaptureDeviceInput(device: dev), captureSession.canAddInput(newInput) {
-            captureSession.addInput(newInput)
-            currentVideoInput = newInput
-        }
-        captureSession.commitConfiguration()
     }
 
     func capturePhoto() {
@@ -227,6 +275,7 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
             recordingSecondsCount = 0
             recordingDuration = "00:00:00"
 
+            recordingTimer?.invalidate()
             recordingTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
                 guard let self = self else { return }
                 self.recordingSecondsCount += 1
@@ -246,9 +295,11 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
                 return
             }
 
+            // Vision boundingBox uses lower-left origin in the oriented image space.
+            // Convert cleanly to SwiftUI top-left normalized coordinates.
             let box = firstFace.boundingBox
             let normalized = CGRect(
-                x: 1.0 - box.maxX,
+                x: box.minX,
                 y: 1.0 - box.maxY,
                 width: box.width,
                 height: box.height
@@ -259,7 +310,8 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
             }
         }
 
-        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: .right, options: [:])
+        let orientation: CGImagePropertyOrientation = activePositionFront ? .leftMirrored : .right
+        let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: orientation, options: [:])
         try? handler.perform([request])
     }
 }
