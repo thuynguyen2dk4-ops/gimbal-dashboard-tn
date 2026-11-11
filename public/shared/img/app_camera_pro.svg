@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 823" width="380" height="823">
+  <defs>
+    <linearGradient id="skyPro" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0C0F14"/>
+      <stop offset="60%" stop-color="#171C24"/>
+      <stop offset="100%" stop-color="#0B0D11"/>
+    </linearGradient>
+    <pattern id="gridPro" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#FFFFFF" stroke-opacity="0.04" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <!-- Frame -->
+  <rect width="380" height="823" rx="34" fill="#07080B"/>
+  <rect x="4" y="4" width="372" height="815" rx="30" fill="url(#skyPro)"/>
+  <rect x="4" y="138" width="372" height="516" fill="url(#gridPro)"/>
+  <!-- Top Cinema Header Strip -->
+  <rect x="4" y="4" width="372" height="132" rx="26" fill="#090B0E"/>
+  <rect x="132" y="30" width="116" height="30" rx="15" fill="#000000"/>
+  <rect x="20" y="74" width="66" height="22" rx="6" fill="#1C2029" stroke="#303644"/>
+  <text x="53" y="89" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10.5" font-weight="700" fill="#FFD60A">4K 60</text>
+  <rect x="94" y="74" width="90" height="22" rx="6" fill="#1C2029" stroke="#303644"/>
+  <text x="139" y="89" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#5AC8FA">APPLE LOG</text>
+  <!-- Telemetry Values Row -->
+  <text x="26" y="122" font-family="ui-monospace, monospace" font-size="10.5" font-weight="600" fill="#9CA3AF">ISO <tspan fill="#FFFFFF">400</tspan></text>
+  <text x="96" y="122" font-family="ui-monospace, monospace" font-size="10.5" font-weight="600" fill="#9CA3AF">SH <tspan fill="#FFFFFF">180°</tspan></text>
+  <text x="172" y="122" font-family="ui-monospace, monospace" font-size="10.5" font-weight="600" fill="#9CA3AF">WB <tspan fill="#FFFFFF">5600K</tspan></text>
+  <!-- Live Mini Histogram + Audio Meters -->
+  <rect x="262" y="74" width="98" height="48" rx="8" fill="#141820" stroke="#2D3340"/>
+  <path d="M270 116 L282 106 L296 92 L310 100 L324 88 L338 112 L352 116 Z" fill="#5AC8FA" fill-opacity="0.35" stroke="#5AC8FA" stroke-width="1.4"/>
+  <rect x="270" y="80" width="54" height="4" rx="2" fill="#30D158"/>
+  <rect x="270" y="87" width="44" height="4" rx="2" fill="#FFD60A"/>
+  <!-- 2.39:1 Anamorphic Letterbox Viewport with Cyan Focus Peaking -->
+  <rect x="4" y="138" width="372" height="58" fill="#000000" fill-opacity="0.62"/>
+  <rect x="4" y="596" width="372" height="58" fill="#000000" fill-opacity="0.62"/>
+  <line x1="4" y1="196" x2="376" y2="196" stroke="#FFFFFF" stroke-opacity="0.28" stroke-dasharray="4 4"/>
+  <line x1="4" y1="596" x2="376" y2="596" stroke="#FFFFFF" stroke-opacity="0.28" stroke-dasharray="4 4"/>
+  <!-- Geometric Mountain / Studio Wireframe with Focus Peaking -->
+  <path d="M18 525 L108 355 L178 442 L252 325 L356 498" fill="none" stroke="#38BDF8" stroke-width="2" stroke-opacity="0.72"/>
+  <path d="M54 555 L146 420 L216 485 L292 385 L364 532" fill="none" stroke="#94A3B8" stroke-width="1.2" stroke-opacity="0.4"/>
+  <!-- Center Crosshair + Electronic Spirit Level -->
+  <circle cx="190" cy="396" r="24" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1.2"/>
+  <line x1="154" y1="396" x2="176" y2="396" stroke="#30D158" stroke-width="2"/>
+  <line x1="204" y1="396" x2="226" y2="396" stroke="#30D158" stroke-width="2"/>
+  <line x1="190" y1="366" x2="190" y2="380" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="1.2"/>
+  <line x1="190" y1="412" x2="190" y2="426" stroke="#FFFFFF" stroke-opacity="0.45" stroke-width="1.2"/>
+  <!-- Focus Peaking Pill & CNC Focus Wheel Overlay -->
+  <rect x="20" y="210" width="96" height="22" rx="11" fill="#0F172A" stroke="#38BDF8" stroke-width="1"/>
+  <text x="68" y="225" text-anchor="middle" font-family="ui-monospace, monospace" font-size="9.5" font-weight="700" fill="#38BDF8">PEAK • 0.85m</text>
+  <rect x="332" y="276" width="32" height="236" rx="16" fill="#12161E" fill-opacity="0.88" stroke="#333A48"/>
+  <line x1="340" y1="320" x2="356" y2="320" stroke="#64748B" stroke-width="1.5"/>
+  <line x1="340" y1="350" x2="356" y2="350" stroke="#64748B" stroke-width="1.5"/>
+  <line x1="336" y1="394" x2="360" y2="394" stroke="#FFD60A" stroke-width="2.5"/>
+  <line x1="340" y1="438" x2="356" y2="438" stroke="#64748B" stroke-width="1.5"/>
+  <line x1="340" y1="468" x2="356" y2="468" stroke="#64748B" stroke-width="1.5"/>
+  <!-- Bottom Pro Controls Deck -->
+  <rect x="4" y="654" width="372" height="165" rx="28" fill="#090B0E"/>
+  <rect x="24" y="668" width="96" height="26" rx="13" fill="#1B1F28" stroke="#323846"/>
+  <text x="72" y="685" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#FFFFFF">3D LUT: CINE</text>
+  <rect x="142" y="668" width="96" height="26" rx="13" fill="#1B1F28" stroke="#323846"/>
+  <text x="190" y="685" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#FFD60A">PAN FOLLOW</text>
+  <rect x="260" y="668" width="96" height="26" rx="13" fill="#1B1F28" stroke="#323846"/>
+  <text x="308" y="685" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#30D158">2.39:1</text>
+  <!-- Bottom Shutter & Joystick -->
+  <circle cx="68" cy="748" r="22" fill="#181C24" stroke="#3E4656" stroke-width="1.5"/>
+  <circle cx="68" cy="748" r="7" fill="#94A3B8"/>
+  <circle cx="190" cy="748" r="33" fill="none" stroke="#FFFFFF" stroke-width="3.5"/>
+  <circle cx="190" cy="748" r="26" fill="#FF3B30"/>
+  <rect x="288" y="726" width="44" height="44" rx="10" fill="#181C24" stroke="#3E4656" stroke-width="1.5"/>
+  <text x="310" y="752" text-anchor="middle" font-family="ui-monospace, monospace" font-size="10" font-weight="700" fill="#FFFFFF">FOC</text>
+  <rect x="132" y="803" width="116" height="4.5" rx="2.25" fill="#FFFFFF" fill-opacity="0.72"/>
+</svg>

@@ -128,15 +128,15 @@
         "tagline": "Vững khung hình, Trọn cảm xúc. Đỉnh cao chống rung 3 trục cho Smartphone.",
         "subtitle": "Chống rung siêu mượt khi vừa đi vừa quay cho iPhone & Smartphone. Hít nam châm MagSafe 1 giây gọn nhẹ, xoay bánh xe thu phóng tiện lợi và pin dùng suốt 18 giờ.",
         "badge": "Flagship 2026",
-        "img": "/shared/img/feed_portrait_dusk.jpg",
+        "img": "/shared/img/tflow_pro_main.png",
         "status": "Đang Mở Bán",
         "totalOrders": 1420,
         "is_flagship": true,
         "gallery": [
-          "/shared/img/feed_portrait_dusk.jpg",
-          "/shared/img/feed_portrait_day.jpg",
-          "/shared/img/feed_person_portrait.jpg",
-          "/shared/img/feed_land_dusk.jpg"
+          "/shared/img/tflow_pro_main.png",
+          "/shared/img/tflow_pro_front.png",
+          "/shared/img/tflow_pro_body.png",
+          "/shared/img/tflow_pro_cutaway.png"
         ],
         "colors": [
           { "id": "space-black", "name": "Space Black (Đen Không Gian)", "hex": "#1F2022" },
@@ -224,13 +224,12 @@
         "tagline": "Theo dõi chủ thể thông minh độc lập không cần kết nối App qua Bluetooth.",
         "subtitle": "Camera AI cảm biến quang học độc lập nhận diện khuôn mặt và cử chỉ tay ở khoảng cách 5m. Tích hợp đèn LED trợ sáng Bi-Color CRI 96+ đổi nhiệt độ màu 2500K-6500K, hít trực tiếp sau lưng ngàm MagSafe.",
         "badge": "Phụ Kiện AI Mới",
-        "img": "/shared/img/feed_person_portrait.jpg",
+        "img": "/shared/img/tflow_eye_module.svg",
         "status": "Đang Mở Bán",
         "totalOrders": 520,
         "is_flagship": false,
         "gallery": [
-          "/shared/img/feed_person_portrait.jpg",
-          "/shared/img/feed_portrait_day.jpg"
+          "/shared/img/tflow_eye_module.svg"
         ],
         "colors": [
           { "id": "space-black", "name": "Space Black", "hex": "#1F2022" }
@@ -269,12 +268,12 @@
         "tagline": "Vững chãi trên mọi địa hình, trọng lượng siêu nhẹ từ sợi Carbon 8 lớp.",
         "subtitle": "Chân đế 3 chân mini hợp kim nhôm hàng không và sợi carbon dệt 8 lớp. Ren tiêu chuẩn 1/4 inch tương thích hoàn hảo với T-Flow Pro, máy ảnh mirrorless và rig quay phim.",
         "badge": "Phụ Kiện Chính Hãng",
-        "img": "/shared/img/feed_land_dusk.jpg",
+        "img": "/shared/img/tflow_mini_tripod.svg",
         "status": "Đang Mở Bán",
         "totalOrders": 890,
         "is_flagship": false,
         "gallery": [
-          "/shared/img/feed_land_dusk.jpg"
+          "/shared/img/tflow_mini_tripod.svg"
         ],
         "colors": [
           { "id": "carbon-black", "name": "Carbon Weave Black", "hex": "#1A1A1A" }
@@ -312,12 +311,12 @@
         "tagline": "Bảo vệ toàn diện chuẩn quân đội cho toàn bộ bộ kit gimbal và phụ kiện.",
         "subtitle": "Vali hợp kim nhôm nguyên khối bo góc kim loại. Khay mút EVA đúc laser định hình chính xác từng vị trí gimbal, đèn, mic và pin sạc. Kháng nước và chống bụi tiêu chuẩn IP67.",
         "badge": "Kháng Nước IP67",
-        "img": "/shared/img/feed_portrait_day.jpg",
+        "img": "/shared/img/tflow_master_case.svg",
         "status": "Đang Mở Bán",
         "totalOrders": 310,
         "is_flagship": false,
         "gallery": [
-          "/shared/img/feed_portrait_day.jpg"
+          "/shared/img/tflow_master_case.svg"
         ],
         "colors": [
           { "id": "stealth-black", "name": "Stealth Black", "hex": "#242426" },
@@ -357,12 +356,12 @@
         "tagline": "Trái tim xử lý thuật toán động cơ 3 trục siêu êm mượt cho kỹ sư R&D.",
         "subtitle": "Bo mạch chủ vi điều khiển ARM Cortex-M4 32-bit tần số xung nhịp 168MHz. Tích hợp mạch cầu H MOSFET công suất Pure FOC tần số 20kHz triệt tiêu tiếng rít và cổng giao tiếp CAN-Bus/UART.",
         "badge": "Linh Kiện R&D",
-        "img": "/shared/img/feed_land_day.jpg",
+        "img": "/shared/img/pcb_mainboard.png",
         "status": "Sẵn Hàng",
         "totalOrders": 140,
         "is_flagship": false,
         "gallery": [
-          "/shared/img/feed_land_day.jpg"
+          "/shared/img/pcb_mainboard.png"
         ],
         "colors": [
           { "id": "pcb-black", "name": "Matte Black PCB", "hex": "#1C1C1E" }
@@ -401,12 +400,13 @@
         "tagline": "Cảm biến từ trường góc quay 14-bit và gia tốc con quay hồi chuyển 6 trục.",
         "subtitle": "Mô-đun cảm biến độ phân giải 16384 xung/vòng (14-bit) kết hợp IMU 6-DOF bù nhiệt độ. Cung cấp dữ liệu phản hồi góc nghiêng Roll/Pitch/Yaw chính xác đến 0.01 độ cho vòng lặp FOC.",
         "badge": "Độ Nhạy Cao",
-        "img": "/shared/img/feed_person_land.jpg",
+        "img": "/shared/img/pcb_imu_head.png",
         "status": "Sẵn Hàng",
         "totalOrders": 280,
         "is_flagship": false,
         "gallery": [
-          "/shared/img/feed_person_land.jpg"
+          "/shared/img/pcb_imu_head.png",
+          "/shared/img/pcb_encoder.png"
         ],
         "colors": [
           { "id": "pcb-green", "name": "Industry Green PCB", "hex": "#1B4332" }
@@ -518,22 +518,54 @@
           try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch (e) {}
         }
       }
-      // Normalize tiers & root-relative image paths
+      // Normalize tiers & root-relative image paths + migrate retired stock/fake URLs
+      var LEGACY_FILE_MAP = {
+        'feed_portrait_dusk.jpg': '/shared/img/tflow_pro_main.png',
+        'feed_portrait_day.jpg': '/shared/img/tflow_pro_front.png',
+        'feed_person_portrait.jpg': '/shared/img/tflow_pro_body.png',
+        'feed_land_dusk.jpg': '/shared/img/tflow_pro_cutaway.png',
+        'feed_land_day.jpg': '/shared/img/pcb_mainboard.png',
+        'feed_person_land.jpg': '/shared/img/pcb_imu_head.png',
+        '01_camera_basic_dark.png': '/shared/img/app_camera_basic.svg',
+        '02_camera_pro_dark.png': '/shared/img/app_camera_pro.svg'
+      };
+      var LEGACY_RE = /(?:feed_|thumb_|01_camera_basic_dark\.png|02_camera_pro_dark\.png)/i;
       var mediaMigrated = false;
-      function normImgPath(url) {
-        if (typeof url === 'string' && url.indexOf('../shared/img/') === 0) {
+      function normImgPath(url, productDefaultImg) {
+        if (typeof url !== 'string') return url;
+        var out = url;
+        if (out.indexOf('../shared/img/') === 0) {
           mediaMigrated = true;
-          return url.replace('../shared/img/', '/shared/img/');
+          out = out.replace('../shared/img/', '/shared/img/');
         }
-        return url;
+        if (LEGACY_RE.test(out)) {
+          mediaMigrated = true;
+          if (productDefaultImg) return productDefaultImg;
+          var filePart = out.split('/').pop().split('?')[0];
+          return LEGACY_FILE_MAP[filePart] || '/shared/img/tflow_pro_main.png';
+        }
+        return out;
       }
+      var defaultById = {};
+      (DEFAULT_CATALOG.products || []).forEach(function(dp) { defaultById[dp.id] = dp; });
       (parsed.products || []).forEach(function(p) {
-        if (p.img) p.img = normImgPath(p.img);
+        var defProd = defaultById[p.id] || null;
+        if (p.img) {
+          p.img = normImgPath(p.img, defProd ? defProd.img : null);
+        } else if (defProd && defProd.img) {
+          p.img = defProd.img;
+          mediaMigrated = true;
+        }
         if (Array.isArray(p.gallery)) {
-          p.gallery = p.gallery.map(normImgPath);
+          if (defProd && p.gallery.length > 0 && p.gallery.every(function(g) { return typeof g === 'string' && LEGACY_RE.test(g); })) {
+            p.gallery = defProd.gallery.slice();
+            mediaMigrated = true;
+          } else {
+            p.gallery = p.gallery.map(function(g) { return normImgPath(g, null); });
+          }
         }
         if (Array.isArray(p.overview)) {
-          p.overview.forEach(function(o) { if (o && o.img) o.img = normImgPath(o.img); });
+          p.overview.forEach(function(o) { if (o && o.img) o.img = normImgPath(o.img, null); });
         }
         if (p.id === 'tf-g31-pro') {
           var defaultPro = DEFAULT_CATALOG.products[0];
@@ -718,7 +750,21 @@
     if (typeof localStorage === 'undefined') return [];
     try {
       var raw = localStorage.getItem(CART_KEY);
-      return raw ? JSON.parse(raw) : [];
+      var list = raw ? JSON.parse(raw) : [];
+      if (Array.isArray(list) && list.length > 0) {
+        var cartDirty = false;
+        list.forEach(function(item) {
+          if (item && typeof item.img === 'string' && (item.img.indexOf('../shared/img/') === 0 || /(?:feed_|thumb_)/i.test(item.img))) {
+            var matchDef = (DEFAULT_CATALOG.products || []).find(function(dp) { return dp.id === item.productId; });
+            item.img = matchDef ? matchDef.img : '/shared/img/tflow_pro_main.png';
+            cartDirty = true;
+          }
+        });
+        if (cartDirty) {
+          try { localStorage.setItem(CART_KEY, JSON.stringify(list)); } catch (err) {}
+        }
+      }
+      return list;
     } catch (e) {
       return [];
     }
@@ -755,7 +801,7 @@
         price: item.price || 2890000,
         colorId: item.colorId || 'natural-titanium',
         colorName: item.colorName || 'Natural Titanium',
-        img: item.img || '/shared/img/feed_portrait_dusk.jpg',
+        img: item.img || '/shared/img/tflow_pro_main.png',
         qty: item.qty || 1
       });
     }

@@ -1905,35 +1905,35 @@
         <div class="form-section-title">2. Bộ Hình Ảnh Bài Đăng (Media Gallery)</div>
         <div class="form-group">
           <label>Đường Dẫn Ảnh Đại Diện Chính (URL / Local Path)</label>
-          <input type="text" class="form-control" id="formProdImg" value="/shared/img/feed_portrait_dusk.jpg" oninput="updateMediaPreviews()">
+          <input type="text" class="form-control" id="formProdImg" value="/shared/img/tflow_pro_main.png" oninput="updateMediaPreviews()">
         </div>
         <div class="form-row-2">
           <div class="form-group">
             <label>Ảnh Góc Chụp 1</label>
-            <input type="text" class="form-control" id="formProdGallery1" value="/shared/img/feed_portrait_dusk.jpg" oninput="updateMediaPreviews()">
+            <input type="text" class="form-control" id="formProdGallery1" value="/shared/img/tflow_pro_main.png" oninput="updateMediaPreviews()">
           </div>
           <div class="form-group">
             <label>Ảnh Góc Chụp 2</label>
-            <input type="text" class="form-control" id="formProdGallery2" value="/shared/img/feed_portrait_day.jpg" oninput="updateMediaPreviews()">
+            <input type="text" class="form-control" id="formProdGallery2" value="/shared/img/tflow_pro_front.png" oninput="updateMediaPreviews()">
           </div>
         </div>
         <div class="form-row-2">
           <div class="form-group">
             <label>Ảnh Góc Chụp 3</label>
-            <input type="text" class="form-control" id="formProdGallery3" value="/shared/img/feed_person_portrait.jpg" oninput="updateMediaPreviews()">
+            <input type="text" class="form-control" id="formProdGallery3" value="/shared/img/tflow_pro_body.png" oninput="updateMediaPreviews()">
           </div>
           <div class="form-group">
             <label>Ảnh Góc Chụp 4</label>
-            <input type="text" class="form-control" id="formProdGallery4" value="/shared/img/feed_land_dusk.jpg" oninput="updateMediaPreviews()">
+            <input type="text" class="form-control" id="formProdGallery4" value="/shared/img/tflow_pro_cutaway.png" oninput="updateMediaPreviews()">
           </div>
         </div>
         <div>
           <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">Khung Xem Trước Ảnh Bài Đăng:</label>
           <div class="gallery-preview-grid">
-            <div class="gallery-preview-item"><img id="previewImg1" src="/shared/img/feed_portrait_dusk.jpg" alt="p1"></div>
-            <div class="gallery-preview-item"><img id="previewImg2" src="/shared/img/feed_portrait_day.jpg" alt="p2"></div>
-            <div class="gallery-preview-item"><img id="previewImg3" src="/shared/img/feed_person_portrait.jpg" alt="p3"></div>
-            <div class="gallery-preview-item"><img id="previewImg4" src="/shared/img/feed_land_dusk.jpg" alt="p4"></div>
+            <div class="gallery-preview-item"><img id="previewImg1" src="/shared/img/tflow_pro_main.png" alt="p1"></div>
+            <div class="gallery-preview-item"><img id="previewImg2" src="/shared/img/tflow_pro_front.png" alt="p2"></div>
+            <div class="gallery-preview-item"><img id="previewImg3" src="/shared/img/tflow_pro_body.png" alt="p3"></div>
+            <div class="gallery-preview-item"><img id="previewImg4" src="/shared/img/tflow_pro_cutaway.png" alt="p4"></div>
           </div>
         </div>
 
@@ -2595,7 +2595,7 @@
           <td>
             <div style="display:flex; align-items:center; gap:12px;">
               <div class="prod-thumb-sm">
-                <img src="${p.img || '/shared/img/feed_portrait_dusk.jpg'}" alt="${p.name}">
+                <img src="${p.img || '/shared/img/tflow_pro_main.png'}" alt="${p.name}">
               </div>
               <div>
                 <div style="font-size:14.5px; font-weight:800;">${p.name}</div>
@@ -2650,7 +2650,11 @@
       document.getElementById('formProdName').value = '';
       document.getElementById('formProdTagline').value = '';
       document.getElementById('formProdIsMvp').checked = false;
-      document.getElementById('formProdImg').value = '/shared/img/feed_portrait_dusk.jpg';
+      document.getElementById('formProdImg').value = '/shared/img/tflow_pro_main.png';
+      document.getElementById('formProdGallery1').value = '/shared/img/tflow_pro_main.png';
+      document.getElementById('formProdGallery2').value = '/shared/img/tflow_pro_front.png';
+      document.getElementById('formProdGallery3').value = '/shared/img/tflow_pro_body.png';
+      document.getElementById('formProdGallery4').value = '/shared/img/tflow_pro_cutaway.png';
 
       renderGroupSelectOptions('cat-phone');
 
@@ -2684,14 +2688,14 @@
       document.getElementById('formProdTagline').value = prod.tagline || prod.subtitle || '';
       document.getElementById('formProdStatus').value = prod.status || 'Đang Mở Bán';
       document.getElementById('formProdIsMvp').checked = (prod.id === currentCatalog.mvpProductId);
-      document.getElementById('formProdImg').value = prod.img || '/shared/img/feed_portrait_dusk.jpg';
+      const mainFallback = prod.img || '/shared/img/tflow_pro_main.png';
+      document.getElementById('formProdImg').value = mainFallback;
 
-      if (prod.gallery && prod.gallery.length >= 4) {
-        document.getElementById('formProdGallery1').value = prod.gallery[0];
-        document.getElementById('formProdGallery2').value = prod.gallery[1];
-        document.getElementById('formProdGallery3').value = prod.gallery[2];
-        document.getElementById('formProdGallery4').value = prod.gallery[3];
-      }
+      const gal = Array.isArray(prod.gallery) ? prod.gallery : [];
+      document.getElementById('formProdGallery1').value = gal[0] || mainFallback;
+      document.getElementById('formProdGallery2').value = gal[1] || '';
+      document.getElementById('formProdGallery3').value = gal[2] || '';
+      document.getElementById('formProdGallery4').value = gal[3] || '';
 
       if (prod.boxContents) {
         document.getElementById('formProdBox').value = prod.boxContents.join('\n');
@@ -2789,10 +2793,10 @@
     }
 
     function updateMediaPreviews() {
-      const img1 = document.getElementById('formProdImg').value || '/shared/img/feed_portrait_dusk.jpg';
-      const img2 = document.getElementById('formProdGallery2').value || '/shared/img/feed_portrait_day.jpg';
-      const img3 = document.getElementById('formProdGallery3').value || '/shared/img/feed_person_portrait.jpg';
-      const img4 = document.getElementById('formProdGallery4').value || '/shared/img/feed_land_dusk.jpg';
+      const img1 = document.getElementById('formProdGallery1').value.trim() || document.getElementById('formProdImg').value.trim() || '/shared/img/tflow_pro_main.png';
+      const img2 = document.getElementById('formProdGallery2').value.trim() || img1;
+      const img3 = document.getElementById('formProdGallery3').value.trim() || img1;
+      const img4 = document.getElementById('formProdGallery4').value.trim() || img1;
 
       document.getElementById('previewImg1').src = img1;
       document.getElementById('previewImg2').src = img2;
@@ -2807,7 +2811,7 @@
       const tagline = document.getElementById('formProdTagline').value.trim();
       const status = document.getElementById('formProdStatus').value;
       const isMvp = document.getElementById('formProdIsMvp').checked;
-      const mainImg = document.getElementById('formProdImg').value.trim();
+      const mainImg = document.getElementById('formProdImg').value.trim() || '/shared/img/tflow_pro_main.png';
 
       if (!name) {
         alert('Vui lòng nhập Tên sản phẩm!');
@@ -2819,12 +2823,13 @@
         return;
       }
 
-      const gallery = [
-        document.getElementById('formProdGallery1').value.trim() || mainImg,
-        document.getElementById('formProdGallery2').value.trim() || mainImg,
-        document.getElementById('formProdGallery3').value.trim() || mainImg,
-        document.getElementById('formProdGallery4').value.trim() || mainImg
-      ];
+      const galleryRaw = [
+        document.getElementById('formProdGallery1').value.trim(),
+        document.getElementById('formProdGallery2').value.trim(),
+        document.getElementById('formProdGallery3').value.trim(),
+        document.getElementById('formProdGallery4').value.trim()
+      ].filter(Boolean);
+      const gallery = galleryRaw.length > 0 ? galleryRaw : [mainImg];
 
       const boxContents = document.getElementById('formProdBox').value.split('\n').filter(s => s.trim().length > 0);
 

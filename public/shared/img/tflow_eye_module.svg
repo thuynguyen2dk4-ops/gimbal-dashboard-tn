@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <defs>
+    <radialGradient id="eyeBg" cx="50%" cy="46%" r="54%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F1F3F6"/>
+    </radialGradient>
+    <linearGradient id="eyeShell" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3A3C42"/>
+      <stop offset="45%" stop-color="#1E1F24"/>
+      <stop offset="100%" stop-color="#101114"/>
+    </linearGradient>
+    <radialGradient id="eyeRing" cx="50%" cy="50%" r="50%">
+      <stop offset="72%" stop-color="#FFF4E0" stop-opacity="0"/>
+      <stop offset="84%" stop-color="#FFE6BA" stop-opacity="0.95"/>
+      <stop offset="93%" stop-color="#FFC77D" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#FFAE52" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="eyeLens" cx="38%" cy="35%" r="60%">
+      <stop offset="0%" stop-color="#58A6FF" stop-opacity="0.85"/>
+      <stop offset="35%" stop-color="#16324F"/>
+      <stop offset="80%" stop-color="#0A0F18"/>
+      <stop offset="100%" stop-color="#05070B"/>
+    </radialGradient>
+    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#0B0D12" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <ellipse cx="300" cy="464" rx="132" ry="18" fill="#0D0F14" opacity="0.10"/>
+  <!-- Pogo-pin MagSafe magnetic mount base -->
+  <g filter="url(#dropShadow)">
+    <rect x="228" y="384" width="144" height="46" rx="12" fill="#18191D" stroke="#34373F" stroke-width="2"/>
+    <rect x="242" y="422" width="116" height="16" rx="6" fill="#2A2C32"/>
+    <circle cx="272" cy="430" r="3.5" fill="#D4AF37"/>
+    <circle cx="291" cy="430" r="3.5" fill="#D4AF37"/>
+    <circle cx="309" cy="430" r="3.5" fill="#D4AF37"/>
+    <circle cx="328" cy="430" r="3.5" fill="#D4AF37"/>
+    <!-- Neck stem -->
+    <rect x="270" y="356" width="60" height="34" rx="6" fill="#25272C"/>
+    <!-- Main T-Flow Eye body -->
+    <rect x="172" y="136" width="256" height="232" rx="56" fill="url(#eyeShell)" stroke="#484B54" stroke-width="2.5"/>
+    <rect x="184" y="148" width="232" height="208" rx="46" fill="none" stroke="#FFFFFF" stroke-opacity="0.08" stroke-width="1.5"/>
+  </g>
+  <!-- RGB Fill Light Diffusion Ring -->
+  <circle cx="300" cy="248" r="88" fill="url(#eyeRing)"/>
+  <circle cx="300" cy="248" r="76" fill="none" stroke="#FFF1D0" stroke-width="7" stroke-opacity="0.88"/>
+  <!-- Outer Optical Barrel -->
+  <circle cx="300" cy="248" r="56" fill="#121318" stroke="#363942" stroke-width="3"/>
+  <circle cx="300" cy="248" r="44" fill="#0D0E12" stroke="#24272F" stroke-width="2"/>
+  <!-- Multi-coated AI Vision Lens -->
+  <circle cx="300" cy="248" r="33" fill="url(#eyeLens)"/>
+  <circle cx="288" cy="236" r="8" fill="#9BD0FF" opacity="0.48"/>
+  <circle cx="312" cy="262" r="4" fill="#5FE3C2" opacity="0.35"/>
+  <circle cx="300" cy="248" r="11" fill="#06090F" stroke="#2E5B88" stroke-opacity="0.55" stroke-width="1.5"/>
+  <!-- Tracking Status LED + AI Mic -->
+  <circle cx="300" cy="176" r="4" fill="#30D158"/>
+  <circle cx="300" cy="176" r="8" fill="#30D158" opacity="0.22"/>
+  <rect x="284" y="328" width="32" height="4" rx="2" fill="#4E525C"/>
+  <!-- Subtle corner spec caption -->
+  <text x="300" y="532" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="600" letter-spacing="1.8" fill="#6E6E73">T-FLOW EYE • AI VISION + RGB FILL</text>
+</svg>

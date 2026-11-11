@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <defs>
+    <radialGradient id="triBg" cx="50%" cy="46%" r="54%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F1F3F6"/>
+    </radialGradient>
+    <linearGradient id="carbonLeg" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1E2024"/>
+      <stop offset="45%" stop-color="#393D45"/>
+      <stop offset="100%" stop-color="#15161A"/>
+    </linearGradient>
+    <linearGradient id="aluCollar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#27292E"/>
+      <stop offset="50%" stop-color="#5B5F69"/>
+      <stop offset="100%" stop-color="#1F2126"/>
+    </linearGradient>
+    <linearGradient id="steelScrew" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#9CA3AF"/>
+      <stop offset="50%" stop-color="#F3F4F6"/>
+      <stop offset="100%" stop-color="#6B7280"/>
+    </linearGradient>
+    <pattern id="cfWeave" width="12" height="12" patternUnits="userSpaceOnUse">
+      <rect width="6" height="6" fill="#23252A"/>
+      <rect x="6" y="6" width="6" height="6" fill="#23252A"/>
+      <rect x="6" y="0" width="6" height="6" fill="#2E3138"/>
+      <rect x="0" y="6" width="6" height="6" fill="#2E3138"/>
+    </pattern>
+  </defs>
+  <!-- Ground shadows -->
+  <ellipse cx="300" cy="466" rx="165" ry="18" fill="#0B0D12" opacity="0.10"/>
+  <!-- Center carbon leg (rear) -->
+  <g>
+    <path d="M286 218 L314 218 L322 448 L278 448 Z" fill="url(#carbonLeg)"/>
+    <path d="M288 220 L312 220 L319 446 L281 446 Z" fill="url(#cfWeave)" opacity="0.42"/>
+    <ellipse cx="300" cy="452" rx="22" ry="8" fill="#141518"/>
+  </g>
+  <!-- Left tripod leg -->
+  <g transform="rotate(27 284 214)">
+    <rect x="266" y="212" width="32" height="248" rx="12" fill="url(#carbonLeg)"/>
+    <rect x="269" y="216" width="26" height="236" rx="10" fill="url(#cfWeave)" opacity="0.55"/>
+    <rect x="264" y="446" width="36" height="20" rx="9" fill="#121316"/>
+  </g>
+  <!-- Right tripod leg -->
+  <g transform="rotate(-27 316 214)">
+    <rect x="302" y="212" width="32" height="248" rx="12" fill="url(#carbonLeg)"/>
+    <rect x="305" y="216" width="26" height="236" rx="10" fill="url(#cfWeave)" opacity="0.55"/>
+    <rect x="300" y="446" width="36" height="20" rx="9" fill="#121316"/>
+  </g>
+  <!-- CNC Spider Collar & 1/4"-20 Mount -->
+  <rect x="266" y="154" width="68" height="62" rx="10" fill="url(#aluCollar)" stroke="#18191C" stroke-width="2"/>
+  <rect x="258" y="142" width="84" height="16" rx="5" fill="#1E2025"/>
+  <ellipse cx="300" cy="142" rx="42" ry="7" fill="#32353C"/>
+  <!-- 1/4"-20 stainless screw + thread ribs -->
+  <rect x="290" y="114" width="20" height="28" rx="3" fill="url(#steelScrew)"/>
+  <line x1="290" y1="120" x2="310" y2="122" stroke="#6B7280" stroke-width="1.4"/>
+  <line x1="290" y1="126" x2="310" y2="128" stroke="#6B7280" stroke-width="1.4"/>
+  <line x1="290" y1="132" x2="310" y2="134" stroke="#6B7280" stroke-width="1.4"/>
+  <!-- Center lock hub ring -->
+  <circle cx="300" cy="186" r="14" fill="#1A1C20" stroke="#6B707C" stroke-width="2"/>
+  <circle cx="300" cy="186" r="6" fill="#464A54"/>
+  <text x="300" y="532" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="600" letter-spacing="1.8" fill="#6E6E73">T-FLOW CARBON MINI TRIPOD • 1/4"-20</text>
+</svg>

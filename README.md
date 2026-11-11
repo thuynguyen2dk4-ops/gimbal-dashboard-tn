@@ -23,10 +23,9 @@ gimbal-dashboard-tn/
 │   ├── profile/index.html               # /profile — Chỉnh sửa hồ sơ người dùng
 │   ├── studio/index.html                # /studio — Vibe-Coding Live Inspector
 │   ├── auth/google/index.html           # /auth/google/ — Cửa sổ OAuth Google thống nhất
-│   ├── preview/                         # Ảnh minh họa App (01_camera_basic_dark.png, 02_camera_pro_dark.png)
 │   └── shared/
 │       ├── catalog_store.js             # Nguồn dữ liệu sản phẩm, giỏ hàng & đồng bộ realtime
-│       └── img/                         # Tài nguyên ảnh & logo thương hiệu T-Flow
+│       └── img/                         # Tài nguyên ảnh 3D CAD/PCB thật, vector SVG phụ kiện & logo thương hiệu T-Flow
 ├── ios_app/                             # Native iOS App (Swift / SwiftUI — iOS 16+)
 │   ├── project.yml                      # Đặc tả XcodeGen tự động gom Sources/**
 │   ├── SmartGimbalPro.xcodeproj/        # Project Xcode đồng bộ 1:1 với 20 module Swift

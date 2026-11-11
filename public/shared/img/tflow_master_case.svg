@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600">
+  <defs>
+    <radialGradient id="caseBg" cx="50%" cy="46%" r="54%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F1F3F6"/>
+    </radialGradient>
+    <linearGradient id="caseOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#35383F"/>
+      <stop offset="50%" stop-color="#1E2025"/>
+      <stop offset="100%" stop-color="#121317"/>
+    </linearGradient>
+    <linearGradient id="caseFoam" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#272A31"/>
+      <stop offset="100%" stop-color="#181A1E"/>
+    </linearGradient>
+    <filter id="caseShadow" x="-15%" y="-15%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#0B0D12" flood-opacity="0.16"/>
+    </filter>
+  </defs>
+  <ellipse cx="300" cy="468" rx="188" ry="18" fill="#0B0D12" opacity="0.11"/>
+  <!-- Handle top -->
+  <path d="M242 138 C242 114, 358 114, 358 138" fill="none" stroke="#1E2025" stroke-width="18" stroke-linecap="round"/>
+  <path d="M242 138 C242 114, 358 114, 358 138" fill="none" stroke="#454954" stroke-width="6" stroke-linecap="round"/>
+  <!-- Hard Case Outer Aluminum Shell -->
+  <g filter="url(#caseShadow)">
+    <rect x="108" y="138" width="384" height="316" rx="28" fill="url(#caseOuter)" stroke="#555A66" stroke-width="3"/>
+    <!-- Inner Custom Cut EVA Foam -->
+    <rect x="128" y="158" width="344" height="276" rx="18" fill="url(#caseFoam)" stroke="#3B3F4A" stroke-width="1.5"/>
+  </g>
+  <!-- Corner CNC Bumpers -->
+  <rect x="108" y="138" width="32" height="32" rx="8" fill="#3D414B"/>
+  <rect x="460" y="138" width="32" height="32" rx="8" fill="#3D414B"/>
+  <rect x="108" y="422" width="32" height="32" rx="8" fill="#3D414B"/>
+  <rect x="460" y="422" width="32" height="32" rx="8" fill="#3D414B"/>
+  <!-- Recessed CNC Latches -->
+  <rect x="176" y="446" width="44" height="14" rx="4" fill="#6E7380"/>
+  <rect x="380" y="446" width="44" height="14" rx="4" fill="#6E7380"/>
+  <!-- Custom Cutout Silhouette: Folded 3-Axis Gimbal Slot -->
+  <rect x="156" y="184" width="136" height="224" rx="20" fill="#101216" stroke="#2D313B" stroke-width="1.5"/>
+  <rect x="184" y="210" width="80" height="34" rx="10" fill="#2A2E37"/>
+  <rect x="208" y="242" width="32" height="136" rx="10" fill="#252931"/>
+  <!-- Slot 2: Tripod -->
+  <rect x="314" y="184" width="60" height="224" rx="16" fill="#101216" stroke="#2D313B" stroke-width="1.5"/>
+  <rect x="330" y="214" width="28" height="164" rx="8" fill="#262A32"/>
+  <!-- Slot 3 & 4: AI Eye + Mic/Cable Compartment -->
+  <rect x="394" y="184" width="54" height="102" rx="14" fill="#101216" stroke="#2D313B" stroke-width="1.5"/>
+  <circle cx="421" cy="235" r="16" fill="#2A2E37" stroke="#4D5361" stroke-width="1.5"/>
+  <rect x="394" y="306" width="54" height="102" rx="14" fill="#101216" stroke="#2D313B" stroke-width="1.5"/>
+  <rect x="408" y="328" width="26" height="58" rx="6" fill="#262A32"/>
+  <text x="300" y="532" text-anchor="middle" font-family="Inter, -apple-system, BlinkMacSystemFont, sans-serif" font-size="14" font-weight="600" letter-spacing="1.8" fill="#6E6E73">T-FLOW MASTER FLIGHT CASE • IP67 CNC</text>
+</svg>
