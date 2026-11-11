@@ -69,9 +69,11 @@ const FALLBACK_GEMINI_MODELS = [
   'gemini-3.8-flash',
   'gemini-3.5-flash-lite',
   'gemini-3.5-flash',
-  'gemini-2.5-flash',
+  'gemini-3.1-flash-lite',
   'gemini-flash-latest'
 ];
+const ATTEMPT_TIMEOUT_MS = 7500;
+const TOTAL_UPSTREAM_BUDGET_MS = 22000;
 
 function sanitizeErrorText(text) {
   return String(text || '')
@@ -82,7 +84,14 @@ function sanitizeErrorText(text) {
 
 function normalizeModelName(rawModel) {
   const m = (typeof rawModel === 'string') ? rawModel.trim() : '';
-  if (!m || m === 'gemini-1.5-flash' || m === 'gemini-2.0-flash' || m === 'gemini-1.5-pro') {
+  if (
+    !m ||
+    m === 'gemini-1.5-flash' ||
+    m === 'gemini-2.0-flash' ||
+    m === 'gemini-1.5-pro' ||
+    m === 'gemini-2.5-flash' ||
+    m === 'gemini-2.5-flash-lite'
+  ) {
     return DEFAULT_GEMINI_MODEL;
   }
   return m.replace(/^models\//, '');
@@ -91,6 +100,46 @@ function normalizeModelName(rawModel) {
 function buildModelCandidates(primaryModel) {
   const list = [primaryModel, ...FALLBACK_GEMINI_MODELS];
   return [...new Set(list.filter(Boolean))];
+}
+
+function buildGenerationConfig(candidateModel, effectiveMode) {
+  const m = String(candidateModel || '').toLowerCase();
+  const isGemini3Family = m.startsWith('gemini-3') || m.startsWith('gemini-4');
+  const isFlashLite = m.includes('flash-lite');
+  const config = {
+    maxOutputTokens: 2048
+  };
+
+  if (effectiveMode === 'app') {
+    config.responseMimeType = 'application/json';
+  }
+
+  if (isGemini3Family) {
+    // Gemini 3.x/4.x deprecate temperature/top_p/top_k and control latency via thinkingConfig.thinkingLevel.
+    // gemini-3.8-flash supports low|medium|high (not minimal); flash-lite defaults to minimal and rejects temperature.
+    if (!isFlashLite) {
+      config.thinkingConfig = {
+        thinkingLevel: 'low'
+      };
+    }
+  } else {
+    config.temperature = effectiveMode === 'app' ? 0.2 : 0.4;
+  }
+
+  return config;
+}
+
+async function fetchWithTimeout(url, options, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(new Error(`Request timed out after ${timeoutMs}ms`)), timeoutMs);
+  try {
+    return await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function buildFormattedResponse({ answerText, effectiveMode, source, modelUsed }) {
@@ -305,51 +354,66 @@ QUY TẮC PHẢN HỒI QUAN TRỌNG:
 
     let lastStatus = null;
     let lastError = null;
+    let sawAuthError = false;
+    const upstreamStartedAt = Date.now();
 
     // 1. PRIMARY: DIRECT GOOGLE GEMINI REST API (if GEMINI_API_KEY / header key exists)
     if (effectiveKey) {
       const modelCandidates = buildModelCandidates(requestedModel);
-      const geminiPayload = {
-        contents: [
-          ...sanitizedHistory.map(msg => ({
-            role: msg.sender === 'user' ? 'user' : 'model',
-            parts: [{ text: msg.text.trim() }]
-          })),
-          {
-            role: 'user',
-            parts: [{ text: cleanPrompt }]
-          }
-        ],
-        system_instruction: {
-          parts: [{ text: systemPrompt }]
-        },
-        generationConfig: {
-          temperature: effectiveMode === 'app' ? 0.2 : 0.4,
-          maxOutputTokens: 1024
+      const baseContents = [
+        ...sanitizedHistory.map(msg => ({
+          role: msg.sender === 'user' ? 'user' : 'model',
+          parts: [{ text: msg.text.trim() }]
+        })),
+        {
+          role: 'user',
+          parts: [{ text: cleanPrompt }]
         }
-      };
-
-      if (effectiveMode === 'app') {
-        geminiPayload.generationConfig.responseMimeType = 'application/json';
-      }
+      ];
 
       for (const candidateModel of modelCandidates) {
+        const remainingBudget = TOTAL_UPSTREAM_BUDGET_MS - (Date.now() - upstreamStartedAt);
+        if (remainingBudget < 1500) {
+          console.warn(`Stopping Gemini failover loop: upstream budget exhausted (${TOTAL_UPSTREAM_BUDGET_MS}ms)`);
+          break;
+        }
+        const attemptTimeout = Math.min(ATTEMPT_TIMEOUT_MS, remainingBudget);
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(candidateModel)}:generateContent`;
-        const apiResponse = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-goog-api-key': effectiveKey
+        const geminiPayload = {
+          contents: baseContents,
+          system_instruction: {
+            parts: [{ text: systemPrompt }]
           },
-          body: JSON.stringify(geminiPayload)
-        });
+          generationConfig: buildGenerationConfig(candidateModel, effectiveMode)
+        };
+
+        let apiResponse = null;
+        try {
+          apiResponse = await fetchWithTimeout(
+            apiUrl,
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-goog-api-key': effectiveKey
+              },
+              body: JSON.stringify(geminiPayload)
+            },
+            attemptTimeout
+          );
+        } catch (fetchErr) {
+          const isTimeout = fetchErr?.name === 'AbortError' || fetchErr?.name === 'TimeoutError' || /timed out|abort/i.test(fetchErr?.message || '');
+          lastStatus = isTimeout ? 504 : 502;
+          lastError = sanitizeErrorText(fetchErr?.message || (isTimeout ? 'Upstream Gemini request timed out' : 'Upstream Gemini network error'));
+          console.warn(`Google Gemini Fetch Exception (${candidateModel}):`, lastStatus, lastError.slice(0, 180));
+          continue;
+        }
 
         if (apiResponse.ok) {
           const data = await apiResponse.json();
           const parts = data?.candidates?.[0]?.content?.parts;
-          const candidateText = Array.isArray(parts)
-            ? parts.map(p => p?.text || '').join('').trim()
-            : '';
+          const visibleParts = Array.isArray(parts) ? parts.filter(p => !p?.thought) : [];
+          const candidateText = visibleParts.map(p => p?.text || '').join('').trim();
 
           if (candidateText) {
             return res.status(200).json(
@@ -375,20 +439,31 @@ QUY TẮC PHẢN HỒI QUAN TRỌNG:
           lastError = sanitizeErrorText(rawErrText);
         }
 
-        const isModelLookupMiss =
-          apiResponse.status === 404 ||
-          (apiResponse.status === 400 && /not found|unsupported|unknown model|invalid model/i.test(lastError));
+        const isInvalidAuthError =
+          apiResponse.status === 401 ||
+          apiResponse.status === 403 ||
+          (apiResponse.status === 400 && /api[_ ]?key|unauthorized|permission denied/i.test(lastError));
 
         console.warn(`Google Gemini API Error (${candidateModel}):`, apiResponse.status, lastError.slice(0, 180));
-        if (!isModelLookupMiss) {
+        if (isInvalidAuthError) {
+          sawAuthError = true;
           break;
         }
       }
     }
 
-    // 2. SECONDARY: VERCEL AI GATEWAY (if gateway key or Vercel OIDC token is available)
-    if (!effectiveKey && gatewayToken) {
-      const gatewayModels = [...new Set([`google/${requestedModel}`, 'google/gemini-3.8-flash', 'google/gemini-3-flash', 'google/gemini-2.5-flash'])];
+    // 2. SECONDARY: VERCEL AI GATEWAY (if no direct key OR direct Gemini transiently failed and OIDC/Gateway token exists)
+    const canUseGateway = Boolean(gatewayToken) && (!effectiveKey || !sawAuthError);
+    if (canUseGateway && (TOTAL_UPSTREAM_BUDGET_MS - (Date.now() - upstreamStartedAt)) >= 1500) {
+      const gatewayModels = [
+        ...new Set([
+          `google/${requestedModel}`,
+          'google/gemini-3.5-flash-lite',
+          'google/gemini-3.5-flash',
+          'google/gemini-3.8-flash',
+          'google/gemini-3-flash'
+        ])
+      ];
       const openAiMessages = [
         { role: 'system', content: systemPrompt },
         ...sanitizedHistory.map(msg => ({
@@ -398,20 +473,37 @@ QUY TẮC PHẢN HỒI QUAN TRỌNG:
         { role: 'user', content: cleanPrompt }
       ];
 
+      let gwLastStatus = null;
+      let gwLastError = null;
       for (const gwModel of gatewayModels) {
-        const gwResponse = await fetch('https://ai-gateway.vercel.sh/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${gatewayToken}`
-          },
-          body: JSON.stringify({
-            model: gwModel,
-            messages: openAiMessages,
-            temperature: effectiveMode === 'app' ? 0.2 : 0.4,
-            max_tokens: 1024
-          })
-        });
+        const remainingBudget = TOTAL_UPSTREAM_BUDGET_MS - (Date.now() - upstreamStartedAt);
+        if (remainingBudget < 1500) break;
+        const attemptTimeout = Math.min(ATTEMPT_TIMEOUT_MS, remainingBudget);
+
+        let gwResponse = null;
+        try {
+          gwResponse = await fetchWithTimeout(
+            'https://ai-gateway.vercel.sh/v1/chat/completions',
+            {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${gatewayToken}`
+              },
+              body: JSON.stringify({
+                model: gwModel,
+                messages: openAiMessages,
+                max_tokens: 2048
+              })
+            },
+            attemptTimeout
+          );
+        } catch (gwFetchErr) {
+          gwLastStatus = 504;
+          gwLastError = sanitizeErrorText(gwFetchErr?.message || 'Vercel AI Gateway timed out');
+          console.warn(`Vercel AI Gateway Fetch Exception (${gwModel}):`, gwLastError.slice(0, 180));
+          continue;
+        }
 
         if (gwResponse.ok) {
           const gwData = await gwResponse.json();
@@ -430,12 +522,16 @@ QUY TẮC PHẢN HỒI QUAN TRỌNG:
         }
 
         const rawGwErr = await gwResponse.text();
-        lastStatus = gwResponse.status;
-        lastError = sanitizeErrorText(rawGwErr).slice(0, 220);
-        console.warn(`Vercel AI Gateway Error (${gwModel}):`, gwResponse.status, lastError);
-        if (gwResponse.status !== 404) {
+        gwLastStatus = gwResponse.status;
+        gwLastError = sanitizeErrorText(rawGwErr).slice(0, 220);
+        console.warn(`Vercel AI Gateway Error (${gwModel}):`, gwResponse.status, gwLastError);
+        if (gwResponse.status === 401 || gwResponse.status === 402 || gwResponse.status === 403) {
           break;
         }
+      }
+      if (!effectiveKey) {
+        lastStatus = gwLastStatus;
+        lastError = gwLastError;
       }
     }
 

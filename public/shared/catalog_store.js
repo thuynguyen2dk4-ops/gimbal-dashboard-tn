@@ -2468,7 +2468,7 @@
       var parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== 'object') return def;
       parsed.apiKey = (typeof parsed.apiKey === 'string') ? parsed.apiKey.trim() : '';
-      if (!parsed.model || parsed.model === 'gemini-1.5-flash' || parsed.model === 'gemini-2.0-flash' || parsed.model === 'gemini-1.5-pro') {
+      if (!parsed.model || parsed.model === 'gemini-1.5-flash' || parsed.model === 'gemini-2.0-flash' || parsed.model === 'gemini-1.5-pro' || parsed.model === 'gemini-2.5-flash' || parsed.model === 'gemini-2.5-flash-lite') {
         parsed.model = DEFAULT_AI_MODEL;
       }
       return Object.assign({}, def, parsed);
