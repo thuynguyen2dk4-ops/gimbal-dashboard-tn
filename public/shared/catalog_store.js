@@ -2447,10 +2447,10 @@
   }
 
   // =========================================================================
-  // --- T-FLOW UNIFIED CLOUD AI ENGINE (GOOGLE GEMINI 3.8 FLASH) ---
+  // --- T-FLOW UNIFIED CLOUD AI ENGINE (GOOGLE GEMINI 3.5 FLASH) ---
   // =========================================================================
   var DEFAULT_GEMINI_API_KEY = '';
-  var DEFAULT_AI_MODEL = 'gemini-3.8-flash';
+  var DEFAULT_AI_MODEL = 'gemini-3.5-flash';
   var AI_CLOUD_CONFIG_KEY = 'tflow_cloud_ai_config';
 
   function getCloudAiConfig() {

@@ -64,16 +64,18 @@ Nhiệm vụ trọng tâm:
 const WEB_SYSTEM_PROMPT = SALES_SYSTEM_PROMPT;
 const APP_SYSTEM_PROMPT = CREATIVE_SYSTEM_PROMPT;
 
-const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
+const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash';
 const FALLBACK_GEMINI_MODELS = [
-  'gemini-3.8-flash',
-  'gemini-3.5-flash-lite',
   'gemini-3.5-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-3.8-flash',
   'gemini-3.1-flash-lite',
   'gemini-flash-latest'
 ];
-const ATTEMPT_TIMEOUT_MS = 7500;
-const TOTAL_UPSTREAM_BUDGET_MS = 22000;
+const PRIMARY_ATTEMPT_TIMEOUT_MS = 11000;
+const FAILOVER_ATTEMPT_TIMEOUT_MS = 6000;
+const DIRECT_GEMINI_BUDGET_MS = 20000;
+const TOTAL_UPSTREAM_BUDGET_MS = 28000;
 
 function sanitizeErrorText(text) {
   return String(text || '')
@@ -371,13 +373,15 @@ QUY TẮC PHẢN HỒI QUAN TRỌNG:
         }
       ];
 
-      for (const candidateModel of modelCandidates) {
-        const remainingBudget = TOTAL_UPSTREAM_BUDGET_MS - (Date.now() - upstreamStartedAt);
-        if (remainingBudget < 1500) {
-          console.warn(`Stopping Gemini failover loop: upstream budget exhausted (${TOTAL_UPSTREAM_BUDGET_MS}ms)`);
+      for (let idx = 0; idx < modelCandidates.length; idx++) {
+        const candidateModel = modelCandidates[idx];
+        const remainingDirectBudget = DIRECT_GEMINI_BUDGET_MS - (Date.now() - upstreamStartedAt);
+        if (remainingDirectBudget < 1500) {
+          console.warn(`Stopping direct Gemini failover loop: direct budget exhausted (${DIRECT_GEMINI_BUDGET_MS}ms)`);
           break;
         }
-        const attemptTimeout = Math.min(ATTEMPT_TIMEOUT_MS, remainingBudget);
+        const perAttemptCap = idx === 0 ? PRIMARY_ATTEMPT_TIMEOUT_MS : FAILOVER_ATTEMPT_TIMEOUT_MS;
+        const attemptTimeout = Math.min(perAttemptCap, remainingDirectBudget);
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(candidateModel)}:generateContent`;
         const geminiPayload = {
           contents: baseContents,
@@ -458,8 +462,8 @@ QUY TẮC PHẢN HỒI QUAN TRỌNG:
       const gatewayModels = [
         ...new Set([
           `google/${requestedModel}`,
-          'google/gemini-3.5-flash-lite',
           'google/gemini-3.5-flash',
+          'google/gemini-3.5-flash-lite',
           'google/gemini-3.8-flash',
           'google/gemini-3-flash'
         ])
@@ -478,7 +482,7 @@ QUY TẮC PHẢN HỒI QUAN TRỌNG:
       for (const gwModel of gatewayModels) {
         const remainingBudget = TOTAL_UPSTREAM_BUDGET_MS - (Date.now() - upstreamStartedAt);
         if (remainingBudget < 1500) break;
-        const attemptTimeout = Math.min(ATTEMPT_TIMEOUT_MS, remainingBudget);
+        const attemptTimeout = Math.min(FAILOVER_ATTEMPT_TIMEOUT_MS, remainingBudget);
 
         let gwResponse = null;
         try {
