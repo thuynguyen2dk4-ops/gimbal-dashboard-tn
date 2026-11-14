@@ -78,6 +78,14 @@ struct GimbalDeviceHubView: View {
             .sheet(isPresented: $showDeviceSettingsSheet) {
                 DeviceSettingsSheetView(camera: camera, store: store, ble: ble)
             }
+            .onChange(of: ble.firmwareVersion) { newFw in
+                store.updateDeviceTelemetry(battery: ble.batteryLevel, firmware: newFw)
+            }
+            .onChange(of: ble.isConnected) { connected in
+                if connected {
+                    store.updateDeviceTelemetry(battery: ble.batteryLevel, firmware: ble.firmwareVersion)
+                }
+            }
         }
     }
 

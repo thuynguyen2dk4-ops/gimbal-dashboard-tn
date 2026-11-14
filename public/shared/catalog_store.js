@@ -25,8 +25,374 @@
   var REVIEWS_KEY = 'tflow_pro_real_user_reviews_v2';
   var REVIEWS_EVENT = 'tflow_reviews_updated';
 
+  var SUPABASE_URL = 'https://dlgkrwodxdsbbliwdnkg.supabase.co/rest/v1';
+  var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZ2tyd29keGRzYmJsaXdkbmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxMjIwNjQsImV4cCI6MjEwOTY5ODA2NH0.Lg6C6MpLhX_CoKgWtl_nhWLGNw5NuYE9FZJoTxXnu6I';
+  var REALTIME_CHANNEL_NAME = 'tflow_realtime_bridge';
+  var TAB_INSTANCE_ID = 'tab_' + Math.random().toString(36).slice(2) + '_' + Date.now();
+  var _realtimeChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel(REALTIME_CHANNEL_NAME) : null;
+  var _activePushCount = 0;
+  var _pushQueueByEmail = {};
+  var _pushVersionByEmail = {};
+  var _syncPromise = null;
+
   var ADMIN_GMAILS = ['thuynguyen2dk4@gmail.com', 'thuy.nguyen@tflow.tech'];
   var BUNDLED_CATALOG_VERSION = '3.6.0-visual-clean';
+
+  function normalizeModulesArray(raw, fallback) {
+    var base = Array.isArray(fallback) && fallback.length === 7 ? fallback.slice() : [false, false, false, false, false, false, false];
+    if (Array.isArray(raw)) {
+      var out = [];
+      for (var i = 0; i < 7; i++) {
+        out.push(Boolean(i < raw.length ? raw[i] : base[i]));
+      }
+      return out;
+    }
+    return base;
+  }
+
+  function mapCloudUserToLocal(row, existingLocal) {
+    row = row || {};
+    var ex = existingLocal || {};
+    var email = String(row.email || ex.email || '').trim().toLowerCase();
+    var tier = row.tier || ex.tier || 'Basic Creator';
+    var device = row.device || ex.device || ex.registeredDevice || 'Smart Gimbal S1 Titanium';
+    var isAdmin = (typeof row.is_admin === 'boolean')
+      ? row.is_admin
+      : (typeof ex.isAdmin === 'boolean' ? ex.isAdmin : ADMIN_GMAILS.indexOf(email) !== -1);
+    return Object.assign({}, ex, {
+      id: row.id || ex.id || ('usr-' + (email || 'guest').replace(/[^a-z0-9]/g, '-')),
+      name: row.name || ex.name || 'T-FLOW User',
+      email: email,
+      phone: (row.phone !== undefined && row.phone !== null) ? row.phone : (ex.phone || ''),
+      address: ex.address || '',
+      password: ex.password || '',
+      avatar: ex.avatar || '',
+      device: device,
+      registeredDevice: device,
+      tier: tier,
+      tierBadge: row.tier_badge || (tier + ' Tier') || ex.tierBadge || 'Basic Creator Tier',
+      memberSince: row.member_since || ex.memberSince || new Date().toISOString().slice(0, 10),
+      serial: (row.serial !== undefined && row.serial !== null) ? row.serial : (ex.serial || ''),
+      warrantyDays: (typeof row.warranty_days === 'number') ? row.warranty_days : (typeof ex.warrantyDays === 'number' ? ex.warrantyDays : 365),
+      battery: (typeof row.battery === 'number') ? row.battery : (typeof ex.battery === 'number' ? ex.battery : 88),
+      firmware: row.firmware || ex.firmware || 'v2.4.2',
+      status: row.status || ex.status || 'Hoạt động',
+      modules: normalizeModulesArray(row.modules, ex.modules),
+      isAdmin: isAdmin,
+      lastActive: row.last_active || ex.lastActive || new Date().toISOString(),
+      createdAt: row.created_at || ex.createdAt || new Date().toISOString()
+    });
+  }
+
+  function mapLocalUserToCloud(u, cloudIdOverride) {
+    u = u || {};
+    var emailLower = String(u.email || '').trim().toLowerCase();
+    var fallbackId = 'usr-' + (emailLower || 'guest').replace(/[^a-z0-9]/g, '-');
+    var tier = u.tier || 'Basic Creator';
+    return {
+      id: cloudIdOverride || u.id || fallbackId,
+      name: u.name || 'T-FLOW User',
+      email: emailLower,
+      phone: u.phone || '',
+      device: u.device || u.registeredDevice || 'Smart Gimbal S1 Titanium',
+      tier: tier,
+      tier_badge: u.tierBadge || (tier + ' Tier'),
+      member_since: u.memberSince || new Date().toISOString().slice(0, 10),
+      serial: u.serial || '',
+      warranty_days: typeof u.warrantyDays === 'number' ? u.warrantyDays : 365,
+      battery: typeof u.battery === 'number' ? u.battery : 88,
+      firmware: u.firmware || 'v2.4.2',
+      status: u.status || 'Hoạt động',
+      modules: normalizeModulesArray(u.modules),
+      is_admin: typeof u.isAdmin === 'boolean' ? u.isAdmin : (ADMIN_GMAILS.indexOf(emailLower) !== -1),
+      last_active: new Date().toISOString()
+    };
+  }
+
+  function postRealtimeBridge(msgType, payload) {
+    if (!_realtimeChannel) return;
+    try {
+      _realtimeChannel.postMessage({
+        type: msgType,
+        senderId: TAB_INSTANCE_ID,
+        payload: payload || null,
+        ts: Date.now()
+      });
+    } catch (e) {}
+  }
+
+  function persistCurrentUserLocally(userObj, emitEvent) {
+    if (!userObj) return;
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(userObj));
+      } catch (e) {}
+    }
+    try {
+      var cookieCur = Object.assign({}, userObj);
+      if (cookieCur.avatar && cookieCur.avatar.length > 150) {
+        cookieCur.avatar = 'photo_avatar';
+      }
+      if (typeof setCookie === 'function') {
+        setCookie('tflow_user_session', cookieCur, 30);
+      }
+      if (typeof createSession === 'function') {
+        createSession(userObj);
+      }
+    } catch (e) {}
+    if (emitEvent && typeof window !== 'undefined') {
+      try {
+        window.dispatchEvent(new CustomEvent(USER_EVENT, { detail: userObj }));
+      } catch (e) {}
+    }
+  }
+
+  function mergeSingleCloudRowLocally(row) {
+    if (!row || !row.email) return null;
+    var cat = getCatalog();
+    if (!cat.users) cat.users = [];
+    var rowEmail = String(row.email).trim().toLowerCase();
+    var idx = cat.users.findIndex(function (u) {
+      return (u.email && u.email.toLowerCase() === rowEmail) || (row.id && u.id === row.id);
+    });
+    var merged = mapCloudUserToLocal(row, idx !== -1 ? cat.users[idx] : null);
+    if (idx !== -1) {
+      cat.users[idx] = merged;
+    } else {
+      cat.users.push(merged);
+    }
+    if (typeof localStorage !== 'undefined') {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cat));
+      } catch (e) {}
+    }
+    var cur = getCurrentUser();
+    if (cur && ((cur.email && cur.email.toLowerCase() === rowEmail) || (cur.id && cur.id === merged.id))) {
+      var updatedCur = mapCloudUserToLocal(row, cur);
+      persistCurrentUserLocally(updatedCur, true);
+    }
+    return merged;
+  }
+
+  function pushUserToCloud(userObj) {
+    if (!userObj || !userObj.email || typeof fetch !== 'function') {
+      return Promise.resolve({ ok: false, skipped: true });
+    }
+    var emailLower = String(userObj.email).trim().toLowerCase();
+    var snapshot = Object.assign({}, userObj, {
+      modules: Array.isArray(userObj.modules) ? userObj.modules.slice() : undefined
+    });
+    _pushVersionByEmail[emailLower] = (_pushVersionByEmail[emailLower] || 0) + 1;
+    var myVersion = _pushVersionByEmail[emailLower];
+
+    var headers = {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    };
+
+    var executePush = function () {
+      _activePushCount++;
+      return fetch(SUPABASE_URL + '/users?email=eq.' + encodeURIComponent(emailLower) + '&select=id', {
+        method: 'GET',
+        headers: headers
+      })
+        .then(function (res) { return res.ok ? res.json() : []; })
+        .then(function (rows) {
+          if (Array.isArray(rows) && rows.length > 0 && rows[0].id) {
+            var cloudId = rows[0].id;
+            var patchPayload = mapLocalUserToCloud(snapshot, cloudId);
+            delete patchPayload.id;
+            return fetch(SUPABASE_URL + '/users?id=eq.' + encodeURIComponent(cloudId), {
+              method: 'PATCH',
+              headers: headers,
+              body: JSON.stringify(patchPayload)
+            });
+          } else {
+            var insertPayload = mapLocalUserToCloud(snapshot);
+            var upsertHeaders = Object.assign({}, headers, {
+              'Prefer': 'resolution=merge-duplicates,return=representation'
+            });
+            return fetch(SUPABASE_URL + '/users?on_conflict=id', {
+              method: 'POST',
+              headers: upsertHeaders,
+              body: JSON.stringify(insertPayload)
+            });
+          }
+        })
+        .then(function (res) {
+          _activePushCount = Math.max(0, _activePushCount - 1);
+          if (!res || !res.ok) {
+            return { ok: false, status: res ? res.status : 0 };
+          }
+          return res.json().then(function (data) {
+            var saved = Array.isArray(data) && data.length > 0 ? data[0] : null;
+            if (saved && _pushVersionByEmail[emailLower] === myVersion) {
+              mergeSingleCloudRowLocally(saved);
+              postRealtimeBridge('USER_CLOUD_PUSHED', saved);
+            }
+            return { ok: true, user: saved };
+          });
+        })
+        .catch(function (err) {
+          _activePushCount = Math.max(0, _activePushCount - 1);
+          return { ok: false, error: err && err.message ? err.message : String(err) };
+        });
+    };
+
+    var prevQueue = _pushQueueByEmail[emailLower] || Promise.resolve();
+    var nextQueue = prevQueue.catch(function () {}).then(executePush);
+    _pushQueueByEmail[emailLower] = nextQueue;
+    return nextQueue;
+  }
+
+  function syncFromCloud(callback) {
+    if (typeof fetch !== 'function') {
+      var fallbackRes = { ok: false, skipped: true, users: getCatalog().users || [] };
+      if (typeof callback === 'function') callback(fallbackRes);
+      return Promise.resolve(fallbackRes);
+    }
+    if (_syncPromise) return _syncPromise;
+
+    var headers = {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+    };
+
+    _syncPromise = fetch(SUPABASE_URL + '/users?select=*&order=last_active.desc', {
+      method: 'GET',
+      headers: headers
+    })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Supabase GET users HTTP ' + res.status);
+        return res.json();
+      })
+      .then(function (rows) {
+        if (!Array.isArray(rows)) rows = [];
+        var cat = getCatalog();
+        if (!cat.users) cat.users = [];
+
+        var byEmail = {};
+        for (var i = 0; i < cat.users.length; i++) {
+          var lu = cat.users[i];
+          if (lu && lu.email) byEmail[String(lu.email).trim().toLowerCase()] = lu;
+        }
+
+        var mergedList = [];
+        var seenEmails = {};
+        for (var j = 0; j < rows.length; j++) {
+          var row = rows[j];
+          var em = String(row.email || '').trim().toLowerCase();
+          var ex = em ? byEmail[em] : null;
+          var merged = mapCloudUserToLocal(row, ex);
+          mergedList.push(merged);
+          if (em) seenEmails[em] = true;
+        }
+
+        var missingSeeds = [];
+        var cur = getCurrentUser();
+        for (var k = 0; k < cat.users.length; k++) {
+          var localOnly = cat.users[k];
+          var lEmail = localOnly && localOnly.email ? String(localOnly.email).trim().toLowerCase() : '';
+          if (lEmail && !seenEmails[lEmail]) {
+            mergedList.push(localOnly);
+            seenEmails[lEmail] = true;
+            if (lEmail === 'thuynguyen2dk4@gmail.com' || (cur && cur.email && cur.email.toLowerCase() === lEmail)) {
+              missingSeeds.push(localOnly);
+            }
+          }
+        }
+
+        cat.users = mergedList;
+        if (typeof localStorage !== 'undefined') {
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cat));
+          } catch (e) {}
+        }
+
+        if (cur && cur.email && _activePushCount === 0) {
+          var cEmail = String(cur.email).trim().toLowerCase();
+          var updatedUser = mergedList.find(function (u) {
+            return u.email && u.email.toLowerCase() === cEmail;
+          });
+          if (updatedUser) {
+            cur = Object.assign({}, cur, updatedUser, {
+              password: cur.password || updatedUser.password || '',
+              address: cur.address || updatedUser.address || '',
+              avatar: cur.avatar || updatedUser.avatar || ''
+            });
+            persistCurrentUserLocally(cur, true);
+          }
+        }
+
+        if (typeof window !== 'undefined') {
+          try {
+            window.dispatchEvent(new CustomEvent(SYNC_EVENT, { detail: cat }));
+          } catch (e) {}
+        }
+
+        if (missingSeeds.length > 0 && _activePushCount === 0) {
+          missingSeeds.forEach(function (seedUser) {
+            pushUserToCloud(seedUser);
+          });
+        }
+
+        var result = { ok: true, users: cat.users, count: rows.length, currentUser: cur };
+        _syncPromise = null;
+        if (typeof callback === 'function') callback(result);
+        return result;
+      })
+      .catch(function (err) {
+        _syncPromise = null;
+        var errResult = { ok: false, error: err && err.message ? err.message : String(err), users: getCatalog().users || [] };
+        if (typeof callback === 'function') callback(errResult);
+        return errResult;
+      });
+
+    return _syncPromise;
+  }
+
+  if (typeof window !== 'undefined') {
+    if (_realtimeChannel) {
+      _realtimeChannel.onmessage = function (evt) {
+        var msg = evt && evt.data;
+        if (!msg || msg.senderId === TAB_INSTANCE_ID) return;
+        try {
+          if (msg.type === 'CATALOG_SYNCED') {
+            if (typeof window.dispatchEvent === 'function') {
+              window.dispatchEvent(new CustomEvent(SYNC_EVENT, { detail: getCatalog() }));
+            }
+          } else if (msg.type === 'USER_UPDATED' || msg.type === 'USER_CLOUD_PUSHED') {
+            if (msg.type === 'USER_CLOUD_PUSHED' && msg.payload) {
+              mergeSingleCloudRowLocally(msg.payload);
+            }
+            if (typeof window.dispatchEvent === 'function') {
+              window.dispatchEvent(new CustomEvent(USER_EVENT, { detail: getCurrentUser() }));
+              window.dispatchEvent(new CustomEvent(SYNC_EVENT, { detail: getCatalog() }));
+            }
+          }
+        } catch (e) {}
+      };
+    }
+
+    if (typeof window.addEventListener === 'function') {
+      window.addEventListener('storage', function (e) {
+        if (!e || !e.key) return;
+        try {
+          if (e.key === STORAGE_KEY) {
+            if (typeof window.dispatchEvent === 'function') {
+              window.dispatchEvent(new CustomEvent(SYNC_EVENT, { detail: getCatalog() }));
+            }
+          } else if (e.key === CURRENT_USER_KEY) {
+            if (typeof window.dispatchEvent === 'function') {
+              window.dispatchEvent(new CustomEvent(USER_EVENT, { detail: getCurrentUser() }));
+            }
+          }
+        } catch (err) {}
+      });
+    }
+  }
 
   // ==========================================================================
   // 1. DEFAULT DATA DEFINITIONS
@@ -642,6 +1008,8 @@
       var evt = new CustomEvent(SYNC_EVENT, { detail: catalogData });
       window.dispatchEvent(evt);
     } catch (e) {}
+
+    postRealtimeBridge('CATALOG_SYNCED', null);
 
     try {
       var frames = window.parent && window.parent.frames ? window.parent.frames : [];
@@ -1280,8 +1648,10 @@
     if (typeof window !== 'undefined') {
       var evt = new CustomEvent(USER_EVENT, { detail: found });
       window.dispatchEvent(evt);
+      postRealtimeBridge('USER_UPDATED', found);
     }
 
+    pushUserToCloud(found);
     return { success: true, user: found, isAdmin: isAdmin };
   }
 
@@ -1302,6 +1672,7 @@
     }
 
     var isAdmin = isUserAdmin({ email: cleanEmail });
+    var defaultDevice = userData.device || (userData.serial ? 'Smart Gimbal S1 Titanium' : 'T-Flow Pro (Chưa kích hoạt)');
     var newUser = {
       id: 'user-' + Date.now(),
       name: userData.name || cleanEmail.split('@')[0],
@@ -1310,11 +1681,15 @@
       phone: userData.phone || '',
       role: isAdmin ? 'Master Administrator & Founder' : 'Khách Hàng Thành Viên',
       company: userData.company || 'Công ty TNHH Công nghệ T-Flow Việt Nam',
+      tier: isAdmin ? 'Enterprise Studio' : 'Basic Creator',
       tierBadge: isAdmin ? 'Master Admin' : 'Thành Viên Mới',
-      registeredDevice: userData.serial ? 'T-Flow Pro' : 'T-Flow Pro (Chưa kích hoạt)',
+      memberSince: new Date().toISOString().slice(0, 10),
+      device: defaultDevice,
+      registeredDevice: defaultDevice,
       serial: userData.serial || '',
+      warrantyDays: 365,
       battery: 100,
-      firmware: 'FW-TF-G31-v1.2.0 (Mới nhất)',
+      firmware: 'v2.4.2',
       status: 'Đang Hoạt Động',
       modules: isAdmin ? [true, true, true, true, true, true, true] : [true, false, false, false, false, false, false]
     };
@@ -1339,8 +1714,10 @@
     if (typeof window !== 'undefined') {
       var evt = new CustomEvent(USER_EVENT, { detail: newUser });
       window.dispatchEvent(evt);
+      postRealtimeBridge('USER_UPDATED', newUser);
     }
 
+    pushUserToCloud(newUser);
     return { success: true, user: newUser, isAdmin: isAdmin };
   }
 
@@ -1364,11 +1741,15 @@
         phone: isAdmin ? '0908 888 888' : '',
         role: isAdmin ? 'Master Administrator & Founder' : 'Khách Hàng Thành Viên',
         company: 'Công ty TNHH Công nghệ T-Flow Việt Nam',
+        tier: isAdmin ? 'Enterprise Studio' : 'Basic Creator',
         tierBadge: isAdmin ? 'Master Admin' : 'Thành Viên Mới',
-        registeredDevice: 'T-Flow Pro (TF-G31-PRO)',
+        memberSince: new Date().toISOString().slice(0, 10),
+        device: 'Smart Gimbal S1 Titanium',
+        registeredDevice: 'Smart Gimbal S1 Titanium',
         serial: isAdmin ? 'HQYVYFYFR4' : '',
+        warrantyDays: 365,
         battery: 98,
-        firmware: 'FW-TF-G31-v1.2.0 (Mới nhất)',
+        firmware: 'v2.4.2',
         status: 'Đang Hoạt Động',
         modules: isAdmin ? [true, true, true, true, true, true, true] : [true, false, false, false, false, false, false]
       };
@@ -1377,6 +1758,7 @@
     } else if (isAdmin) {
       user.modules = [true, true, true, true, true, true, true];
       user.role = 'Master Administrator & Founder';
+      user.tier = user.tier || 'Enterprise Studio';
       user.tierBadge = 'Master Admin';
       saveCatalog(cat);
     }
@@ -1398,8 +1780,10 @@
     if (typeof window !== 'undefined') {
       var evt = new CustomEvent(USER_EVENT, { detail: user });
       window.dispatchEvent(evt);
+      postRealtimeBridge('USER_UPDATED', user);
     }
 
+    pushUserToCloud(user);
     return { success: true, user: user, isAdmin: isAdmin };
   }
 
@@ -1427,62 +1811,88 @@
     var cur = getCurrentUser();
 
     var targetId = userId || (cur ? cur.id : null);
-    var targetEmail = (cur && cur.email ? cur.email.toLowerCase() : null) || (profileData && profileData.email ? profileData.email.toLowerCase() : null);
+    var targetEmail = (profileData && profileData.email ? String(profileData.email).trim().toLowerCase() : null) ||
+                      (!userId && cur && cur.email ? String(cur.email).trim().toLowerCase() : null);
 
     var idx = cat.users.findIndex(function (u) {
       return (targetId && u.id === targetId) ||
              (targetEmail && u.email && u.email.toLowerCase() === targetEmail);
     });
 
+    var updatedRecord = null;
     if (idx !== -1) {
       Object.assign(cat.users[idx], profileData);
+      if (profileData.device && !profileData.registeredDevice) {
+        cat.users[idx].registeredDevice = profileData.device;
+      } else if (profileData.registeredDevice && !profileData.device) {
+        cat.users[idx].device = profileData.registeredDevice;
+      }
+      updatedRecord = cat.users[idx];
       saveCatalog(cat);
-    } else if (cur) {
+    } else if (cur && (!userId || cur.id === userId)) {
       Object.assign(cur, profileData);
+      if (profileData.device && !profileData.registeredDevice) {
+        cur.registeredDevice = profileData.device;
+      }
       cat.users.push(cur);
+      updatedRecord = cur;
       saveCatalog(cat);
     }
 
-    if (cur) {
+    var matchesCur = Boolean(cur && (
+      (targetId && cur.id === targetId) ||
+      (targetEmail && cur.email && cur.email.toLowerCase() === targetEmail) ||
+      (updatedRecord && cur.email && updatedRecord.email && cur.email.toLowerCase() === updatedRecord.email.toLowerCase())
+    ));
+
+    if (matchesCur) {
       Object.assign(cur, profileData);
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(cur));
+      if (updatedRecord && updatedRecord.device) {
+        cur.device = updatedRecord.device;
+        cur.registeredDevice = updatedRecord.device;
       }
-      var cookieCur = Object.assign({}, cur);
-      if (cookieCur.avatar && cookieCur.avatar.length > 150) {
-        cookieCur.avatar = 'photo_avatar';
-      }
-      setCookie('tflow_user_session', cookieCur, 30);
-      createSession(cur);
-      if (typeof window !== 'undefined') {
-        var evt = new CustomEvent(USER_EVENT, { detail: cur });
-        window.dispatchEvent(evt);
-      }
+      persistCurrentUserLocally(cur, true);
+      postRealtimeBridge('USER_UPDATED', cur);
     }
-    return true;
+
+    if (updatedRecord) {
+      pushUserToCloud(updatedRecord);
+    } else if (matchesCur && cur) {
+      pushUserToCloud(cur);
+    }
+    return Boolean(updatedRecord || matchesCur);
   }
 
-  function updateUserModules(userId, moduleIndex, isEnabled) {
+  function updateUserModules(userId, moduleIndexOrArray, isEnabled) {
     var cat = getCatalog();
-    var idx = cat.users.findIndex(function (u) { return u.id === userId; });
+    if (!cat.users) cat.users = [];
+    var idx = cat.users.findIndex(function (u) {
+      return u.id === userId || (u.email && userId && u.email.toLowerCase() === String(userId).trim().toLowerCase());
+    });
     if (idx === -1) return false;
-    if (!cat.users[idx].modules) {
-      cat.users[idx].modules = [false, false, false, false, false, false, false];
+    if (!Array.isArray(cat.users[idx].modules) || cat.users[idx].modules.length !== 7) {
+      cat.users[idx].modules = normalizeModulesArray(cat.users[idx].modules);
     }
-    cat.users[idx].modules[moduleIndex] = isEnabled;
+
+    if (Array.isArray(moduleIndexOrArray)) {
+      cat.users[idx].modules = normalizeModulesArray(moduleIndexOrArray, cat.users[idx].modules);
+    } else if (typeof moduleIndexOrArray === 'number' && moduleIndexOrArray >= 0 && moduleIndexOrArray < 7) {
+      cat.users[idx].modules[moduleIndexOrArray] = Boolean(isEnabled);
+    } else {
+      return false;
+    }
+
     saveCatalog(cat);
 
     var cur = getCurrentUser();
-    if (cur && cur.id === userId) {
-      cur.modules[moduleIndex] = isEnabled;
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(cur));
-      }
-      if (typeof window !== 'undefined') {
-        var evt = new CustomEvent(USER_EVENT, { detail: cur });
-        window.dispatchEvent(evt);
-      }
+    var targetEmail = cat.users[idx].email ? cat.users[idx].email.toLowerCase() : '';
+    if (cur && (cur.id === cat.users[idx].id || (cur.email && targetEmail && cur.email.toLowerCase() === targetEmail))) {
+      cur.modules = cat.users[idx].modules.slice();
+      persistCurrentUserLocally(cur, true);
+      postRealtimeBridge('USER_UPDATED', cur);
     }
+
+    pushUserToCloud(cat.users[idx]);
     return true;
   }
 
@@ -1584,7 +1994,7 @@
   // ==========================================================================
   // 8. CSV EXPORT & IMPORT API
   // ==========================================================================
-  function exportProductsCSV() {
+  function exportProductsCSV(skipDownload) {
     var cat = getCatalog();
     var rows = [
       ["Nhom_Hang", "Ma_San_Pham", "Ten_San_Pham", "Slogan", "Phan_Cap", "Gia_Ban", "Gia_Goc", "Qua_Tang", "So_Don_Ban", "Trang_Thai"]
@@ -1634,13 +2044,16 @@
       }).join(",");
     }).join("\n");
 
-    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    var link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", "TFlow_Products_Export_" + Date.now() + ".csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (!skipDownload && typeof document !== 'undefined') {
+      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", "TFlow_Products_Export_" + Date.now() + ".csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    return csvContent;
   }
 
   function importProductsCSV(csvText) {
@@ -1648,10 +2061,10 @@
     return { success: true, count: 1, message: 'Đã xử lý danh mục sản phẩm T-Flow.' };
   }
 
-  function exportUsersCSV() {
+  function exportUsersCSV(skipDownload) {
     var users = getUsers();
     var rows = [
-      ["ID", "Ho_Va_Ten", "Email", "So_Dien_Thoai", "Cap_Bac", "Thiet_Bi", "Trang_Thai"]
+      ["ID", "Ho_Va_Ten", "Email", "So_Dien_Thoai", "Cap_Bac", "Thiet_Bi", "Serial", "Pin", "Firmware", "Trang_Thai"]
     ];
 
     users.forEach(function (u) {
@@ -1660,8 +2073,11 @@
         u.name,
         u.email,
         u.phone || '',
-        u.tierBadge || u.role,
-        u.registeredDevice || 'T-Flow Pro',
+        u.tierBadge || u.tier || u.role || '',
+        u.device || u.registeredDevice || 'Smart Gimbal S1 Titanium',
+        u.serial || '',
+        (typeof u.battery === 'number' ? u.battery + '%' : ''),
+        u.firmware || '',
         u.status || 'Đang Hoạt Động'
       ]);
     });
@@ -1676,13 +2092,16 @@
       }).join(",");
     }).join("\n");
 
-    var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    var link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.setAttribute("download", "TFlow_Users_Export_" + Date.now() + ".csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    if (!skipDownload && typeof document !== 'undefined') {
+      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      var link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", "TFlow_Users_Export_" + Date.now() + ".csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    return csvContent;
   }
 
   // ==========================================================================
@@ -2937,7 +3356,10 @@
     createOrder: createOrder,
     getUserOrders: getUserOrders,
 
-    // Users & Auth
+    // Users & Auth & Cloud Sync
+    SUPABASE_URL: SUPABASE_URL,
+    syncFromCloud: syncFromCloud,
+    pushUserToCloud: pushUserToCloud,
     getUsers: getUsers,
     getCurrentUser: getCurrentUser,
     isUserAdmin: isUserAdmin,

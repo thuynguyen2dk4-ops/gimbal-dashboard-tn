@@ -19,6 +19,9 @@ final class SupabaseModuleStore: ObservableObject {
     @Published var userName: String = "Thủy Nguyễn (Founder)"
     @Published var userTier: String = "VIP LIFETIME"
     @Published var deviceName: String = "Smart Gimbal S1 Titanium"
+    @Published var deviceBattery: Int = 94
+    @Published var deviceFirmware: String = "v2.4.1"
+    @Published var cloudUsersCount: Int = 0
     @Published var isOnline: Bool = true
     @Published var isSyncing: Bool = false
     @Published var lastSyncTime: String = "Vừa xong"
@@ -70,12 +73,88 @@ final class SupabaseModuleStore: ObservableObject {
     private let authSessionStorageKey = "tflow_auth_session_v1"
     private let userProfileStorageKey = "tflow_user_profile_v1"
     private let registeredAccountsStorageKey = "tflow_registered_accounts_v1"
+    private let deviceNameStorageKey = "tflow_device_name_v1"
+    private let deviceBatteryStorageKey = "tflow_device_battery_v1"
+    private let deviceFirmwareStorageKey = "tflow_device_firmware_v1"
 
     private let cookieName = "tflow_session_token"
     private let cookieDomain = ".t-flow-tech.vercel.app"
 
+    private let supabaseRestURL = "https://dlgkrwodxdsbbliwdnkg.supabase.co/rest/v1"
+    private let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZ2tyd29keGRzYmJsaXdkbmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxMjIwNjQsImV4cCI6MjEwOTY5ODA2NH0.Lg6C6MpLhX_CoKgWtl_nhWLGNw5NuYE9FZJoTxXnu6I"
+    private let supabaseWriteQueue = DispatchQueue(label: "com.tflow.supabase.write.serial", qos: .utility)
+    private var activePushCount: Int = 0
+
+    private enum SyncPayloadMode {
+        case full
+        case profileOnly
+        case modulesOnly
+        case telemetryOnly
+    }
+
+    private struct SupabaseUserRow: Codable {
+        var id: String?
+        var name: String?
+        var email: String?
+        var phone: String?
+        var device: String?
+        var tier: String?
+        var tier_badge: String?
+        var member_since: String?
+        var serial: String?
+        var warranty_days: Int?
+        var battery: Int?
+        var firmware: String?
+        var status: String?
+        var modules: [Bool]?
+        var is_admin: Bool?
+        var last_active: String?
+    }
+
+    private struct SupabaseFullPayload: Encodable {
+        var id: String
+        var name: String
+        var email: String
+        var phone: String
+        var device: String
+        var tier: String
+        var tier_badge: String
+        var member_since: String
+        var serial: String
+        var warranty_days: Int
+        var battery: Int
+        var firmware: String
+        var status: String
+        var modules: [Bool]
+        var is_admin: Bool
+        var last_active: String
+    }
+
+    private struct SupabaseProfilePatch: Encodable {
+        var name: String
+        var email: String
+        var phone: String
+        var serial: String
+        var last_active: String
+    }
+
+    private struct SupabaseModulesPatch: Encodable {
+        var tier: String
+        var tier_badge: String
+        var modules: [Bool]
+        var last_active: String
+    }
+
+    private struct SupabaseTelemetryPatch: Encodable {
+        var device: String
+        var battery: Int
+        var firmware: String
+        var last_active: String
+    }
+
     init() {
         loadPersistedState()
+        syncWithCloud()
     }
 
     // MARK: - Persisted State & Cookie Hydration
@@ -87,6 +166,15 @@ final class SupabaseModuleStore: ObservableObject {
         }
         if let savedModules = defaults.array(forKey: modulesStorageKey) as? [Bool], savedModules.count == 7 {
             modules = savedModules
+        }
+        if let savedDevice = defaults.string(forKey: deviceNameStorageKey), !savedDevice.isEmpty {
+            deviceName = savedDevice
+        }
+        if defaults.object(forKey: deviceBatteryStorageKey) != nil {
+            deviceBattery = defaults.integer(forKey: deviceBatteryStorageKey)
+        }
+        if let savedFw = defaults.string(forKey: deviceFirmwareStorageKey), !savedFw.isEmpty {
+            deviceFirmware = savedFw
         }
         if let profileData = defaults.data(forKey: userProfileStorageKey),
            let decodedProfile = try? JSONDecoder().decode(UserAccountProfile.self, from: profileData) {
@@ -111,6 +199,9 @@ final class SupabaseModuleStore: ObservableObject {
         let defaults = UserDefaults.standard
         defaults.set(userTier, forKey: tierStorageKey)
         defaults.set(modules, forKey: modulesStorageKey)
+        defaults.set(deviceName, forKey: deviceNameStorageKey)
+        defaults.set(deviceBattery, forKey: deviceBatteryStorageKey)
+        defaults.set(deviceFirmware, forKey: deviceFirmwareStorageKey)
         if let encodedProfile = try? JSONEncoder().encode(currentUser) {
             defaults.set(encodedProfile, forKey: userProfileStorageKey)
         }
@@ -217,6 +308,7 @@ final class SupabaseModuleStore: ObservableObject {
                 && acc.password == pwTrimmed
         }) {
             createAndPersistSession(for: matched.profile)
+            syncUserRecordAfterLogin(for: matched.profile)
             return (true, "Đăng nhập thành công")
         }
 
@@ -234,6 +326,7 @@ final class SupabaseModuleStore: ObservableObject {
                     memberSince: "11/2025"
                 )
             createAndPersistSession(for: profile)
+            syncUserRecordAfterLogin(for: profile)
             return (true, "Đăng nhập thành công")
         }
 
@@ -280,6 +373,7 @@ final class SupabaseModuleStore: ObservableObject {
         saveRegisteredAccounts(accounts)
 
         createAndPersistSession(for: profile)
+        pushCurrentUserToSupabase(mode: .full)
         return (true, "Tạo tài khoản & Cookie Session thành công")
     }
 
@@ -295,6 +389,7 @@ final class SupabaseModuleStore: ObservableObject {
             )
             : currentUser
         createAndPersistSession(for: profile)
+        syncUserRecordAfterLogin(for: profile)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 
@@ -353,16 +448,19 @@ final class SupabaseModuleStore: ObservableObject {
         userName = updated.fullName
         persistState()
 
-        if let pw = newPassword?.trimmingCharacters(in: .whitespacesAndNewlines), !pw.isEmpty {
-            var accounts = loadRegisteredAccounts()
-            if let idx = accounts.firstIndex(where: { $0.profile.email.lowercased() == oldEmail || $0.profile.email.lowercased() == updated.email.lowercased() }) {
-                accounts[idx].password = pw
-                accounts[idx].profile = updated
-            } else {
-                accounts.append(StoredAccount(password: pw, profile: updated))
+        var accounts = loadRegisteredAccounts()
+        let cleanedNewPw = newPassword?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        if let idx = accounts.firstIndex(where: { $0.profile.email.lowercased() == oldEmail || $0.profile.email.lowercased() == updated.email.lowercased() }) {
+            accounts[idx].profile = updated
+            if !cleanedNewPw.isEmpty {
+                accounts[idx].password = cleanedNewPw
             }
             saveRegisteredAccounts(accounts)
+        } else if !cleanedNewPw.isEmpty {
+            accounts.append(StoredAccount(password: cleanedNewPw, profile: updated))
+            saveRegisteredAccounts(accounts)
         }
+        pushCurrentUserToSupabase(mode: .profileOnly)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 
@@ -392,34 +490,438 @@ final class SupabaseModuleStore: ObservableObject {
         guard modules.indices.contains(index) else { return }
         modules[index].toggle()
         persistState()
-        syncWithCloud()
+        pushCurrentUserToSupabase(mode: .modulesOnly)
     }
 
     func setTier(_ tier: String) {
         userTier = tier
-        if tier == "Free Starter" {
+        if tier == "Free Starter" || tier == "Basic Creator" {
             modules = [false, false, false, false, false, false, false]
-        } else if tier == "Creator Pro" {
+        } else if tier == "Creator Pro" || tier == "Pro Cinema" {
             modules = [true, true, true, true, true, false, false]
         } else {
             modules = [true, true, true, true, true, true, true]
         }
         persistState()
-        syncWithCloud()
+        pushCurrentUserToSupabase(mode: .modulesOnly)
+    }
+
+    func updateDeviceTelemetry(deviceName: String? = nil, battery: Int? = nil, firmware: String? = nil) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if let dev = deviceName?.trimmingCharacters(in: .whitespacesAndNewlines), !dev.isEmpty {
+                self.deviceName = dev
+            }
+            if let bat = battery {
+                self.deviceBattery = bat
+            }
+            if let fw = firmware?.trimmingCharacters(in: .whitespacesAndNewlines), !fw.isEmpty {
+                self.deviceFirmware = fw
+            }
+            self.persistState()
+            if self.isLoggedIn && !self.currentUser.email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                self.pushCurrentUserToSupabase(mode: .telemetryOnly)
+            }
+        }
     }
 
     func syncWithCloud() {
         persistState()
-        isSyncing = true
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { [weak self] in
-            guard let self = self else { return }
-            self.isSyncing = false
-            self.isOnline = true
-            let formatter = DateFormatter()
-            formatter.dateFormat = "HH:mm:ss"
-            self.lastSyncTime = formatter.string(from: Date())
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        let cleanedEmail = currentUser.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard let request = makeSupabaseRequest(
+            endpoint: "/users",
+            queryItems: [
+                URLQueryItem(name: "select", value: "*"),
+                URLQueryItem(name: "order", value: "last_active.desc")
+            ],
+            method: "GET"
+        ) else {
+            return
         }
+
+        DispatchQueue.main.async { [weak self] in
+            self?.isSyncing = true
+        }
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+
+        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+            guard let self = self else { return }
+            guard error == nil,
+                  let http = response as? HTTPURLResponse,
+                  (200...299).contains(http.statusCode),
+                  let data = data,
+                  let rows = try? JSONDecoder().decode([SupabaseUserRow].self, from: data) else {
+                DispatchQueue.main.async {
+                    self.isSyncing = false
+                    self.isOnline = false
+                }
+                return
+            }
+
+            DispatchQueue.main.async {
+                self.cloudUsersCount = rows.count
+                self.mergeCloudRowsIntoLocalAccounts(rows)
+
+                var matchedCurrent = false
+                if self.isLoggedIn && !cleanedEmail.isEmpty && self.activePushCount == 0 {
+                    if let matchedRow = rows.first(where: { ($0.email ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == cleanedEmail }) {
+                        matchedCurrent = true
+                        self.applyCloudRowToCurrentState(matchedRow)
+                    } else {
+                        self.pushCurrentUserToSupabase(mode: .full)
+                    }
+                } else if !cleanedEmail.isEmpty && rows.contains(where: { ($0.email ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == cleanedEmail }) {
+                    matchedCurrent = true
+                }
+
+                if matchedCurrent {
+                    self.persistState()
+                }
+                self.isSyncing = (self.activePushCount > 0)
+                self.isOnline = true
+                self.lastSyncTime = self.formattedSyncTimestamp()
+            }
+        }.resume()
+    }
+
+    // MARK: - Private Supabase REST Sync Helpers
+
+    private func makeSupabaseRequest(
+        endpoint: String,
+        queryItems: [URLQueryItem] = [],
+        method: String = "GET",
+        prefer: String? = nil,
+        bodyData: Data? = nil
+    ) -> URLRequest? {
+        guard var components = URLComponents(string: "\(supabaseRestURL)\(endpoint)") else {
+            return nil
+        }
+        if !queryItems.isEmpty {
+            components.queryItems = queryItems
+        }
+        guard let url = components.url else { return nil }
+        var req = URLRequest(url: url)
+        req.httpMethod = method
+        req.timeoutInterval = 12
+        req.setValue(supabaseAnonKey, forHTTPHeaderField: "apikey")
+        req.setValue("Bearer \(supabaseAnonKey)", forHTTPHeaderField: "Authorization")
+        req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        if let prefer = prefer {
+            req.setValue(prefer, forHTTPHeaderField: "Prefer")
+        }
+        req.httpBody = bodyData
+        return req
+    }
+
+    private func makeStableCloudId(for email: String) -> String {
+        let lower = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        if lower == "thuynguyen2dk4@gmail.com" {
+            return "thuy-nguyen"
+        }
+        let sanitized = lower.unicodeScalars.map { ch -> Character in
+            CharacterSet.alphanumerics.contains(ch) ? Character(ch) : "-"
+        }
+        return "usr-" + String(sanitized)
+    }
+
+    private func normalizedModules(_ raw: [Bool]?, fallback: [Bool]) -> [Bool] {
+        guard let raw = raw, !raw.isEmpty else {
+            return fallback.count == 7 ? fallback : [false, false, false, false, false, false, false]
+        }
+        var out: [Bool] = []
+        for idx in 0..<7 {
+            if idx < raw.count {
+                out.append(raw[idx])
+            } else if idx < fallback.count {
+                out.append(fallback[idx])
+            } else {
+                out.append(false)
+            }
+        }
+        return out
+    }
+
+    private func applyCloudRowToCurrentState(_ row: SupabaseUserRow) {
+        let resolvedName = (row.name?.isEmpty == false) ? row.name! : currentUser.fullName
+        let resolvedEmail = (row.email?.isEmpty == false) ? row.email!.lowercased() : currentUser.email
+        let resolvedPhone = row.phone ?? currentUser.phone
+        let resolvedSerial = (row.serial?.isEmpty == false) ? row.serial!.uppercased() : currentUser.gimbalSerial
+        let resolvedMember = (row.member_since?.isEmpty == false) ? row.member_since! : currentUser.memberSince
+
+        currentUser = UserAccountProfile(
+            fullName: resolvedName,
+            email: resolvedEmail,
+            phone: resolvedPhone,
+            address: currentUser.address,
+            gimbalSerial: resolvedSerial,
+            memberSince: resolvedMember
+        )
+        userName = resolvedName
+        if let tier = row.tier, !tier.isEmpty {
+            userTier = tier
+        }
+        if let dev = row.device, !dev.isEmpty {
+            deviceName = dev
+        }
+        if let bat = row.battery {
+            deviceBattery = bat
+        }
+        if let fw = row.firmware, !fw.isEmpty {
+            deviceFirmware = fw
+        }
+        if let cloudMods = row.modules, cloudMods.count == 7 {
+            modules = cloudMods
+        }
+    }
+
+    private func mergeCloudRowsIntoLocalAccounts(_ rows: [SupabaseUserRow]) {
+        var accounts = loadRegisteredAccounts()
+        for row in rows {
+            guard let rawEmail = row.email?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+                  !rawEmail.isEmpty else { continue }
+            let existingIdx = accounts.firstIndex(where: { $0.profile.email.lowercased() == rawEmail })
+            let existingProfile = existingIdx != nil ? accounts[existingIdx!].profile : nil
+            let existingPassword = existingIdx != nil ? accounts[existingIdx!].password : "123456"
+
+            let mergedProfile = UserAccountProfile(
+                fullName: (row.name?.isEmpty == false) ? row.name! : (existingProfile?.fullName ?? rawEmail),
+                email: rawEmail,
+                phone: row.phone ?? existingProfile?.phone ?? "",
+                address: existingProfile?.address ?? currentUser.address,
+                gimbalSerial: (row.serial?.isEmpty == false) ? row.serial!.uppercased() : (existingProfile?.gimbalSerial ?? "TF-G31-PRO"),
+                memberSince: (row.member_since?.isEmpty == false) ? row.member_since! : (existingProfile?.memberSince ?? "11/2025")
+            )
+
+            if let idx = existingIdx {
+                accounts[idx].profile = mergedProfile
+            } else {
+                accounts.append(StoredAccount(password: existingPassword, profile: mergedProfile))
+            }
+        }
+        saveRegisteredAccounts(accounts)
+    }
+
+    private func syncUserRecordAfterLogin(for profile: UserAccountProfile) {
+        let emailLower = profile.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !emailLower.isEmpty,
+              let req = makeSupabaseRequest(
+                endpoint: "/users",
+                queryItems: [
+                    URLQueryItem(name: "email", value: "eq.\(emailLower)"),
+                    URLQueryItem(name: "select", value: "*")
+                ],
+                method: "GET"
+              ) else {
+            return
+        }
+
+        URLSession.shared.dataTask(with: req) { [weak self] data, response, error in
+            guard let self = self else { return }
+            guard error == nil,
+                  let http = response as? HTTPURLResponse,
+                  (200...299).contains(http.statusCode),
+                  let data = data,
+                  let rows = try? JSONDecoder().decode([SupabaseUserRow].self, from: data) else {
+                DispatchQueue.main.async {
+                    self.isOnline = false
+                }
+                return
+            }
+
+            DispatchQueue.main.async {
+                if let matched = rows.first {
+                    self.applyCloudRowToCurrentState(matched)
+                    self.persistState()
+                    self.isOnline = true
+                    self.lastSyncTime = self.formattedSyncTimestamp()
+                    self.pushCurrentUserToSupabase(mode: .telemetryOnly)
+                } else {
+                    self.pushCurrentUserToSupabase(mode: .full)
+                }
+            }
+        }.resume()
+    }
+
+    private func pushCurrentUserToSupabase(mode: SyncPayloadMode) {
+        let profileSnapshot = currentUser
+        let emailLower = profileSnapshot.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !emailLower.isEmpty else { return }
+
+        let tierSnapshot = userTier
+        let deviceSnapshot = deviceName.isEmpty ? "Smart Gimbal S1 Titanium" : deviceName
+        let batterySnapshot = deviceBattery
+        let firmwareSnapshot = deviceFirmware.isEmpty ? "v2.4.1" : deviceFirmware
+        let modulesSnapshot = normalizedModules(modules, fallback: modules)
+        let nowIso = ISO8601DateFormatter().string(from: Date())
+        let isAdminEmail = ["thuynguyen2dk4@gmail.com", "thuy.nguyen@tflow.tech"].contains(emailLower)
+
+        guard let lookupReq = makeSupabaseRequest(
+            endpoint: "/users",
+            queryItems: [
+                URLQueryItem(name: "email", value: "eq.\(emailLower)"),
+                URLQueryItem(name: "select", value: "id")
+            ],
+            method: "GET"
+        ) else {
+            return
+        }
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.activePushCount += 1
+            self.isSyncing = true
+        }
+
+        supabaseWriteQueue.async { [weak self] in
+            guard let self = self else { return }
+            let lookupSem = DispatchSemaphore(value: 0)
+            var existingRows: [SupabaseUserRow] = []
+            var lookupFailed = false
+
+            URLSession.shared.dataTask(with: lookupReq) { data, _, error in
+                defer { lookupSem.signal() }
+                if error != nil {
+                    lookupFailed = true
+                    return
+                }
+                if let data = data {
+                    existingRows = (try? JSONDecoder().decode([SupabaseUserRow].self, from: data)) ?? []
+                }
+            }.resume()
+
+            _ = lookupSem.wait(timeout: .now() + 15)
+
+            if lookupFailed {
+                DispatchQueue.main.async {
+                    self.activePushCount = max(0, self.activePushCount - 1)
+                    self.isSyncing = (self.activePushCount > 0)
+                    self.isOnline = false
+                }
+                return
+            }
+
+            let cloudId = existingRows.first?.id
+            let encoder = JSONEncoder()
+            var writeReq: URLRequest?
+
+            if let cloudId = cloudId, !cloudId.isEmpty {
+                let patchData: Data?
+                switch mode {
+                case .profileOnly:
+                    patchData = try? encoder.encode(SupabaseProfilePatch(
+                        name: profileSnapshot.fullName,
+                        email: emailLower,
+                        phone: profileSnapshot.phone,
+                        serial: profileSnapshot.gimbalSerial,
+                        last_active: nowIso
+                    ))
+                case .modulesOnly:
+                    patchData = try? encoder.encode(SupabaseModulesPatch(
+                        tier: tierSnapshot,
+                        tier_badge: "\(tierSnapshot) Tier",
+                        modules: modulesSnapshot,
+                        last_active: nowIso
+                    ))
+                case .telemetryOnly:
+                    patchData = try? encoder.encode(SupabaseTelemetryPatch(
+                        device: deviceSnapshot,
+                        battery: batterySnapshot,
+                        firmware: firmwareSnapshot,
+                        last_active: nowIso
+                    ))
+                case .full:
+                    patchData = try? encoder.encode(SupabaseFullPayload(
+                        id: cloudId,
+                        name: profileSnapshot.fullName,
+                        email: emailLower,
+                        phone: profileSnapshot.phone,
+                        device: deviceSnapshot,
+                        tier: tierSnapshot,
+                        tier_badge: isAdminEmail ? "Master Admin" : "\(tierSnapshot) Tier",
+                        member_since: profileSnapshot.memberSince.isEmpty ? "11/2025" : profileSnapshot.memberSince,
+                        serial: profileSnapshot.gimbalSerial,
+                        warranty_days: 365,
+                        battery: batterySnapshot,
+                        firmware: firmwareSnapshot,
+                        status: "Hoạt động",
+                        modules: modulesSnapshot,
+                        is_admin: isAdminEmail,
+                        last_active: nowIso
+                    ))
+                }
+                writeReq = self.makeSupabaseRequest(
+                    endpoint: "/users",
+                    queryItems: [URLQueryItem(name: "id", value: "eq.\(cloudId)")],
+                    method: "PATCH",
+                    prefer: "return=representation",
+                    bodyData: patchData
+                )
+            } else {
+                let insertPayload = SupabaseFullPayload(
+                    id: self.makeStableCloudId(for: emailLower),
+                    name: profileSnapshot.fullName,
+                    email: emailLower,
+                    phone: profileSnapshot.phone,
+                    device: deviceSnapshot,
+                    tier: tierSnapshot,
+                    tier_badge: isAdminEmail ? "Master Admin" : "\(tierSnapshot) Tier",
+                    member_since: profileSnapshot.memberSince.isEmpty ? "11/2025" : profileSnapshot.memberSince,
+                    serial: profileSnapshot.gimbalSerial,
+                    warranty_days: 365,
+                    battery: batterySnapshot,
+                    firmware: firmwareSnapshot,
+                    status: "Hoạt động",
+                    modules: modulesSnapshot,
+                    is_admin: isAdminEmail,
+                    last_active: nowIso
+                )
+                let insertData = try? encoder.encode(insertPayload)
+                writeReq = self.makeSupabaseRequest(
+                    endpoint: "/users",
+                    queryItems: [URLQueryItem(name: "on_conflict", value: "id")],
+                    method: "POST",
+                    prefer: "resolution=merge-duplicates,return=representation",
+                    bodyData: insertData
+                )
+            }
+
+            guard let finalReq = writeReq else {
+                DispatchQueue.main.async {
+                    self.activePushCount = max(0, self.activePushCount - 1)
+                    self.isSyncing = (self.activePushCount > 0)
+                }
+                return
+            }
+
+            let writeSem = DispatchSemaphore(value: 0)
+            var writeSuccess = false
+
+            URLSession.shared.dataTask(with: finalReq) { _, writeResp, writeErr in
+                defer { writeSem.signal() }
+                if writeErr == nil, let http = writeResp as? HTTPURLResponse, (200...299).contains(http.statusCode) {
+                    writeSuccess = true
+                }
+            }.resume()
+
+            _ = writeSem.wait(timeout: .now() + 15)
+
+            DispatchQueue.main.async {
+                self.activePushCount = max(0, self.activePushCount - 1)
+                self.isSyncing = (self.activePushCount > 0)
+                if writeSuccess {
+                    self.isOnline = true
+                    self.lastSyncTime = self.formattedSyncTimestamp()
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                } else {
+                    self.isOnline = false
+                }
+            }
+        }
+    }
+
+    private func formattedSyncTimestamp() -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm:ss"
+        return formatter.string(from: Date())
     }
 }

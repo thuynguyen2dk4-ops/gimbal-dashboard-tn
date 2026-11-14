@@ -1741,6 +1741,7 @@
           <div class="card-sub">Bật/tắt tức thời 7 tính năng chuyên sâu và đồng bộ tới Cổng Khách Hàng.</div>
         </div>
         <div class="toolbar-actions">
+          <button class="btn btn-primary" id="btnSyncUsersCloud" onclick="syncUsersCloudNow()">🔄 Đồng Bộ App &amp; Cloud</button>
           <button class="btn btn-outline" onclick="exportUsersCSV()">Xuất Khẩu Người Dùng (Excel)</button>
         </div>
       </div>
@@ -2105,13 +2106,26 @@
       </div>
       <div class="drawer-body">
         <input type="hidden" id="drawerUserId">
-        <div style="margin-bottom:20px;">
+        <div style="margin-bottom:14px;">
           <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">Gói Cấp Bậc Tài Khoản</label>
           <select class="form-control" id="drawerUserTier">
             <option value="Basic Creator">Basic Creator</option>
+            <option value="Free Starter">Free Starter</option>
+            <option value="Creator Pro">Creator Pro</option>
             <option value="Pro Cinema">Pro Cinema</option>
             <option value="Enterprise Studio">Enterprise Studio</option>
+            <option value="VIP LIFETIME">VIP LIFETIME</option>
           </select>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
+          <div>
+            <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">Thiết Bị Gimbal</label>
+            <input type="text" class="form-control" id="drawerUserDevice" placeholder="Smart Gimbal S1 Titanium">
+          </div>
+          <div>
+            <label style="font-size:12px; font-weight:700; color:var(--text-secondary);">Mã Serial (S/N)</label>
+            <input type="text" class="form-control" id="drawerUserSerial" placeholder="VD: TF-G31-PRO">
+          </div>
         </div>
 
         <div style="font-size:13px; font-weight:700; line-height:1.3; margin-bottom:12px;">7 Module Tính Năng Ứng Dụng:</div>
@@ -2355,11 +2369,34 @@
         loadCatalog();
         renderAll();
       });
+      if (SmartGimbalCatalog.USER_EVENT) {
+        window.addEventListener(SmartGimbalCatalog.USER_EVENT, () => {
+          loadCatalog();
+          renderAll();
+        });
+      }
       window.addEventListener('hashchange', applyAdminHashRoute);
 
       // Default or hash-based view
       applyAdminHashRoute();
 
+      // Sync latest Supabase Cloud user & device state (Web <-> iOS App)
+      if (typeof SmartGimbalCatalog.syncFromCloud === 'function') {
+        SmartGimbalCatalog.syncFromCloud((res) => {
+          if (res && res.ok) {
+            loadCatalog();
+            renderAll();
+          }
+        });
+        window.addEventListener('focus', () => {
+          SmartGimbalCatalog.syncFromCloud((res) => {
+            if (res && res.ok) {
+              loadCatalog();
+              renderAll();
+            }
+          });
+        });
+      }
     }
 
     function loadCatalog() {
@@ -2954,6 +2991,10 @@
       const users = SmartGimbalCatalog.getUsers();
       users.forEach(u => {
         const activeCount = (u.modules || []).filter(Boolean).length;
+        const devTitle = u.device || u.registeredDevice || 'Smart Gimbal S1 Titanium';
+        const serialText = u.serial || 'Chưa kích hoạt';
+        const batText = (typeof u.battery === 'number') ? `${u.battery}%` : '98%';
+        const fwText = u.firmware || 'v2.4.2';
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td><b style="font-size:14px;">${u.name}</b></td>
@@ -2961,7 +3002,10 @@
             <div>${u.email}</div>
             <div style="font-size:11.5px; color:var(--text-muted);">${u.phone || ''}</div>
           </td>
-          <td>${u.device || u.registeredDevice || 'Smart Gimbal S1 Titanium'}</td>
+          <td>
+            <div style="font-size:13px; font-weight:600;">${devTitle}</div>
+            <div style="font-size:11.5px; color:var(--text-muted); font-family:monospace;">S/N: ${serialText} • Pin ${batText} • ${fwText}</div>
+          </td>
           <td><span class="badge-mvp" style="background:#555;">${u.tier || 'Basic Creator'}</span></td>
           <td><b>${activeCount}/7</b> module kích hoạt</td>
           <td style="text-align:right;">
@@ -2976,11 +3020,24 @@
       const user = SmartGimbalCatalog.getUsers().find(u => u.id === userId);
       if (!user) return;
 
-      const devDisplay = user.device || user.registeredDevice || user.deviceName || user.phone || 'Smart Gimbal S1 Titanium';
+      const devDisplay = user.device || user.registeredDevice || user.deviceName || 'Smart Gimbal S1 Titanium';
       document.getElementById('drawerUserId').value = user.id;
       document.getElementById('drawerUserName').textContent = user.name;
       document.getElementById('drawerUserEmail').textContent = `${user.email} • ${devDisplay}`;
-      document.getElementById('drawerUserTier').value = user.tier || 'Basic Creator';
+      const tierSel = document.getElementById('drawerUserTier');
+      const userTierVal = user.tier || 'Basic Creator';
+      if (tierSel && !Array.from(tierSel.options).some(o => o.value === userTierVal)) {
+        const extraOpt = document.createElement('option');
+        extraOpt.value = userTierVal;
+        extraOpt.textContent = userTierVal;
+        tierSel.appendChild(extraOpt);
+      }
+      if (tierSel) tierSel.value = userTierVal;
+
+      const devInput = document.getElementById('drawerUserDevice');
+      if (devInput) devInput.value = devDisplay;
+      const serialInput = document.getElementById('drawerUserSerial');
+      if (serialInput) serialInput.value = user.serial || '';
 
       const container = document.getElementById('drawerModulesList');
       container.innerHTML = '';
@@ -3011,6 +3068,10 @@
     function saveUserModules() {
       const userId = document.getElementById('drawerUserId').value;
       const newTier = document.getElementById('drawerUserTier').value;
+      const devInput = document.getElementById('drawerUserDevice');
+      const serialInput = document.getElementById('drawerUserSerial');
+      const newDevice = devInput ? devInput.value.trim() : '';
+      const newSerial = serialInput ? serialInput.value.trim().toUpperCase() : '';
 
       const newModules = [];
       for (let i = 0; i < MODULE_NAMES.length; i++) {
@@ -3018,23 +3079,57 @@
         newModules.push(chk ? chk.checked : false);
       }
 
-      SmartGimbalCatalog.updateUserProfile(userId, { tier: newTier, tierBadge: newTier + ' Tier' });
+      const profilePatch = { tier: newTier, tierBadge: newTier + ' Tier' };
+      if (newDevice) {
+        profilePatch.device = newDevice;
+        profilePatch.registeredDevice = newDevice;
+      }
+      if (serialInput) {
+        profilePatch.serial = newSerial;
+      }
+
+      SmartGimbalCatalog.updateUserProfile(userId, profilePatch);
       SmartGimbalCatalog.updateUserModules(userId, newModules);
 
       closeUserDrawer();
       renderUsersTable();
-      showToast('Đã lưu phân quyền 7 module & đồng bộ tới khách hàng');
+      showToast('Đã lưu phân quyền 7 module & đồng bộ Supabase Cloud');
+    }
+
+    function syncUsersCloudNow() {
+      const btn = document.getElementById('btnSyncUsersCloud');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang đồng bộ Cloud...';
+      }
+      if (typeof SmartGimbalCatalog.syncFromCloud !== 'function') {
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 Đồng Bộ App & Cloud'; }
+        return;
+      }
+      SmartGimbalCatalog.syncFromCloud((res) => {
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '🔄 Đồng Bộ App & Cloud';
+        }
+        loadCatalog();
+        renderAll();
+        if (res && res.ok) {
+          showToast(`Đã đồng bộ ${res.count || 0} tài khoản từ Supabase Cloud`);
+        } else {
+          showToast('Không thể kết nối Cloud, đang dùng dữ liệu cục bộ');
+        }
+      });
     }
 
     // 8. EXCEL CSV IMPORT & EXPORT
     function exportProductsCSV() {
-      const csv = SmartGimbalCatalog.exportProductsCSV();
+      const csv = SmartGimbalCatalog.exportProductsCSV(true);
       downloadFile(csv, 'Danh_Sach_San_Pham_Smart_Gimbal.csv', 'text/csv;charset=utf-8;');
       showToast('Đã xuất file Excel sản phẩm thành công');
     }
 
     function exportUsersCSV() {
-      const csv = SmartGimbalCatalog.exportUsersCSV();
+      const csv = SmartGimbalCatalog.exportUsersCSV(true);
       downloadFile(csv, 'Danh_Sach_Nguoi_Dung_Module.csv', 'text/csv;charset=utf-8;');
       showToast('Đã xuất file Excel người dùng thành công');
     }

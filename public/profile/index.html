@@ -988,6 +988,7 @@
   <script src="/shared/catalog_store.js"></script>
   <script>
     let currentUser = null;
+    let hasUnsavedChanges = false;
 
     document.addEventListener('DOMContentLoaded', () => {
       initProfileEditor();
@@ -1013,9 +1014,30 @@
       // Track form changes
       const form = document.getElementById('profileForm');
       form.addEventListener('input', () => {
+        hasUnsavedChanges = true;
         document.getElementById('saveStatusNotice').textContent = 'Có thay đổi chưa lưu';
         document.getElementById('saveStatusNotice').style.color = '#E6A700';
       });
+
+      window.addEventListener(SmartGimbalCatalog.USER_EVENT, () => {
+        const refreshed = SmartGimbalCatalog.getCurrentUser();
+        if (refreshed && !hasUnsavedChanges) {
+          currentUser = refreshed;
+          renderSessionStatus();
+          populateForm();
+        }
+      });
+
+      if (typeof SmartGimbalCatalog.syncFromCloud === 'function') {
+        SmartGimbalCatalog.syncFromCloud(() => {
+          const syncedUser = SmartGimbalCatalog.getCurrentUser();
+          if (syncedUser && !hasUnsavedChanges) {
+            currentUser = syncedUser;
+            renderSessionStatus();
+            populateForm();
+          }
+        });
+      }
     }
 
     function renderSessionStatus() {
@@ -1251,11 +1273,12 @@
         }
       };
 
-      // Save to catalog store
+      // Save to catalog store & sync to Supabase Cloud
       const success = SmartGimbalCatalog.updateUserProfile(currentUser.id, updatedData);
 
       if (success) {
-        showToast('✓ Đã cập nhật hồ sơ cá nhân thành công!');
+        hasUnsavedChanges = false;
+        showToast('✓ Đã cập nhật hồ sơ cá nhân & đồng bộ Cloud!');
         document.getElementById('saveStatusNotice').textContent = '✓ Đã đồng bộ tất cả thay đổi';
         document.getElementById('saveStatusNotice').style.color = '#28A745';
 

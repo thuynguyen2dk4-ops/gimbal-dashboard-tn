@@ -862,6 +862,7 @@
             </div>
           </div>
           <div class="profile-actions">
+            <button class="btn btn-outline" id="btnCloudSync" onclick="syncAccountCloudNow()">🔄 Đồng Bộ App &amp; Cloud</button>
             <a href="/profile" class="btn btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;"><span>✏️</span> Sửa Hồ Sơ</a>
             <button class="btn btn-outline" onclick="logoutUser()">Đăng Xuất</button>
           </div>
@@ -1226,6 +1227,17 @@
       window.addEventListener(SmartGimbalCatalog.SYNC_EVENT, () => {
         loadUserData();
       });
+
+      if (typeof SmartGimbalCatalog.syncFromCloud === 'function') {
+        SmartGimbalCatalog.syncFromCloud(() => {
+          loadUserData();
+        });
+        window.addEventListener('focus', () => {
+          SmartGimbalCatalog.syncFromCloud(() => {
+            loadUserData();
+          });
+        });
+      }
     }
 
     function loadUserData() {
@@ -1345,8 +1357,35 @@
       window.location.href = '/profile';
     }
 
+    function syncAccountCloudNow() {
+      const btn = document.getElementById('btnCloudSync');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang đồng bộ Cloud...';
+      }
+      if (typeof SmartGimbalCatalog !== 'undefined' && typeof SmartGimbalCatalog.syncFromCloud === 'function') {
+        SmartGimbalCatalog.syncFromCloud((res) => {
+          if (btn) {
+            btn.disabled = false;
+            btn.textContent = '🔄 Đồng Bộ App & Cloud';
+          }
+          loadUserData();
+          showNotification(res && res.ok ? 'Đã đồng bộ dữ liệu App iOS & Supabase Cloud' : 'Đang sử dụng bộ nhớ đệm offline');
+        });
+      } else if (btn) {
+        btn.disabled = false;
+        btn.textContent = '🔄 Đồng Bộ App & Cloud';
+      }
+    }
+
     function checkOtaUpdate() {
-      alert('Đang kết nối BLE với T-Flow...\nPhiên bản hiện tại v2.4.1 đã là phiên bản mới nhất và ổn định nhất!');
+      const fwVal = (currentUser && (currentUser.firmware || currentUser.fw)) || 'v2.4.2 (Mới nhất)';
+      const batVal = (currentUser && typeof currentUser.battery === 'number') ? `${currentUser.battery}%` : '98%';
+      const devVal = (currentUser && (currentUser.device || currentUser.registeredDevice)) || 'Smart Gimbal S1 Titanium';
+      if (typeof SmartGimbalCatalog !== 'undefined' && typeof SmartGimbalCatalog.syncFromCloud === 'function') {
+        SmartGimbalCatalog.syncFromCloud(() => { loadUserData(); });
+      }
+      alert(`Đang đồng bộ BLE/Cloud với ${devVal}...\nFirmware: ${fwVal} • Pin: ${batVal}\nTrạng thái: Đang dùng bản mới nhất và ổn định nhất!`);
     }
 
     // AUTH GATEWAY TAB SWITCHER

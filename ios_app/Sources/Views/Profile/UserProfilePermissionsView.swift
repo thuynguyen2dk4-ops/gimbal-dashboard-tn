@@ -355,7 +355,7 @@ struct UserProfilePermissionsView: View {
                 iconBg: Color(UIColor.systemBlue),
                 iconFg: .white,
                 title: "Thiết bị của tôi",
-                subtitle: "2 Gimbal đã ghép đôi • BLE \(ble.batteryLevel)%"
+                subtitle: "\(store.deviceName) • Pin \(ble.batteryLevel)% • FW \(ble.firmwareVersion)"
             ) {
                 showPairingSheet = true
             }
@@ -1631,6 +1631,11 @@ struct BLEPairingScanSheetView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
             ble.isConnected = true
             store.deviceName = name
+            store.updateDeviceTelemetry(
+                deviceName: name,
+                battery: ble.batteryLevel,
+                firmware: ble.firmwareVersion
+            )
             connectingDeviceName = nil
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             withAnimation(.easeInOut(duration: 0.25)) {

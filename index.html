@@ -6402,6 +6402,14 @@
         renderReviewsList();
         renderCartDrawer();
       });
+
+      // Live cloud sync on load & focus (iOS App <-> Web Storefront)
+      if (typeof SmartGimbalCatalog !== 'undefined' && typeof SmartGimbalCatalog.syncFromCloud === 'function') {
+        SmartGimbalCatalog.syncFromCloud();
+        window.addEventListener('focus', () => {
+          SmartGimbalCatalog.syncFromCloud();
+        });
+      }
     }
 
     // ==========================================================================

@@ -412,9 +412,9 @@
     <div class="brand">
       <div class="brand-badge">S1</div>
       <span>Smart Gimbal Vibe-Coding Studio</span>
-      <span class="status-pill">
+      <span class="status-pill" id="studioCloudStatus">
         <span class="status-dot"></span>
-        Supabase Cloud Connected (dlgkrwodxdsbbliwdnkg)
+        <span id="studioCloudText">Supabase Cloud Connected (dlgkrwodxdsbbliwdnkg)</span>
       </span>
     </div>
 
@@ -534,8 +534,19 @@
     </div>
   </div>
 
+  <script src="/shared/catalog_store.js"></script>
   <script>
     let currentCodeLines = [];
+
+    function updateStudioCloudPill(syncRes) {
+      const textEl = document.getElementById('studioCloudText');
+      if (!textEl || typeof SmartGimbalCatalog === 'undefined') return;
+      const users = SmartGimbalCatalog.getUsers ? SmartGimbalCatalog.getUsers() : [];
+      const cur = SmartGimbalCatalog.getCurrentUser ? SmartGimbalCatalog.getCurrentUser() : null;
+      const userCount = (syncRes && typeof syncRes.count === 'number') ? syncRes.count : users.length;
+      const curLabel = cur ? ` • ${cur.name} (${(cur.modules || []).filter(Boolean).length}/7 mod)` : '';
+      textEl.textContent = `Supabase Cloud Live • ${userCount} tài khoản${curLabel}`;
+    }
 
     function hasWebGLSupport() {
       try {
@@ -552,6 +563,19 @@
         console.warn('[T-Flow Studio] Trình duyệt hiện không bật WebGL; chế độ xem trước 2D/iframe vẫn hoạt động bình thường.');
       }
       loadCodeFile('/index.html', document.querySelector('.f-tab'));
+      if (typeof SmartGimbalCatalog !== 'undefined') {
+        updateStudioCloudPill();
+        if (typeof SmartGimbalCatalog.syncFromCloud === 'function') {
+          SmartGimbalCatalog.syncFromCloud((res) => updateStudioCloudPill(res));
+        }
+        window.addEventListener(SmartGimbalCatalog.SYNC_EVENT, () => updateStudioCloudPill());
+        window.addEventListener(SmartGimbalCatalog.USER_EVENT, () => updateStudioCloudPill());
+        window.addEventListener('focus', () => {
+          if (typeof SmartGimbalCatalog.syncFromCloud === 'function') {
+            SmartGimbalCatalog.syncFromCloud((res) => updateStudioCloudPill(res));
+          }
+        });
+      }
     });
 
     async function loadCodeFile(relPath, btnEl) {
