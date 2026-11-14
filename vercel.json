@@ -61,22 +61,24 @@
       "permanent": true
     },
     {
-      "source": "/app",
-      "destination": "/",
-      "permanent": true
-    },
-    {
-      "source": "/app/",
-      "destination": "/",
-      "permanent": true
-    },
-    {
       "source": "/google_auth.html",
       "destination": "/auth/google/",
       "permanent": true
     }
   ],
   "rewrites": [
+    {
+      "source": "/tflow-app",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/app",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/auth/apple",
+      "destination": "/auth/apple/index.html"
+    },
     {
       "source": "/san-pham",
       "destination": "/index.html"

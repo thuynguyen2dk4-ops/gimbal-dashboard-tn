@@ -68,7 +68,7 @@ struct MediaGallerySheetView: View {
                             }
                         }
 
-                        Text("\(filteredMedia.count) Video • Đã lưu trữ iCloud")
+                        Text("\(camera.realPhotoCount) Ảnh • \(camera.realVideoCount) Video • \(camera.totalLibraryStorageBytesFormatted)")
                             .font(.system(size: 13, weight: .medium))
                             .foregroundColor(.secondary)
                             .padding(.vertical, 18)
@@ -108,8 +108,7 @@ struct MediaGallerySheetView: View {
                 MediaDetailPreviewSheet(
                     item: item,
                     onSaveEditedCopy: { edited in
-                        camera.capturedMedia.insert(edited, at: 0)
-                        camera.latestThumbnail = edited.image
+                        camera.addAndPersistMedia(edited)
                     },
                     onDelete: {
                         camera.deleteMedia(item)

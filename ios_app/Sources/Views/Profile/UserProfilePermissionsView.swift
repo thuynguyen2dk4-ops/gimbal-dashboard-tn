@@ -53,9 +53,6 @@ struct UserProfilePermissionsView: View {
             ScrollView(showsIndicators: false) {
                 VStack(alignment: .leading, spacing: 16) {
                     headerRow
-                    if !store.isLoggedIn {
-                        guestSignInBanner
-                    }
                     userHeaderCard
                     cloudStorageCard
                     accountSectionHeader
@@ -122,51 +119,6 @@ struct UserProfilePermissionsView: View {
         }
         .padding(.horizontal, 20)
         .padding(.top, 14)
-    }
-
-    private var guestSignInBanner: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 10) {
-                Image(systemName: "person.crop.circle.badge.exclamationmark")
-                    .font(.system(size: 22, weight: .semibold))
-                    .foregroundColor(accentGold)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Đang dùng chế độ Khách")
-                        .font(.system(size: 15, weight: .bold))
-                        .foregroundColor(.primary)
-                    Text("Đăng nhập để lưu Cookie Session, bảo hành & dự án Cloud")
-                        .font(.system(size: 12.5))
-                        .foregroundColor(.secondary)
-                }
-                Spacer()
-            }
-
-            Button {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                store.showSignInSheet = true
-            } label: {
-                Text("Đăng nhập / Đăng ký tài khoản")
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 44)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(accentGold)
-                    )
-            }
-            .buttonStyle(.plain)
-        }
-        .padding(14)
-        .background(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .fill(Color(UIColor.secondarySystemGroupedBackground))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(accentGold.opacity(0.45), lineWidth: 1)
-        )
-        .padding(.horizontal, 16)
     }
 
     private var userHeaderCard: some View {
@@ -250,13 +202,20 @@ struct UserProfilePermissionsView: View {
     }
 
     private var cloudStorageCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        let totalBytes = max(Double(camera.realTotalStorageBytes), 1.0)
+        let fillFraction = camera.realTotalStorageBytes > 0
+            ? min(1.0, max(0.06, Double(camera.realTotalStorageBytes) / max(Double(camera.realTotalStorageBytes), 50.0 * 1024.0 * 1024.0)))
+            : 0.0
+        let videoRatio = camera.realTotalStorageBytes > 0 ? fillFraction * (Double(camera.realVideoStorageBytes) / totalBytes) : 0.0
+        let photoRatio = camera.realTotalStorageBytes > 0 ? fillFraction * (Double(camera.realPhotoStorageBytes) / totalBytes) : 0.0
+
+        return VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Lưu trữ Đám mây Gimbal Pro")
+                Text("Thư viện Thiết bị")
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundColor(.primary)
                 Spacer()
-                Text("142 GB / 200 GB")
+                Text(camera.capturedMedia.isEmpty ? "Chưa có dữ liệu" : "\(camera.capturedMedia.count) tệp • \(camera.totalLibraryStorageBytesFormatted)")
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(.primary)
             }
@@ -268,27 +227,25 @@ struct UserProfilePermissionsView: View {
                         .fill(Color(UIColor.tertiarySystemFill))
                         .frame(height: 8)
 
-                    HStack(spacing: 0) {
-                        Rectangle()
-                            .fill(Color(UIColor.systemBlue))
-                            .frame(width: totalWidth * 0.50)
-                        Rectangle()
-                            .fill(Color(UIColor.systemPurple))
-                            .frame(width: totalWidth * 0.15)
-                        Rectangle()
-                            .fill(accentGold)
-                            .frame(width: totalWidth * 0.06)
+                    if camera.realTotalStorageBytes > 0 {
+                        HStack(spacing: 0) {
+                            Rectangle()
+                                .fill(Color(UIColor.systemBlue))
+                                .frame(width: totalWidth * videoRatio)
+                            Rectangle()
+                                .fill(accentGold)
+                                .frame(width: totalWidth * photoRatio)
+                        }
+                        .frame(height: 8)
+                        .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
                     }
-                    .frame(height: 8)
-                    .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
                 }
             }
             .frame(height: 8)
 
             HStack(spacing: 14) {
-                storageLegendDot(color: Color(UIColor.systemBlue), label: "Video 4K (100GB)")
-                storageLegendDot(color: Color(UIColor.systemPurple), label: "Dự án (30GB)")
-                storageLegendDot(color: accentGold, label: "LUTs (12GB)")
+                storageLegendDot(color: Color(UIColor.systemBlue), label: "\(camera.realVideoCount) Video (\(camera.videoStorageFormatted))")
+                storageLegendDot(color: accentGold, label: "\(camera.realPhotoCount) Ảnh (\(camera.photoStorageFormatted))")
             }
         }
         .padding(16)
@@ -331,7 +288,7 @@ struct UserProfilePermissionsView: View {
                 iconBg: Color(UIColor.systemBlue),
                 iconFg: .white,
                 title: "Thông tin cá nhân",
-                subtitle: "Hồ sơ, SĐT, Serial & Cookie phiên"
+                subtitle: "Hồ sơ, SĐT, Địa chỉ & Mã Serial"
             ) {
                 showPersonalInfoSheet = true
             }
@@ -494,7 +451,7 @@ struct UserProfilePermissionsView: View {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 store.logout()
             } label: {
-                Text(store.isLoggedIn ? "Đăng xuất tài khoản" : "Thoát chế độ Khách")
+                Text("Đăng xuất tài khoản")
                     .font(.system(size: 16.5, weight: .medium))
                     .foregroundColor(Color(UIColor.systemRed))
                     .frame(maxWidth: .infinity, minHeight: 46)
@@ -560,6 +517,47 @@ struct UserProfilePermissionsView: View {
 
 // MARK: - 2. AUTH SIGN-IN & ONBOARDING GATE (21_onboarding + 22_signin)
 
+enum OAuthProviderType: String, Identifiable {
+    case apple
+    case google
+
+    var id: String { rawValue }
+    var displayTitle: String {
+        switch self {
+        case .apple: return "Apple"
+        case .google: return "Google"
+        }
+    }
+}
+
+struct GoogleGLogoView: View {
+    var size: CGFloat = 20
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .trim(from: 0.585, to: 0.89)
+                .stroke(Color(red: 0.92, green: 0.26, blue: 0.21), style: StrokeStyle(lineWidth: size * 0.21, lineCap: .butt))
+            Circle()
+                .trim(from: 0.395, to: 0.595)
+                .stroke(Color(red: 0.98, green: 0.74, blue: 0.02), style: StrokeStyle(lineWidth: size * 0.21, lineCap: .butt))
+            Circle()
+                .trim(from: 0.105, to: 0.405)
+                .stroke(Color(red: 0.20, green: 0.66, blue: 0.33), style: StrokeStyle(lineWidth: size * 0.21, lineCap: .butt))
+            Circle()
+                .trim(from: 0.0, to: 0.115)
+                .stroke(Color(red: 0.26, green: 0.52, blue: 0.96), style: StrokeStyle(lineWidth: size * 0.21, lineCap: .butt))
+            Rectangle()
+                .fill(Color(red: 0.26, green: 0.52, blue: 0.96))
+                .frame(width: size * 0.50, height: size * 0.21)
+                .offset(x: size * 0.24)
+        }
+        .frame(width: size * 0.79, height: size * 0.79)
+        .clipShape(Circle())
+        .frame(width: size, height: size)
+    }
+}
+
 struct AuthSignInGateView: View {
     @EnvironmentObject var store: SupabaseModuleStore
     @Environment(\.dismiss) var dismiss
@@ -568,6 +566,7 @@ struct AuthSignInGateView: View {
     @State private var showOnboarding: Bool = false
     @State private var onboardingPage: Int = 0
     @State private var selectedTab: Int = 0 // 0 = Đăng nhập, 1 = Đăng ký
+    @State private var activeOAuthProvider: OAuthProviderType? = nil
 
     @State private var loginIdentifier: String = ""
     @State private var loginPassword: String = ""
@@ -601,7 +600,7 @@ struct AuthSignInGateView: View {
         ),
         (
             "4K Apple Log & 3D LUTs",
-            "Quay màu phẳng điện ảnh, đồng bộ tài khoản qua Cookie bảo mật và lưu trữ đám mây tự động.",
+            "Quay màu phẳng điện ảnh, đồng bộ hồ sơ và lưu trữ thư viện thiết bị thực tế.",
             "camera.filters"
         )
     ]
@@ -617,7 +616,7 @@ struct AuthSignInGateView: View {
             }
             .background(Color(UIColor.systemBackground).ignoresSafeArea())
             .toolbar {
-                if store.isGuestMode || store.isLoggedIn {
+                if store.isLoggedIn {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Đóng") {
                             store.showSignInSheet = false
@@ -628,7 +627,18 @@ struct AuthSignInGateView: View {
                 }
             }
             .onAppear {
-                showOnboarding = !store.hasCompletedOnboarding && !store.isGuestMode && !store.isLoggedIn
+                showOnboarding = !store.hasCompletedOnboarding && !store.isLoggedIn
+            }
+            .sheet(item: $activeOAuthProvider) { provider in
+                OAuthAccountSignInSheetView(
+                    provider: provider,
+                    accentGold: accentGold
+                ) {
+                    store.hasCompletedOnboarding = true
+                    store.showSignInSheet = false
+                    dismiss()
+                }
+                .environmentObject(store)
             }
         }
     }
@@ -796,42 +806,6 @@ struct AuthSignInGateView: View {
                 }
 
                 Button {
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    store.hasCompletedOnboarding = true
-                    store.continueAsGuest()
-                    store.showSignInSheet = false
-                    dismiss()
-                } label: {
-                    Text("Bỏ qua, dùng thử (Khách)")
-                        .font(.system(size: 15.5, weight: .semibold))
-                        .foregroundColor(.primary)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 46)
-                        .background(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(Color(UIColor.secondarySystemFill))
-                        )
-                }
-                .buttonStyle(.plain)
-
-                HStack(spacing: 6) {
-                    Image(systemName: "checkmark.shield.fill")
-                        .font(.system(size: 12))
-                        .foregroundColor(store.isLoggedIn ? Color(UIColor.systemGreen) : .secondary)
-                    Text("Cookie Session: tflow_session_token (HTTPCookieStorage.shared)")
-                        .font(.system(size: 11.5))
-                        .foregroundColor(.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.85)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(Color(UIColor.secondarySystemGroupedBackground))
-                )
-
-                Button {
                     withAnimation {
                         onboardingPage = 0
                         showOnboarding = true
@@ -898,19 +872,6 @@ struct AuthSignInGateView: View {
                 )
             }
 
-            HStack {
-                Button {
-                    loginIdentifier = "thuynguyen2dk4@gmail.com"
-                    loginPassword = "admin"
-                    authError = ""
-                } label: {
-                    Text("Điền nhanh Admin (thuynguyen2dk4@gmail.com)")
-                        .font(.system(size: 11.5, weight: .medium))
-                        .foregroundColor(Color(UIColor.systemBlue))
-                }
-                Spacer()
-            }
-
             Button {
                 let res = store.login(identifier: loginIdentifier, password: loginPassword)
                 if res.ok {
@@ -946,11 +907,9 @@ struct AuthSignInGateView: View {
             .padding(.vertical, 4)
 
             Button {
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                store.hasCompletedOnboarding = true
-                store.signInWithApple()
-                store.showSignInSheet = false
-                dismiss()
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                authError = ""
+                activeOAuthProvider = .apple
             } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "applelogo")
@@ -969,26 +928,12 @@ struct AuthSignInGateView: View {
             .buttonStyle(.plain)
 
             Button {
-                UINotificationFeedbackGenerator().notificationOccurred(.success)
-                store.hasCompletedOnboarding = true
-                store.signInWithGoogle()
-                store.showSignInSheet = false
-                dismiss()
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                authError = ""
+                activeOAuthProvider = .google
             } label: {
                 HStack(spacing: 10) {
-                    Text("G")
-                        .font(.system(size: 16, weight: .black))
-                        .foregroundColor(.white)
-                        .frame(width: 24, height: 24)
-                        .background(
-                            Circle().fill(
-                                LinearGradient(
-                                    colors: [Color(UIColor.systemBlue), Color(UIColor.systemGreen)],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                        )
+                    GoogleGLogoView(size: 20)
                     Text("Đăng nhập bằng Google")
                         .font(.system(size: 17, weight: .medium))
                         .foregroundColor(.primary)
@@ -1060,7 +1005,7 @@ struct AuthSignInGateView: View {
                     UINotificationFeedbackGenerator().notificationOccurred(.error)
                 }
             } label: {
-                Text("Tạo tài khoản & Tạo Session Cookie")
+                Text("Đăng ký")
                     .font(.system(size: 16.5, weight: .bold))
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
@@ -1099,7 +1044,106 @@ struct AuthSignInGateView: View {
     }
 }
 
-// MARK: - 3. PERSONAL INFO & COOKIE SESSION EDITOR
+// MARK: - 2B. INTERACTIVE OAUTH SIGN-IN (APPLE ID & GOOGLE ACCOUNT)
+
+struct OAuthAccountSignInSheetView: View {
+    @EnvironmentObject var store: SupabaseModuleStore
+    @Environment(\.dismiss) private var dismiss
+
+    let provider: OAuthProviderType
+    let accentGold: Color
+    let onCompleted: () -> Void
+
+    @State private var email: String = ""
+    @State private var fullName: String = ""
+    @State private var errorMsg: String = ""
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    HStack(spacing: 12) {
+                        if provider == .apple {
+                            Image(systemName: "applelogo")
+                                .font(.system(size: 24, weight: .semibold))
+                                .frame(width: 34, height: 34)
+                        } else {
+                            GoogleGLogoView(size: 26)
+                                .frame(width: 34, height: 34)
+                        }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Đăng nhập bằng \(provider.displayTitle)")
+                                .font(.system(size: 17, weight: .bold))
+                            Text("Đồng bộ trực tiếp với tài khoản trên T-Flow Web & Cloud")
+                                .font(.system(size: 12.5))
+                                .foregroundColor(.secondary)
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+
+                if !errorMsg.isEmpty {
+                    Section {
+                        Text(errorMsg)
+                            .font(.system(size: 13.5, weight: .medium))
+                            .foregroundColor(Color(UIColor.systemRed))
+                    }
+                }
+
+                Section("Thông tin tài khoản \(provider.displayTitle)") {
+                    TextField(
+                        provider == .apple ? "Apple ID Email (VD: ten@icloud.com)" : "Google Email (VD: ten@gmail.com)",
+                        text: $email
+                    )
+                    .keyboardType(.emailAddress)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+
+                    TextField("Họ và tên hiển thị (không bắt buộc nếu đã có)", text: $fullName)
+                        .textInputAutocapitalization(.words)
+                }
+
+                Section {
+                    Button {
+                        let res = store.signInWithOAuthAccount(
+                            email: email,
+                            fullName: fullName,
+                            provider: provider.displayTitle
+                        )
+                        if res.ok {
+                            errorMsg = ""
+                            dismiss()
+                            onCompleted()
+                        } else {
+                            errorMsg = res.message
+                        }
+                    } label: {
+                        Text("Tiếp tục với \(provider.displayTitle)")
+                            .font(.system(size: 16.5, weight: .bold))
+                            .foregroundColor(.black)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 44)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(accentGold)
+                            )
+                    }
+                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                    .listRowBackground(Color.clear)
+                }
+            }
+            .navigationTitle("Tài khoản \(provider.displayTitle)")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Huỷ") { dismiss() }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - 3. PERSONAL INFO EDITOR
 
 struct PersonalInfoEditSheetView: View {
     @EnvironmentObject var store: SupabaseModuleStore
@@ -1118,13 +1162,6 @@ struct PersonalInfoEditSheetView: View {
         colorScheme == .light
             ? Color(red: 0.90, green: 0.65, blue: 0.00)
             : Color(red: 1.00, green: 0.84, blue: 0.04)
-    }
-
-    private var formattedSessionDate: String {
-        guard let date = store.sessionCreatedAt else { return "Chưa kích hoạt" }
-        let df = DateFormatter()
-        df.dateFormat = "dd/MM/yyyy HH:mm:ss"
-        return df.string(from: date)
     }
 
     var body: some View {
@@ -1199,59 +1236,6 @@ struct PersonalInfoEditSheetView: View {
                     LabeledContent("Đổi mật khẩu") {
                         SecureField("Để trống nếu giữ nguyên", text: $newPassword)
                             .multilineTextAlignment(.trailing)
-                    }
-                }
-
-                Section("Phiên Đăng Nhập & Cookie Bảo Mật") {
-                    HStack {
-                        Text("Session ID")
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Text(store.sessionId.isEmpty ? "--" : store.sessionId)
-                            .font(.system(size: 12.5, design: .monospaced))
-                            .lineLimit(1)
-                    }
-
-                    HStack {
-                        Text("Cookie Token")
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Text(store.sessionCookieToken.isEmpty ? "Chưa cấp (Khách)" : store.sessionCookieToken)
-                            .font(.system(size: 12, design: .monospaced))
-                            .lineLimit(1)
-                            .truncationMode(.middle)
-                    }
-
-                    HStack {
-                        Text("Thời điểm tạo phiên")
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Text(formattedSessionDate)
-                            .font(.system(size: 13))
-                    }
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("HTTPCookieStorage.shared")
-                            .font(.system(size: 12, weight: .semibold))
-                            .foregroundColor(.secondary)
-                        Text(store.activeCookieSummary)
-                            .font(.system(size: 12, design: .monospaced))
-                            .foregroundColor(.primary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .padding(.vertical, 2)
-
-                    Button {
-                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                        store.refreshSessionCookie()
-                        statusBanner = "✓ Đã làm mới Cookie Session (tflow_session_token)"
-                    } label: {
-                        HStack {
-                            Image(systemName: "arrow.clockwise.circle.fill")
-                            Text("Làm mới Cookie Session")
-                                .fontWeight(.semibold)
-                        }
-                        .foregroundColor(Color(UIColor.systemBlue))
                     }
                 }
 

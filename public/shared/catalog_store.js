@@ -36,7 +36,17 @@
   var _syncPromise = null;
 
   var ADMIN_GMAILS = ['thuynguyen2dk4@gmail.com', 'thuy.nguyen@tflow.tech'];
-  var BUNDLED_CATALOG_VERSION = '3.6.0-visual-clean';
+  var BUNDLED_CATALOG_VERSION = '3.7.0-single-product-dynamic';
+  var REMOVED_LEGACY_USER_IDS = ['usr-mailinh', 'usr-minh', 'usr-long', 'usr-huong', 'usr-ngoc', 'usr-dung'];
+  var REMOVED_LEGACY_USER_EMAILS = ['mailinh.film@gmail.com', 'minh.vlog@gmail.com', 'long.cinema@film.vn', 'huong.media@gmail.com', 'ngoc.agency@film.vn', 'dung.travel@gmail.com'];
+  var REMOVED_LEGACY_PRODUCT_IDS = ['tf-cam-eye', 'tf-acc-tripod', 'tf-acc-case', 'tf-m32-core', 'tf-x14-imu', 's1', 's2', 's1-air', 'p1', 'x2', 'acc-mic', 'acc-magsafe', 'acc-light', 'acc-tripod', 'acc-case'];
+
+  function isRemovedLegacyUser(u) {
+    if (!u) return true;
+    var uid = String(u.id || '').trim().toLowerCase();
+    var uemail = String(u.email || '').trim().toLowerCase();
+    return REMOVED_LEGACY_USER_IDS.indexOf(uid) !== -1 || REMOVED_LEGACY_USER_EMAILS.indexOf(uemail) !== -1;
+  }
 
   function normalizeModulesArray(raw, fallback) {
     var base = Array.isArray(fallback) && fallback.length === 7 ? fallback.slice() : [false, false, false, false, false, false, false];
@@ -283,6 +293,7 @@
         var seenEmails = {};
         for (var j = 0; j < rows.length; j++) {
           var row = rows[j];
+          if (isRemovedLegacyUser(row)) continue;
           var em = String(row.email || '').trim().toLowerCase();
           var ex = em ? byEmail[em] : null;
           var merged = mapCloudUserToLocal(row, ex);
@@ -294,6 +305,7 @@
         var cur = getCurrentUser();
         for (var k = 0; k < cat.users.length; k++) {
           var localOnly = cat.users[k];
+          if (isRemovedLegacyUser(localOnly)) continue;
           var lEmail = localOnly && localOnly.email ? String(localOnly.email).trim().toLowerCase() : '';
           if (lEmail && !seenEmails[lEmail]) {
             mergedList.push(localOnly);
@@ -463,38 +475,21 @@
         "name": "Gimbal Cầm Tay",
         "icon": "bi-camera-reels",
         "prefix": "TF-G",
-        "desc": "Gimbal chống rung 3 trục cho Smartphone & Camera."
-      },
-      {
-        "id": "group-cam",
-        "name": "Cụm Camera & Phụ Kiện AI",
-        "icon": "bi-camera",
-        "prefix": "TF-CAM",
-        "desc": "Camera AI bám nét độc lập & đèn MagSafe."
-      },
-      {
-        "id": "group-core",
-        "name": "Bo Mạch Điều Khiển Lõi",
-        "icon": "bi-cpu",
-        "prefix": "TF-M / TF-D",
-        "desc": "Bo mạch vi điều khiển STM32 & Pure FOC 20kHz."
-      },
-      {
-        "id": "group-sensor",
-        "name": "Bo Mạch Mở Rộng & Cảm Biến",
-        "icon": "bi-hdd-network",
-        "prefix": "TF-X",
-        "desc": "Cảm biến IMU 6 trục & Encoder 14-bit."
+        "desc": "Gimbal chống rung 3 trục AI cao cấp cho Smartphone & Nhà sáng tạo."
       }
     ],
     "products": [
       {
         "id": "tf-g31-pro",
+        "slug": "t-flow-pro",
         "sku": "TF-G31-PRO",
         "groupId": "group-gimbal",
         "name": "T-Flow Pro",
+        "heroBadge": "Flagship 2026 • Gimbal 3 Trục AI",
+        "overviewBadge": "Điểm Nhấn Cốt Lõi",
         "tagline": "Chống rung 3 trục • AI không cần App",
         "subtitle": "Gắn MagSafe 1 chạm. Bám nét khuôn mặt ở mọi ứng dụng.",
+        "pillTags": ["⚡ FOC 20kHz", "🎯 AI 60fps", "🔋 Pin 18h"],
         "badge": "Flagship 2026",
         "img": "/shared/img/tflow_pro_main.png",
         "status": "Đang Mở Bán",
@@ -515,40 +510,62 @@
           {
             "key": "standard",
             "name": "Standard Edition",
+            "label": "Standard Edition",
             "tag": "Khởi Đầu",
             "price": 2490000,
             "origPrice": 2890000,
             "priceFormatted": "2.490.000₫",
+            "oldPriceFormatted": "2.890.000₫",
+            "save": "Tiết kiệm 400.000₫",
+            "gift": "Ngàm MagSafe N52 + Tripod Mini",
             "desc": "Gimbal T-Flow Pro + ngàm MagSafe + Tripod mini + cáp USB-C."
           },
           {
             "key": "creator",
             "name": "Creator Kit",
+            "label": "Creator Kit",
             "tag": "Bán Chạy Nhất",
             "price": 3190000,
             "origPrice": 3690000,
             "priceFormatted": "3.190.000₫",
+            "oldPriceFormatted": "3.690.000₫",
+            "save": "Tiết kiệm 500.000₫",
+            "gift": "Đèn LED MagSafe RGB + Túi EVA chống sốc",
             "desc": "Bộ Standard + đèn LED MagSafe RGB + túi EVA chống sốc."
           },
           {
             "key": "cinematic",
             "name": "Cinematic Pro",
+            "label": "Cinematic Pro",
             "tag": "Được Khuyên Dùng",
             "price": 3990000,
             "origPrice": 4590000,
             "priceFormatted": "3.990.000₫",
+            "oldPriceFormatted": "4.590.000₫",
+            "save": "Tiết kiệm 600.000₫",
+            "gift": "Micro kép chống ồn AI + Tạ đối trọng Pro",
             "desc": "Bộ Creator + micro kép chống ồn AI + tạ đối trọng Pro."
           },
           {
             "key": "master",
             "name": "Master Edition",
+            "label": "Master Edition",
             "tag": "Đặc Biệt",
             "price": 5490000,
             "origPrice": 6290000,
             "priceFormatted": "5.490.000₫",
+            "oldPriceFormatted": "6.290.000₫",
+            "save": "Tiết kiệm 800.000₫",
+            "gift": "Vali nhôm hàng không + Thẻ MasterClass",
             "desc": "Full phụ kiện Pro + vali nhôm hàng không + MasterClass."
           }
         ],
+        "perks": [
+          "Miễn phí giao hàng tiêu chuẩn toàn quốc (2 - 3 ngày)",
+          "Bảo hành chính hãng 12 tháng 1 đổi 1 tận nơi",
+          "30 ngày dùng thử đổi mới miễn phí"
+        ],
+        "warranty": "12 tháng 1 đổi 1 • 30 ngày dùng thử • Cập nhật OTA trọn đời.",
         "highlights": [
           {
             "icon": "⚡",
@@ -585,228 +602,8 @@
           { "name": "Chân Đế Tripod Mini Hợp Kim", "qty": "01" },
           { "name": "Cáp Sạc Nhanh Type-C to Type-C PD", "qty": "01" },
           { "name": "Túi Đựng Nhựa Nhung Cao Cấp", "qty": "01" }
-        ]
-      },
-      {
-        "id": "tf-cam-eye",
-        "sku": "TF-CAM-AI01",
-        "groupId": "group-cam",
-        "name": "T-Flow Eye — Mô-đun AI Tracking & Đèn RGB",
-        "tagline": "Camera AI bám nét độc lập — Không cần App",
-        "subtitle": "Nhận diện khuôn mặt 5m và cử chỉ tay, kèm đèn LED CRI 96+.",
-        "badge": "Phụ Kiện AI Mới",
-        "img": "/shared/img/tflow_eye_module.svg",
-        "status": "Đang Mở Bán",
-        "totalOrders": 520,
-        "is_flagship": false,
-        "gallery": [
-          "/shared/img/tflow_eye_module.svg"
         ],
-        "colors": [
-          { "id": "space-black", "name": "Space Black", "hex": "#1F2022" }
-        ],
-        "tiers": [
-          {
-            "key": "standard",
-            "name": "Bản Đơn",
-            "tag": "Tiêu Chuẩn",
-            "price": 890000,
-            "origPrice": 1090000,
-            "priceFormatted": "890.000₫",
-            "desc": "Camera AI Tracking + ngàm MagSafe + cáp USB-C."
-          }
-        ],
-        "highlights": [
-          { "icon": "👁️", "metric": "AI 60fps", "title": "Bám Nét Độc Lập", "desc": "Quay TikTok, Facebook, YouTube không cần mở app." },
-          { "icon": "💡", "metric": "CRI 96+", "title": "Đèn LED Bi-Color", "desc": "Đổi màu 2500K–6500K tôn da chuẩn studio." }
-        ],
-        "specs": [
-          { "label": "SKU", "val": "TF-CAM-AI01" },
-          { "label": "Tương Thích", "val": "T-Flow Pro & thiết bị MagSafe" },
-          { "label": "Khoảng Cách Nhận Diện", "val": "0.5m - 5m (Góc rộng 120°)" },
-          { "label": "Thời Lượng Pin", "val": "4 giờ (Pin rời 800mAh)" }
-        ],
-        "boxContents": [
-          { "name": "Mô-đun T-Flow Eye", "qty": "01" },
-          { "name": "Cáp Sạc Type-C", "qty": "01" }
-        ]
-      },
-      {
-        "id": "tf-acc-tripod",
-        "sku": "TF-ACC-TRIPOD",
-        "groupId": "group-gimbal",
-        "name": "Chân Đế Mini Tripod Carbon T-Flow",
-        "tagline": "Tripod Carbon 8 lớp — Siêu nhẹ 85g",
-        "subtitle": "Nhôm CNC hàng không kết hợp ren 1/4 inch, chịu tải đến 5kg.",
-        "badge": "Phụ Kiện Chính Hãng",
-        "img": "/shared/img/tflow_mini_tripod.svg",
-        "status": "Đang Mở Bán",
-        "totalOrders": 890,
-        "is_flagship": false,
-        "gallery": [
-          "/shared/img/tflow_mini_tripod.svg"
-        ],
-        "colors": [
-          { "id": "carbon-black", "name": "Carbon Weave Black", "hex": "#1A1A1A" }
-        ],
-        "tiers": [
-          {
-            "key": "standard",
-            "name": "Bản Tiêu Chuẩn",
-            "tag": "Carbon CNC",
-            "price": 390000,
-            "origPrice": 490000,
-            "priceFormatted": "390.000₫",
-            "desc": "Tripod Carbon mini + khóa siết chống trượt."
-          }
-        ],
-        "highlights": [
-          { "icon": "🪶", "metric": "85g / 5kg", "title": "Carbon Siêu Nhẹ", "desc": "Sợi Carbon 8 lớp, chịu tải đứng tối đa 5kg." },
-          { "icon": "🔒", "metric": "Ren 1/4\"", "title": "Đế Silicon Bám Chắc", "desc": "Chống trượt, bảo vệ bề mặt khi đặt góc nghiêng." }
-        ],
-        "specs": [
-          { "label": "SKU", "val": "TF-ACC-TRIPOD" },
-          { "label": "Vật Liệu", "val": "Carbon 8 lớp & Nhôm AL6061 CNC" },
-          { "label": "Chuẩn Ren", "val": "1/4 inch quốc tế" },
-          { "label": "Tải Trọng Chịu Đựng", "val": "5.0 kg" }
-        ],
-        "boxContents": [
-          { "name": "Chân Đế Carbon T-Flow", "qty": "01" }
-        ]
-      },
-      {
-        "id": "tf-acc-case",
-        "sku": "TF-ACC-CASE",
-        "groupId": "group-gimbal",
-        "name": "Vali Hàng Không Chống Sốc T-Flow Master",
-        "tagline": "Vali nhôm hàng không — Chuẩn kháng nước IP67",
-        "subtitle": "Khay mút EVA cắt laser vừa khít gimbal, đèn, mic và pin.",
-        "badge": "Kháng Nước IP67",
-        "img": "/shared/img/tflow_master_case.svg",
-        "status": "Đang Mở Bán",
-        "totalOrders": 310,
-        "is_flagship": false,
-        "gallery": [
-          "/shared/img/tflow_master_case.svg"
-        ],
-        "colors": [
-          { "id": "stealth-black", "name": "Stealth Black", "hex": "#242426" },
-          { "id": "aviation-silver", "name": "Aviation Silver", "hex": "#D1D5DB" }
-        ],
-        "tiers": [
-          {
-            "key": "standard",
-            "name": "Bản Cao Cấp",
-            "tag": "IP67 Armor",
-            "price": 1190000,
-            "origPrice": 1490000,
-            "priceFormatted": "1.190.000₫",
-            "desc": "Vali nhôm nguyên khối + quai da + dây đeo vai."
-          }
-        ],
-        "highlights": [
-          { "icon": "🛡️", "metric": "Nén 120kg", "title": "Khung Nhôm Bảo Vệ", "desc": "Bo góc kim loại chịu lực va đập mạnh." },
-          { "icon": "💧", "metric": "Chuẩn IP67", "title": "Kháng Nước & Bụi", "desc": "Gioăng cao su kép chống nước biển và cát bụi." }
-        ],
-        "specs": [
-          { "label": "SKU", "val": "TF-ACC-CASE" },
-          { "label": "Kích Thước", "val": "320 x 240 x 110 mm" },
-          { "label": "Trọng Lượng", "val": "1.25 kg" },
-          { "label": "Chuẩn Bảo Vệ", "val": "IP67 Waterproof & Dustproof" }
-        ],
-        "boxContents": [
-          { "name": "Vali Hợp Kim T-Flow", "qty": "01" },
-          { "name": "Dây Đeo Vai Đệm Khí", "qty": "01" }
-        ]
-      },
-      {
-        "id": "tf-m32-core",
-        "sku": "TF-M32-FOC-R1",
-        "groupId": "group-core",
-        "name": "Bo Mạch Điều Khiển Lõi 32-bit Pure FOC 20kHz",
-        "tagline": "Bo mạch 32-bit Pure FOC 20kHz — Dành cho R&D",
-        "subtitle": "Vi điều khiển ARM Cortex-M4 168MHz, hỗ trợ CAN-Bus & UART.",
-        "badge": "Linh Kiện R&D",
-        "img": "/shared/img/pcb_mainboard.png",
-        "status": "Sẵn Hàng",
-        "totalOrders": 140,
-        "is_flagship": false,
-        "gallery": [
-          "/shared/img/pcb_mainboard.png"
-        ],
-        "colors": [
-          { "id": "pcb-black", "name": "Matte Black PCB", "hex": "#1C1C1E" }
-        ],
-        "tiers": [
-          {
-            "key": "standard",
-            "name": "Bo Mạch R1.0",
-            "tag": "OEM Component",
-            "price": 1450000,
-            "origPrice": 1750000,
-            "priceFormatted": "1.450.000₫",
-            "desc": "Bo mạch FOC 32-bit + sẵn Bootloader + cáp JST."
-          }
-        ],
-        "highlights": [
-          { "icon": "🧠", "metric": "168 MHz", "title": "MCU Cortex-M4", "desc": "Tính toán Euler & bộ lọc EKF ở chu kỳ 1000Hz." },
-          { "icon": "⚡", "metric": "FOC 20kHz", "title": "Chuyển Mạch Siêu Êm", "desc": "Triệt tiêu tiếng rít MOSFET trên micro thu âm." }
-        ],
-        "specs": [
-          { "label": "SKU", "val": "TF-M32-FOC-R1" },
-          { "label": "Điện Áp Hoạt Động", "val": "7.4V - 12.6V (2S - 3S Li-ion)" },
-          { "label": "Dòng Điện Cực Đại", "val": "15A tức thời / 5A liên tục" },
-          { "label": "Giao Tiếp", "val": "CAN-Bus, UART, I2C, SPI" }
-        ],
-        "boxContents": [
-          { "name": "Bo Mạch TF-M32-FOC", "qty": "01" },
-          { "name": "Dây Cáp JST-SH Kết Nối", "qty": "04" }
-        ]
-      },
-      {
-        "id": "tf-x14-imu",
-        "sku": "TF-X14-IMU-R1",
-        "groupId": "group-sensor",
-        "name": "Mạch Cảm Biến Góc Mag-IMU 14-bit Siêu Nhạy",
-        "tagline": "Cảm biến góc Mag-IMU 14-bit — Chính xác 0.01°",
-        "subtitle": "Encoder từ tính 16.384 xung/vòng kết hợp IMU 6 trục bù nhiệt.",
-        "badge": "Độ Nhạy Cao",
-        "img": "/shared/img/pcb_imu_head.png",
-        "status": "Sẵn Hàng",
-        "totalOrders": 280,
-        "is_flagship": false,
-        "gallery": [
-          "/shared/img/pcb_imu_head.png",
-          "/shared/img/pcb_encoder.png"
-        ],
-        "colors": [
-          { "id": "pcb-green", "name": "Industry Green PCB", "hex": "#1B4332" }
-        ],
-        "tiers": [
-          {
-            "key": "standard",
-            "name": "Bộ 3 Cảm Biến Trục",
-            "tag": "Full Set 3 Axis",
-            "price": 650000,
-            "origPrice": 800000,
-            "priceFormatted": "650.000₫",
-            "desc": "Bộ 3 mạch Encoder 14-bit + nam châm định tâm."
-          }
-        ],
-        "highlights": [
-          { "icon": "🧭", "metric": "14-bit", "title": "Độ Phân Giải Cao", "desc": "16.384 xung/vòng cho chuyển động vi mô mượt mà." },
-          { "icon": "📐", "metric": "±0.01°", "title": "Chống Nhiễu Từ Trường", "desc": "Lọc phần cứng nhiễu từ động cơ và nguồn xung." }
-        ],
-        "specs": [
-          { "label": "SKU", "val": "TF-X14-IMU-R1" },
-          { "label": "Độ Phân Giải", "val": "14-bit (0.022°/bước)" },
-          { "label": "Chuẩn Giao Tiếp", "val": "SPI / SSI 10MHz" },
-          { "label": "Kích Thước", "val": "15mm x 15mm siêu nhỏ gọn" }
-        ],
-        "boxContents": [
-          { "name": "Mạch Cảm Biến Mag-IMU", "qty": "03" },
-          { "name": "Nam Châm Trục Định Tâm", "qty": "03" }
-        ]
+        "customBlocks": []
       }
     ],
     "users": [
@@ -869,11 +666,46 @@
     }
     try {
       var parsed = JSON.parse(saved);
-      if (!parsed.products || parsed.products.length < DEFAULT_CATALOG.products.length) {
+      if (!parsed.products || !Array.isArray(parsed.products) || parsed.products.length === 0) {
         saveCatalog(DEFAULT_CATALOG);
         return DEFAULT_CATALOG;
       }
       var needsVersionMigration = parsed.catalogVersion !== BUNDLED_CATALOG_VERSION;
+      var mediaMigrated = false;
+
+      if (Array.isArray(parsed.users)) {
+        var beforeUserLen = parsed.users.length;
+        parsed.users = parsed.users.filter(function(u) { return !isRemovedLegacyUser(u); });
+        if (parsed.users.length !== beforeUserLen) mediaMigrated = true;
+      }
+
+      if (needsVersionMigration) {
+        var beforeProdLen = parsed.products.length;
+        parsed.products = parsed.products.filter(function(p) {
+          return p && REMOVED_LEGACY_PRODUCT_IDS.indexOf(p.id) === -1;
+        });
+        if (parsed.products.length === 0) {
+          parsed.products = JSON.parse(JSON.stringify(DEFAULT_CATALOG.products));
+        }
+        if (parsed.products.length !== beforeProdLen) mediaMigrated = true;
+        if (!parsed.products.some(function(p) { return p.id === parsed.mvpProductId; })) {
+          parsed.mvpProductId = parsed.products[0].id;
+          mediaMigrated = true;
+        }
+        var removedOldGroupIds = ['group-cam', 'group-core', 'group-sensor'];
+        if (Array.isArray(parsed.groups)) {
+          var inUseGroups = {};
+          parsed.products.forEach(function(p) { if (p && p.groupId) inUseGroups[p.groupId] = true; });
+          parsed.groups = parsed.groups.filter(function(g) {
+            return g && (removedOldGroupIds.indexOf(g.id) === -1 || inUseGroups[g.id]);
+          });
+          if (parsed.groups.length === 0) {
+            parsed.groups = JSON.parse(JSON.stringify(DEFAULT_CATALOG.groups));
+          }
+          mediaMigrated = true;
+        }
+      }
+
       var defaultGroupById = {};
       (DEFAULT_CATALOG.groups || []).forEach(function(dg) { defaultGroupById[dg.id] = dg; });
       // Normalize cached group names (remove internal numbering & B2C tags)
@@ -893,7 +725,7 @@
           }
         });
         if (groupsMigrated) {
-          try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch (e) {}
+          mediaMigrated = true;
         }
       }
       // Normalize tiers & root-relative image paths + migrate retired stock/fake URLs
@@ -908,7 +740,6 @@
         '02_camera_pro_dark.png': '/shared/img/app_camera_pro.svg'
       };
       var LEGACY_RE = /(?:feed_|thumb_|01_camera_basic_dark\.png|02_camera_pro_dark\.png)/i;
-      var mediaMigrated = false;
       function normImgPath(url, productDefaultImg) {
         if (typeof url !== 'string') return url;
         var out = url;
@@ -946,8 +777,15 @@
           p.overview.forEach(function(o) { if (o && o.img) o.img = normImgPath(o.img, null); });
         }
         if (needsVersionMigration && defProd) {
+          p.slug = p.slug || defProd.slug;
+          p.heroBadge = p.heroBadge || defProd.heroBadge;
+          p.overviewBadge = p.overviewBadge || defProd.overviewBadge;
           p.tagline = defProd.tagline;
           p.subtitle = defProd.subtitle;
+          if (!Array.isArray(p.pillTags) || p.pillTags.length === 0) p.pillTags = JSON.parse(JSON.stringify(defProd.pillTags || []));
+          if (!Array.isArray(p.perks) || p.perks.length === 0) p.perks = JSON.parse(JSON.stringify(defProd.perks || []));
+          p.warranty = p.warranty || defProd.warranty;
+          if (!Array.isArray(p.customBlocks)) p.customBlocks = [];
           p.highlights = JSON.parse(JSON.stringify(defProd.highlights || []));
           p.specs = JSON.parse(JSON.stringify(defProd.specs || []));
           if (Array.isArray(p.tiers) && Array.isArray(defProd.tiers)) {
@@ -955,7 +793,12 @@
             defProd.tiers.forEach(function(dt) { defTierByKey[dt.key] = dt; });
             p.tiers.forEach(function(t) {
               var dt = defTierByKey[t.key || t.id];
-              if (dt) t.desc = dt.desc;
+              if (dt) {
+                t.desc = dt.desc;
+                t.gift = t.gift || dt.gift;
+                t.oldPriceFormatted = t.oldPriceFormatted || dt.oldPriceFormatted;
+                t.save = t.save || dt.save;
+              }
             });
           }
           mediaMigrated = true;
@@ -969,6 +812,9 @@
             if (!t.name && !t.label) {
               t.name = t.tag || ('Phiên bản ' + (idx + 1));
               t.label = t.name;
+            }
+            if (!t.oldPriceFormatted && t.origPrice && t.origPrice > t.price) {
+              t.oldPriceFormatted = formatVND(t.origPrice);
             }
           });
         }
@@ -1785,6 +1631,25 @@
 
     pushUserToCloud(user);
     return { success: true, user: user, isAdmin: isAdmin };
+  }
+
+  // 6.4 Apple ID Sign-In (Đồng bộ tài khoản Apple giữa Web & App iOS)
+  function loginWithApple(email, displayName) {
+    if (!email) return { success: false, message: 'Vui lòng cung cấp địa chỉ Email Apple ID.' };
+    var res = loginWithGmail(email, displayName);
+    if (res && res.success && res.user) {
+      res.user.authProvider = 'apple';
+      var cat = getCatalog();
+      var idx = (cat.users || []).findIndex(function (u) { return u.id === res.user.id; });
+      if (idx !== -1) {
+        cat.users[idx].authProvider = 'apple';
+        saveCatalog(cat);
+      }
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(res.user));
+      }
+    }
+    return res;
   }
 
   function logoutUser() {
@@ -3366,6 +3231,7 @@
     loginUser: loginUser,
     registerUser: registerUser,
     loginWithGmail: loginWithGmail,
+    loginWithApple: loginWithApple,
     logoutUser: logoutUser,
     updateUserProfile: updateUserProfile,
     updateUserModules: updateUserModules,

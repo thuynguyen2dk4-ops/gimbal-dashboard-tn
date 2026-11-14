@@ -161,7 +161,7 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     override init() {
         super.init()
         loadUiPreferences()
-        setupMockThumbnails()
+        loadPersistedMediaFromDisk()
         startAudioVUAnimation()
         setupOrientationObserver()
     }
@@ -336,29 +336,137 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
         defaults.set(antiFlicker, forKey: PrefKeys.antiFlicker)
     }
 
-    private func setupMockThumbnails() {
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 80, height: 80))
-        let img = renderer.image { ctx in
-            UIColor(red: 0.12, green: 0.12, blue: 0.15, alpha: 1.0).setFill()
-            ctx.fill(CGRect(x: 0, y: 0, width: 80, height: 80))
-            let paragraph = NSMutableParagraphStyle()
-            paragraph.alignment = .center
-            let attrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 24),
-                .paragraphStyle: paragraph
-            ]
-            ("🎬" as NSString).draw(in: CGRect(x: 0, y: 24, width: 80, height: 32), withAttributes: attrs)
+    private struct PersistedMediaRecord: Codable {
+        let id: UUID
+        let fileName: String
+        let isVideo: Bool
+        let duration: String?
+        let timestamp: Date
+        let resolution: String
+        let profile: String
+        let fileSizeBytes: Int64
+    }
+
+    private var mediaDirectoryURL: URL {
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        return docs.appendingPathComponent("TFlowMedia", isDirectory: true)
+    }
+
+    private var manifestFileURL: URL {
+        mediaDirectoryURL.appendingPathComponent("manifest.json")
+    }
+
+    var realPhotoCount: Int {
+        capturedMedia.filter { !$0.isVideo }.count
+    }
+
+    var realVideoCount: Int {
+        capturedMedia.filter { $0.isVideo }.count
+    }
+
+    var realTotalStorageBytes: Int64 {
+        capturedMedia.reduce(0) { $0 + $1.fileSizeBytes }
+    }
+
+    var realVideoStorageBytes: Int64 {
+        capturedMedia.filter { $0.isVideo }.reduce(0) { $0 + $1.fileSizeBytes }
+    }
+
+    var realPhotoStorageBytes: Int64 {
+        capturedMedia.filter { !$0.isVideo }.reduce(0) { $0 + $1.fileSizeBytes }
+    }
+
+    var totalLibraryStorageBytesFormatted: String {
+        formatByteCount(realTotalStorageBytes)
+    }
+
+    var videoStorageFormatted: String {
+        formatByteCount(realVideoStorageBytes)
+    }
+
+    var photoStorageFormatted: String {
+        formatByteCount(realPhotoStorageBytes)
+    }
+
+    private func formatByteCount(_ bytes: Int64) -> String {
+        guard bytes > 0 else { return "0 KB" }
+        return ByteCountFormatter.string(fromByteCount: bytes, countStyle: .file)
+    }
+
+    private func ensureMediaDirectoryExists() {
+        if !FileManager.default.fileExists(atPath: mediaDirectoryURL.path) {
+            try? FileManager.default.createDirectory(at: mediaDirectoryURL, withIntermediateDirectories: true)
         }
-        latestThumbnail = img
-        capturedMedia.append(
-            CapturedMediaItem(
-                image: img,
-                isVideo: true,
-                duration: "00:01:24",
-                resolution: "4K ProRes 60fps",
-                profile: "Apple Log"
+    }
+
+    private func loadPersistedMediaFromDisk() {
+        ensureMediaDirectoryExists()
+        guard let data = try? Data(contentsOf: manifestFileURL),
+              let records = try? JSONDecoder().decode([PersistedMediaRecord].self, from: data) else {
+            capturedMedia = []
+            latestThumbnail = nil
+            return
+        }
+
+        var loaded: [CapturedMediaItem] = []
+        for record in records {
+            let fileURL = mediaDirectoryURL.appendingPathComponent(record.fileName)
+            guard let imgData = try? Data(contentsOf: fileURL),
+                  let image = UIImage(data: imgData) else {
+                continue
+            }
+            let diskSize = Int64(imgData.count)
+            loaded.append(
+                CapturedMediaItem(
+                    id: record.id,
+                    image: image,
+                    isVideo: record.isVideo,
+                    duration: record.duration,
+                    timestamp: record.timestamp,
+                    resolution: record.resolution,
+                    profile: record.profile,
+                    fileName: record.fileName,
+                    fileSizeBytes: record.fileSizeBytes > 0 ? record.fileSizeBytes : diskSize
+                )
             )
-        )
+        }
+        capturedMedia = loaded
+        latestThumbnail = loaded.first?.image
+    }
+
+    private func saveManifestToDisk() {
+        ensureMediaDirectoryExists()
+        let records = capturedMedia.map {
+            PersistedMediaRecord(
+                id: $0.id,
+                fileName: $0.fileName,
+                isVideo: $0.isVideo,
+                duration: $0.duration,
+                timestamp: $0.timestamp,
+                resolution: $0.resolution,
+                profile: $0.profile,
+                fileSizeBytes: $0.fileSizeBytes
+            )
+        }
+        if let data = try? JSONEncoder().encode(records) {
+            try? data.write(to: manifestFileURL, options: .atomic)
+        }
+    }
+
+    func addAndPersistMedia(_ item: CapturedMediaItem) {
+        ensureMediaDirectoryExists()
+        var stored = item
+        if stored.fileName.isEmpty {
+            stored.fileName = "\(stored.id.uuidString).jpg"
+        }
+        let targetURL = mediaDirectoryURL.appendingPathComponent(stored.fileName)
+        if let encoded = stored.image.jpegData(compressionQuality: 0.9) ?? stored.image.pngData() {
+            try? encoded.write(to: targetURL, options: .atomic)
+            stored.fileSizeBytes = Int64(encoded.count)
+        }
+        capturedMedia.insert(stored, at: 0)
+        latestThumbnail = stored.image
+        saveManifestToDisk()
     }
 
     private func startAudioVUAnimation() {
@@ -488,8 +596,13 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     }
 
     func deleteMedia(_ item: CapturedMediaItem) {
+        if !item.fileName.isEmpty {
+            let fileURL = mediaDirectoryURL.appendingPathComponent(item.fileName)
+            try? FileManager.default.removeItem(at: fileURL)
+        }
         capturedMedia.removeAll { $0.id == item.id }
         latestThumbnail = capturedMedia.first?.image
+        saveManifestToDisk()
         UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 
@@ -527,8 +640,7 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
             resolution: selectedResolution,
             profile: activeLut
         )
-        capturedMedia.insert(newItem, at: 0)
-        latestThumbnail = photo
+        addAndPersistMedia(newItem)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 
@@ -567,8 +679,7 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
                 resolution: selectedResolution,
                 profile: activeLut
             )
-            capturedMedia.insert(newItem, at: 0)
-            latestThumbnail = clipThumb
+            addAndPersistMedia(newItem)
         } else {
             isRecording = true
             UIImpactFeedbackGenerator(style: .heavy).impactOccurred()

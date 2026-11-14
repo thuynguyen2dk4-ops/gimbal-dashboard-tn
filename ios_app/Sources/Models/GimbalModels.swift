@@ -13,13 +13,15 @@ import UIKit
 // =====================================================================
 
 struct CapturedMediaItem: Identifiable {
-    let id = UUID()
+    var id: UUID = UUID()
     let image: UIImage
     let isVideo: Bool
     let duration: String?
-    let timestamp: Date = Date()
+    var timestamp: Date = Date()
     let resolution: String
     let profile: String
+    var fileName: String = ""
+    var fileSizeBytes: Int64 = 0
 }
 
 struct ChatMessage: Identifiable {

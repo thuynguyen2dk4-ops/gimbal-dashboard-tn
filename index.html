@@ -126,8 +126,189 @@
     }
     .nav-links li button.active {
       color: var(--text-main);
-      background: var(--bg-alt);
+      background: #EBEBED;
       font-weight: 700;
+      box-shadow: inset 0 0 0 1px rgba(29, 29, 31, 0.14);
+    }
+
+    /* ==========================================================================
+       VIEW 5: T-FLOW APP SHOWCASE & INTERACTIVE SIMULATOR
+       ========================================================================== */
+    .tflow-app-hero {
+      padding: 28px 0 64px 0;
+      min-height: calc(100dvh - var(--nav-h));
+      background: #0B101B;
+      color: #F8FAFC;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+    .tflow-app-hero[data-app-theme="light"] {
+      background: #F5F5F7;
+      color: #1D1D1F;
+    }
+    .app-studio-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 20px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 18px;
+      margin-bottom: 26px;
+    }
+    .tflow-app-hero[data-app-theme="light"] .app-studio-topbar {
+      background: #FFFFFF;
+      border-color: rgba(0, 0, 0, 0.08);
+      box-shadow: var(--shadow-sm);
+    }
+    .app-cluster-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .app-cluster-btn {
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: transparent;
+      color: #CBD5E1;
+      padding: 8px 14px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .app-cluster-btn.active {
+      background: #FACC15;
+      color: #111827;
+      border-color: #FACC15;
+      font-weight: 700;
+    }
+    .tflow-app-hero[data-app-theme="light"] .app-cluster-btn {
+      color: #4B5563;
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+    .tflow-app-hero[data-app-theme="light"] .app-cluster-btn.active {
+      background: #1D1D1F;
+      color: #FFFFFF;
+      border-color: #1D1D1F;
+    }
+    .app-sim-stage {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 28px;
+      align-items: start;
+      margin-bottom: 36px;
+    }
+    .iphone-bezel {
+      width: 320px;
+      max-width: 100%;
+      margin: 0 auto;
+      background: #000000;
+      border-radius: 44px;
+      padding: 12px;
+      border: 3px solid #2D3342;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+      transition: all 0.3s var(--ease);
+    }
+    .iphone-bezel.landscape {
+      width: 560px;
+      border-radius: 32px;
+    }
+    .iphone-screen {
+      background: #10141F;
+      border-radius: 34px;
+      min-height: 560px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      position: relative;
+      color: #FFFFFF;
+    }
+    .iphone-bezel.landscape .iphone-screen {
+      border-radius: 22px;
+      min-height: 300px;
+    }
+    .tflow-app-hero[data-app-theme="light"] .iphone-screen {
+      background: #FFFFFF;
+      color: #1D1D1F;
+    }
+    .iphone-island {
+      width: 96px;
+      height: 24px;
+      background: #000;
+      border-radius: 99px;
+      margin: 10px auto 6px auto;
+    }
+    .app-sim-body {
+      flex: 1;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .app-sim-tabbar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 10px 8px 14px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(10, 14, 23, 0.94);
+    }
+    .tflow-app-hero[data-app-theme="light"] .app-sim-tabbar {
+      background: #F5F5F7;
+      border-top-color: rgba(0, 0, 0, 0.08);
+    }
+    .app-sim-tab-btn {
+      background: none;
+      border: none;
+      color: #94A3B8;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .app-sim-tab-btn.active {
+      color: #FACC15;
+      font-weight: 700;
+    }
+    .tflow-app-hero[data-app-theme="light"] .app-sim-tab-btn.active {
+      color: #0071E3;
+    }
+    .app-screens-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .app-screen-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 18px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .app-screen-card:hover, .app-screen-card.active {
+      border-color: #FACC15;
+      background: rgba(250, 204, 21, 0.08);
+      transform: translateY(-2px);
+    }
+    .tflow-app-hero[data-app-theme="light"] .app-screen-card {
+      background: #FFFFFF;
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    .tflow-app-hero[data-app-theme="light"] .app-screen-card.active {
+      border-color: #1D1D1F;
+      background: #FFFBEB;
+    }
+    @media (max-width: 900px) {
+      .app-sim-stage {
+        grid-template-columns: 1fr;
+      }
     }
 
     .nav-actions {
@@ -1310,33 +1491,34 @@
        VIEW 3: TRANG CHI TIẾT SẢN PHẨM RIÊNG (APPLE STORE BUY PAGE)
        ========================================================================== */
     .product-detail-view {
-      padding: clamp(12px, max(1.8dvh, calc((var(--view-h) - 670px) * 0.36)), 84px) 0 clamp(40px, 6dvh, 88px) 0;
+      padding: clamp(32px, 5.5dvh, 72px) 0 clamp(48px, 7dvh, 96px) 0;
     }
 
     /* Top 2 Columns */
     .detail-top-grid {
       display: grid;
       grid-template-columns: 1.05fr 0.95fr;
-      gap: clamp(22px, 3.6vw, 52px);
-      align-items: start;
-      margin-bottom: clamp(28px, 5dvh, 64px);
+      gap: clamp(24px, 3.6vw, 52px);
+      align-items: center;
+      min-height: calc(100dvh - var(--nav-h) - 72px);
+      margin-bottom: clamp(44px, 8dvh, 96px);
     }
     .sticky-gallery-col {
       position: sticky;
-      top: calc(var(--nav-h) + 24px);
+      top: calc(var(--nav-h) + 32px);
       margin-top: 0;
     }
     .gallery-main-frame {
       background: var(--bg-alt);
       border-radius: var(--radius-lg);
-      padding: clamp(14px, 2.2dvh, 28px);
+      padding: clamp(16px, 2.5dvh, 32px);
       border: 1px solid var(--border);
-      height: clamp(240px, 46dvh, 420px);
+      height: clamp(300px, 52dvh, 480px);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      margin-bottom: clamp(8px, 1.3dvh, 12px);
+      margin-bottom: clamp(10px, 1.5dvh, 14px);
     }
     .gallery-main-frame img {
       max-height: 100%;
@@ -5119,6 +5301,7 @@
     <ul class="nav-links">
       <li><button class="nav-btn active" id="btnNavHome" onclick="switchView('home')">Trang Chủ</button></li>
       <li><button class="nav-btn" id="btnNavCatalog" onclick="switchView('catalog')">Dải Sản Phẩm</button></li>
+      <li><button class="nav-btn" id="btnNavApp" onclick="switchView('app')">T-Flow App</button></li>
       <li><button class="nav-btn" id="btnNavReviews" onclick="switchView('reviews')">Đánh Giá &amp; Hỏi Đáp</button></li>
     </ul>
 
@@ -5154,13 +5337,13 @@
 
           <!-- Right: Flagship Info & Configurator -->
           <div class="flagship-info">
-            <div class="tag-clean">Flagship 2026 &bull; Gimbal 3 Trục AI</div>
+            <div class="tag-clean" id="heroFlagshipEyebrow">Flagship 2026 &bull; Gimbal 3 Trục AI</div>
             <h1 id="heroFlagshipTitle">T-Flow Pro</h1>
             <div class="flagship-tagline" id="heroFlagshipTagline">Chống rung 3 trục • AI không cần App</div>
             <p class="flagship-desc" id="heroFlagshipDesc">
               Gắn MagSafe 1 chạm. Bám nét khuôn mặt ở mọi ứng dụng.
             </p>
-            <div class="hero-spec-badges" aria-label="Thông số nổi bật">
+            <div class="hero-spec-badges" id="heroSpecBadges" aria-label="Thông số nổi bật">
               <span class="hero-spec-pill">⚡ FOC 20kHz</span>
               <span class="hero-spec-pill">🎯 AI 60fps</span>
               <span class="hero-spec-pill">🔋 Pin 18h</span>
@@ -5428,7 +5611,7 @@
                 <span class="summary-old-price" id="detailOldPrice">3.490.000₫</span>
               </div>
               <div class="summary-gift-tag" id="detailGiftTag">Tặng kèm: Ngàm MagSafe + Tripod Mini Carbon</div>
-              <div class="summary-perks">
+              <div class="summary-perks" id="detailSummaryPerks">
                 <div>&bull; Miễn phí giao hàng tiêu chuẩn toàn quốc (2 - 3 ngày)</div>
                 <div>&bull; Bảo hành chính hãng 12 tháng 1 đổi 1 tận nơi</div>
                 <div>&bull; 30 ngày dùng thử đổi mới miễn phí</div>
@@ -5454,14 +5637,18 @@
         <!-- Deep Tab 1: Overview / Mô Tả Sản Phẩm -->
         <div id="deepTabOverview" class="deep-tab-panel">
           <div class="detail-overview-lead" id="detailOverviewLead">
-            <div class="tag-clean">Điểm Nhấn Cốt Lõi</div>
+            <div class="tag-clean" id="detailOverviewBadge">Điểm Nhấn Cốt Lõi</div>
             <div class="detail-tagline" id="detailTagline">Chống rung 3 trục • AI không cần App</div>
             <p class="detail-short-desc" id="detailShortDesc">
               Gắn MagSafe 1 chạm. Bám nét khuôn mặt ở mọi ứng dụng.
             </p>
+            <div class="hero-spec-badges" id="detailPillTags" style="margin-top:12px;"></div>
           </div>
           <div id="detailOverviewContainer">
             <!-- Dynamically populated visual icon+metric cards -->
+          </div>
+          <div id="detailCustomBlocksContainer" style="margin-top:24px;">
+            <!-- Dynamically populated custom modular blocks from Admin CMS -->
           </div>
         </div>
 
@@ -5504,6 +5691,96 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       VIEW 3B: T-FLOW APP (IOS CAMERA STUDIO, XOAY NGANG 16:9 & LUỒNG APP IOS)
+       ========================================================================== -->
+  <main class="view-panel" id="viewApp">
+    <section class="tflow-app-hero" id="tflowAppSection" data-app-theme="dark">
+      <div class="container">
+        <div class="app-studio-topbar">
+          <div>
+            <div style="font-size:17px; font-weight:700; display:flex; align-items:center; gap:8px;">
+              <span>📱 T-Flow App — Hệ Sinh Thái iOS Studio</span>
+            </div>
+            <div style="font-size:12.5px; opacity:0.75; margin-top:2px;">Đồng bộ thời gian thực với tài khoản T-Flow &amp; phần cứng Gimbal BLE 5.3</div>
+          </div>
+
+          <div class="app-cluster-tabs" role="tablist">
+            <button type="button" class="app-cluster-btn active" id="btnAppClusterCamera" onclick="switchAppCluster('camera', this)">iOS Camera Studio (10)</button>
+            <button type="button" class="app-cluster-btn" id="btnAppClusterLandscape" onclick="switchAppCluster('landscape', this)">Xoay Ngang 16:9 (8)</button>
+            <button type="button" class="app-cluster-btn" id="btnAppClusterFlow" onclick="switchAppCluster('flow', this)">Luồng App iOS (17)</button>
+          </div>
+
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <button type="button" class="app-cluster-btn" id="btnToggleAppOrient" onclick="toggleAppOrientation()">🔄 Xoay Dọc / Ngang</button>
+            <button type="button" class="app-cluster-btn" id="btnToggleAppTheme" onclick="toggleAppTheme()">☀️ Chế Độ Sáng</button>
+          </div>
+        </div>
+
+        <!-- INTERACTIVE SIMULATOR STAGE -->
+        <div class="app-sim-stage">
+          <div id="tflowAppPhoneColumn">
+            <div class="iphone-bezel" id="tflowPhoneBezel">
+              <div class="iphone-screen">
+                <div class="iphone-island"></div>
+                <div class="app-sim-body" id="tflowPhoneBody">
+                  <!-- Rendered dynamically by renderTflowAppSimulator() -->
+                </div>
+                <div class="app-sim-tabbar" id="tflowPhoneTabbar">
+                  <button type="button" class="app-sim-tab-btn active" onclick="selectAppScreen('01_basic')">
+                    <span>📷</span><span>Quay</span>
+                  </button>
+                  <button type="button" class="app-sim-tab-btn" onclick="selectAppScreen('27_gallery')">
+                    <span>🖼️</span><span>Thư viện</span>
+                  </button>
+                  <button type="button" class="app-sim-tab-btn" onclick="selectAppScreen('30_device')">
+                    <span>🎛️</span><span>Thiết bị</span>
+                  </button>
+                  <button type="button" class="app-sim-tab-btn" onclick="selectAppScreen('35_profile')">
+                    <span>👤</span><span>Hồ sơ</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- INSPECTOR / REAL ACCOUNT SYNC PANEL -->
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div class="app-screen-card" style="cursor:default;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span id="appActiveScreenBadge" style="font-size:11px; font-weight:700; padding:4px 10px; border-radius:99px; background:#FACC15; color:#111827;">CAMERA CƠ BẢN</span>
+                <span id="appSyncAccountBadge" style="font-size:12px; font-weight:600; opacity:0.85;">Chưa đăng nhập</span>
+              </div>
+              <h2 id="appActiveScreenTitle" style="font-size:22px; font-weight:700; margin-bottom:8px;">01. Camera Cơ Bản — Quay 1 chạm</h2>
+              <p id="appActiveScreenDesc" style="font-size:14px; opacity:0.82; line-height:1.55; margin-bottom:14px;">
+                Chạm khung hình để khóa AI bám nét người/thú cưng/vật thể 60fps; chọn nhanh tỉ lệ 9:16, 4:3, 1:1, 16:9, 2.39:1 ở cả hai chế độ Cơ Bản &amp; Chuyên Nghiệp.
+              </p>
+              <div id="appInteractiveControls" style="display:flex; flex-wrap:wrap; gap:8px;">
+                <!-- Context controls: aspect ratio switcher, camera Basic/Pro toggle, AI target selector -->
+              </div>
+            </div>
+
+            <div class="app-screen-card" style="cursor:default;">
+              <div style="font-size:13px; font-weight:700; margin-bottom:8px;">Đồng Bộ Tài Khoản &amp; Cloud iOS ↔ Web</div>
+              <p id="appSyncUserSummary" style="font-size:13px; opacity:0.8; line-height:1.5; margin-bottom:12px;">
+                Đăng nhập bằng Google, Apple ID hoặc Email để đồng bộ tức thì gói cước, 7 module bản quyền và lịch sử kích hoạt với T-Flow App trên iPhone.
+              </p>
+              <div style="display:flex; gap:8px; flex-wrap:wrap;" id="appSyncActionsRow">
+                <button type="button" class="app-cluster-btn active" onclick="toggleAuthModal(true)">🔐 Đăng Nhập / Đăng Ký</button>
+                <a href="/account" class="app-cluster-btn" style="display:inline-flex; align-items:center;">📱 Mở Cổng Khách Hàng</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCREEN CATALOG GRID -->
+        <div class="app-screens-grid" id="appScreensGrid">
+          <!-- Populated dynamically by switchAppCluster() -->
         </div>
       </div>
     </section>
@@ -6151,7 +6428,7 @@
       }
     }
 
-    // Listen for Google OAuth success message from /auth/google/ popup
+    // Listen for Google & Apple OAuth success messages from /auth/google/ and /auth/apple/ popups
     window.addEventListener('message', function(event) {
       if (event.data && event.data.type === 'GOOGLE_OAUTH_SUCCESS') {
         const googleUser = event.data.user;
@@ -6160,12 +6437,48 @@
           toggleAuthModal(false);
           renderNavUserSection();
           renderReviewsList();
+          if (typeof renderTflowAppSimulator === 'function') renderTflowAppSimulator();
           showToast('✓ Đăng nhập Google thành công (' + googleUser.email + ')');
+        }
+      } else if (event.data && event.data.type === 'APPLE_OAUTH_SUCCESS') {
+        const appleUser = event.data.user;
+        if (appleUser && appleUser.email && typeof SmartGimbalCatalog !== 'undefined') {
+          if (SmartGimbalCatalog.loginWithApple) {
+            SmartGimbalCatalog.loginWithApple(appleUser.email, appleUser.name);
+          } else {
+            SmartGimbalCatalog.loginWithGmail(appleUser.email, appleUser.name);
+          }
+          toggleAuthModal(false);
+          renderNavUserSection();
+          renderReviewsList();
+          if (typeof renderTflowAppSimulator === 'function') renderTflowAppSimulator();
+          showToast('✓ Đăng nhập Apple thành công (' + appleUser.email + ')');
         }
       }
     });
 
-    // Check if user just redirected back from /auth/google/
+    function loginWithAppleOAuth() {
+      const width = 460;
+      const height = 600;
+      const left = window.screenX + (window.outerWidth - width) / 2;
+      const top = window.screenY + (window.outerHeight - height) / 2;
+      try {
+        const popup = window.open(
+          '/auth/apple/',
+          'AppleIdOAuth',
+          `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
+        );
+        if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+          window.location.href = '/auth/apple/';
+        } else if (popup && popup.focus) {
+          popup.focus();
+        }
+      } catch (e) {
+        window.location.href = '/auth/apple/';
+      }
+    }
+
+    // Check if user just redirected back from /auth/google/ or /auth/apple/
     try {
       const redirectedUserStr = localStorage.getItem('tflow_google_auth_redirect_user');
       if (redirectedUserStr) {
@@ -6176,6 +6489,17 @@
           renderNavUserSection();
           renderReviewsList();
           showToast('✓ Đăng nhập Google thành công (' + rUser.email + ')');
+        }
+      }
+      const appleRedirStr = localStorage.getItem('tflow_apple_auth_redirect_user');
+      if (appleRedirStr) {
+        localStorage.removeItem('tflow_apple_auth_redirect_user');
+        const aUser = JSON.parse(appleRedirStr);
+        if (aUser && aUser.email && typeof SmartGimbalCatalog !== 'undefined') {
+          (SmartGimbalCatalog.loginWithApple || SmartGimbalCatalog.loginWithGmail)(aUser.email, aUser.name);
+          renderNavUserSection();
+          renderReviewsList();
+          showToast('✓ Đăng nhập Apple thành công (' + aUser.email + ')');
         }
       }
     } catch(err) {}
@@ -6468,6 +6792,9 @@
       if (viewName === 'catalog') {
         targetPath = '/san-pham';
         targetTitle = 'Dải Sản Phẩm — t-flow';
+      } else if (viewName === 'app') {
+        targetPath = '/tflow-app';
+        targetTitle = 'T-Flow App Studio — t-flow';
       } else if (viewName === 'reviews') {
         targetPath = '/danh-gia';
         targetTitle = 'Đánh Giá & Hỏi Đáp — t-flow';
@@ -6526,6 +6853,11 @@
         return;
       }
 
+      if (path === '/tflow-app' || path === '/app') {
+        switchView('app', { skipHistory: true, skipScroll: true });
+        return;
+      }
+
       if (path === '/danh-gia' || path === '/reviews') {
         switchView('reviews', { skipHistory: true, skipScroll: true });
         return;
@@ -6548,12 +6880,15 @@
         'home': document.getElementById('viewHome'),
         'catalog': document.getElementById('viewCatalog'),
         'detail': document.getElementById('viewProductDetail'),
+        'app': document.getElementById('viewApp'),
         'reviews': document.getElementById('viewReviews')
       };
 
       const navBtns = {
         'home': document.getElementById('btnNavHome'),
         'catalog': document.getElementById('btnNavCatalog'),
+        'detail': document.getElementById('btnNavCatalog'),
+        'app': document.getElementById('btnNavApp'),
         'reviews': document.getElementById('btnNavReviews')
       };
 
@@ -6587,6 +6922,8 @@
       if (viewName === 'catalog') {
         renderCatalogFilterChips();
         renderCatalogGrid();
+      } else if (viewName === 'app') {
+        if (typeof renderTflowAppView === 'function') renderTflowAppView();
       } else if (viewName === 'reviews') {
         syncUserAuthState();
       } else if (viewName === 'home') {
@@ -6611,10 +6948,19 @@
       }
       if (!currentMvp) return;
 
+      const elEyebrow = document.getElementById('heroFlagshipEyebrow');
+      if (elEyebrow) elEyebrow.textContent = currentMvp.heroBadge || 'Flagship 2026 • Gimbal 3 Trục AI';
       document.getElementById('heroFlagshipTitle').textContent = currentMvp.name;
       document.getElementById('heroFlagshipTagline').textContent = currentMvp.tagline || currentMvp.subtitle || '';
       document.getElementById('heroFlagshipDesc').textContent = currentMvp.subtitle || '';
       document.getElementById('heroFlagshipImg').src = currentMvp.img || '/shared/img/tflow_pro_main.png';
+      const elBadges = document.getElementById('heroSpecBadges');
+      if (elBadges) {
+        const tags = Array.isArray(currentMvp.pillTags) && currentMvp.pillTags.length > 0
+          ? currentMvp.pillTags
+          : ['⚡ FOC 20kHz', '🎯 AI 60fps', '🔋 Pin 18h'];
+        elBadges.innerHTML = tags.map(t => `<span class="hero-spec-pill">${escapeCatalogHtml(t)}</span>`).join('');
+      }
 
       // Render Tiers
       const tierContainer = document.getElementById('heroTierSelector');
@@ -7161,6 +7507,8 @@
       // Heading & Overview Lead info (tagline + full description moved down into Mô Tả Sản Phẩm tab)
       const elTitle = document.getElementById('detailTitle');
       if (elTitle) elTitle.textContent = prod.name;
+      const elOverviewBadge = document.getElementById('detailOverviewBadge');
+      if (elOverviewBadge) elOverviewBadge.textContent = prod.overviewBadge || 'Điểm Nhấn Cốt Lõi';
       const elTagline = document.getElementById('detailTagline');
       if (elTagline) {
         elTagline.textContent = prod.tagline || '';
@@ -7171,9 +7519,26 @@
         elShortDesc.textContent = prod.subtitle || '';
         elShortDesc.style.display = prod.subtitle ? '' : 'none';
       }
+      const elPillTags = document.getElementById('detailPillTags');
+      if (elPillTags) {
+        const pTags = Array.isArray(prod.pillTags) ? prod.pillTags : [];
+        elPillTags.style.display = pTags.length > 0 ? 'flex' : 'none';
+        elPillTags.innerHTML = pTags.map(t => `<span class="hero-spec-pill">${escapeCatalogHtml(t)}</span>`).join('');
+      }
+      const elPerks = document.getElementById('detailSummaryPerks');
+      if (elPerks) {
+        const perksList = Array.isArray(prod.perks) && prod.perks.length > 0
+          ? prod.perks
+          : [
+              'Miễn phí giao hàng tiêu chuẩn toàn quốc (2 - 3 ngày)',
+              'Bảo hành chính hãng 12 tháng 1 đổi 1 tận nơi',
+              '30 ngày dùng thử đổi mới miễn phí'
+            ];
+        elPerks.innerHTML = perksList.map(pk => `<div>&bull; ${escapeCatalogHtml(pk)}</div>`).join('');
+      }
       const elLead = document.getElementById('detailOverviewLead');
       if (elLead) {
-        elLead.style.display = (prod.tagline || prod.subtitle) ? '' : 'none';
+        elLead.style.display = (prod.tagline || prod.subtitle || (prod.pillTags && prod.pillTags.length)) ? '' : 'none';
       }
 
       // Gallery main image
@@ -7277,6 +7642,28 @@
         overviewContainer.appendChild(grid);
       }
 
+      // Render dynamic Custom Modular Blocks from Admin CMS (text / table / tags)
+      const customContainer = document.getElementById('detailCustomBlocksContainer');
+      if (customContainer) {
+        const blocks = Array.isArray(prod.customBlocks) ? prod.customBlocks : [];
+        if (blocks.length === 0) {
+          customContainer.innerHTML = '';
+        } else {
+          customContainer.innerHTML = blocks.map(blk => {
+            const titleHtml = blk.title ? `<h4 style="font-size:16px; font-weight:700; margin-bottom:10px; color:var(--text-main);">${escapeCatalogHtml(blk.title)}</h4>` : '';
+            if (blk.type === 'tags') {
+              const items = Array.isArray(blk.items) ? blk.items : [];
+              return `<div style="background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius-md); padding:18px 20px; margin-bottom:14px;">${titleHtml}<div class="hero-spec-badges">${items.map(it => `<span class="hero-spec-pill">${escapeCatalogHtml(it)}</span>`).join('')}</div></div>`;
+            }
+            if (blk.type === 'table') {
+              const rows = Array.isArray(blk.rows) ? blk.rows : [];
+              return `<div style="background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius-md); padding:18px 20px; margin-bottom:14px;">${titleHtml}<table class="specs-table" style="margin-top:0;">${rows.map(r => `<tr><td>${escapeCatalogHtml(r.label || '')}</td><td>${escapeCatalogHtml(r.val || '')}</td></tr>`).join('')}</table></div>`;
+            }
+            return `<div style="background:var(--bg-alt); border:1px solid var(--border); border-radius:var(--radius-md); padding:18px 20px; margin-bottom:14px;">${titleHtml}<p style="font-size:14px; color:var(--text-secondary); line-height:1.6;">${escapeCatalogHtml(blk.content || '')}</p></div>`;
+          }).join('');
+        }
+      }
+
       // Reset to default Mô Tả Sản Phẩm tab cleanly on product switch
       const deepTabBtns = typeof document.querySelectorAll === 'function' ? document.querySelectorAll('.deep-tab-btn') : [];
       if (deepTabBtns.length > 0 && typeof switchDetailTab === 'function') {
@@ -7331,6 +7718,266 @@
         skipScroll: !shouldScroll || !!opts.skipScroll,
         product: prod
       }));
+    }
+
+    // ==========================================================================
+    // 4B. T-FLOW APP STUDIO (3 CLUSTERS + INTERACTIVE IPHONE/LANDSCAPE SIMULATOR)
+    // ==========================================================================
+    const TFLOW_APP_SCREENS = {
+      camera: [
+        { id: '01_basic', num: '01', badge: 'CƠ BẢN (BASIC)', title: 'Cơ Bản — Quay 1 Chạm', desc: 'Giao diện tối giản với 5 nút chế độ (Timelapse, Slo-Mo, Video, Ảnh, Pano), phóng to 0.5x–2x và AI khóa nét chạm khung hình.' },
+        { id: '02_pro', num: '02', badge: 'PRO CINEMA', title: 'Chuyên Nghiệp — ISO & Histogram', desc: 'Hiển thị thông số 4K 60fps, ISO 100, 1/120s, 5600K, biểu đồ phơi sáng RGB Histogram thời gian thực và mức pin BLE.' },
+        { id: '03_rec', num: '03', badge: 'LIVE RECORDING', title: 'Đang Ghi Hình (Timer Đỏ)', desc: 'Đồng hồ đếm thời gian quay sắc nét, nút chụp nhanh độc lập và khóa chống chạm nhầm màn hình.' },
+        { id: '04_quick', num: '04', badge: 'QUICK MENU', title: 'Cài Đặt Nhanh (40pt Grid)', desc: 'Chọn nhanh Tỉ lệ khung hình (16:9, 9:16, 2.39:1), Độ phân giải 4K60, Xoay Dọc/Ngang, Lưới 3x3 và chế độ Giao Diện.' },
+        { id: '05_aspect', num: '05', badge: 'FRAMING GUIDES', title: 'Tỉ Lệ Khung Hình Đồng Nhất', desc: 'Nút đổi tỉ lệ khung hình (9:16, 4:3, 1:1, 16:9, 2.39:1) khả dụng trực tiếp ở CẢ Cơ Bản & Chuyên Nghiệp và luôn giữ trạng thái đồng bộ khi chuyển chế độ.' },
+        { id: '06_radial', num: '06', badge: 'GIMBAL RADIAL', title: 'Vòng Xoay Chế Độ Gimbal', desc: 'Chuyển nhanh thuật toán FOC: Khóa (L), Theo dõi (F), Pan Follow (PF), FPV, và Inception 360°.' },
+        { id: '07_ai', num: '07', badge: 'AI VISION', title: 'Khóa Mục Tiêu Theo Chủ Thể', desc: 'Chạm trực tiếp vào Người, Thú cưng hoặc Vật thể để khóa khung nhận diện 60fps.' },
+        { id: '08_front', num: '08', badge: 'FRONT VLOG', title: 'Camera Trước & Vlog Studio', desc: 'Tự động lật camera trước giữ AI bám khuôn mặt ổn định khi quay vlog.' },
+        { id: '09_manual', num: '09', badge: 'PHƠI SÁNG', title: 'Bảng Chỉnh Thủ Công Phim Trường', desc: 'Thanh trượt tốc độ màn trập, ISO, Cân bằng trắng 5600K và Focus Peaking.' },
+        { id: '10_timelapse', num: '10', badge: 'TIMELAPSE', title: 'Motionlapse & Panorama 3x3', desc: 'Lập trình điểm dừng A → B tự động xoay 3 trục theo quỹ đạo.' }
+      ],
+      landscape: [
+        { id: '01L_basic', num: '01L', badge: 'BASIC LANDSCAPE', title: 'Khung Ngắm Cơ Bản — Xoay Ngang', desc: 'Safe Area 16:9 thoáng đãng với nút REC ngón cái phải và chuyển cam trái.' },
+        { id: '02L_pro', num: '02L', badge: 'PRO CINEMA LAND', title: 'Khung Ngắm Chuyên Nghiệp — Xoay Ngang', desc: 'Edge-docking hai cạnh trái/phải giữ trống vùng nhìn 16:9, kèm False Color & Audio VU.' },
+        { id: '04L_menu', num: '04L', badge: 'DROPDOWN LANDSCAPE', title: 'Trình Đơn Cài Đặt — Xoay Ngang', desc: 'Popover 2 cột nhỏ gọn chỉnh nhanh Tỉ lệ khung hình, 4K60 và chế độ Cơ Bản/Chuyên Nghiệp.' },
+        { id: '06L_radial', num: '06L', badge: 'GIMBAL MODE LAND', title: 'Vòng Xoay Chế Độ — Xoay Ngang', desc: 'Cung bán nguyệt tối ưu cho ngón cái trái chuyển L / F / PF / FPV / 3D.' },
+        { id: '07L_ai', num: '07L', badge: 'AI VISION LAND', title: 'AI Tracking 16:9 — Xoay Ngang', desc: 'Theo dõi chủ thể chuyển động ngang theo bố cục 1/3 Rule of Thirds.' },
+        { id: '26L_home', num: '26L', badge: 'HOME SPLIT VIEW', title: 'Trang Chủ Split View Ngang', desc: 'Cột trái điều khiển Gimbal & mở Camera; cột phải xem nhanh Mẫu quay & Hướng dẫn.' },
+        { id: '29L_edit', num: '29L', badge: 'EDITOR LANDSCAPE', title: 'Trình Cắt Ghép & LUT Ngang', desc: 'Chỉnh màu 3D LUT và cắt ghép timeline mượt mà trên màn hình ngang.' },
+        { id: '41L_foc', num: '41L', badge: 'ADMIN TELEMETRY', title: 'Đo Đạc Hệ Thống FOC 20kHz', desc: 'Giám sát điện áp pin 11.42V, nhiệt độ MOSFET 38.5°C và vòng lặp PID 20kHz.' }
+      ],
+      flow: [
+        { id: '20_splash', num: '20', badge: 'KHỞI ĐỘNG', title: 'Màn Hình Khởi Động (Splash)', desc: 'Khởi tạo lõi T-Flow AI & giao thức BLE 5.3.' },
+        { id: '22_signin', num: '22', badge: 'XÁC THỰC', title: 'Đăng Nhập (Apple / Google / Email)', desc: 'Dùng tài khoản thật (Apple ID, Google hoặc Email/Mật khẩu) đồng bộ trực tiếp với Web & Supabase Cloud — không tài khoản test.' },
+        { id: '23_perms', num: '23', badge: 'CẤP QUYỀN', title: 'Cấp Quyền Hệ Thống Minh Bạch', desc: 'Cấp quyền Camera, Micro, Bluetooth và Thư viện Ảnh thực tế.' },
+        { id: '24_ble', num: '24', badge: 'GHÉP ĐÔI BLE', title: 'Quét Tìm T-Flow Pro BLE 5.3', desc: 'Radar tìm tay cầm Smart Gimbal lân cận và ghép đôi 1 chạm.' },
+        { id: '26_home', num: '26', badge: 'TRUNG TÂM', title: 'Trung Tâm Điều Khiển', desc: 'Hiển thị pin 92%, Firmware v2.4.1 và nút Mở Camera Quay Phim.' },
+        { id: '27_gallery', num: '27', badge: 'THƯ VIỆN THẬT', title: 'Thư Viện Media (Lưu Trữ Thực Tế)', desc: 'Chỉ hiển thị ảnh/video quay thực tế trên thiết bị, tính dung lượng lưu trữ thật (Documents/TFlowMedia).' },
+        { id: '30_device', num: '30', badge: 'THIẾT BỊ', title: 'Cân Chỉnh 3 Trục & Joystick', desc: 'Tùy chỉnh độ nhạy Joystick, tốc độ Pan/Tilt/Roll và hiệu chỉnh 6 mặt cảm biến IMU.' },
+        { id: '35_profile', num: '35', badge: 'HỒ SƠ', title: 'Hồ Sơ & 7 Module Bản Quyền', desc: 'Hiển thị dung lượng lưu trữ thật từ thư viện máy, 7 module đồng bộ cloud và chỉnh sửa thông tin cá nhân.' }
+      ]
+    };
+
+    let appViewState = {
+      cluster: 'camera',
+      screenId: '01_basic',
+      theme: 'dark',
+      orientation: 'portrait',
+      camMode: 'basic',
+      aspect: '16:9',
+      aiTarget: 'Người'
+    };
+
+    function renderTflowAppView() {
+      const container = document.getElementById('viewApp');
+      if (!container) return;
+      renderTflowAppGrid();
+      renderTflowAppSimulator();
+    }
+
+    function switchAppCluster(clusterKey, btn) {
+      appViewState.cluster = clusterKey;
+      document.querySelectorAll('.app-cluster-tabs .app-cluster-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      if (clusterKey === 'landscape') {
+        appViewState.orientation = 'landscape';
+      } else {
+        appViewState.orientation = 'portrait';
+      }
+      const list = TFLOW_APP_SCREENS[clusterKey] || [];
+      if (list.length > 0) appViewState.screenId = list[0].id;
+      applyAppBezelOrientation();
+      renderTflowAppGrid();
+      renderTflowAppSimulator();
+    }
+
+    function toggleAppOrientation() {
+      appViewState.orientation = (appViewState.orientation === 'portrait') ? 'landscape' : 'portrait';
+      applyAppBezelOrientation();
+      renderTflowAppSimulator();
+    }
+
+    function applyAppBezelOrientation() {
+      const bezel = document.getElementById('tflowPhoneBezel');
+      const btn = document.getElementById('btnToggleAppOrient');
+      if (bezel) bezel.classList.toggle('landscape', appViewState.orientation === 'landscape');
+      if (btn) btn.textContent = appViewState.orientation === 'landscape' ? '📱 Xoay Dọc 9:16' : '🔄 Xoay Ngang 16:9';
+    }
+
+    function toggleAppTheme() {
+      appViewState.theme = (appViewState.theme === 'dark') ? 'light' : 'dark';
+      const hero = document.getElementById('tflowAppSection');
+      const btn = document.getElementById('btnToggleAppTheme');
+      if (hero) hero.setAttribute('data-app-theme', appViewState.theme);
+      if (btn) btn.textContent = appViewState.theme === 'dark' ? '☀️ Chế Độ Sáng' : '🌙 Chế Độ Tối';
+    }
+
+    function selectAppScreen(screenId) {
+      appViewState.screenId = screenId;
+      if (screenId.indexOf('L_') !== -1 && appViewState.orientation !== 'landscape') {
+        appViewState.orientation = 'landscape';
+        applyAppBezelOrientation();
+      }
+      renderTflowAppGrid();
+      renderTflowAppSimulator();
+    }
+
+    function setAppSimulatorAspect(ratio) {
+      appViewState.aspect = ratio;
+      renderTflowAppSimulator();
+    }
+
+    function setAppSimulatorMode(mode) {
+      appViewState.camMode = mode;
+      renderTflowAppSimulator();
+    }
+
+    function setAppSimulatorTarget(target) {
+      appViewState.aiTarget = target;
+      renderTflowAppSimulator();
+    }
+
+    function renderTflowAppGrid() {
+      const grid = document.getElementById('appScreensGrid');
+      if (!grid) return;
+      const list = TFLOW_APP_SCREENS[appViewState.cluster] || TFLOW_APP_SCREENS.camera;
+      grid.innerHTML = list.map(s => `
+        <div class="app-screen-card ${appViewState.screenId === s.id ? 'active' : ''}" onclick="selectAppScreen('${s.id}')">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span style="font-size:11px; font-weight:700; opacity:0.65;">#${s.num}</span>
+            <span style="font-size:10px; font-weight:700; padding:3px 8px; border-radius:99px; background:rgba(250,204,21,0.16); color:#FACC15;">${s.badge}</span>
+          </div>
+          <div style="font-size:15px; font-weight:700; margin-bottom:6px;">${s.title}</div>
+          <div style="font-size:12.5px; opacity:0.78; line-height:1.45;">${s.desc}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderTflowAppSimulator() {
+      const body = document.getElementById('tflowPhoneBody');
+      if (!body) return;
+      const allScreens = [].concat(TFLOW_APP_SCREENS.camera, TFLOW_APP_SCREENS.landscape, TFLOW_APP_SCREENS.flow);
+      const curScreen = allScreens.find(s => s.id === appViewState.screenId) || TFLOW_APP_SCREENS.camera[0];
+      const user = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getCurrentUser) ? SmartGimbalCatalog.getCurrentUser() : null;
+
+      const badgeEl = document.getElementById('appActiveScreenBadge');
+      const titleEl = document.getElementById('appActiveScreenTitle');
+      const descEl = document.getElementById('appActiveScreenDesc');
+      const acctEl = document.getElementById('appSyncAccountBadge');
+      const summaryEl = document.getElementById('appSyncUserSummary');
+      const controlsEl = document.getElementById('appInteractiveControls');
+
+      if (badgeEl) badgeEl.textContent = curScreen.badge;
+      if (titleEl) titleEl.textContent = `${curScreen.num}. ${curScreen.title}`;
+      if (descEl) descEl.textContent = curScreen.desc;
+      if (acctEl) {
+        acctEl.textContent = user ? `✓ Đã đồng bộ: ${user.name} (${user.email})` : 'Chưa đăng nhập — Đăng nhập để đồng bộ';
+      }
+      if (summaryEl) {
+        if (user) {
+          const activeMods = Array.isArray(user.modules) ? user.modules.filter(Boolean).length : 1;
+          summaryEl.innerHTML = `<strong>${escapeCatalogHtml(user.name)}</strong> (${escapeCatalogHtml(user.email)}) • Gói <strong>${escapeCatalogHtml(user.tier || 'Creator')}</strong> • Đang mở khóa <strong>${activeMods}/7</strong> module AI &amp; FOC.`;
+        } else {
+          summaryEl.textContent = 'Đăng nhập bằng Google, Apple ID hoặc Email để đồng bộ tức thì gói cước, 7 module bản quyền và lịch sử kích hoạt với T-Flow App trên iPhone.';
+        }
+      }
+
+      if (controlsEl) {
+        controlsEl.innerHTML = `
+          <button type="button" class="app-cluster-btn ${appViewState.camMode === 'basic' ? 'active' : ''}" onclick="setAppSimulatorMode('basic')">Cơ Bản</button>
+          <button type="button" class="app-cluster-btn ${appViewState.camMode === 'pro' ? 'active' : ''}" onclick="setAppSimulatorMode('pro')">Chuyên Nghiệp</button>
+          <button type="button" class="app-cluster-btn ${appViewState.aspect === '9:16' ? 'active' : ''}" onclick="setAppSimulatorAspect('9:16')">9:16</button>
+          <button type="button" class="app-cluster-btn ${appViewState.aspect === '16:9' ? 'active' : ''}" onclick="setAppSimulatorAspect('16:9')">16:9</button>
+          <button type="button" class="app-cluster-btn ${appViewState.aspect === '2.39:1' ? 'active' : ''}" onclick="setAppSimulatorAspect('2.39:1')">2.39:1</button>
+          <button type="button" class="app-cluster-btn ${appViewState.aiTarget === 'Người' ? 'active' : ''}" onclick="setAppSimulatorTarget('Người')">🎯 Người</button>
+          <button type="button" class="app-cluster-btn ${appViewState.aiTarget === 'Vật thể' ? 'active' : ''}" onclick="setAppSimulatorTarget('Vật thể')">📦 Vật thể</button>
+        `;
+      }
+
+      // Render inside phone screen depending on active flow/camera screen
+      if (curScreen.id === '22_signin') {
+        body.innerHTML = `
+          <div style="text-align:center; padding:18px 8px;">
+            <div style="width:46px; height:46px; background:#FACC15; color:#111827; border-radius:12px; display:inline-flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; margin-bottom:12px;">📷</div>
+            <div style="font-size:18px; font-weight:700; margin-bottom:4px;">Đăng nhập tài khoản</div>
+            <div style="font-size:11.5px; opacity:0.7; margin-bottom:18px;">Đồng bộ cấu hình gimbal &amp; module bản quyền</div>
+            <button type="button" onclick="loginWithAppleOAuth()" style="width:100%; padding:10px; border-radius:10px; border:none; background:#FFFFFF; color:#111827; font-size:12.5px; font-weight:700; margin-bottom:8px; cursor:pointer;"> Đăng nhập bằng Apple</button>
+            <button type="button" onclick="loginWithGoogleOAuth()" style="width:100%; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); color:inherit; font-size:12.5px; font-weight:600; margin-bottom:8px; cursor:pointer;">Đăng nhập bằng Google</button>
+            <button type="button" onclick="toggleAuthModal(true)" style="width:100%; padding:10px; border-radius:10px; border:1px solid rgba(255,255,255,0.16); background:transparent; color:inherit; font-size:12px; font-weight:600; cursor:pointer;">Tiếp tục bằng Email / Mật khẩu</button>
+          </div>
+        `;
+      } else if (curScreen.id === '35_profile') {
+        const displayName = user ? user.name : 'Chưa đăng nhập';
+        const displayEmail = user ? user.email : 'Nhấn để đăng nhập đồng bộ';
+        const modsCount = user && Array.isArray(user.modules) ? user.modules.filter(Boolean).length : 0;
+        body.innerHTML = `
+          <div style="padding:8px 4px; display:flex; flex-direction:column; gap:10px;">
+            <div style="font-size:20px; font-weight:700;">Hồ sơ</div>
+            <div style="padding:12px; border-radius:14px; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1);">
+              <div style="font-size:14px; font-weight:700;">${escapeCatalogHtml(displayName)}</div>
+              <div style="font-size:11px; opacity:0.75; margin-top:2px;">${escapeCatalogHtml(displayEmail)}</div>
+              <div style="font-size:11px; color:#FACC15; font-weight:700; margin-top:6px;">Module hoạt động: ${modsCount}/7</div>
+            </div>
+            <div style="padding:12px; border-radius:14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08);">
+              <div style="font-size:12px; font-weight:700; margin-bottom:4px;">Thư viện Media thực tế</div>
+              <div style="font-size:11px; opacity:0.75;">0 mục đã quay trên thiết bị • 0 KB</div>
+            </div>
+          </div>
+        `;
+      } else if (curScreen.id === '27_gallery') {
+        body.innerHTML = `
+          <div style="padding:8px 4px; display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div style="font-size:18px; font-weight:700;">Thư viện</div>
+              <span style="font-size:11px; opacity:0.7;">Tất cả • Video • Ảnh</span>
+            </div>
+            <div style="padding:36px 14px; text-align:center; border-radius:14px; background:rgba(255,255,255,0.04); border:1px dashed rgba(255,255,255,0.15);">
+              <div style="font-size:26px; margin-bottom:6px;">🎞️</div>
+              <div style="font-size:12.5px; font-weight:700;">Chưa có video/ảnh nào</div>
+              <div style="font-size:11px; opacity:0.7; margin-top:4px;">Chỉ lưu trữ tệp quay thật từ camera iPhone trong Documents/TFlowMedia.</div>
+            </div>
+          </div>
+        `;
+      } else if (curScreen.id === '30_device') {
+        body.innerHTML = `
+          <div style="padding:8px 4px; display:flex; flex-direction:column; gap:10px;">
+            <div style="font-size:18px; font-weight:700;">Thiết bị</div>
+            <div style="padding:12px; border-radius:14px; background:rgba(52,199,89,0.12); border:1px solid rgba(52,199,89,0.3);">
+              <div style="font-size:12px; font-weight:700; color:#34C759;">● T-Flow Pro (BLE 5.3)</div>
+              <div style="font-size:11px; opacity:0.85; margin-top:2px;">Pin 92% • FOC 20kHz • Pan Follow</div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px; font-size:11px; font-weight:700; text-align:center;">
+              <div style="padding:8px 4px; border-radius:8px; background:rgba(255,255,255,0.08);">PF</div>
+              <div style="padding:8px 4px; border-radius:8px; background:#FACC15; color:#111827;">Follow</div>
+              <div style="padding:8px 4px; border-radius:8px; background:rgba(255,255,255,0.08);">Lock</div>
+              <div style="padding:8px 4px; border-radius:8px; background:rgba(255,255,255,0.08);">FPV</div>
+            </div>
+          </div>
+        `;
+      } else {
+        const isPro = appViewState.camMode === 'pro' || curScreen.id.includes('02') || curScreen.id.includes('09');
+        body.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:10.5px; font-weight:700; padding:4px 6px; background:rgba(0,0,0,0.45); border-radius:10px;">
+            <span>● T-Flow Pro • 92%</span>
+            <span style="background:#FACC15; color:#111827; padding:2px 7px; border-radius:99px;">${appViewState.aspect}</span>
+            <span>${isPro ? 'PRO 4K60' : 'CƠ BẢN'}</span>
+          </div>
+          ${isPro ? `<div style="display:flex; justify-content:space-between; font-size:10px; padding:4px 8px; background:rgba(250,204,21,0.12); border:1px solid rgba(250,204,21,0.3); border-radius:8px; color:#FACC15;"><span>ISO 100 • 1/120s • 5600K</span><span>FOC 20kHz</span></div>` : ''}
+          <div style="flex:1; display:flex; align-items:center; justify-content:center; position:relative; border:1.5px solid #FACC15; border-radius:14px; background:radial-gradient(circle at center, rgba(250,204,21,0.14), rgba(0,0,0,0.4)); padding:14px;">
+            <div style="text-align:center;">
+              <img src="/shared/img/tflow_pro_main.png" alt="T-Flow Camera Viewfinder" style="width:120px; height:120px; object-fit:contain; filter:drop-shadow(0 8px 18px rgba(0,0,0,0.45));">
+              <div style="margin-top:8px; font-size:11px; font-weight:700; color:#FACC15; background:rgba(0,0,0,0.6); padding:4px 10px; border-radius:99px; display:inline-block;">
+                🎯 Đang bám: ${escapeCatalogHtml(appViewState.aiTarget)} (${appViewState.aspect})
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-around; padding-top:4px;">
+            <span style="font-size:11px; opacity:0.75;">🖼️ Thư viện</span>
+            <div style="width:46px; height:46px; border-radius:50%; background:#FF3B30; border:3px solid #FFF; box-shadow:0 0 0 2px rgba(255,255,255,0.2);"></div>
+            <span style="font-size:11px; opacity:0.75;">🔄 Lật Cam</span>
+          </div>
+        `;
+      }
     }
 
     function selectDetailTier(tierKey) {
@@ -8144,9 +8791,15 @@
       </div>
 
       <!-- REAL GOOGLE OAUTH SIGN-IN BUTTON (OPENS GOOGLE ACCOUNTS POPUP) -->
-      <button type="button" onclick="loginWithGoogleOAuth()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px 16px; background:#FFFFFF; border:1px solid #747775; border-radius:10px; cursor:pointer; font-size:13.5px; font-weight:600; color:#1F1F1F; box-shadow:0 1px 2px rgba(0,0,0,0.06); transition:background 0.2s;">
+      <button type="button" onclick="loginWithGoogleOAuth()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px 16px; background:#FFFFFF; border:1px solid #747775; border-radius:10px; cursor:pointer; font-size:13.5px; font-weight:600; color:#1F1F1F; box-shadow:0 1px 2px rgba(0,0,0,0.06); transition:background 0.2s; margin-bottom:10px;">
         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
         Đăng nhập bằng tài khoản Google
+      </button>
+
+      <!-- APPLE ID SIGN-IN BUTTON (PARITY WITH IOS APP) -->
+      <button type="button" onclick="loginWithAppleOAuth()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:11px 16px; background:#1D1D1F; border:1px solid #1D1D1F; border-radius:10px; cursor:pointer; font-size:13.5px; font-weight:600; color:#FFFFFF; transition:background 0.2s;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+        Đăng nhập bằng Apple
       </button>
     </form>
 

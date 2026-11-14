@@ -38,7 +38,7 @@ struct MainTabShellView: View {
 
     var body: some View {
         Group {
-            if !store.isLoggedIn && !store.isGuestMode {
+            if !store.isLoggedIn {
                 AuthSignInGateView()
             } else {
                 TabView(selection: $store.activeMainTab) {

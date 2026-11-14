@@ -1305,6 +1305,9 @@
       <a href="/" target="_blank" class="sidebar-footer-btn">
         <span>🌐</span> Xem Web Bán Hàng
       </a>
+      <a href="/tflow-app" target="_blank" class="sidebar-footer-btn">
+        <span>📱</span> T-Flow App Studio
+      </a>
       <a href="/account" target="_blank" class="sidebar-footer-btn">
         <span>👤</span> Cổng Khách Hàng
       </a>
@@ -1329,14 +1332,16 @@
         </h2>
       </div>
 
-      <div style="display:flex; align-items:center; gap:16px;">
-        <div style="font-size:12.5px; color:var(--text-secondary); display:flex; align-items:center; gap:8px;">
-          <span>Sản Phẩm MVP:</span>
+      <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+        <span style="font-size:12px; font-weight:700; color:#1D1D1F; background:#EBEBED; padding:5px 12px; border-radius:99px; border:1px solid #1D1D1F;">⚙️ Admin CMS</span>
+        <a href="/tflow-app" target="_blank" class="btn-nav-link" style="padding:5px 12px; font-size:12px;">📱 T-Flow App</a>
+        <div style="font-size:12.5px; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
+          <span>MVP:</span>
           <b id="headerMvpName" style="color:var(--text-main);">T-Flow Pro</b>
         </div>
         <div style="font-size:11.5px; background:rgba(52,199,89,0.12); color:#248A3D; padding:4px 10px; border-radius:99px; font-weight:700; display:flex; align-items:center; gap:6px;">
           <span style="width:6px; height:6px; border-radius:50%; background:#34C759;"></span>
-          Gemini 3.5 Cloud AI • Active
+          Cloud Sync • Active
         </div>
       </div>
     </header>
@@ -1883,24 +1888,47 @@
       <div class="modal-body">
         <input type="hidden" id="formProdId">
 
-        <!-- Section 1: Identity -->
-        <div class="form-section-title">1. Thông Tin Định Danh Bài Đăng</div>
+        <!-- MODULAR BLOCK / FIELD TYPE SELECTOR TOOLBAR (CHỌN TRƯỚC KHI NHẬP) -->
+        <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin-bottom:16px;">
+          <div style="font-size:12px; font-weight:700; color:var(--text-main); margin-bottom:8px;">➕ Chọn Loại Khối Thông Tin Cần Thêm Vào Bài Đăng (Đồng Bộ 1:1 Với Trang Sản Phẩm):</div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;" id="modularBuilderToolbar">
+            <button type="button" class="btn btn-outline" style="font-size:11.5px; padding:5px 10px; background:#FFF;" onclick="addModularField('color')">🎨 + Ô Chọn Màu</button>
+            <button type="button" class="btn btn-outline" style="font-size:11.5px; padding:5px 10px; background:#FFF;" onclick="addModularField('tag')">🏷️ + Tag Chữ Nổi Bật</button>
+            <button type="button" class="btn btn-outline" style="font-size:11.5px; padding:5px 10px; background:#FFF;" onclick="addModularField('highlight')">📝 + Ô Chữ / Điểm Nhấn</button>
+            <button type="button" class="btn btn-outline" style="font-size:11.5px; padding:5px 10px; background:#FFF;" onclick="addModularField('spec')">📊 + Dòng Bảng Thông Số</button>
+            <button type="button" class="btn btn-outline" style="font-size:11.5px; padding:5px 10px; background:#FFF;" onclick="addModularField('box')">📦 + Phụ Kiện Trong Hộp</button>
+            <button type="button" class="btn btn-outline" style="font-size:11.5px; padding:5px 10px; background:#FFF;" onclick="addCustomBlockPreset('text')">📄 + Khối Chữ Tùy Chỉnh</button>
+            <button type="button" class="btn btn-outline" style="font-size:11.5px; padding:5px 10px; background:#FFF;" onclick="addCustomBlockPreset('table')">📑 + Bảng Mô Tả Tùy Chỉnh</button>
+            <button type="button" class="btn btn-outline" style="font-size:11.5px; padding:5px 10px; background:#FFF;" onclick="addCustomBlockPreset('tags')">🔖 + Nhóm Tag Chữ Mới</button>
+          </div>
+        </div>
+
+        <!-- Section 1: Identity & Hero/Overview Labels -->
+        <div class="form-section-title">1. Thông Tin Định Danh, Tagline &amp; Nhãn Đầu Trang</div>
         <div class="form-row-2">
           <div class="form-group">
             <label>Nhóm Hàng Hóa (Cấp 1)</label>
-            <select class="form-control" id="formProdGroup">
-              <!-- Dynamically populated from getGroups() -->
-            </select>
+            <select class="form-control" id="formProdGroup"></select>
           </div>
           <div class="form-group">
             <label>Tên Sản Phẩm</label>
-            <input type="text" class="form-control" id="formProdName" placeholder="Ví dụ: T-Flow T-Flow Pro">
+            <input type="text" class="form-control" id="formProdName" placeholder="Ví dụ: T-Flow Pro">
           </div>
         </div>
         <div class="form-row-2">
           <div class="form-group">
-            <label>Câu Tagline / Slogan Ngắn</label>
-            <input type="text" class="form-control" id="formProdTagline" placeholder="Đưa thước phim di động lên tầm điện ảnh.">
+            <label>Nhãn Đầu Trang (Hero Badge)</label>
+            <input type="text" class="form-control" id="formProdHeroBadge" placeholder="Flagship 2026 • Gimbal 3 Trục AI">
+          </div>
+          <div class="form-group">
+            <label>Nhãn Tab Mô Tả (Overview Badge)</label>
+            <input type="text" class="form-control" id="formProdOverviewBadge" placeholder="Điểm Nhấn Cốt Lõi">
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group">
+            <label>Dòng Tiêu Đề Nổi Bật (Tagline)</label>
+            <input type="text" class="form-control" id="formProdTagline" placeholder="Chống rung 3 trục • AI không cần App">
           </div>
           <div class="form-group">
             <label>Trạng Thái Mở Bán</label>
@@ -1910,13 +1938,24 @@
             </select>
           </div>
         </div>
+        <div class="form-group">
+          <label>Mô Tả Ngắn Dưới Tagline (Subtitle)</label>
+          <input type="text" class="form-control" id="formProdSubtitle" placeholder="Gắn MagSafe 1 chạm. Bám nét khuôn mặt ở mọi ứng dụng.">
+        </div>
         <div class="form-group" style="display:flex; align-items:center; gap:8px;">
           <input type="checkbox" id="formProdIsMvp" style="width:16px; height:16px; accent-color:var(--text-main);">
           <label for="formProdIsMvp" style="margin-bottom:0; cursor:pointer;">Ghim làm Sản Phẩm Nổi Bật (MVP) trên Trang Chủ</label>
         </div>
 
-        <!-- Section 2: Media Gallery -->
-        <div class="form-section-title">2. Bộ Hình Ảnh Bài Đăng (Media Gallery)</div>
+        <!-- Section 2: Tag Pills (⚡ FOC 20kHz, 🎯 AI 60fps...) -->
+        <div class="form-section-title">
+          <span>2. Tag Chữ Nổi Bật (Hero &amp; Mô Tả Sản Phẩm)</span>
+          <button type="button" class="btn btn-outline" style="padding:3px 10px; font-size:11px;" onclick="addModularField('tag')">+ Thêm Tag Chữ</button>
+        </div>
+        <div id="formPillTagsList" style="display:flex; flex-direction:column; gap:6px; margin-bottom:14px;"></div>
+
+        <!-- Section 3: Media Gallery -->
+        <div class="form-section-title">3. Bộ Hình Ảnh Bài Đăng (Media Gallery)</div>
         <div class="form-group">
           <label>Đường Dẫn Ảnh Đại Diện Chính (URL / Local Path)</label>
           <input type="text" class="form-control" id="formProdImg" value="/shared/img/tflow_pro_main.png" oninput="updateMediaPreviews()">
@@ -1951,60 +1990,63 @@
           </div>
         </div>
 
-        <!-- Section 3: Colors -->
-        <div class="form-section-title">3. Tùy Chọn Màu Sắc Sản Phẩm</div>
-        <div class="form-row-2">
-          <div class="form-group">
-            <label>Tên Màu 1 + Mã Hex</label>
-            <input type="text" class="form-control" id="formColor1" value="Titanium Tự Nhiên (#D4D2CD)">
-          </div>
-          <div class="form-group">
-            <label>Tên Màu 2 + Mã Hex</label>
-            <input type="text" class="form-control" id="formColor2" value="Đen Không Gian (#2C2C2E)">
-          </div>
-        </div>
-
-        <!-- Section 4: What's in the Box -->
-        <div class="form-section-title">4. Trong Hộp Có Gì (What's in the Box)</div>
-        <div class="form-group">
-          <label>Danh Sách Phụ Kiện Đi Kèm (Mỗi món một dòng)</label>
-          <textarea class="form-control" id="formProdBox" rows="4">01 Thân máy T-Flow T-Flow Pro
-01 Ngàm hít từ tính MagSafe N52 Quick-Snap
-01 Chân đế Tripod Mini sợi Carbon CNC
-01 Cáp sạc nhanh USB-C to USB-C
-01 Túi nhung chống sốc bảo quản du lịch</textarea>
-        </div>
-
-        <!-- Section 5: Tech Specs -->
-        <div class="form-section-title">5. Bảng Thông Số Kỹ Thuật (Tech Specs)</div>
-        <div class="form-row-2">
-          <div class="form-group">
-            <label>Trọng Lượng Thân Máy</label>
-            <input type="text" class="form-control" id="formSpecWeight" value="480g">
-          </div>
-          <div class="form-group">
-            <label>Tải Trọng Tối Đa</label>
-            <input type="text" class="form-control" id="formSpecPayload" value="380g">
-          </div>
-        </div>
-        <div class="form-row-2">
-          <div class="form-group">
-            <label>Thời Lượng Pin Hoạt Động</label>
-            <input type="text" class="form-control" id="formSpecBattery" value="18 giờ">
-          </div>
-          <div class="form-group">
-            <label>Chuẩn Kết Nối</label>
-            <input type="text" class="form-control" id="formSpecConnect" value="Bluetooth 5.3 Low Energy">
-          </div>
-        </div>
-
-        <!-- Section 6: Dynamic Multi-Tier Management -->
+        <!-- Section 4: Interactive Color Pickers -->
         <div class="form-section-title">
-          <span>6. Cấu Hình Các Phân Cấp &amp; Giá Bán (Cấp 3)</span>
-          <span style="font-size:12px; font-weight:600; color:var(--link);" id="formTiersCountLabel">3 phân cấp</span>
+          <span>4. Ô Chọn Màu Sắc Sản Phẩm (Kèm Bảng Chọn Màu)</span>
+          <button type="button" class="btn btn-outline" style="padding:3px 10px; font-size:11px;" onclick="addModularField('color')">+ Thêm Màu</button>
+        </div>
+        <div id="formColorsList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+
+        <!-- Section 5: Visual Highlight Cards (Điểm Nhấn Cốt Lõi) -->
+        <div class="form-section-title">
+          <span>5. Thẻ Điểm Nhấn Cốt Lõi (Icon + Chỉ Số + Tiêu Đề + Mô Tả)</span>
+          <button type="button" class="btn btn-outline" style="padding:3px 10px; font-size:11px;" onclick="addModularField('highlight')">+ Thêm Thẻ Điểm Nhấn</button>
+        </div>
+        <div id="formHighlightsList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+
+        <!-- Section 6: What's in the Box -->
+        <div class="form-section-title">
+          <span>6. Trong Hộp Có Gì (What's in the Box)</span>
+          <button type="button" class="btn btn-outline" style="padding:3px 10px; font-size:11px;" onclick="addModularField('box')">+ Thêm Phụ Kiện</button>
+        </div>
+        <div id="formBoxList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+
+        <!-- Section 7: Dynamic 2-Column Tech Specs Table -->
+        <div class="form-section-title">
+          <span>7. Bảng Thông Số Kỹ Thuật (Tech Specs Động)</span>
+          <button type="button" class="btn btn-outline" style="padding:3px 10px; font-size:11px;" onclick="addModularField('spec')">+ Thêm Dòng Thông Số</button>
+        </div>
+        <div id="formSpecsList" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+
+        <!-- Section 8: Perks & Warranty -->
+        <div class="form-section-title">8. Chính Sách Ưu Đãi &amp; Bảo Hành (Tab Bảo Hành + Khung Giá)</div>
+        <div class="form-group">
+          <label>Quyền Lợi Dưới Khung Giá (Mỗi dòng 1 ý)</label>
+          <textarea class="form-control" id="formProdPerks" rows="3" placeholder="Miễn phí giao hàng tiêu chuẩn toàn quốc..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Cam Kết Bảo Hành (Tab Bảo Hành &amp; Hỗ Trợ)</label>
+          <input type="text" class="form-control" id="formProdWarranty" placeholder="12 tháng 1 đổi 1 • 30 ngày dùng thử • Cập nhật OTA trọn đời.">
+        </div>
+
+        <!-- Section 9: Dynamic Custom Modular Blocks (User-Selected Type Before Input) -->
+        <div class="form-section-title">
+          <span>9. Các Khối Nội Dung Tùy Chỉnh (Văn Bản / Bảng 2 Cột / Tag Chữ)</span>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn btn-outline" style="padding:3px 8px; font-size:11px;" onclick="addCustomBlockPreset('text')">+ Chữ</button>
+            <button type="button" class="btn btn-outline" style="padding:3px 8px; font-size:11px;" onclick="addCustomBlockPreset('table')">+ Bảng</button>
+            <button type="button" class="btn btn-outline" style="padding:3px 8px; font-size:11px;" onclick="addCustomBlockPreset('tags')">+ Tag</button>
+          </div>
+        </div>
+        <div id="formCustomBlocksList" style="display:flex; flex-direction:column; gap:10px; margin-bottom:14px;"></div>
+
+        <!-- Section 10: Dynamic Editable Multi-Tier Management -->
+        <div class="form-section-title">
+          <span>10. Cấu Hình Các Phân Cấp &amp; Giá Bán (Chỉnh Trực Tiếp Từng Bản)</span>
+          <span style="font-size:12px; font-weight:600; color:var(--link);" id="formTiersCountLabel">4 phân cấp</span>
         </div>
         <div id="formTiersList">
-          <!-- Dynamically populated list of tiers -->
+          <!-- Dynamically populated inline-editable list of tiers -->
         </div>
 
         <div style="background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; margin-top:12px;">
@@ -2029,7 +2071,7 @@
               <input type="text" class="form-control" id="newTierGift" placeholder="VD: Vali + 2 Mic Kép">
             </div>
             <div>
-              <label style="font-size:11px; font-weight:700; color:var(--text-secondary);">Thông Số Khác Biệt</label>
+              <label style="font-size:11px; font-weight:700; color:var(--text-secondary);">Mô Tả / Thông Số Khác Biệt</label>
               <input type="text" class="form-control" id="newTierSpecs" placeholder="VD: Creator Kit • Kèm Cảm Biến AI">
             </div>
           </div>
@@ -2339,8 +2381,14 @@
     let currentCatalog = null;
     let selectedTableFilter = 'all';
 
-    // Temporary storage for tiers in publishing form
+    // Temporary storage for modular publishing form (1:1 parity with Storefront & PDP)
     let formTiersBuffer = [];
+    let formPillTagsBuffer = [];
+    let formColorsBuffer = [];
+    let formHighlightsBuffer = [];
+    let formBoxBuffer = [];
+    let formSpecsBuffer = [];
+    let formCustomBlocksBuffer = [];
 
     window.addEventListener('DOMContentLoaded', () => {
       initAdmin();
@@ -2652,35 +2700,232 @@
       }
     }
 
-    // 5. PRODUCT PUBLISHING MODAL (WITH MULTI-TIER MANAGEMENT)
+    // 5. PRODUCT PUBLISHING MODAL (1:1 PARITY + MODULAR FIELD BUILDER)
+    function escAttr(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function addModularField(kind) {
+      if (kind === 'color') {
+        formColorsBuffer.push({ id: 'color-' + Date.now(), name: 'Màu Mới', hex: '#1D1D1F' });
+        renderFormColors();
+      } else if (kind === 'tag') {
+        formPillTagsBuffer.push('✨ Tag Nổi Bật');
+        renderFormPillTags();
+      } else if (kind === 'highlight') {
+        formHighlightsBuffer.push({ icon: '⚡', metric: 'Tính Năng Mới', title: 'Tiêu Đề Điểm Nhấn', desc: 'Mô tả ngắn gọn, súc tích.', img: '/shared/img/tflow_pro_main.png' });
+        renderFormHighlights();
+      } else if (kind === 'spec') {
+        formSpecsBuffer.push({ label: 'Thông số mới', val: 'Giá trị' });
+        renderFormSpecs();
+      } else if (kind === 'box') {
+        formBoxBuffer.push({ name: 'Phụ kiện mới', qty: '1x' });
+        renderFormBox();
+      }
+    }
+
+    function addCustomBlockPreset(type) {
+      if (type === 'table') {
+        formCustomBlocksBuffer.push({ id: 'blk-' + Date.now(), type: 'table', title: 'Bảng Thông Tin Bổ Sung', rows: [{ label: 'Thuộc tính 1', val: 'Giá trị 1' }] });
+      } else if (type === 'tags') {
+        formCustomBlocksBuffer.push({ id: 'blk-' + Date.now(), type: 'tags', title: 'Tag Đặc Điểm Nổi Bật', items: ['Pure FOC 20kHz', 'MagSafe N52'] });
+      } else {
+        formCustomBlocksBuffer.push({ id: 'blk-' + Date.now(), type: 'text', title: 'Khối Văn Bản Mô Tả', content: 'Nội dung mô tả ngắn gọn...' });
+      }
+      renderFormCustomBlocks();
+    }
+
+    function renderFormPillTags() {
+      const el = document.getElementById('formPillTagsList');
+      if (!el) return;
+      if (formPillTagsBuffer.length === 0) {
+        el.innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Chưa có tag chữ. Nhấn "+ Thêm Tag Chữ" để thêm.</div>';
+        return;
+      }
+      el.innerHTML = formPillTagsBuffer.map((t, i) => `
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" class="form-control" value="${escAttr(t)}" oninput="formPillTagsBuffer[${i}] = this.value" placeholder="VD: ⚡ FOC 20kHz">
+          <button type="button" class="btn btn-outline" style="padding:5px 10px; color:#DC3545;" onclick="formPillTagsBuffer.splice(${i}, 1); renderFormPillTags();">Xóa</button>
+        </div>
+      `).join('');
+    }
+
+    function renderFormColors() {
+      const el = document.getElementById('formColorsList');
+      if (!el) return;
+      if (formColorsBuffer.length === 0) {
+        el.innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Chưa có màu sắc nào. Nhấn "+ Thêm Màu".</div>';
+        return;
+      }
+      el.innerHTML = formColorsBuffer.map((c, i) => `
+        <div style="display:grid; grid-template-columns:46px 1fr 120px auto; gap:8px; align-items:center;">
+          <input type="color" value="${escAttr(c.hex || '#1C1C1E')}" oninput="formColorsBuffer[${i}].hex = this.value; document.getElementById('colorHex_${i}').value = this.value;" style="width:44px; height:36px; border:1px solid var(--border); border-radius:8px; padding:2px; background:#FFF; cursor:pointer;">
+          <input type="text" class="form-control" value="${escAttr(c.name)}" oninput="formColorsBuffer[${i}].name = this.value" placeholder="Tên màu (VD: Đen Space Black)">
+          <input type="text" class="form-control" id="colorHex_${i}" value="${escAttr(c.hex)}" oninput="formColorsBuffer[${i}].hex = this.value" placeholder="#1C1C1E">
+          <button type="button" class="btn btn-outline" style="padding:5px 10px; color:#DC3545;" onclick="formColorsBuffer.splice(${i}, 1); renderFormColors();">Xóa</button>
+        </div>
+      `).join('');
+    }
+
+    function renderFormHighlights() {
+      const el = document.getElementById('formHighlightsList');
+      if (!el) return;
+      if (formHighlightsBuffer.length === 0) {
+        el.innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Chưa có thẻ Điểm Nhấn Cốt Lõi. Nhấn "+ Thêm Thẻ Điểm Nhấn".</div>';
+        return;
+      }
+      el.innerHTML = formHighlightsBuffer.map((h, i) => `
+        <div style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:grid; grid-template-columns:70px 160px 1fr auto; gap:8px; align-items:center;">
+            <input type="text" class="form-control" value="${escAttr(h.icon || '⚡')}" oninput="formHighlightsBuffer[${i}].icon = this.value" placeholder="Icon">
+            <input type="text" class="form-control" value="${escAttr(h.metric || '')}" oninput="formHighlightsBuffer[${i}].metric = this.value" placeholder="Chỉ số (FOC 20kHz)">
+            <input type="text" class="form-control" value="${escAttr(h.title || '')}" oninput="formHighlightsBuffer[${i}].title = this.value" placeholder="Tiêu đề">
+            <button type="button" class="btn btn-outline" style="padding:5px 10px; color:#DC3545;" onclick="formHighlightsBuffer.splice(${i}, 1); renderFormHighlights();">Xóa</button>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <input type="text" class="form-control" value="${escAttr(h.desc || '')}" oninput="formHighlightsBuffer[${i}].desc = this.value" placeholder="Mô tả ngắn gọn">
+            <input type="text" class="form-control" value="${escAttr(h.img || '')}" oninput="formHighlightsBuffer[${i}].img = this.value" placeholder="Đường dẫn ảnh minh họa">
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderFormBox() {
+      const el = document.getElementById('formBoxList');
+      if (!el) return;
+      if (formBoxBuffer.length === 0) {
+        el.innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Chưa có phụ kiện trong hộp. Nhấn "+ Thêm Phụ Kiện".</div>';
+        return;
+      }
+      el.innerHTML = formBoxBuffer.map((b, i) => `
+        <div style="display:grid; grid-template-columns:1fr 100px auto; gap:8px; align-items:center;">
+          <input type="text" class="form-control" value="${escAttr(b.name)}" oninput="formBoxBuffer[${i}].name = this.value" placeholder="Tên phụ kiện (VD: Thân gimbal T-Flow Pro)">
+          <input type="text" class="form-control" value="${escAttr(b.qty)}" oninput="formBoxBuffer[${i}].qty = this.value" placeholder="1x">
+          <button type="button" class="btn btn-outline" style="padding:5px 10px; color:#DC3545;" onclick="formBoxBuffer.splice(${i}, 1); renderFormBox();">Xóa</button>
+        </div>
+      `).join('');
+    }
+
+    function renderFormSpecs() {
+      const el = document.getElementById('formSpecsList');
+      if (!el) return;
+      if (formSpecsBuffer.length === 0) {
+        el.innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Chưa có dòng thông số. Nhấn "+ Thêm Dòng Thông Số".</div>';
+        return;
+      }
+      el.innerHTML = formSpecsBuffer.map((s, i) => `
+        <div style="display:grid; grid-template-columns:1fr 1.3fr auto; gap:8px; align-items:center;">
+          <input type="text" class="form-control" value="${escAttr(s.label)}" oninput="formSpecsBuffer[${i}].label = this.value" placeholder="Tên thông số (VD: Trọng lượng)">
+          <input type="text" class="form-control" value="${escAttr(s.val)}" oninput="formSpecsBuffer[${i}].val = this.value" placeholder="Giá trị (VD: 480g)">
+          <button type="button" class="btn btn-outline" style="padding:5px 10px; color:#DC3545;" onclick="formSpecsBuffer.splice(${i}, 1); renderFormSpecs();">Xóa</button>
+        </div>
+      `).join('');
+    }
+
+    function renderFormCustomBlocks() {
+      const el = document.getElementById('formCustomBlocksList');
+      if (!el) return;
+      if (formCustomBlocksBuffer.length === 0) {
+        el.innerHTML = '<div style="font-size:12px; color:var(--text-muted);">Chưa có khối tùy chỉnh thêm. Chọn loại (+ Chữ / + Bảng / + Tag) trước khi nhập để thêm nội dung tự do lên trang sản phẩm.</div>';
+        return;
+      }
+      el.innerHTML = formCustomBlocksBuffer.map((blk, i) => {
+        let bodyField = '';
+        if (blk.type === 'tags') {
+          const val = Array.isArray(blk.items) ? blk.items.join(', ') : '';
+          bodyField = `<input type="text" class="form-control" value="${escAttr(val)}" oninput="formCustomBlocksBuffer[${i}].items = this.value.split(',').map(s=>s.trim()).filter(Boolean)" placeholder="Các tag cách nhau bởi dấu phẩy (,)">`;
+        } else if (blk.type === 'table') {
+          const rows = Array.isArray(blk.rows) ? blk.rows : [];
+          bodyField = rows.map((r, ri) => `
+            <div style="display:grid; grid-template-columns:1fr 1fr auto; gap:6px; margin-bottom:4px;">
+              <input type="text" class="form-control" value="${escAttr(r.label)}" oninput="formCustomBlocksBuffer[${i}].rows[${ri}].label = this.value" placeholder="Cột 1">
+              <input type="text" class="form-control" value="${escAttr(r.val)}" oninput="formCustomBlocksBuffer[${i}].rows[${ri}].val = this.value" placeholder="Cột 2">
+              <button type="button" class="btn btn-outline" style="padding:4px 8px; color:#DC3545;" onclick="formCustomBlocksBuffer[${i}].rows.splice(${ri},1); renderFormCustomBlocks();">X</button>
+            </div>
+          `).join('') + `<button type="button" class="btn btn-outline" style="font-size:11px; padding:3px 8px; margin-top:4px;" onclick="formCustomBlocksBuffer[${i}].rows.push({label:'',val:''}); renderFormCustomBlocks();">+ Dòng Bảng</button>`;
+        } else {
+          bodyField = `<textarea class="form-control" rows="2" oninput="formCustomBlocksBuffer[${i}].content = this.value" placeholder="Nhập nội dung đoạn chữ...">${escAttr(blk.content || '')}</textarea>`;
+        }
+        return `
+          <div style="background:var(--bg); border:1px solid var(--border); border-radius:10px; padding:10px 12px;">
+            <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+              <span style="font-size:11px; font-weight:700; padding:3px 8px; border-radius:99px; background:#EBEBED;">${blk.type === 'table' ? '📑 Bảng 2 Cột' : (blk.type === 'tags' ? '🔖 Tag Chữ' : '📄 Văn Bản')}</span>
+              <input type="text" class="form-control" value="${escAttr(blk.title || '')}" oninput="formCustomBlocksBuffer[${i}].title = this.value" placeholder="Tiêu đề khối">
+              <button type="button" class="btn btn-outline" style="padding:5px 10px; color:#DC3545;" onclick="formCustomBlocksBuffer.splice(${i}, 1); renderFormCustomBlocks();">Xóa Khối</button>
+            </div>
+            ${bodyField}
+          </div>
+        `;
+      }).join('');
+    }
+
     function openPublishProductModal() {
       document.getElementById('productModalTitle').textContent = 'Đăng Bài Sản Phẩm Mới';
       document.getElementById('formProdId').value = '';
       document.getElementById('formProdName').value = '';
+      document.getElementById('formProdHeroBadge').value = 'Flagship 2026 • Gimbal 3 Trục AI';
+      document.getElementById('formProdOverviewBadge').value = 'Điểm Nhấn Cốt Lõi';
       document.getElementById('formProdTagline').value = '';
+      document.getElementById('formProdSubtitle').value = '';
+      document.getElementById('formProdStatus').value = 'Đang Mở Bán';
       document.getElementById('formProdIsMvp').checked = false;
       document.getElementById('formProdImg').value = '/shared/img/tflow_pro_main.png';
       document.getElementById('formProdGallery1').value = '/shared/img/tflow_pro_main.png';
       document.getElementById('formProdGallery2').value = '/shared/img/tflow_pro_front.png';
       document.getElementById('formProdGallery3').value = '/shared/img/tflow_pro_body.png';
       document.getElementById('formProdGallery4').value = '/shared/img/tflow_pro_cutaway.png';
+      document.getElementById('formProdPerks').value = 'Miễn phí giao hàng tiêu chuẩn toàn quốc (2 - 3 ngày)\nBảo hành chính hãng 12 tháng 1 đổi 1 tận nơi\n30 ngày dùng thử đổi mới miễn phí';
+      document.getElementById('formProdWarranty').value = '12 tháng 1 đổi 1 • 30 ngày dùng thử • Cập nhật OTA trọn đời.';
 
       const defaultGroupId = (currentCatalog && currentCatalog.groups && currentCatalog.groups[0]) ? currentCatalog.groups[0].id : 'group-gimbal';
       renderGroupSelectOptions(defaultGroupId);
 
+      formPillTagsBuffer = ['⚡ FOC 20kHz', '🎯 AI 60fps', '🔋 Pin 18h'];
+      formColorsBuffer = [
+        { id: 'space-black', name: 'Space Black (Đen Không Gian)', hex: '#1C1C1E' },
+        { id: 'natural-titanium', name: 'Natural Titanium (Titan Tự Nhiên)', hex: '#8E8E93' }
+      ];
+      formHighlightsBuffer = [
+        { icon: '⚡', metric: 'FOC 20kHz', title: 'Chống Rung 3 Trục Thuần Khiết', desc: 'Cảm biến góc từ tính phản hồi tức thì, triệt tiêu rung động khi chạy.', img: '/shared/img/tflow_pro_main.png' }
+      ];
+      formBoxBuffer = [
+        { name: 'Thân gimbal T-Flow Pro', qty: '1x' },
+        { name: 'Ngàm hít MagSafe N52', qty: '1x' },
+        { name: 'Chân Tripod Mini', qty: '1x' }
+      ];
+      formSpecsBuffer = [
+        { label: 'Trọng lượng thân máy', val: '480g' },
+        { label: 'Tải trọng tối đa', val: '380g' },
+        { label: 'Thời lượng pin', val: '18 giờ' },
+        { label: 'Chuẩn kết nối', val: 'Bluetooth 5.3' }
+      ];
+      formCustomBlocksBuffer = [];
+
       formTiersBuffer = [
         {
-          key: "standard",
-          label: "Bản Tiêu Chuẩn",
-          name: "Bản Tiêu Chuẩn",
-          price: 1990000,
-          priceFormatted: "1.990.000₫",
-          oldPriceFormatted: "2.490.000₫",
-          gift: "Phụ kiện tiêu chuẩn",
-          specs: "Thông số tiêu chuẩn",
-          highlights: ["Bảo hành chính hãng 12 tháng"]
+          key: 'standard',
+          label: 'Standard Edition',
+          name: 'Standard Edition',
+          price: 2490000,
+          priceFormatted: '2.490.000₫',
+          oldPriceFormatted: '2.990.000₫',
+          save: 'Tiết kiệm 500.000₫',
+          gift: 'Ngàm MagSafe + Tripod mini',
+          desc: 'Gimbal T-Flow Pro + ngàm MagSafe + Tripod mini + cáp USB-C.',
+          specs: 'Gimbal T-Flow Pro + ngàm MagSafe + Tripod mini + cáp USB-C.'
         }
       ];
+
+      renderFormPillTags();
+      renderFormColors();
+      renderFormHighlights();
+      renderFormBox();
+      renderFormSpecs();
+      renderFormCustomBlocks();
       renderFormTiersList();
 
       updateMediaPreviews();
@@ -2695,10 +2940,13 @@
       document.getElementById('formProdId').value = prod.id;
       const fallbackGroupId = (currentCatalog && currentCatalog.groups && currentCatalog.groups[0]) ? currentCatalog.groups[0].id : 'group-gimbal';
       renderGroupSelectOptions(prod.groupId || fallbackGroupId);
-      document.getElementById('formProdName').value = prod.name;
-      document.getElementById('formProdTagline').value = prod.tagline || prod.subtitle || '';
+      document.getElementById('formProdName').value = prod.name || '';
+      document.getElementById('formProdHeroBadge').value = prod.heroBadge || 'Flagship 2026 • Gimbal 3 Trục AI';
+      document.getElementById('formProdOverviewBadge').value = prod.overviewBadge || 'Điểm Nhấn Cốt Lõi';
+      document.getElementById('formProdTagline').value = prod.tagline || '';
+      document.getElementById('formProdSubtitle').value = prod.subtitle || '';
       document.getElementById('formProdStatus').value = prod.status || 'Đang Mở Bán';
-      document.getElementById('formProdIsMvp').checked = (prod.id === currentCatalog.mvpProductId);
+      document.getElementById('formProdIsMvp').checked = (prod.id === currentCatalog.mvpProductId || Boolean(prod.is_flagship));
       const mainFallback = prod.img || '/shared/img/tflow_pro_main.png';
       document.getElementById('formProdImg').value = mainFallback;
 
@@ -2708,18 +2956,35 @@
       document.getElementById('formProdGallery3').value = gal[2] || '';
       document.getElementById('formProdGallery4').value = gal[3] || '';
 
-      if (prod.boxContents) {
-        document.getElementById('formProdBox').value = prod.boxContents.join('\n');
-      }
+      document.getElementById('formProdPerks').value = Array.isArray(prod.perks) && prod.perks.length > 0
+        ? prod.perks.join('\n')
+        : 'Miễn phí giao hàng tiêu chuẩn toàn quốc (2 - 3 ngày)\nBảo hành chính hãng 12 tháng 1 đổi 1 tận nơi\n30 ngày dùng thử đổi mới miễn phí';
+      document.getElementById('formProdWarranty').value = prod.warranty || '12 tháng 1 đổi 1 • 30 ngày dùng thử • Cập nhật OTA trọn đời.';
 
-      if (prod.specs) {
-        document.getElementById('formSpecWeight').value = prod.specs["Trọng lượng thân máy"] || prod.specs["Trọng lượng"] || "480g";
-        document.getElementById('formSpecPayload').value = prod.specs["Tải trọng tối đa"] || "380g";
-        document.getElementById('formSpecBattery').value = prod.specs["Thời lượng pin"] || "18 giờ";
-        document.getElementById('formSpecConnect').value = prod.specs["Chuẩn kết nối"] || "Bluetooth 5.3 Low Energy";
+      formPillTagsBuffer = Array.isArray(prod.pillTags) ? prod.pillTags.slice() : ['⚡ FOC 20kHz', '🎯 AI 60fps', '🔋 Pin 18h'];
+      formColorsBuffer = Array.isArray(prod.colors) && prod.colors.length > 0
+        ? JSON.parse(JSON.stringify(prod.colors))
+        : [{ id: 'space-black', name: 'Space Black', hex: '#1C1C1E' }];
+      formHighlightsBuffer = Array.isArray(prod.highlights) ? JSON.parse(JSON.stringify(prod.highlights)) : [];
+      formBoxBuffer = Array.isArray(prod.boxContents)
+        ? prod.boxContents.map(b => typeof b === 'object' ? { name: b.name || '', qty: b.qty || '1x' } : { name: String(b), qty: '1x' })
+        : [];
+      if (Array.isArray(prod.specs)) {
+        formSpecsBuffer = JSON.parse(JSON.stringify(prod.specs));
+      } else if (prod.specs && typeof prod.specs === 'object') {
+        formSpecsBuffer = Object.entries(prod.specs).map(([k, v]) => ({ label: k, val: String(v) }));
+      } else {
+        formSpecsBuffer = [];
       }
-
+      formCustomBlocksBuffer = Array.isArray(prod.customBlocks) ? JSON.parse(JSON.stringify(prod.customBlocks)) : [];
       formTiersBuffer = JSON.parse(JSON.stringify(prod.tiers || []));
+
+      renderFormPillTags();
+      renderFormColors();
+      renderFormHighlights();
+      renderFormBox();
+      renderFormSpecs();
+      renderFormCustomBlocks();
       renderFormTiersList();
 
       updateMediaPreviews();
@@ -2738,6 +3003,26 @@
       });
     }
 
+    function updateInlineTierField(idx, field, val) {
+      if (!formTiersBuffer[idx]) return;
+      if (field === 'price' || field === 'oldPrice') {
+        const num = parseInt(val, 10) || 0;
+        if (field === 'price') {
+          formTiersBuffer[idx].price = num;
+          formTiersBuffer[idx].priceFormatted = SmartGimbalCatalog.formatVND(num);
+        } else {
+          formTiersBuffer[idx].oldPriceFormatted = num > 0 ? SmartGimbalCatalog.formatVND(num) : '';
+        }
+        const curPrice = formTiersBuffer[idx].price || 0;
+        const oldNum = parseInt(String(formTiersBuffer[idx].oldPriceFormatted || '').replace(/[^0-9]/g, ''), 10) || 0;
+        formTiersBuffer[idx].save = (oldNum > curPrice) ? `Tiết kiệm ${SmartGimbalCatalog.formatVND(oldNum - curPrice)}` : '';
+      } else {
+        formTiersBuffer[idx][field] = val;
+        if (field === 'name') formTiersBuffer[idx].label = val;
+        if (field === 'desc') formTiersBuffer[idx].specs = val;
+      }
+    }
+
     function renderFormTiersList() {
       const container = document.getElementById('formTiersList');
       container.innerHTML = '';
@@ -2746,14 +3031,18 @@
       formTiersBuffer.forEach((t, idx) => {
         const box = document.createElement('div');
         box.className = 'form-tier-item';
+        box.style.cssText = 'flex-direction:column; align-items:stretch; gap:8px; padding:12px;';
+        const oldPriceDigits = parseInt(String(t.oldPriceFormatted || '').replace(/[^0-9]/g, ''), 10) || '';
         box.innerHTML = `
-          <div class="form-tier-info">
-            <div class="form-tier-name">${t.label}</div>
-            <div class="form-tier-price">${t.priceFormatted || SmartGimbalCatalog.formatVND(t.price)} ${t.oldPriceFormatted ? `(Gốc: ${t.oldPriceFormatted})` : ''}</div>
-            <div class="form-tier-gift">Tặng: ${t.gift || 'Không có'} &bull; ${t.specs || ''}</div>
+          <div style="display:grid; grid-template-columns:1.2fr 0.9fr 0.9fr auto; gap:8px; align-items:center;">
+            <input type="text" class="form-control" value="${escAttr(t.name || t.label || '')}" oninput="updateInlineTierField(${idx}, 'name', this.value)" placeholder="Tên phân cấp">
+            <input type="number" class="form-control" value="${escAttr(t.price || 0)}" oninput="updateInlineTierField(${idx}, 'price', this.value)" placeholder="Giá bán (VNĐ)">
+            <input type="number" class="form-control" value="${escAttr(oldPriceDigits)}" oninput="updateInlineTierField(${idx}, 'oldPrice', this.value)" placeholder="Giá gốc (VNĐ)">
+            <button type="button" class="btn btn-outline" style="padding:5px 10px; font-size:11px; color:#DC3545;" onclick="removeInlineTier(${idx})">Xóa</button>
           </div>
-          <div>
-            <button class="btn btn-outline" style="padding:4px 8px; font-size:11px; color:#DC3545;" onclick="removeInlineTier(${idx})">Xóa</button>
+          <div style="display:grid; grid-template-columns:1fr 1.2fr; gap:8px;">
+            <input type="text" class="form-control" value="${escAttr(t.gift || '')}" oninput="updateInlineTierField(${idx}, 'gift', this.value)" placeholder="Quà tặng kèm">
+            <input type="text" class="form-control" value="${escAttr(t.desc || t.specs || '')}" oninput="updateInlineTierField(${idx}, 'desc', this.value)" placeholder="Mô tả phụ kiện / điểm khác biệt">
           </div>
         `;
         container.appendChild(box);
@@ -2781,7 +3070,8 @@
         oldPriceFormatted: oldPrice ? SmartGimbalCatalog.formatVND(oldPrice) : '',
         save: oldPrice && oldPrice > price ? `Tiết kiệm ${SmartGimbalCatalog.formatVND(oldPrice - price)}` : '',
         gift: gift || 'Quà tặng chính hãng',
-        specs: specs || 'Thông số tiêu chuẩn',
+        desc: specs || 'Phiên bản chính hãng',
+        specs: specs || 'Phiên bản chính hãng',
         highlights: [specs || 'Chất lượng hoàn thiện cao']
       });
 
@@ -2819,10 +3109,15 @@
       const prodId = document.getElementById('formProdId').value;
       const name = document.getElementById('formProdName').value.trim();
       const groupId = document.getElementById('formProdGroup').value;
+      const heroBadge = document.getElementById('formProdHeroBadge').value.trim() || 'Flagship 2026 • Gimbal 3 Trục AI';
+      const overviewBadge = document.getElementById('formProdOverviewBadge').value.trim() || 'Điểm Nhấn Cốt Lõi';
       const tagline = document.getElementById('formProdTagline').value.trim();
+      const subtitle = document.getElementById('formProdSubtitle').value.trim() || tagline;
       const status = document.getElementById('formProdStatus').value;
       const isMvp = document.getElementById('formProdIsMvp').checked;
       const mainImg = document.getElementById('formProdImg').value.trim() || '/shared/img/tflow_pro_main.png';
+      const perks = document.getElementById('formProdPerks').value.split('\n').map(s => s.trim()).filter(Boolean);
+      const warranty = document.getElementById('formProdWarranty').value.trim() || '12 tháng 1 đổi 1 • 30 ngày dùng thử • Cập nhật OTA trọn đời.';
 
       if (!name) {
         alert('Vui lòng nhập Tên sản phẩm!');
@@ -2842,47 +3137,41 @@
       ].filter(Boolean);
       const gallery = galleryRaw.length > 0 ? galleryRaw : [mainImg];
 
-      const boxContents = document.getElementById('formProdBox').value.split('\n').filter(s => s.trim().length > 0);
+      const cleanPillTags = formPillTagsBuffer.map(t => String(t || '').trim()).filter(Boolean);
+      const cleanColors = formColorsBuffer.filter(c => c && c.name && c.hex);
+      const cleanHighlights = formHighlightsBuffer.filter(h => h && (h.title || h.desc));
+      const cleanBox = formBoxBuffer.filter(b => b && b.name).map(b => ({ name: b.name.trim(), qty: (b.qty || '1x').trim() }));
+      const cleanSpecs = formSpecsBuffer.filter(s => s && s.label && s.val).map(s => ({ label: s.label.trim(), val: s.val.trim() }));
+      const cleanCustomBlocks = formCustomBlocksBuffer.slice();
 
-      const specs = {
-        "Trọng lượng thân máy": document.getElementById('formSpecWeight').value.trim(),
-        "Tải trọng tối đa": document.getElementById('formSpecPayload').value.trim(),
-        "Thời lượng pin": document.getElementById('formSpecBattery').value.trim(),
-        "Chuẩn kết nối": document.getElementById('formSpecConnect').value.trim()
+      const payload = {
+        name: name,
+        groupId: groupId,
+        heroBadge: heroBadge,
+        overviewBadge: overviewBadge,
+        tagline: tagline,
+        subtitle: subtitle,
+        pillTags: cleanPillTags,
+        status: status,
+        img: mainImg,
+        gallery: gallery,
+        colors: cleanColors.length > 0 ? cleanColors : [{ id: 'space-black', name: 'Space Black', hex: '#1C1C1E' }],
+        highlights: cleanHighlights,
+        overview: cleanHighlights,
+        boxContents: cleanBox,
+        specs: cleanSpecs,
+        perks: perks,
+        warranty: warranty,
+        customBlocks: cleanCustomBlocks,
+        tiers: formTiersBuffer
       };
 
       if (prodId) {
-        SmartGimbalCatalog.updateProduct(prodId, {
-          name: name,
-          groupId: groupId,
-          tagline: tagline,
-          subtitle: tagline,
-          status: status,
-          img: mainImg,
-          gallery: gallery,
-          boxContents: boxContents,
-          specs: specs,
-          tiers: formTiersBuffer
-        });
+        SmartGimbalCatalog.updateProduct(prodId, payload);
         if (isMvp) SmartGimbalCatalog.setMvpProduct(prodId);
         showToast(`Đã cập nhật bài đăng [${name}]`);
       } else {
-        const newProd = SmartGimbalCatalog.addProduct({
-          name: name,
-          groupId: groupId,
-          tagline: tagline,
-          subtitle: tagline,
-          status: status,
-          img: mainImg,
-          gallery: gallery,
-          boxContents: boxContents,
-          specs: specs,
-          colors: [
-            { id: "natural", name: "Titan Tự Nhiên", hex: "#D4D2CD" },
-            { id: "black", name: "Đen Không Gian", hex: "#1C1C1E" }
-          ],
-          tiers: formTiersBuffer
-        });
+        const newProd = SmartGimbalCatalog.addProduct(payload);
         if (isMvp) SmartGimbalCatalog.setMvpProduct(newProd.id);
         showToast(`Đã xuất bản bài đăng mới [${name}]`);
       }
