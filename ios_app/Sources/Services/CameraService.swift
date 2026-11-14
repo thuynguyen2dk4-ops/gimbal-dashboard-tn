@@ -28,6 +28,35 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     @Published var capturedMedia: [CapturedMediaItem] = []
     @Published var detectedFaceRect: CGRect? = nil
 
+    // Camera Mode, Flash & Zoom State
+    @Published var selectedMode: String = "VIDEO"
+    @Published var zoomFactor: String = "1x"
+    @Published var isFlashEnabled: Bool = false
+
+    // Customizable Figma UI States (05_Settings_UI_Customizer_Modal)
+    @Published var isProMode: Bool = false {
+        didSet { persistUiPreferences() }
+    }
+    @Published var uiThemeMode: String = "dark" {
+        didSet { persistUiPreferences() }
+    }
+    @Published var showExposureReadout: Bool = true {
+        didSet { persistUiPreferences() }
+    }
+    @Published var showHorizonLevel: Bool = true {
+        didSet { persistUiPreferences() }
+    }
+    @Published var showHistogram: Bool = true {
+        didSet { persistUiPreferences() }
+    }
+    @Published var autoHideControls3s: Bool = true {
+        didSet { persistUiPreferences() }
+    }
+    @Published var touchLockEnabled: Bool = false {
+        didSet { persistUiPreferences() }
+    }
+    @Published var isLandscapeMode: Bool = false
+
     // Pro Exposure & Audio HUD State
     @Published var iso: Int = 100
     @Published var shutterSpeed: String = "1/120s"
@@ -38,10 +67,40 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     @Published var audioLevelR: Double = 0.48
 
     // Quick Settings Viewfinder Overlays (Shared across Camera HUD & Quick Settings)
-    @Published var gridEnabled: Bool = true
-    @Published var zebraEnabled: Bool = false
-    @Published var peakingEnabled: Bool = false
-    @Published var antiFlicker: String = "50Hz"
+    @Published var gridEnabled: Bool = true {
+        didSet { persistUiPreferences() }
+    }
+    @Published var zebraEnabled: Bool = false {
+        didSet { persistUiPreferences() }
+    }
+    @Published var peakingEnabled: Bool = false {
+        didSet { persistUiPreferences() }
+    }
+    @Published var antiFlicker: String = "50Hz" {
+        didSet { persistUiPreferences() }
+    }
+
+    // Compatibility Aliases (Preserves external naming contracts)
+    var isoValue: Int {
+        get { iso }
+        set { iso = newValue }
+    }
+    var whiteBalanceKelvin: Int {
+        get { wbKelvin }
+        set { wbKelvin = newValue }
+    }
+    var evBias: Double {
+        get { ev }
+        set { ev = newValue }
+    }
+    var selectedLut: String {
+        get { activeLut }
+        set { activeLut = newValue }
+    }
+    var aspectRatio: String {
+        get { selectedAspectRatio }
+        set { selectedAspectRatio = newValue }
+    }
 
     let captureSession = AVCaptureSession()
     private let sessionQueue = DispatchQueue(label: "tflow.camera.session.queue")
@@ -53,9 +112,25 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     private var recordingTimer: Timer?
     private var vuTimer: Timer?
     private var recordingSecondsCount: Int = 0
+    private var isRestoringPreferences: Bool = false
+
+    private enum PrefKeys {
+        static let isProMode = "tflow_ui_is_pro_mode"
+        static let uiThemeMode = "tflow_ui_theme_mode"
+        static let showExposureReadout = "tflow_ui_show_exposure"
+        static let showHorizonLevel = "tflow_ui_show_horizon"
+        static let showHistogram = "tflow_ui_show_histogram"
+        static let autoHideControls3s = "tflow_ui_autohide_3s"
+        static let touchLockEnabled = "tflow_ui_touch_lock"
+        static let gridEnabled = "tflow_ui_grid_enabled"
+        static let zebraEnabled = "tflow_ui_zebra_enabled"
+        static let peakingEnabled = "tflow_ui_peaking_enabled"
+        static let antiFlicker = "tflow_ui_anti_flicker"
+    }
 
     override init() {
         super.init()
+        loadUiPreferences()
         setupMockThumbnails()
         startAudioVUAnimation()
     }
@@ -71,8 +146,62 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
         }
     }
 
+    private func loadUiPreferences() {
+        isRestoringPreferences = true
+        defer { isRestoringPreferences = false }
+        let defaults = UserDefaults.standard
+        if defaults.object(forKey: PrefKeys.isProMode) != nil {
+            isProMode = defaults.bool(forKey: PrefKeys.isProMode)
+        }
+        if let savedTheme = defaults.string(forKey: PrefKeys.uiThemeMode), !savedTheme.isEmpty {
+            uiThemeMode = savedTheme
+        }
+        if defaults.object(forKey: PrefKeys.showExposureReadout) != nil {
+            showExposureReadout = defaults.bool(forKey: PrefKeys.showExposureReadout)
+        }
+        if defaults.object(forKey: PrefKeys.showHorizonLevel) != nil {
+            showHorizonLevel = defaults.bool(forKey: PrefKeys.showHorizonLevel)
+        }
+        if defaults.object(forKey: PrefKeys.showHistogram) != nil {
+            showHistogram = defaults.bool(forKey: PrefKeys.showHistogram)
+        }
+        if defaults.object(forKey: PrefKeys.autoHideControls3s) != nil {
+            autoHideControls3s = defaults.bool(forKey: PrefKeys.autoHideControls3s)
+        }
+        if defaults.object(forKey: PrefKeys.touchLockEnabled) != nil {
+            touchLockEnabled = defaults.bool(forKey: PrefKeys.touchLockEnabled)
+        }
+        if defaults.object(forKey: PrefKeys.gridEnabled) != nil {
+            gridEnabled = defaults.bool(forKey: PrefKeys.gridEnabled)
+        }
+        if defaults.object(forKey: PrefKeys.zebraEnabled) != nil {
+            zebraEnabled = defaults.bool(forKey: PrefKeys.zebraEnabled)
+        }
+        if defaults.object(forKey: PrefKeys.peakingEnabled) != nil {
+            peakingEnabled = defaults.bool(forKey: PrefKeys.peakingEnabled)
+        }
+        if let savedFlicker = defaults.string(forKey: PrefKeys.antiFlicker), !savedFlicker.isEmpty {
+            antiFlicker = savedFlicker
+        }
+    }
+
+    private func persistUiPreferences() {
+        guard !isRestoringPreferences else { return }
+        let defaults = UserDefaults.standard
+        defaults.set(isProMode, forKey: PrefKeys.isProMode)
+        defaults.set(uiThemeMode, forKey: PrefKeys.uiThemeMode)
+        defaults.set(showExposureReadout, forKey: PrefKeys.showExposureReadout)
+        defaults.set(showHorizonLevel, forKey: PrefKeys.showHorizonLevel)
+        defaults.set(showHistogram, forKey: PrefKeys.showHistogram)
+        defaults.set(autoHideControls3s, forKey: PrefKeys.autoHideControls3s)
+        defaults.set(touchLockEnabled, forKey: PrefKeys.touchLockEnabled)
+        defaults.set(gridEnabled, forKey: PrefKeys.gridEnabled)
+        defaults.set(zebraEnabled, forKey: PrefKeys.zebraEnabled)
+        defaults.set(peakingEnabled, forKey: PrefKeys.peakingEnabled)
+        defaults.set(antiFlicker, forKey: PrefKeys.antiFlicker)
+    }
+
     private func setupMockThumbnails() {
-        // Initial placeholder thumbnail
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 80, height: 80))
         let img = renderer.image { ctx in
             UIColor(red: 0.12, green: 0.12, blue: 0.15, alpha: 1.0).setFill()
@@ -188,18 +317,54 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
         }
     }
 
+    func toggleFlash() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        isFlashEnabled.toggle()
+        let nextEnabled = isFlashEnabled
+        sessionQueue.async { [weak self] in
+            guard let device = self?.currentVideoInput?.device,
+                  device.hasTorch,
+                  device.isTorchModeSupported(nextEnabled ? .on : .off) else { return }
+            try? device.lockForConfiguration()
+            device.torchMode = nextEnabled ? .on : .off
+            device.unlockForConfiguration()
+        }
+    }
+
+    func setZoom(_ label: String) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        zoomFactor = label
+        let targetScale: CGFloat
+        switch label {
+        case ".5": targetScale = 1.0
+        case "2", "2x": targetScale = 2.0
+        case "5", "5x": targetScale = 5.0
+        default: targetScale = 1.0
+        }
+        sessionQueue.async { [weak self] in
+            guard let device = self?.currentVideoInput?.device else { return }
+            let clamped = max(device.minAvailableVideoZoomFactor, min(targetScale, min(device.activeFormat.videoMaxZoomFactor, 8.0)))
+            try? device.lockForConfiguration()
+            device.videoZoomFactor = clamped
+            device.unlockForConfiguration()
+        }
+    }
+
+    func deleteMedia(_ item: CapturedMediaItem) {
+        capturedMedia.removeAll { $0.id == item.id }
+        latestThumbnail = capturedMedia.first?.image
+        UINotificationFeedbackGenerator().notificationOccurred(.success)
+    }
+
     func capturePhoto() {
-        // Shutter flash animation
         UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
         shutterFlash = true
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) { [weak self] in
             self?.shutterFlash = false
         }
 
-        // Render snap thumbnail
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: 400, height: 400))
         let photo = renderer.image { ctx in
-            // Base background
             UIColor(red: 0.15, green: 0.16, blue: 0.20, alpha: 1.0).setFill()
             ctx.fill(CGRect(x: 0, y: 0, width: 400, height: 400))
 
@@ -232,7 +397,6 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
 
     func toggleRecording() {
         if isRecording {
-            // Stop recording
             isRecording = false
             recordingTimer?.invalidate()
             recordingTimer = nil
@@ -269,7 +433,6 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
             capturedMedia.insert(newItem, at: 0)
             latestThumbnail = clipThumb
         } else {
-            // Start recording
             isRecording = true
             UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
             recordingSecondsCount = 0

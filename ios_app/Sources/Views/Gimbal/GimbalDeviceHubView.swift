@@ -3,252 +3,472 @@
 //  SmartGimbalPro
 //
 //  T-Flow Pro S1 — Modular SwiftUI Architecture (iOS 16.0+)
+//  Trung tâm Thiết bị Gimbal (12_Settings_Device_Hub) & Multi-Cam Studio (13_Multicam_Director_Studio).
 //
 
 import SwiftUI
-import UIKit
-
-// MARK: - =====================================================================
-// 14. TAB 2: GIMBAL DEVICE HUB VIEW (SCREEN 30 & 31)
-// =====================================================================
 
 struct GimbalDeviceHubView: View {
-    @EnvironmentObject var ble: BLEGimbalManager
     @EnvironmentObject var store: SupabaseModuleStore
-    @State private var joystickDragOffset: CGSize = .zero
+    @EnvironmentObject var ble: BLEGimbalManager
+    @Environment(\.colorScheme) private var colorScheme
+
+    @State private var joystickOffset: CGSize = .zero
+    @State private var showMultiCamSheet: Bool = false
+    @State private var showPaywallSheet: Bool = false
+
+    private let goldAccent = Color(red: 0.98, green: 0.72, blue: 0.10)
+    private let appleBlue = Color(red: 0.23, green: 0.51, blue: 0.96)
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ScrollView {
-                VStack(spacing: 20) {
-                    // HERO HARDWARE CARD
-                    VStack(alignment: .leading, spacing: 14) {
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                HStack(spacing: 8) {
-                                    TFlowBrandLogo(size: 26)
-                                    Text("T-Flow Pro S1")
-                                        .font(.system(size: 20, weight: .bold))
-                                }
-                                Text("Titanium Aerospace Edition • BLE 5.3")
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.6))
-                            }
-                            Spacer()
-                            HStack(spacing: 5) {
-                                Circle().fill(Color.green).frame(width: 7, height: 7)
-                                Text("50Hz FOC Synced")
-                                    .font(.system(size: 11, weight: .bold))
-                                    .foregroundColor(.green)
-                            }
-                            .padding(.horizontal, 9)
-                            .padding(.vertical, 5)
-                            .background(Color.green.opacity(0.12))
-                            .clipShape(Capsule())
-                        }
-
-                        Divider().background(Color.white.opacity(0.1))
-
-                        HStack(spacing: 24) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("PIN 4500mAh").font(.system(size: 10, weight: .bold)).foregroundColor(.white.opacity(0.5))
-                                Text("\(ble.batteryLevel)%").font(.system(size: 18, weight: .bold, design: .monospaced)).foregroundColor(.white)
-                            }
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("XUNG ĐIỀU KHIỂN").font(.system(size: 10, weight: .bold)).foregroundColor(.white.opacity(0.5))
-                                Text("20 kHz").font(.system(size: 18, weight: .bold, design: .monospaced)).foregroundColor(.green)
-                            }
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("FIRMWARE").font(.system(size: 10, weight: .bold)).foregroundColor(.white.opacity(0.5))
-                                Text("v2.4.1").font(.system(size: 18, weight: .bold, design: .monospaced)).foregroundColor(.white)
-                            }
-                        }
-                    }
-                    .padding(20)
-                    .background(Color(red: 0.11, green: 0.11, blue: 0.13))
-                    .cornerRadius(20)
-                    .overlay(RoundedRectangle(cornerRadius: 20).stroke(Color.white.opacity(0.12), lineWidth: 1))
-
-                    // 3-AXIS REALTIME FOC ANGLE GAUGES (Pan, Tilt, Roll)
-                    VStack(alignment: .leading, spacing: 14) {
-                        HStack {
-                            Text("GÓC QUAY 3 TRỤC THỜI GIAN THỰC (50Hz IMU)")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(.white.opacity(0.6))
-                            Spacer()
-                            if !store.isRawTelemetryAllowed {
-                                Label("Đã Khóa", systemImage: "lock.fill")
-                                    .font(.system(size: 10, weight: .bold))
-                                    .foregroundColor(.red)
-                            }
-                        }
-
-                        if store.isRawTelemetryAllowed {
-                            HStack(spacing: 12) {
-                                AxisAngleCard(axis: "ROLL", angle: String(format: "%.2f°", ble.rollAngle), status: "Chuẩn Cân", color: .green)
-                                AxisAngleCard(axis: "TILT", angle: String(format: "%+.1f°", ble.pitchAngle), status: "Góc Chụp", color: Color(red: 0.98, green: 0.72, blue: 0.10))
-                                AxisAngleCard(axis: "PAN", angle: String(format: "%.1f°", ble.panAngle), status: "Quay 360°", color: .cyan)
-                            }
-                        } else {
-                            HStack(spacing: 10) {
-                                Image(systemName: "lock.shield.fill")
-                                    .foregroundColor(.red)
-                                Text("Cần mở khóa Module '500Hz Gyro Raw Telemetry' tại Tab Tài Khoản (gói hiện tại: \(store.userTier)) để xem số liệu góc IMU.")
-                                    .font(.system(size: 11.5, weight: .medium))
-                                    .foregroundColor(.white.opacity(0.75))
-                            }
-                            .padding(14)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .background(Color.white.opacity(0.06))
-                            .cornerRadius(14)
-                        }
-                    }
-
-                    // TỰ ĐỘNG CÂN BẰNG TRỌNG TÂM (CoG)
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("HIỆU CHUẨN ĐỘNG CƠ COG")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(.white.opacity(0.6))
-
-                        Button(action: {
-                            ble.showCalibrationModal = true
-                            ble.startCoGCalibration()
-                        }) {
-                            HStack {
-                                Image(systemName: "scope")
-                                    .font(.system(size: 18, weight: .bold))
-                                    .foregroundColor(Color(red: 0.98, green: 0.72, blue: 0.10))
-                                VStack(alignment: .leading, spacing: 2) {
-                                    Text("Tự Động Cân Bằng Trọng Tâm (CoG)")
-                                        .font(.system(size: 14, weight: .bold))
-                                    Text("Tự triệt tiêu rung lắc tải trọng • Sai số ±0.01°")
-                                        .font(.system(size: 11))
-                                        .foregroundColor(.white.opacity(0.5))
-                                }
-                                Spacer()
-                                Image(systemName: "chevron.right")
-                                    .foregroundColor(.white.opacity(0.4))
-                            }
-                            .padding(16)
-                            .background(Color.white.opacity(0.08))
-                            .foregroundColor(.white)
-                            .cornerRadius(16)
-                        }
-                    }
-
-                    // TACTILE VIRTUAL JOYSTICK CONTROLLER
-                    VStack(alignment: .leading, spacing: 14) {
-                        HStack {
-                            Text("CẦN ĐIỀU KHIỂN JOYSTICK ẢO (PAN & TILT)")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(.white.opacity(0.6))
-                            Spacer()
-                            Text(ble.joystickSensitivity > 0.7 ? "Thể Thao (1.0x)" : (ble.joystickSensitivity > 0.4 ? "Chuẩn (0.6x)" : "Điện Ảnh Mượt (0.3x)"))
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(Color(red: 0.98, green: 0.72, blue: 0.10))
-                        }
-
-                        // Circular Touch Pad
-                        ZStack {
-                            Circle()
-                                .fill(Color.white.opacity(0.05))
-                                .frame(width: 170, height: 170)
-                                .overlay(Circle().stroke(Color.white.opacity(0.12), lineWidth: 1.5))
-
-                            // Crosshair lines
-                            Rectangle().fill(Color.white.opacity(0.1)).frame(width: 140, height: 1)
-                            Rectangle().fill(Color.white.opacity(0.1)).frame(width: 1, height: 140)
-
-                            // Draggable Thumb Knob
-                            Circle()
-                                .fill(
-                                    LinearGradient(
-                                        colors: [Color(red: 0.98, green: 0.72, blue: 0.10), Color.orange],
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    )
-                                )
-                                .frame(width: 52, height: 52)
-                                .shadow(color: Color.black.opacity(0.5), radius: 6)
-                                .offset(joystickDragOffset)
-                                .gesture(
-                                    DragGesture()
-                                        .onChanged { value in
-                                            let maxDist: CGFloat = 58
-                                            let dist = hypot(value.translation.width, value.translation.height)
-                                            if dist < maxDist {
-                                                joystickDragOffset = value.translation
-                                            } else {
-                                                let angle = atan2(value.translation.height, value.translation.width)
-                                                joystickDragOffset = CGSize(width: cos(angle) * maxDist, height: sin(angle) * maxDist)
-                                            }
-                                            let nx = Double(joystickDragOffset.width / maxDist)
-                                            let ny = Double(joystickDragOffset.height / maxDist)
-                                            ble.sendManualJoystick(x: nx, y: ny)
-                                        }
-                                        .onEnded { _ in
-                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                                                joystickDragOffset = .zero
-                                            }
-                                        }
-                                )
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
-
-                        // Sensitivity Slider
-                        VStack(alignment: .leading, spacing: 6) {
-                            Text("Độ Nhạy Phản Hồi: \(Int(ble.joystickSensitivity * 100))%")
-                                .font(.system(size: 12, weight: .semibold))
-                                .foregroundColor(.white.opacity(0.8))
-
-                            Slider(value: $ble.joystickSensitivity, in: 0.1...1.0)
-                                .tint(Color(red: 0.98, green: 0.72, blue: 0.10))
-                        }
-                    }
-                    .padding(18)
-                    .background(Color(red: 0.11, green: 0.11, blue: 0.13))
-                    .cornerRadius(18)
-
-                    // 3-AXIS MOTOR TORQUE LIMITS
-                    VStack(alignment: .leading, spacing: 14) {
-                        HStack {
-                            Text("LỰC KÉO ĐỘNG CƠ PURE FOC (TORQUE)")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(.white.opacity(0.6))
-                            Spacer()
-                            if !store.isFocTuningAllowed {
-                                Label("Đã Khóa", systemImage: "lock.fill")
-                                    .font(.system(size: 10, weight: .bold))
-                                    .foregroundColor(.red)
-                            }
-                        }
-
-                        VStack(spacing: 12) {
-                            TorqueSliderRow(title: "Pan Motor (Yaw Axis)", value: $ble.panTorque)
-                            TorqueSliderRow(title: "Tilt Motor (Pitch Axis)", value: $ble.tiltTorque)
-                            TorqueSliderRow(title: "Roll Motor (Horizon Axis)", value: $ble.rollTorque)
-                        }
-                        .disabled(!store.isFocTuningAllowed)
-                        .opacity(store.isFocTuningAllowed ? 1.0 : 0.45)
-
-                        if !store.isFocTuningAllowed {
-                            Text("🔒 Cần mở khóa Module 'FOC Motor Micro-Tuning' tại Tab Tài Khoản (gói \(store.userTier)) để tinh chỉnh lực kéo động cơ.")
-                                .font(.system(size: 11))
-                                .foregroundColor(.red.opacity(0.9))
-                        }
-                    }
-                    .padding(18)
-                    .background(Color(red: 0.11, green: 0.11, blue: 0.13))
-                    .cornerRadius(18)
+                VStack(spacing: 16) {
+                    heroDeviceCard
+                    threeAxisTelemetrySection
+                    coGBalanceCard
+                    multiCamDirectorCard
+                    virtualJoystickCard
+                    focTorqueSection
                 }
                 .padding(16)
             }
-            .background(Color.black.ignoresSafeArea())
-            .navigationTitle("Thiết Bị T-Flow Pro")
-            .navigationBarTitleDisplayMode(.large)
+            .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
+            .navigationTitle("Gimbal Hub")
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $ble.showCalibrationModal) {
                 AutoCalibrationModalView(ble: ble)
+                    .presentationDetents([.medium])
+            }
+            .sheet(isPresented: $showMultiCamSheet) {
+                MultiCamDirectorStudioSheetView(ble: ble, store: store)
+                    .presentationDetents([.large])
+            }
+            .sheet(isPresented: $showPaywallSheet) {
+                SubscriptionPaywallSheetView(store: store)
+                    .presentationDetents([.medium, .large])
+            }
+        }
+    }
+
+    // MARK: - Hero Device Card
+
+    private var heroDeviceCard: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(goldAccent.opacity(0.16))
+                    .frame(width: 54, height: 54)
+                Image(systemName: "gyroscope")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(goldAccent)
+            }
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 6) {
+                    Text(store.deviceName)
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.primary)
+                    Circle()
+                        .fill(ble.isConnected ? Color.green : goldAccent)
+                        .frame(width: 8, height: 8)
+                }
+                Text(ble.isConnected ? "BLE 5.3 • Độ trễ 4ms" : "Sẵn sàng kết nối")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(.secondary)
+
+                HStack(spacing: 8) {
+                    badgeTag(icon: "battery.75", text: "\(ble.batteryLevel)%", color: .green)
+                    badgeTag(icon: "dial.low.fill", text: ble.gimbalMode, color: goldAccent)
+                }
+                .padding(.top, 2)
+            }
+
+            Spacer()
+
+            Button {
+                ble.isConnected.toggle()
+                ble.showToast(ble.isConnected ? "Đã kết nối BLE 5.3" : "Đã ngắt kết nối")
+            } label: {
+                Text(ble.isConnected ? "Ngắt" : "Kết nối")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(ble.isConnected ? Color.gray : appleBlue)
+                    .cornerRadius(10)
+            }
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color(UIColor.secondarySystemGroupedBackground)))
+    }
+
+    // MARK: - 3-Axis Telemetry
+
+    private var threeAxisTelemetrySection: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                Text("CẢM BIẾN 3 TRỤC IMU")
+                    .font(.system(size: 11, weight: .bold))
+                    .tracking(0.8)
+                    .foregroundColor(.secondary)
+                Spacer()
+                if !store.isRawTelemetryAllowed {
+                    Button("Mở khóa Pro") {
+                        showPaywallSheet = true
+                    }
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(goldAccent)
+                }
+            }
+
+            HStack(spacing: 10) {
+                AxisAngleCard(
+                    axis: "ROLL",
+                    angle: store.isRawTelemetryAllowed ? String(format: "%.1f°", ble.rollAngle) : "LOCK",
+                    status: abs(ble.rollAngle) < 1.5 ? "Cân bằng" : "Đang chỉnh",
+                    color: .green
+                )
+                AxisAngleCard(
+                    axis: "PITCH",
+                    angle: store.isRawTelemetryAllowed ? String(format: "%.1f°", ble.pitchAngle) : "LOCK",
+                    status: "Ổn định",
+                    color: appleBlue
+                )
+                AxisAngleCard(
+                    axis: "PAN",
+                    angle: store.isRawTelemetryAllowed ? String(format: "%.0f°", ble.panAngle) : "LOCK",
+                    status: "360° Free",
+                    color: goldAccent
+                )
+            }
+        }
+    }
+
+    // MARK: - CoG Auto-Balance Card
+
+    private var coGBalanceCard: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "scope")
+                .font(.system(size: 22, weight: .bold))
+                .foregroundColor(appleBlue)
+                .frame(width: 44, height: 44)
+                .background(appleBlue.opacity(0.14))
+                .cornerRadius(12)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Cân Bằng Trọng Tâm CoG")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.primary)
+                Text("Tự động đo tải 3 trục")
+                    .font(.system(size: 11))
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            Button {
+                ble.showCalibrationModal = true
+                ble.startCoGCalibration()
+            } label: {
+                Text("Cân bằng")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                    .background(goldAccent)
+                    .cornerRadius(10)
+            }
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color(UIColor.secondarySystemGroupedBackground)))
+    }
+
+    // MARK: - Multi-Cam Director Studio Card (13_Multicam_Director_Studio)
+
+    private var multiCamDirectorCard: some View {
+        Button {
+            if store.isMultiCamAllowed {
+                showMultiCamSheet = true
+            } else {
+                showPaywallSheet = true
+            }
+        } label: {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.purple.opacity(0.8), appleBlue],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 44, height: 44)
+                    Image(systemName: "rectangle.grid.2x2.fill")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.white)
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Text("Multi-Cam Director Studio")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.primary)
+                        if !store.isMultiCamAllowed {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 10))
+                                .foregroundColor(goldAccent)
+                        }
+                    }
+                    Text("Điều phối 4 góc máy • Tally Live")
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
+                }
+
+                Spacer()
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(.secondary)
+            }
+            .padding(14)
+            .background(RoundedRectangle(cornerRadius: 16).fill(Color(UIColor.secondarySystemGroupedBackground)))
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Virtual Joystick Card
+
+    private var virtualJoystickCard: some View {
+        VStack(spacing: 14) {
+            HStack {
+                Text("JOYSTICK ẢO PAN / TILT")
+                    .font(.system(size: 11, weight: .bold))
+                    .tracking(0.8)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text("Độ nhạy \(Int(ble.joystickSensitivity * 100))%")
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    .foregroundColor(goldAccent)
+            }
+
+            ZStack {
+                Circle()
+                    .fill(colorScheme == .light ? Color.black.opacity(0.05) : Color.white.opacity(0.06))
+                    .frame(width: 140, height: 140)
+                Circle()
+                    .stroke(goldAccent.opacity(0.35), lineWidth: 1.5)
+                    .frame(width: 140, height: 140)
+
+                Circle()
+                    .fill(goldAccent)
+                    .frame(width: 44, height: 44)
+                    .shadow(color: goldAccent.opacity(0.35), radius: 8)
+                    .offset(joystickOffset)
+                    .gesture(
+                        DragGesture()
+                            .onChanged { value in
+                                let maxR: CGFloat = 46
+                                let dx = value.translation.width
+                                let dy = value.translation.height
+                                let dist = sqrt(dx * dx + dy * dy)
+                                let scale = dist > maxR ? maxR / dist : 1.0
+                                let clamped = CGSize(width: dx * scale, height: dy * scale)
+                                joystickOffset = clamped
+                                ble.sendManualJoystick(
+                                    x: Double(clamped.width / maxR),
+                                    y: Double(-clamped.height / maxR)
+                                )
+                            }
+                            .onEnded { _ in
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                                    joystickOffset = .zero
+                                }
+                            }
+                    )
+            }
+
+            Slider(value: $ble.joystickSensitivity, in: 0.2...1.0)
+                .tint(goldAccent)
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color(UIColor.secondarySystemGroupedBackground)))
+    }
+
+    // MARK: - FOC Torque Tuning
+
+    private var focTorqueSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("MÔ-MEN XOẮN ĐỘNG CƠ FOC")
+                    .font(.system(size: 11, weight: .bold))
+                    .tracking(0.8)
+                    .foregroundColor(.secondary)
+                Spacer()
+                if !store.isFocTuningAllowed {
+                    Button("Khóa Pro") {
+                        showPaywallSheet = true
+                    }
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(goldAccent)
+                }
+            }
+
+            TorqueSliderRow(title: "Pan Motor", value: $ble.panTorque)
+                .disabled(!store.isFocTuningAllowed)
+                .opacity(store.isFocTuningAllowed ? 1.0 : 0.45)
+
+            TorqueSliderRow(title: "Tilt Motor", value: $ble.tiltTorque)
+                .disabled(!store.isFocTuningAllowed)
+                .opacity(store.isFocTuningAllowed ? 1.0 : 0.45)
+
+            TorqueSliderRow(title: "Roll Motor", value: $ble.rollTorque)
+                .disabled(!store.isFocTuningAllowed)
+                .opacity(store.isFocTuningAllowed ? 1.0 : 0.45)
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 16).fill(Color(UIColor.secondarySystemGroupedBackground)))
+    }
+
+    private func badgeTag(icon: String, text: String, color: Color) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 10, weight: .bold))
+            Text(text)
+                .font(.system(size: 10, weight: .bold, design: .monospaced))
+        }
+        .foregroundColor(color)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(color.opacity(0.14))
+        .clipShape(Capsule())
+    }
+}
+
+// MARK: - Multi-Cam Director Studio Sheet (13_Multicam_Director_Studio)
+
+struct MultiCamDirectorStudioSheetView: View {
+    @ObservedObject var ble: BLEGimbalManager
+    @ObservedObject var store: SupabaseModuleStore
+    @Environment(\.dismiss) private var dismiss
+
+    @State private var activeProgramCam: String = "CAM A"
+    @State private var isGenlockSynced: Bool = true
+
+    private let appleBlue = Color(red: 0.23, green: 0.51, blue: 0.96)
+    private let goldAccent = Color(red: 0.98, green: 0.72, blue: 0.10)
+
+    private struct CameraFeed: Identifiable {
+        let id: String
+        let role: String
+        let lens: String
+        let status: String
+    }
+
+    private let feeds: [CameraFeed] = [
+        CameraFeed(id: "CAM A", role: "Master Gimbal", lens: "24mm • 4K60", status: "LIVE"),
+        CameraFeed(id: "CAM B", role: "Góc Rộng", lens: "13mm • 4K30", status: "SYNC"),
+        CameraFeed(id: "CAM C", role: "Cận Cảnh Tele", lens: "77mm • 4K60", status: "SYNC"),
+        CameraFeed(id: "CAM D", role: "Overhead", lens: "24mm • 1080p", status: "STANDBY")
+    ]
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 14) {
+                // Genlock & Master Sync Header Bar
+                HStack {
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(isGenlockSynced ? Color.green : goldAccent)
+                            .frame(width: 8, height: 8)
+                        Text(isGenlockSynced ? "Genlock Wi-Fi 6 • 0.8ms" : "Đang đồng bộ...")
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                    }
+                    Spacer()
+                    Button("Cut Program") {
+                        ble.showToast("PGM: \(activeProgramCam)")
+                    }
+                    .font(.system(size: 11, weight: .black))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.red)
+                    .cornerRadius(8)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
+
+                // 2x2 Multi-View Grid
+                LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                    ForEach(feeds) { feed in
+                        let isLive = activeProgramCam == feed.id
+                        Button {
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            activeProgramCam = feed.id
+                        } label: {
+                            ZStack(alignment: .bottomLeading) {
+                                RoundedRectangle(cornerRadius: 14)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [Color(red: 0.10, green: 0.13, blue: 0.20), Color.black],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
+                                    .frame(height: 155)
+
+                                VStack {
+                                    HStack {
+                                        Text(feed.id)
+                                            .font(.system(size: 10, weight: .black, design: .monospaced))
+                                            .foregroundColor(.black)
+                                            .padding(.horizontal, 7)
+                                            .padding(.vertical, 3)
+                                            .background(isLive ? Color.red : goldAccent)
+                                            .cornerRadius(5)
+                                        Spacer()
+                                        Text(isLive ? "PGM" : feed.status)
+                                            .font(.system(size: 9, weight: .bold, design: .monospaced))
+                                            .foregroundColor(isLive ? .red : .green)
+                                            .padding(.horizontal, 6)
+                                            .padding(.vertical, 2)
+                                            .background(Color.black.opacity(0.65))
+                                            .cornerRadius(4)
+                                    }
+                                    Spacer()
+                                }
+                                .padding(10)
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(feed.role)
+                                        .font(.system(size: 13, weight: .bold))
+                                        .foregroundColor(.white)
+                                    Text(feed.lens)
+                                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                                        .foregroundColor(.white.opacity(0.7))
+                                }
+                                .padding(10)
+                            }
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 14)
+                                    .stroke(isLive ? Color.red : appleBlue.opacity(0.25), lineWidth: isLive ? 2.5 : 1)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 16)
+
+                Spacer()
+            }
+            .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
+            .navigationTitle("Multi-Cam Director Studio")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Đóng") { dismiss() }
+                }
             }
         }
     }

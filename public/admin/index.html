@@ -10,7 +10,8 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&subset=vietnamese&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -19,8 +20,8 @@
       --border: rgba(0, 0, 0, 0.08);
       --border-hover: rgba(0, 0, 0, 0.18);
       --text-main: #1D1D1F;
-      --text-secondary: #6E6E73;
-      --text-muted: #86868B;
+      --text-secondary: #52525B;
+      --text-muted: #6B7280;
       --accent: #1D1D1F;
       --link: #0071E3;
       --green: #28A745;
@@ -31,7 +32,7 @@
       --radius-md: 14px;
       --radius-lg: 20px;
       --radius-full: 9999px;
-      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --font-mono: "JetBrains Mono", monospace;
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -39,10 +40,14 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: var(--font);
+      font-kerning: normal;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: 0;
+      line-height: 1.55;
       background-color: var(--bg);
       color: var(--text-main);
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -70,8 +75,9 @@
       align-items: center;
       gap: 10px;
       font-size: 16px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
     }
     .brand-mark {
       width: 28px;
@@ -81,7 +87,7 @@
       color: #FFF;
       display: grid;
       place-items: center;
-      font-weight: 800;
+      font-weight: 700;
       font-size: 14px;
     }
     .nav-actions {
@@ -136,9 +142,10 @@
     }
     .kpi-val {
       font-size: 32px;
-      font-weight: 800;
+      font-weight: 700;
       font-family: var(--font-mono);
-      letter-spacing: -0.02em;
+      line-height: 1.2;
+      letter-spacing: 0;
     }
     .kpi-sub {
       font-size: 12.5px;
@@ -165,8 +172,9 @@
     }
     .card-title {
       font-size: 20px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
     }
     .card-sub {
       font-size: 13.5px;
@@ -229,8 +237,9 @@
     }
     .group-card-name {
       font-size: 16px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
     }
     .group-prod-count {
       font-size: 11px;
@@ -298,7 +307,7 @@
     .badge-mvp {
       background: var(--text-main);
       color: #FFF;
-      font-size: 10.5px;
+      font-size: 11px;
       font-weight: 700;
       padding: 3px 8px;
       border-radius: var(--radius-full);
@@ -384,7 +393,7 @@
       align-items: center;
       justify-content: space-between;
     }
-    .modal-header h3 { font-size: 18px; font-weight: 800; }
+    .modal-header h3 { font-size: 18px; font-weight: 700; line-height: 1.3; }
     .modal-body {
       flex: 1;
       overflow-y: auto;
@@ -403,8 +412,9 @@
 
     .form-section-title {
       font-size: 14.5px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
       margin: 24px 0 14px 0;
       padding-bottom: 8px;
       border-bottom: 1px solid var(--border);
@@ -599,9 +609,10 @@
     }
     .footer-brand-title {
       font-size: 17px;
-      font-weight: 800;
+      font-weight: 700;
+      line-height: 1.3;
       color: #FFFFFF;
-      letter-spacing: -0.01em;
+      letter-spacing: 0;
       margin-bottom: 12px;
     }
     .footer-col-desc {
@@ -839,27 +850,27 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
+      font-weight: 700;
       font-size: 16px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     .admin-brand-title {
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 700;
       color: #1D1D1F;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
+      letter-spacing: 0;
+      line-height: 1.3;
     }
 
     .admin-brand-sub {
       font-size: 11px;
-      color: #8E8E93;
+      color: #6B7280;
       font-weight: 600;
     }
 
     .badge-cms {
-      font-size: 10px;
+      font-size: 11px;
       font-weight: 700;
       background: rgba(0, 113, 227, 0.1);
       color: #0071E3;
@@ -885,7 +896,7 @@
       background: #1D1D1F;
       color: #FFF;
       font-size: 12px;
-      font-weight: 800;
+      font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -904,15 +915,15 @@
     }
 
     .user-role-badge {
-      font-size: 10.5px;
+      font-size: 11px;
       color: #0071E3;
       font-weight: 600;
     }
 
     .admin-nav-group-title {
-      font-size: 10.5px;
-      font-weight: 800;
-      color: #8E8E93;
+      font-size: 11px;
+      font-weight: 700;
+      color: #6B7280;
       text-transform: uppercase;
       letter-spacing: 0.06em;
       padding: 16px 20px 6px 20px;
@@ -970,7 +981,7 @@
 
     .nav-badge-pill {
       font-size: 11px;
-      font-weight: 800;
+      font-weight: 700;
       background: #FF3B30;
       color: #FFF;
       padding: 1px 7px;
@@ -1173,7 +1184,7 @@
 <body>
 
   <!-- ADMIN AUTH GATE -->
-<div id="adminAuthGate" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:linear-gradient(135deg, #F5F5F7 0%, #E5E5EA 100%); z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px; font-family:'Plus Jakarta Sans', -apple-system, sans-serif;">
+<div id="adminAuthGate" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:linear-gradient(135deg, #F5F5F7 0%, #E5E5EA 100%); z-index:99999; display:flex; align-items:center; justify-content:center; padding:20px; font-family:var(--font);">
     <div style="background:#FFFFFF; border-radius:24px; padding:44px 40px; max-width:440px; width:100%; box-shadow:0 20px 48px rgba(0,0,0,0.12); border:1px solid rgba(0,0,0,0.08); text-align:center;">
       
       <!-- Brand Icon -->
@@ -1184,12 +1195,12 @@
         </svg>
       </div>
 
-      <div style="font-size:24px; font-weight:800; letter-spacing:-0.03em; color:#1D1D1F; margin-bottom:6px;">t-flow console</div>
-      <div style="font-size:12px; font-weight:600; color:#86868B; margin-bottom:28px;">Trung Tâm Quản Trị Hệ Sinh Thái &amp; Danh Mục</div>
+      <div style="font-size:24px; font-weight:700; letter-spacing:0; line-height:1.3; color:#1D1D1F; margin-bottom:6px;">t-flow console</div>
+      <div style="font-size:12px; font-weight:600; color:#6B7280; margin-bottom:24px;">Trung tâm quản trị T-Flow</div>
 
-      <div style="background:#F5F5F7; border-radius:14px; padding:18px; margin-bottom:24px; text-align:left;">
-        <div style="font-size:12px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:4px;">Phân Quyền Bằng Gmail</div>
-        <div style="font-size:13.5px; color:#1D1D1F; line-height:1.5;">Hệ thống xác thực tài khoản qua Google. Chỉ email <strong>thuynguyen2dk4@gmail.com</strong> được cấp quyền Master Admin vào console.</div>
+      <div style="background:#F5F5F7; border-radius:14px; padding:16px 18px; margin-bottom:22px; text-align:left;">
+        <div style="font-size:11.5px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:4px;">Phân Quyền Gmail</div>
+        <div style="font-size:13.5px; color:#1D1D1F; line-height:1.5;">Chỉ tài khoản Master Admin <strong>thuynguyen2dk4@gmail.com</strong> được phép truy cập.</div>
       </div>
 
       <!-- 1-Click Google Admin Button -->
@@ -1238,7 +1249,7 @@
       <div style="flex:1; min-width:0;">
         <div class="user-email-text" id="adminDisplayEmail">thuynguyen2dk4@gmail.com</div>
         <div class="user-role-badge">Master Admin &amp; Founder</div>
-        <div style="font-size:10px; color:#248A3D; font-weight:600; display:flex; align-items:center; gap:5px; margin-top:2px;">
+        <div style="font-size:11px; color:#248A3D; font-weight:600; display:flex; align-items:center; gap:5px; margin-top:2px;">
           <span style="width:6px; height:6px; border-radius:50%; background:#34C759; display:inline-block;"></span>
           <span id="adminSessionStatusLabel">Phiên Hoạt Động (Live)</span>
         </div>
@@ -1295,7 +1306,7 @@
         <span>🌐</span> Xem Web Bán Hàng
       </a>
       <a href="/account" target="_blank" class="sidebar-footer-btn">
-        <span>📱</span> Cổng Khách Hàng
+        <span>👤</span> Cổng Khách Hàng
       </a>
       <button onclick="handleAdminLogout()" class="sidebar-footer-btn logout" style="width:100%; border:none; text-align:left;">
         <span>🚪</span> Đăng Xuất
@@ -1313,7 +1324,7 @@
         <button type="button" class="btn-mobile-sidebar-toggle" onclick="toggleAdminSidebar(true)" aria-label="Mở Menu Admin">
           <span>☰</span>
         </button>
-        <h2 id="adminCurrentViewTitle" style="font-size:16px; font-weight:800; color:var(--text-main); margin:0;">
+        <h2 id="adminCurrentViewTitle" style="font-size:16px; font-weight:700; line-height:1.3; color:var(--text-main); margin:0;">
           ⚡ Trung Tâm Huấn Luyện AI &amp; Quản Lý Hội Thoại
         </h2>
       </div>
@@ -1341,10 +1352,10 @@
         <div>
           <div class="card-title" style="display:flex; align-items:center; gap:10px;">
             <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:#0071E3; color:#FFF; font-size:14px;">⚡</span>
-            Trung Tâm Huấn Luyện AI &amp; Quản Lý Hội Thoại (AI Training Center)
+            Trung Tâm Huấn Luyện AI &amp; Hội Thoại
           </div>
           <div class="card-sub">
-            Tổng hợp toàn bộ câu hỏi &amp; câu trả lời từ Web Bán Hàng và App Camera Copilot. Huấn luyện câu trả lời chuẩn xác cho các câu hỏi khó, bảo đảm AI không bao giờ trả lời bừa.
+            Quản lý hội thoại và huấn luyện câu trả lời chuẩn cho Web Bán Hàng &amp; App Copilot.
           </div>
         </div>
         <div class="toolbar-actions">
@@ -1357,28 +1368,28 @@
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin:20px 0 24px 0;">
         <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
           <div style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">Tổng Hội Thoại</div>
-          <div style="font-size:22px; font-weight:800; color:var(--text-main); margin-top:4px;" id="aiKpiTotal">0</div>
-          <div style="font-size:10.5px; color:#8E8E93;">Tất cả 3 chuyên mục</div>
+          <div style="font-size:22px; font-weight:700; color:var(--text-main); margin-top:4px; line-height:1.25;" id="aiKpiTotal">0</div>
+          <div style="font-size:11.5px; color:#6B7280;">Tất cả 3 chuyên mục</div>
         </div>
         <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
           <div style="font-size:11px; font-weight:700; color:#0071E3; text-transform:uppercase;">🛍️ 1. Tư Vấn Bán Hàng</div>
-          <div style="font-size:22px; font-weight:800; color:#0071E3; margin-top:4px;" id="aiKpiSales">0</div>
-          <div style="font-size:10.5px; color:#8E8E93;">Báo giá 4 gói, MagSafe, BH</div>
+          <div style="font-size:22px; font-weight:700; color:#0071E3; margin-top:4px; line-height:1.25;" id="aiKpiSales">0</div>
+          <div style="font-size:11.5px; color:#6B7280;">Báo giá 4 gói, MagSafe, BH</div>
         </div>
         <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
           <div style="font-size:11px; font-weight:700; color:#8944AB; text-transform:uppercase;">🎬 2. Quay Chụp &amp; Edit</div>
-          <div style="font-size:22px; font-weight:800; color:#8944AB; margin-top:4px;" id="aiKpiCreative">0</div>
-          <div style="font-size:10.5px; color:#8E8E93;">Góc máy, LUT, Dựng phim</div>
+          <div style="font-size:22px; font-weight:700; color:#8944AB; margin-top:4px; line-height:1.25;" id="aiKpiCreative">0</div>
+          <div style="font-size:11.5px; color:#6B7280;">Góc máy, LUT, Dựng phim</div>
         </div>
         <div style="background:#F5F5F7; border:1px solid var(--border); border-radius:12px; padding:14px;">
           <div style="font-size:11px; font-weight:700; color:#248A3D; text-transform:uppercase;">🧠 3. Nhận Diện AI</div>
-          <div style="font-size:22px; font-weight:800; color:#248A3D; margin-top:4px;" id="aiKpiSmartVision">0</div>
-          <div style="font-size:10.5px; color:#8E8E93;">Bám nét, Thú cưng, Ultra-Wide</div>
+          <div style="font-size:22px; font-weight:700; color:#248A3D; margin-top:4px; line-height:1.25;" id="aiKpiSmartVision">0</div>
+          <div style="font-size:11.5px; color:#6B7280;">Bám nét, Thú cưng, Ultra-Wide</div>
         </div>
         <div style="background:rgba(230,167,0,0.08); border:1px solid rgba(230,167,0,0.3); border-radius:12px; padding:14px;">
           <div style="font-size:11px; font-weight:700; color:#B45309; text-transform:uppercase;">⚠️ Chờ Admin Duyệt</div>
-          <div style="font-size:22px; font-weight:800; color:#B45309; margin-top:4px;" id="aiKpiPending">0</div>
-          <div style="font-size:10.5px; color:#B45309;">Câu hỏi khó cần training</div>
+          <div style="font-size:22px; font-weight:700; color:#B45309; margin-top:4px; line-height:1.25;" id="aiKpiPending">0</div>
+          <div style="font-size:11.5px; color:#B45309;">Câu hỏi cần training</div>
         </div>
       </div>
 
@@ -1431,7 +1442,7 @@
       <!-- TAB 2 CONTENT: PENDING QUEUE (ADMIN TRAINING INTERFACE) -->
       <div id="aiTabContentPending" style="display:none;">
         <div style="margin-bottom:16px; font-size:13.5px; color:var(--text-secondary); line-height:1.5;">
-          Những câu hỏi người dùng hỏi mà AI nhận định là chuyên sâu hoặc chưa có dữ liệu chuẩn sẽ được chuyển về đây. Admin Thủy Nguyễn nhập câu trả lời chuẩn và bấm <strong>[Lưu &amp; Huấn Luyện AI]</strong>. Ngay lập tức, AI trên cả Web và App sẽ nắm bắt tri thức mới này để trả lời cho những khách hàng tiếp theo!
+          Các câu hỏi chuyên sâu cần duyệt nằm tại đây. Nhập đáp án chuẩn và bấm <strong>[Lưu &amp; Huấn Luyện AI]</strong> để đồng bộ lên Web &amp; App.
         </div>
         <div id="aiPendingCardsList">
           <!-- Dynamically populated pending cards -->
@@ -1472,11 +1483,11 @@
           
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px;">
             <div>
-              <div style="font-size:16px; font-weight:800; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+              <div style="font-size:16px; font-weight:700; line-height:1.3; color:var(--text-main); display:flex; align-items:center; gap:8px;">
                 <span style="font-size:20px;">☁️</span> Bộ Não AI Đám Mây Hợp Nhất (Google Gemini API)
               </div>
               <div style="font-size:12.5px; color:var(--text-secondary); margin-top:4px; max-width:640px; line-height:1.5;">
-                Toàn bộ luồng trò chuyện trên <strong>Web Bán Hàng</strong> và <strong>App Camera Copilot</strong> đều truy vấn tập trung về duy nhất một động cơ Google Cloud AI thông qua endpoint <code>/api/chat</code>. Mọi dữ liệu hỏi đáp đều được đồng bộ về Trung Tâm Huấn Luyện này.
+                Web Bán Hàng và App Copilot dùng chung kết nối Google Cloud AI qua <code>/api/chat</code>.
               </div>
             </div>
             <div id="cloudAiStatusBadge" style="padding:6px 14px; border-radius:99px; font-size:12px; font-weight:700; background:rgba(52,199,89,0.12); color:#248A3D; border:1px solid rgba(52,199,89,0.3); display:flex; align-items:center; gap:6px;">
@@ -1489,14 +1500,14 @@
           <div style="background:#F0F7FF; border:1px solid #BAE6FD; border-radius:14px; padding:18px 20px; margin-bottom:20px;">
             <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
               <div>
-                <div style="font-size:13.5px; font-weight:800; color:#0369A1; display:flex; align-items:center; gap:8px;">
-                  <span>🔐</span> Google OAuth 2.0 Client ID (Đăng Nhập Bằng Google Thật accounts.google.com)
+                <div style="font-size:13.5px; font-weight:700; line-height:1.3; color:#0369A1; display:flex; align-items:center; gap:8px;">
+                  <span>🔐</span> Google OAuth 2.0 Client ID
                 </div>
-                <div style="font-size:11.5px; color:#0C4A6E; margin-top:3px;">
-                  Khi dán Client ID vào đây, nút "Đăng nhập Google" trên Web sẽ mở <strong>100% trang chính hãng của Google (accounts.google.com)</strong>.
+                <div style="font-size:12px; color:#0C4A6E; margin-top:3px;">
+                  Mở đăng nhập Google chính chủ (<code>accounts.google.com</code>) khi cấu hình Client ID.
                 </div>
               </div>
-              <span style="font-size:10px; font-weight:700; background:#0284C7; color:#FFF; padding:2px 8px; border-radius:99px;">Google Identity Services</span>
+              <span style="font-size:11px; font-weight:700; background:#0284C7; color:#FFF; padding:3px 10px; border-radius:99px;">Google Identity Services</span>
             </div>
             
             <div style="display:flex; gap:10px; margin-bottom:8px;">
@@ -1521,8 +1532,8 @@
                 <input type="password" id="cloudAiApiKeyInput" placeholder="Dán mã Gemini API Key từ Google AI Studio..." style="width:100%; padding:10px 40px 10px 12px; border:1px solid var(--border); border-radius:10px; font-size:13px; font-family:monospace; outline:none;">
                 <button type="button" onclick="toggleAiKeyVisibility()" style="position:absolute; right:10px; background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:14px;">👁️</button>
               </div>
-              <div style="font-size:11px; color:var(--text-secondary); margin-top:5px;">
-                🔑 Khóa API được lưu an toàn trong trình duyệt quản trị và đồng bộ trực tiếp tới máy chủ <code>/api/chat</code>.
+              <div style="font-size:11.5px; color:var(--text-secondary); margin-top:5px;">
+                🔑 Khóa API được lưu bảo mật trong trình duyệt quản trị và đồng bộ tới <code>/api/chat</code>.
               </div>
             </div>
 
@@ -1538,8 +1549,8 @@
                 <option value="gemini-3.1-flash-lite">Gemini 3.1 Flash-Lite (Nhẹ • Dự phòng tốc độ cao)</option>
                 <option value="gemini-flash-latest">Gemini Flash Latest (Tự động cập nhật bản mới nhất)</option>
               </select>
-              <div style="font-size:11px; color:var(--text-secondary); margin-top:5px;">
-                ⚡ Model Gemini Flash tối ưu hóa độ trễ phản hồi thời gian thực trên cả Web và App điện thoại.
+              <div style="font-size:11.5px; color:var(--text-secondary); margin-top:5px;">
+                ⚡ Gemini Flash tối ưu độ trễ phản hồi thời gian thực trên Web &amp; App.
               </div>
             </div>
           </div>
@@ -1568,8 +1579,8 @@
 
         <!-- VISUAL ECOSYSTEM ARCHITECTURE SHOWCASE -->
         <div style="background:#F9F9FB; border:1px solid var(--border); border-radius:16px; padding:22px;">
-          <div style="font-size:14px; font-weight:800; color:var(--text-main); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
-            <span>📐</span> Kiến Trúc Hợp Nhất 1 Cloud AI - 2 Persona Riêng Biệt
+          <div style="font-size:14px; font-weight:700; line-height:1.3; color:var(--text-main); margin-bottom:12px; display:flex; align-items:center; gap:8px;">
+            <span>📐</span> Kiến Trúc 1 Cloud AI - 2 Persona Riêng Biệt
           </div>
           
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
@@ -1597,7 +1608,7 @@
           </div>
 
           <div style="margin-top:14px; padding:12px 14px; background:rgba(0,113,227,0.06); border:1px solid rgba(0,113,227,0.2); border-radius:10px; font-size:12px; color:#0071E3; line-height:1.5;">
-            <strong>🛡️ Cơ chế Chống Trả Lời Bừa (Zero Hallucination &amp; Escalation):</strong> Bất kỳ câu hỏi nào vượt quá phạm vi kiểm định đều được AI tự động đính kèm cờ chuyển tiếp về <strong>Hàng Đợi Chờ Duyệt (Pending Queue)</strong>. Admin Thủy Nguyễn nhập đáp án chuẩn và bấm <em>[Lưu &amp; Huấn Luyện]</em> để cập nhật ngay vào cơ sở tri thức cho toàn bộ hệ sinh thái!
+            <strong>🛡️ Chống Trả Lời Bừa:</strong> Câu hỏi ngoài phạm vi được chuyển vào <strong>Chờ Duyệt</strong> để Admin bổ sung đáp án chuẩn.
           </div>
         </div>
       </div>
@@ -1635,23 +1646,23 @@
         <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px; margin:24px 0;">
           <div class="card" onclick="switchAdminView('ai')" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease; border:1px solid rgba(0,113,227,0.2); background:linear-gradient(135deg, #FFF 0%, rgba(0,113,227,0.03) 100%);">
             <div style="font-size:28px; margin-bottom:8px;">⚡</div>
-            <div style="font-weight:800; font-size:14px; color:#0071E3;">Huấn Luyện AI</div>
+            <div style="font-weight:700; font-size:14px; color:#0071E3; line-height:1.3;">Huấn Luyện AI</div>
             <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Bộ não Gemini Cloud AI</div>
           </div>
           <div class="card" onclick="switchAdminView('groups'); openCreateGroupModal();" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease;">
             <div style="font-size:28px; margin-bottom:8px;">📁</div>
-            <div style="font-weight:800; font-size:14px; color:var(--text-main);">Tạo Nhóm Hàng</div>
-            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Cấu hình ngành hàng cấp 1</div>
+            <div style="font-weight:700; font-size:14px; color:var(--text-main); line-height:1.3;">Tạo Nhóm Hàng</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Ngành hàng cấp 1</div>
           </div>
           <div class="card" onclick="switchAdminView('products'); openPublishProductModal();" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease;">
             <div style="font-size:28px; margin-bottom:8px;">📦</div>
-            <div style="font-weight:800; font-size:14px; color:var(--text-main);">Đăng Sản Phẩm</div>
-            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Đăng bán bài viết &amp; combo</div>
+            <div style="font-weight:700; font-size:14px; color:var(--text-main); line-height:1.3;">Đăng Sản Phẩm</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Bài viết &amp; phân cấp</div>
           </div>
           <div class="card" onclick="window.open('/', '_blank')" style="cursor:pointer; padding:20px; text-align:center; transition:all 0.2s ease;">
             <div style="font-size:28px; margin-bottom:8px;">🌐</div>
-            <div style="font-weight:800; font-size:14px; color:var(--text-main);">Xem Website</div>
-            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Cửa hàng bán lẻ trực tuyến</div>
+            <div style="font-weight:700; font-size:14px; color:var(--text-main); line-height:1.3;">Xem Website</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">Web bán lẻ trực tuyến</div>
           </div>
         </div>
       </div>
@@ -1664,7 +1675,7 @@
         <div>
           <div class="card-title">Quản Lý Nhóm Sản Phẩm (Danh Mục Cấp 1)</div>
           <div class="card-sub">
-            Cấu hình các nhóm ngành hàng chính. Thêm, sửa, xóa nhóm tại đây sẽ tự động cập nhật ngay lập tức sang bộ lọc trên website bán hàng và form đăng bài sản phẩm.
+            Nhóm ngành hàng chính — tự động đồng bộ lên Web Bán Hàng và form đăng bài.
           </div>
         </div>
         <div class="toolbar-actions">
@@ -1686,7 +1697,7 @@
       <div class="card-title-row">
         <div>
           <div class="card-title">Quản Lý Bài Đăng Sản Phẩm &amp; Phân Cấp (Cấp 2 &amp; Cấp 3)</div>
-          <div class="card-sub">Quản trị nội dung hiển thị, hình ảnh góc chụp, màu sắc, thông số kỹ thuật và các phân cấp giá bán (Bản Thường, Pro, Max...).</div>
+          <div class="card-sub">Quản trị nội dung, hình ảnh, thông số và các phiên bản giá bán.</div>
         </div>
         <div class="toolbar-actions">
           <button class="btn btn-dark" onclick="openPublishProductModal()">&#43; Đăng Bài Sản Phẩm Mới</button>
@@ -1726,8 +1737,8 @@
     <div class="card">
       <div class="card-title-row">
         <div>
-          <div class="card-title">Cấp Quyền 7 Module Ứng Dụng Cho Người Dùng</div>
-          <div class="card-sub">Bật/tắt tức thời 7 tính năng chuyên sâu và đồng bộ trực tiếp tới Cổng Khách Hàng.</div>
+          <div class="card-title">Cấp Quyền 7 Module Ứng Dụng</div>
+          <div class="card-sub">Bật/tắt tức thời 7 tính năng chuyên sâu và đồng bộ tới Cổng Khách Hàng.</div>
         </div>
         <div class="toolbar-actions">
           <button class="btn btn-outline" onclick="exportUsersCSV()">Xuất Khẩu Người Dùng (Excel)</button>
@@ -1758,8 +1769,8 @@
     <div class="card" style="margin-top:32px;">
       <div class="card-title-row">
         <div>
-          <div class="card-title">Quản Lý Đánh Giá &amp; Cảm Nhận Khách Hàng (T-Flow Pro Reviews)</div>
-          <div class="card-sub">Duyệt, xem chi tiết và kiểm duyệt toàn bộ đánh giá do người dùng gửi từ website bán hàng.</div>
+          <div class="card-title">Quản Lý Đánh Giá Khách Hàng (T-Flow Pro)</div>
+          <div class="card-sub">Duyệt và kiểm duyệt đánh giá thực tế từ Web Bán Hàng.</div>
         </div>
         <div class="toolbar-actions">
           <span style="font-size:12px; font-weight:700; background:rgba(0,113,227,0.1); color:#0071E3; padding:6px 14px; border-radius:99px;" id="adminReviewsCountBadge">Đang tải đánh giá...</span>
@@ -1789,10 +1800,10 @@
           <div class="card-title-row">
             <div>
               <div class="card-title" style="display:flex; align-items:center; gap:10px;">
-                <span>⚙️</span> Cấu Hình Chìa Khóa Hệ Thống (Google Cloud AI &amp; OAuth 2.0)
+                <span>⚙️</span> Cấu Hình Hệ Thống (Google Cloud AI &amp; OAuth 2.0)
               </div>
               <div class="card-sub">
-                Toàn bộ thông tin cấu hình được lưu tự động và bảo vệ tuyệt đối trong môi trường quản trị.
+                Cấu hình được lưu tự động và bảo vệ trong môi trường quản trị.
               </div>
             </div>
             <div class="toolbar-actions">
@@ -1801,24 +1812,24 @@
           </div>
 
           <div style="background:#F0F7FF; border:1px solid #BAE6FD; border-radius:14px; padding:18px 20px; margin-bottom:20px;">
-            <div style="font-size:13.5px; font-weight:800; color:#0369A1; margin-bottom:4px;">
+            <div style="font-size:13.5px; font-weight:700; line-height:1.3; color:#0369A1; margin-bottom:4px;">
               🔐 Google OAuth 2.0 Client ID
             </div>
             <div style="font-size:12px; color:#0C4A6E; margin-bottom:12px;">
-              Mã xác thực đăng nhập Google chính hãng liên kết tới Google Identity Services:
+              Mã xác thực Google Identity Services:
             </div>
             <div style="display:flex; gap:10px;">
-              <input type="text" id="googleOAuthClientIdInput2" readonly value="725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com" style="flex:1; padding:10px 14px; border:1px solid #7DD3FC; border-radius:10px; font-size:12.5px; font-family:monospace; background:#FFF;">
+              <input type="text" id="googleOAuthClientIdInput2" readonly value="725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com" style="flex:1; padding:10px 14px; border:1px solid #7DD3FC; border-radius:10px; font-size:12.5px; font-family:var(--font-mono); background:#FFF;">
               <button class="btn btn-outline" onclick="navigator.clipboard.writeText('725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com'); showNotification('✓ Đã copy Client ID!');">Copy</button>
             </div>
           </div>
 
           <div style="background:#F0FDF4; border:1px solid #BBF7D0; border-radius:14px; padding:18px 20px;">
-            <div style="font-size:13.5px; font-weight:800; color:#15803D; margin-bottom:4px;">
+            <div style="font-size:13.5px; font-weight:700; line-height:1.3; color:#15803D; margin-bottom:4px;">
               🤖 Google Gemini Cloud AI
             </div>
             <div style="font-size:12px; color:#166534; margin-bottom:12px;">
-              Động cơ AI Đám Mây xử lý tư vấn bán hàng và đạo diễn quay chụp trên Mobile App:
+              Động cơ AI cho Web Bán Hàng và App Camera Copilot:
             </div>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
               <input type="password" id="settingsGeminiKeyDisplay" readonly autocomplete="off" placeholder="Đang dùng GEMINI_API_KEY của Vercel hoặc chưa cấu hình" style="flex:1; min-width:240px; padding:10px 14px; border:1px solid #86EFAC; border-radius:10px; font-size:12.5px; font-family:monospace; background:#FFF;">
@@ -2103,7 +2114,7 @@
           </select>
         </div>
 
-        <div style="font-size:13px; font-weight:800; margin-bottom:12px;">7 Module Tính Năng Ứng Dụng:</div>
+        <div style="font-size:13px; font-weight:700; line-height:1.3; margin-bottom:12px;">7 Module Tính Năng Ứng Dụng:</div>
 
         <div id="drawerModulesList">
           <!-- Dynamically populated module toggles -->
@@ -2163,12 +2174,12 @@
     <div class="modal-card" style="width:720px; max-width:94vw; max-height:92vh; overflow-y:auto; border-radius:18px;">
       <div class="modal-header" style="background:#F5F5F7; border-bottom:1px solid var(--border); padding:16px 20px;">
         <div>
-          <div style="font-size:16px; font-weight:800; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+          <div style="font-size:16px; font-weight:700; line-height:1.3; color:var(--text-main); display:flex; align-items:center; gap:8px;">
             <span style="display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:8px; background:#0071E3; color:#FFF; font-size:14px;">💡</span>
-            Admin Góp Ý &amp; Định Hướng AI (Không Cần Viết Kịch Bản)
+            Admin Góp Ý &amp; Định Hướng AI
           </div>
           <div style="font-size:12px; color:var(--text-secondary); margin-top:2px;">
-            Anh chỉ cần để lại nhận xét, góp ý ngắn hoặc lưu ý nghiệp vụ. AI sẽ tự động học hỏi định hướng này để tự biên soạn câu trả lời thông minh, tự nhiên theo đúng ý anh mà không bị rập khuôn kịch bản!
+            Ghi chú ngắn gọn để AI tự biên soạn câu trả lời tự nhiên theo đúng định hướng.
           </div>
         </div>
         <button class="btn btn-outline" style="padding:4px 10px; border-radius:8px;" onclick="closeAdminCommentModal()">&times;</button>
@@ -2182,7 +2193,7 @@
             <span style="font-size:11px; font-weight:700; color:var(--text-secondary); text-transform:uppercase;">❓ Câu Hỏi Của Khách Hàng:</span>
             <span id="adminCommentCustomerMeta" style="font-size:11.5px; color:var(--text-secondary); font-weight:600;"></span>
           </div>
-          <div id="adminCommentCustomerQuery" style="font-size:14.5px; font-weight:800; color:#1D1D1F; line-height:1.45;"></div>
+          <div id="adminCommentCustomerQuery" style="font-size:14.5px; font-weight:700; color:#1D1D1F; line-height:1.45;"></div>
         </div>
 
         <!-- PREVIOUS AI ANSWER -->
@@ -2225,12 +2236,12 @@
           </label>
           <textarea class="form-control" id="adminCommentOfficialAnswer" rows="5" placeholder="Nhập góp ý, nhận xét hoặc lưu ý nghiệp vụ của anh tại đây... Ví dụ: Khách này mới tập quay thì hướng dẫn họ lấy gói Standard 2.490k cho tiết kiệm, nhắc là trong app có sẵn video hướng dẫn chi tiết từng bước, giọng nhiệt tình, hỏi thêm khách dùng iPhone hay Android..."></textarea>
         </div>
-        <div style="font-size:11.5px; color:#8E8E93; line-height:1.45; background:#F5F5F7; padding:8px 12px; border-radius:8px;">
-          🤖 <strong>Cơ chế tự học thông minh:</strong> AI (Google Gemini) sẽ ghi nhớ góp ý này của anh như một lưu ý nghiệp vụ cốt lõi để tự động sáng tạo câu trả lời linh hoạt, tự nhiên nhất cho các khách hàng tiếp theo mà không bao giờ bị rập khuôn kịch bản máy móc.
+        <div style="font-size:11.5px; color:#6B7280; line-height:1.45; background:#F5F5F7; padding:8px 12px; border-radius:8px;">
+          🤖 <strong>Tự học thông minh:</strong> AI ghi nhớ định hướng này để phản hồi tự nhiên cho các khách hàng tiếp theo.
         </div>
       </div>
       <div class="modal-footer" style="padding:14px 20px; background:#F5F5F7; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-size:11.5px; color:#8E8E93;">✓ Tự động nạp vào bộ nhớ định hướng AI Realtime</span>
+        <span style="font-size:11.5px; color:#6B7280;">✓ Đồng bộ định hướng AI Realtime</span>
         <div style="display:flex; gap:10px;">
           <button class="btn btn-outline" onclick="closeAdminCommentModal()">Hủy Bỏ</button>
           <button class="btn btn-dark" onclick="submitAdminCommentTraining()" style="background:#0071E3; border-color:#0071E3; font-weight:700; padding:8px 18px;">
@@ -2559,13 +2570,13 @@
                 <img src="${p.img || '/shared/img/tflow_pro_main.png'}" alt="${p.name}">
               </div>
               <div>
-                <div style="font-size:14.5px; font-weight:800;">${p.name}</div>
-                <div style="font-size:12px; color:var(--text-secondary);">${p.tagline || p.subtitle || ''}</div>
+                <div style="font-size:14.5px; font-weight:700;">${sanitizeHtml(p.name)}</div>
+                <div style="font-size:12px; color:var(--text-secondary);">${sanitizeHtml(p.tagline || p.subtitle || '')}</div>
                 ${isMvp ? '<span class="badge-mvp">Sản Phẩm Nổi Bật (MVP)</span>' : ''}
               </div>
             </div>
           </td>
-          <td><span style="font-size:12.5px; font-weight:700;">${groupName}</span></td>
+          <td><span style="font-size:12.5px; font-weight:700;">${sanitizeHtml(groupName)}</span></td>
           <td>${colorsHtml}</td>
           <td>
             <div>
@@ -3105,9 +3116,9 @@
           gate.innerHTML = `
             <div style="background:#FFFFFF; border-radius:24px; padding:44px 40px; max-width:440px; width:100%; box-shadow:0 20px 48px rgba(0,0,0,0.12); border:1px solid rgba(0,0,0,0.08); text-align:center;">
               <div style="font-size:40px; margin-bottom:12px;">🚫</div>
-              <div style="font-size:22px; font-weight:800; color:#1D1D1F; margin-bottom:8px;">Quyền Truy Cập Bị Từ Chối</div>
-              <div style="font-size:14px; color:#6E6E73; line-height:1.6; margin-bottom:24px;">
-                Tài khoản <strong>${user.email}</strong> là tài khoản Khách Hàng, không có quyền truy cập Quản Trị Viên.<br><br>
+              <div style="font-size:22px; font-weight:700; line-height:1.3; color:#1D1D1F; margin-bottom:8px;">Quyền Truy Cập Bị Từ Chối</div>
+              <div style="font-size:14px; color:#52525B; line-height:1.6; margin-bottom:24px;">
+                Tài khoản <strong>${sanitizeHtml(user.email)}</strong> là tài khoản Khách Hàng, không có quyền truy cập Quản Trị Viên.<br><br>
                 Chỉ email <strong>thuynguyen2dk4@gmail.com</strong> mới có quyền quản trị T-Flow.
               </div>
               <button onclick="adminLoginWithOneClick('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; padding:14px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:12px;">
@@ -3151,6 +3162,15 @@
     // ==========================================================================
     // ADMIN REVIEWS MODERATION ENGINE
     // ==========================================================================
+    function sanitizeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
     function renderAdminReviewsTable() {
       const tbody = document.getElementById('adminReviewsTableBody');
       const badge = document.getElementById('adminReviewsCountBadge');
@@ -3174,26 +3194,26 @@
         html += `
           <tr>
             <td>
-              <div style="font-weight:700; color:var(--text-main);">${r.author || 'Khách Hàng'}</div>
-              <div style="font-size:11.5px; color:var(--text-secondary);">${r.email || r.date || ''}</div>
-              ${r.verified ? '<span style="font-size:10px; font-weight:700; background:rgba(52,199,89,0.12); color:#28CD41; padding:1px 6px; border-radius:99px;">✓ Mua Chính Hãng</span>' : ''}
+              <div style="font-weight:700; color:var(--text-main);">${sanitizeHtml(r.author || 'Khách Hàng')}</div>
+              <div style="font-size:11.5px; color:var(--text-secondary);">${sanitizeHtml(r.email || r.date || '')}</div>
+              ${r.verified ? '<span style="font-size:11px; font-weight:700; background:rgba(52,199,89,0.12); color:#28CD41; padding:2px 6px; border-radius:99px;">✓ Mua Chính Hãng</span>' : ''}
             </td>
             <td>
               <span style="color:#FFB800; font-size:15px; font-weight:700;">${starsStr}</span>
-              <span style="font-size:12px; font-weight:700; margin-left:4px;">(${r.rating}/5)</span>
+              <span style="font-size:12px; font-weight:700; margin-left:4px;">(${Number(r.rating) || 0}/5)</span>
             </td>
             <td>
-              <span style="font-size:12px; font-weight:600; background:#F5F5F7; padding:4px 8px; border-radius:6px;">${r.package || 'T-Flow Pro'}</span>
+              <span style="font-size:12px; font-weight:600; background:#F5F5F7; padding:4px 8px; border-radius:6px;">${sanitizeHtml(r.package || 'T-Flow Pro')}</span>
             </td>
             <td>
-              <div style="font-weight:700; font-size:13px; color:var(--text-main); margin-bottom:3px;">${r.title || ''}</div>
-              <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.4;">"${r.comment || ''}"</div>
+              <div style="font-weight:700; font-size:13px; color:var(--text-main); margin-bottom:3px;">${sanitizeHtml(r.title || '')}</div>
+              <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.45;">"${sanitizeHtml(r.comment || '')}"</div>
               <div style="margin-top:4px; display:flex; gap:4px; flex-wrap:wrap;">
-                ${(r.tags || []).map(t => `<span style="font-size:10.5px; background:rgba(0,0,0,0.04); color:var(--text-secondary); padding:2px 6px; border-radius:4px;">#${t}</span>`).join('')}
+                ${(r.tags || []).map(t => `<span style="font-size:11px; background:rgba(0,0,0,0.04); color:var(--text-secondary); padding:2px 6px; border-radius:4px;">#${sanitizeHtml(t)}</span>`).join('')}
               </div>
             </td>
             <td style="text-align:right;">
-              <button onclick="handleDeleteReview('${r.id}')" style="background:none; border:1px solid #FF3B30; color:#FF3B30; padding:4px 10px; border-radius:6px; font-size:11.5px; font-weight:600; cursor:pointer;">
+              <button onclick="handleDeleteReview('${sanitizeHtml(r.id)}')" style="background:none; border:1px solid #FF3B30; color:#FF3B30; padding:4px 10px; border-radius:6px; font-size:11.5px; font-weight:600; cursor:pointer;">
                 Xóa
               </button>
             </td>
@@ -3604,7 +3624,7 @@
         container.innerHTML = `
           <div style="text-align:center; padding:48px 20px; background:#F5F5F7; border-radius:14px; border:1px solid var(--border);">
             <div style="font-size:36px; margin-bottom:10px;">🎉</div>
-            <div style="font-size:16px; font-weight:800; color:var(--text-main); margin-bottom:4px;">Không Có Câu Hỏi Nào Chờ Duyệt</div>
+            <div style="font-size:16px; font-weight:700; line-height:1.3; color:var(--text-main); margin-bottom:4px;">Không Có Câu Hỏi Nào Chờ Duyệt</div>
             <div style="font-size:13px; color:var(--text-secondary);">AI đang hoạt động chuẩn xác và trả lời tốt toàn bộ thắc mắc của khách hàng.</div>
           </div>
         `;
@@ -3619,22 +3639,22 @@
           : '<span class="badge-source-web">🌐 Web Bán Hàng</span>';
 
         html += `
-          <div class="ai-pending-card" id="pending_card_${item.id}">
+          <div class="ai-pending-card" id="pending_card_${sanitizeHtml(item.id)}">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
               <div style="display:flex; align-items:center; gap:8px;">
                 ${sourceBadge}
-                <span style="font-size:12px; color:var(--text-secondary);">Thời gian: ${timeStr}</span>
-                <span style="font-size:12px; color:var(--text-secondary);">&bull; Người hỏi: <strong>${item.userName || item.userEmail}</strong></span>
+                <span style="font-size:12px; color:var(--text-secondary);">Thời gian: ${sanitizeHtml(timeStr)}</span>
+                <span style="font-size:12px; color:var(--text-secondary);">• Người hỏi: <strong>${sanitizeHtml(item.userName || item.userEmail)}</strong></span>
               </div>
-              <button onclick="handleIgnorePending('${item.id}')" style="background:none; border:none; font-size:12px; color:#FF3B30; font-weight:700; cursor:pointer;">
+              <button onclick="handleIgnorePending('${sanitizeHtml(item.id)}')" style="background:none; border:none; font-size:12px; color:#FF3B30; font-weight:700; cursor:pointer;">
                 ✕ Bỏ qua câu hỏi này
               </button>
             </div>
 
             <div style="background:#FFF9E6; border:1px solid rgba(230,167,0,0.3); border-radius:8px; padding:12px 16px; margin-bottom:14px;">
-              <div style="font-size:11px; font-weight:800; color:#B45309; text-transform:uppercase; margin-bottom:4px;">CÂU HỎI CẦN TRAINING:</div>
-              <div style="font-size:15px; font-weight:800; color:#1D1D1F;">"${item.query}"</div>
-              <div style="font-size:11.5px; color:#92400E; margin-top:4px;">Lý do chuyển tiếp: ${item.reason}</div>
+              <div style="font-size:11px; font-weight:700; color:#B45309; text-transform:uppercase; margin-bottom:4px;">CÂU HỎI CẦN TRAINING:</div>
+              <div style="font-size:15px; font-weight:700; line-height:1.35; color:#1D1D1F;">"${sanitizeHtml(item.query)}"</div>
+              <div style="font-size:11.5px; color:#92400E; margin-top:4px;">Lý do chuyển tiếp: ${sanitizeHtml(item.reason)}</div>
             </div>
 
             <!-- TRAINING FORM -->
@@ -3749,14 +3769,14 @@
         html += `
           <tr>
             <td>
-              <div style="font-weight:700; font-size:13px; color:var(--text-main);">${item.topic || 'Không tên'}</div>
-              ${item.isOfficial ? '<span style="font-size:10px; color:#34C759; font-weight:700;">✓ Tri Thức Chính Thức</span>' : '<span style="font-size:10px; color:#AF52DE; font-weight:700;">⚡ Đã Huấn Luyện</span>'}
+              <div style="font-weight:700; font-size:13px; color:var(--text-main);">${sanitizeHtml(item.topic || 'Không tên')}</div>
+              ${item.isOfficial ? '<span style="font-size:11px; color:#248A3D; font-weight:700;">✓ Tri Thức Chính Thức</span>' : '<span style="font-size:11px; color:#8944AB; font-weight:700;">⚡ Đã Huấn Luyện</span>'}
             </td>
             <td>${targetBadge}</td>
-            <td style="font-size:12px; color:var(--text-secondary); line-height:1.4;">${kws}</td>
-            <td style="font-size:12px; color:var(--text-main); line-height:1.4;">${summary}</td>
+            <td style="font-size:12px; color:var(--text-secondary); line-height:1.45;">${sanitizeHtml(kws)}</td>
+            <td style="font-size:12px; color:var(--text-main); line-height:1.45;">${sanitizeHtml(summary)}</td>
             <td style="text-align:right;">
-              <button onclick="handleDeleteKnowledge('${item.id}')" style="background:none; border:1px solid #FF3B30; color:#FF3B30; padding:4px 8px; border-radius:6px; font-size:11px; cursor:pointer;">
+              <button onclick="handleDeleteKnowledge('${sanitizeHtml(item.id)}')" style="background:none; border:1px solid #FF3B30; color:#FF3B30; padding:4px 8px; border-radius:6px; font-size:11px; cursor:pointer;">
                 Xóa
               </button>
             </td>

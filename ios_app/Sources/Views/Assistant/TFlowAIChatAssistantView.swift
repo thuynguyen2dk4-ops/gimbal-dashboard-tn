@@ -6,22 +6,20 @@
 //
 
 import SwiftUI
-import UIKit
-
-// MARK: - =====================================================================
-// 16. TAB 3: T-FLOW BOT CHAT VIEW (AI COPILOT)
-// =====================================================================
 
 struct TFlowAIChatAssistantView: View {
+    @EnvironmentObject var ble: BLEGimbalManager
+    @EnvironmentObject var camera: CameraService
+
     @State private var messages: [ChatMessage] = [
         ChatMessage(
             isUser: false,
-            text: "Chào anh Thủy! Em là T-Flow Bot — Trợ lý AI đồng hành cùng Smart Gimbal S1 Titanium. Em có thể hướng dẫn anh các kỹ thuật quay điện ảnh, bật Apple Log 4K/60, hiệu chuẩn động cơ FOC hoặc đồng bộ dữ liệu với Web Admin!"
+            text: "Xin chào! T-Flow AI sẵn sàng hỗ trợ quay, cân bằng CoG và setup gimbal."
         )
     ]
     @State private var inputText: String = ""
 
-    let quickChips = [
+    private let quickChips = [
         "Quay Inception 360°",
         "Cài đặt Apple Log 4K/60",
         "Cân bằng trọng tâm CoG",
@@ -29,59 +27,27 @@ struct TFlowAIChatAssistantView: View {
         "Ngàm MagSafe 45N N52"
     ]
 
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                // Quick Chips Row
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(quickChips, id: \.self) { chip in
-                            Button(action: {
-                                sendMessage(chip)
-                            }) {
-                                Text(chip)
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 7)
-                                    .background(Color.white.opacity(0.08))
-                                    .foregroundColor(.white)
-                                    .clipShape(Capsule())
-                            }
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                }
-                .background(Color(red: 0.07, green: 0.07, blue: 0.09))
+    private let goldAccent = Color(red: 0.98, green: 0.72, blue: 0.10)
+    private let appleBlue = Color(red: 0.23, green: 0.51, blue: 0.96)
 
-                // Chat Messages List
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
                 ScrollViewReader { proxy in
                     ScrollView {
-                        LazyVStack(spacing: 14) {
+                        LazyVStack(spacing: 12) {
                             ForEach(messages) { msg in
-                                HStack(alignment: .top, spacing: 10) {
-                                    if msg.isUser {
-                                        Spacer()
-                                        Text(msg.text)
-                                            .font(.system(size: 14))
-                                            .foregroundColor(.white)
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 10)
-                                            .background(Color(red: 0.0, green: 0.48, blue: 1.0))
-                                            .clipShape(RoundedRectangle(cornerRadius: 18))
-                                            .frame(maxWidth: 280, alignment: .trailing)
-                                    } else {
-                                        TFlowBrandLogo(size: 26)
-                                        Text(msg.text)
-                                            .font(.system(size: 14))
-                                            .foregroundColor(.white)
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 10)
-                                            .background(Color.white.opacity(0.08))
-                                            .clipShape(RoundedRectangle(cornerRadius: 18))
-                                            .frame(maxWidth: 290, alignment: .leading)
-                                        Spacer()
-                                    }
+                                HStack {
+                                    if msg.isUser { Spacer(minLength: 48) }
+                                    Text(msg.text)
+                                        .font(.system(size: 13))
+                                        .foregroundColor(msg.isUser ? .white : .primary)
+                                        .padding(12)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 14)
+                                                .fill(msg.isUser ? appleBlue : Color(UIColor.secondarySystemGroupedBackground))
+                                        )
+                                    if !msg.isUser { Spacer(minLength: 48) }
                                 }
                                 .id(msg.id)
                             }
@@ -89,94 +55,87 @@ struct TFlowAIChatAssistantView: View {
                         .padding(16)
                     }
                     .onChange(of: messages.count) { _ in
-                        if let last = messages.last {
+                        if let lastId = messages.last?.id {
                             withAnimation {
-                                proxy.scrollTo(last.id, anchor: .bottom)
+                                proxy.scrollTo(lastId, anchor: .bottom)
                             }
                         }
                     }
                 }
 
-                Divider().background(Color.white.opacity(0.1))
+                // Quick Prompt Chips
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(quickChips, id: \.self) { chip in
+                            Button {
+                                sendMessage(chip)
+                            } label: {
+                                Text(chip)
+                                    .font(.system(size: 11, weight: .semibold))
+                                    .foregroundColor(.primary)
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 7)
+                                    .background(Capsule().fill(Color(UIColor.secondarySystemGroupedBackground)))
+                                    .overlay(Capsule().stroke(goldAccent.opacity(0.45), lineWidth: 1))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 8)
+                }
 
-                // Input Bar
+                // Input Row
                 HStack(spacing: 10) {
-                    TextField("Hỏi T-Flow Bot về kỹ thuật quay, FOC...", text: $inputText)
+                    TextField("Hỏi T-Flow AI...", text: $inputText)
+                        .textFieldStyle(.plain)
                         .padding(.horizontal, 14)
                         .padding(.vertical, 10)
-                        .background(Color.white.opacity(0.07))
-                        .cornerRadius(20)
-                        .foregroundColor(.white)
+                        .background(RoundedRectangle(cornerRadius: 20).fill(Color(UIColor.secondarySystemGroupedBackground)))
 
-                    Button(action: {
-                        if !inputText.trimmingCharacters(in: .whitespaces).isEmpty {
-                            sendMessage(inputText)
-                            inputText = ""
-                        }
-                    }) {
+                    Button {
+                        let trimmed = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+                        guard !trimmed.isEmpty else { return }
+                        inputText = ""
+                        sendMessage(trimmed)
+                    } label: {
                         Image(systemName: "arrow.up.circle.fill")
                             .font(.system(size: 32))
-                            .foregroundColor(Color(red: 0.98, green: 0.72, blue: 0.10))
+                            .foregroundColor(appleBlue)
                     }
                 }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 14)
                 .padding(.vertical, 10)
-                .background(Color(red: 0.07, green: 0.07, blue: 0.09))
+                .background(Color(UIColor.systemBackground))
             }
-            .background(Color.black.ignoresSafeArea())
-            .navigationTitle("T-Flow Bot")
+            .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
+            .navigationTitle("Trợ Lý T-Flow AI")
             .navigationBarTitleDisplayMode(.inline)
         }
     }
 
     private func sendMessage(_ text: String) {
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         messages.append(ChatMessage(isUser: true, text: text))
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            let reply: String
-            let lower = text.lowercased()
-            if lower.contains("inception") || lower.contains("360") {
-                reply = """
-🎬 Để quay cú máy Inception 360°:
-1. Tại Tab Camera, chọn chế độ '360°' trên thanh Gimbal.
-2. Cầm gimbal nằm ngang hướng thẳng vào chủ thể.
-3. Gạt cần Joystick ảo sang trái hoặc phải để trục Roll xoay tròn 360° liên tục không điểm dừng!
-"""
-            } else if lower.contains("apple log") || lower.contains("4k/60") || lower.contains("prores") {
-                reply = """
-🎥 Cài đặt Apple Log 4K/60fps:
-1. Bật nút 'PRO' trên thanh HUD đỉnh máy ảnh.
-2. Chọn không gian màu 'Apple Log (Flat)'.
-3. ISO cố định ở mức 100, góc mở màn trập 180° (1/120s) để đạt dải nhạy sáng dynamic range 14+ stops tối đa!
-"""
-            } else if lower.contains("cog") || lower.contains("cân bằng") || lower.contains("trọng tâm") {
-                reply = """
-⚖️ Tự động cân bằng CoG:
-1. Chuyển sang Tab 'T-Flow Pro'.
-2. Nhấn nút 'Tự Động Cân Bằng Trọng Tâm (CoG)'.
-3. Đặt gimbal đứng yên trong 2 giây để thuật toán FOC quét và triệt tiêu rung sai số ±0.01°.
-"""
-            } else if lower.contains("magsafe") || lower.contains("45n") || lower.contains("n52") || lower.contains("ngàm") || lower.contains("nam châm") {
-                reply = """
-🧲 Hệ thống ngàm MagSafe Snap-Lock Ultra-Hold:
-• Sử dụng 32 lõi nam châm vĩnh cửu Neodymium N52 lực hút định danh 45N (tương đương chịu tải 2.8kg - 4.5kg).
-• Cơ chế khóa chốt cơ học kép Snap-Lock chống văng điện thoại khi chạy bộ, quay thể thao hay lia máy tốc độ cao.
-• Tương thích trực tiếp iPhone 12–16 Pro Max (không cần kẹp siết) và Android qua vòng từ tính siêu mỏng tặng kèm!
-"""
-            } else if lower.contains("báo giá") || lower.contains("gói") || lower.contains("giá") || lower.contains("cấu hình") {
-                reply = """
-📦 Bảng giá 4 cấu hình T-Flow Pro chính hãng:
-• Standard Edition — 2.490.000₫ (Gimbal FOC 20kHz, ngàm MagSafe 45N N52, mini tripod)
-• Creator Kit — 3.190.000₫ (Thêm đèn Fill Light RGB CRI 96+ & túi chống sốc EVA)
-• Cinematic Pro — 3.990.000₫ (Thêm Micro kép 2.4GHz chống ồn AI & tạ đối trọng Pro Max)
-• Master Edition — 5.490.000₫ (Full phụ kiện, vali nhôm hàng không & khóa học MasterClass)
-"""
-            } else {
-                reply = "Dạ em đã ghi nhận yêu cầu của anh. Gimbal S1 Pro của anh đang hoạt động ở trạng thái hoàn hảo với tần số FOC 20kHz và pin 94%!"
-            }
+        let reply = generateReply(for: text)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             messages.append(ChatMessage(isUser: false, text: reply))
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        }
+    }
+
+    private func generateReply(for text: String) -> String {
+        let lower = text.lowercased()
+        if lower.contains("inception") || lower.contains("360") {
+            return "• Chế độ: 360° Spin • 4K 60fps\n• Khuyên dùng: Bật Pro HUD + Zoom 1x\n• Di chuyển chậm giữ trục thẳng."
+        } else if lower.contains("apple log") || lower.contains("4k/60") || lower.contains("prores") {
+            return "• Định dạng: 4K 60fps • Shutter 1/120s\n• Màu: Apple Log + LUT Rec.709\n• Bật Zebra 95% kiểm tra vùng sáng."
+        } else if lower.contains("cog") || lower.contains("cân bằng") || lower.contains("trọng tâm") {
+            return "• Gắn máy vào tâm ngàm trước khi bật\n• Vào Gimbal Hub -> Cân bằng CoG\n• Giữ máy đứng yên 3 giây."
+        } else if lower.contains("magsafe") || lower.contains("45n") || lower.contains("n52") || lower.contains("ngàm") || lower.contains("nam châm") {
+            return "• Lực hút N52 45N tải tối đa 320g\n• Khớp vòng tròn thép sau ốp mỏng\n• Siết an toàn khi chạy tốc độ cao."
+        } else if lower.contains("báo giá") || lower.contains("gói") || lower.contains("giá") || lower.contains("cấu hình") {
+            return "• Free Starter: 0₫ (1080p • Basic)\n• Creator Pro: 299.000₫/tháng (4K • AI)\n• VIP Lifetime: Mở khóa 7 module."
+        } else {
+            return "• Kết nối BLE: \(ble.isConnected ? "Đã ghép đôi" : "Chưa kết nối")\n• Chế độ hiện tại: \(camera.isProMode ? "Chuyên Nghiệp" : "Cơ Bản") • \(camera.selectedAspectRatio)"
         }
     }
 }

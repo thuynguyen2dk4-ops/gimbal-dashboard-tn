@@ -17,13 +17,21 @@ struct SmartGimbalApp: App {
     @StateObject private var ble = BLEGimbalManager()
     @StateObject private var camera = CameraService()
 
+    private var resolvedColorScheme: ColorScheme? {
+        switch camera.uiThemeMode {
+        case "light": return .light
+        case "auto": return nil
+        default: return .dark
+        }
+    }
+
     var body: some Scene {
         WindowGroup {
             MainTabShellView()
                 .environmentObject(store)
                 .environmentObject(ble)
                 .environmentObject(camera)
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(resolvedColorScheme)
         }
     }
 }

@@ -8,7 +8,8 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&subset=vietnamese&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -17,8 +18,8 @@
       --border: rgba(0, 0, 0, 0.08);
       --border-hover: rgba(0, 0, 0, 0.16);
       --text-main: #1D1D1F;
-      --text-secondary: #6E6E73;
-      --text-muted: #86868B;
+      --text-secondary: #52525B;
+      --text-muted: #6B7280;
       --accent: #1D1D1F;
       --link: #0071E3;
       --green: #28A745;
@@ -29,7 +30,7 @@
       --radius-md: 14px;
       --radius-lg: 20px;
       --radius-full: 9999px;
-      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --font-mono: "JetBrains Mono", monospace;
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -37,10 +38,14 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: var(--font);
+      font-kerning: normal;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: 0;
+      line-height: 1.55;
       background-color: var(--bg);
       color: var(--text-main);
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -67,9 +72,10 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      font-weight: 800;
+      font-weight: 700;
       font-size: 16px;
-      letter-spacing: -0.02em;
+      line-height: 1.3;
+      letter-spacing: 0;
     }
     .brand-mark {
       width: 28px;
@@ -80,7 +86,7 @@
       display: grid;
       place-items: center;
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 700;
     }
     .nav-actions {
       display: flex;
@@ -196,15 +202,35 @@
     }
     .page-title {
       font-size: 28px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 6px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
+      margin-bottom: 8px;
     }
     .page-sub {
-      font-size: 14.5px;
+      font-size: 14px;
       color: var(--text-secondary);
       max-width: 650px;
       line-height: 1.5;
+    }
+    .status-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .status-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 11px;
+      border-radius: var(--radius-full);
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.3;
     }
 
     /* Cards & Form Layout */
@@ -220,14 +246,17 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
       margin-bottom: 24px;
       padding-bottom: 16px;
       border-bottom: 1px solid rgba(0,0,0,0.05);
     }
     .card-title {
       font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
       display: flex;
       align-items: center;
       gap: 10px;
@@ -317,7 +346,7 @@
       align-items: center;
       justify-content: center;
       font-size: 28px;
-      font-weight: 800;
+      font-weight: 700;
       box-shadow: var(--shadow-sm);
       flex-shrink: 0;
       overflow: hidden;
@@ -359,8 +388,9 @@
     }
     .avatar-info-col h3 {
       font-size: 19px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
       margin-bottom: 4px;
     }
     .avatar-info-col p {
@@ -515,7 +545,8 @@
     }
     .footer-brand-title {
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 700;
+      line-height: 1.3;
       color: #FFFFFF;
       margin-bottom: 12px;
     }
@@ -583,6 +614,7 @@
       .page-header-box div:last-child {
         width: 100% !important;
         display: flex !important;
+        flex-wrap: wrap !important;
         gap: 8px !important;
       }
       .page-header-box div:last-child .btn {
@@ -618,12 +650,11 @@
           <path d="M 50 34 L 50 82" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" />
         </svg>
       </div>
-      <span>T-Flow ID &mdash; Cài Đặt Hồ Sơ</span>
+      <span>T-Flow ID &bull; Hồ Sơ</span>
     </div>
     <div class="nav-actions">
-      
       <a href="/account" class="btn-nav-link">&larr; Cổng Khách Hàng</a>
-      <a href="/" class="btn-nav-link">Trang Chủ</a>
+      <a href="/" class="btn-nav-link">🛍️ Web Shop</a>
       <button class="btn btn-outline" style="font-size:12.5px;" onclick="handleLogout()">Đăng Xuất</button>
     </div>
   </header>
@@ -631,23 +662,26 @@
   <div class="container">
     <!-- Breadcrumb -->
     <div class="breadcrumb-row">
-      <a href="/">Trang Chủ</a>
+      <a href="/">Web Shop</a>
       <span>&rsaquo;</span>
-      <a href="/account">Cổng Khách Hàng (T-Flow ID)</a>
+      <a href="/account">T-Flow ID</a>
       <span>&rsaquo;</span>
-      <span style="color:var(--text-main); font-weight:700;">Chỉnh Sửa Hồ Sơ Cá Nhân</span>
+      <span style="color:var(--text-main); font-weight:700;">Hồ Sơ Cá Nhân</span>
     </div>
 
     <!-- Page Header -->
     <div class="page-header-box">
       <div>
         <h1 class="page-title">Hồ Sơ Cá Nhân &amp; Bảo Hành</h1>
-        <p class="page-sub">
-          Cập nhật thông tin định danh, số điện thoại kích hoạt bảo hành điện tử 1 đổi 1, địa chỉ nhận hàng và cấu hình thiết bị gimbal của bạn.
-        </p>
+        <div class="status-tags-row">
+          <span class="status-tag">🛡️ Bảo hành 1 đổi 1</span>
+          <span class="status-tag">📱 Đồng bộ T-Flow</span>
+          <span class="status-tag">📦 Địa chỉ giao nhận</span>
+        </div>
       </div>
-      <div style="display:flex; gap:10px;">
-        <a href="/account" class="btn btn-outline">&larr; Hủy Bỏ</a>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+        <a href="/" class="btn btn-outline" style="font-size:13px;">🛍️ Web Shop</a>
+        <a href="/account" class="btn btn-outline" style="font-size:13px;">&larr; Hủy</a>
         <button type="button" class="btn btn-dark" onclick="saveProfileChanges()">
           <span>💾</span> Lưu Thay Đổi
         </button>
@@ -676,63 +710,61 @@
               <span>&bull;</span>
               <span class="badge-google">
                 <svg width="14" height="14" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-                Xác Thực Google Account
+                Google Verified
               </span>
               <span>&bull;</span>
-              <span>Gia nhập: <span id="displayHeaderMemberSince">Tháng 01/2025</span></span>
+              <span>Từ <span id="displayHeaderMemberSince">01/2025</span></span>
             </p>
             <div style="font-size:12px; color:var(--text-secondary); display:flex; align-items:center; gap:6px;">
-              <span>💡 Nhấp vào ảnh hoặc bấm nút bên phải để tải ảnh chân dung của bạn (JPG, PNG, WebP).</span>
+              <span>📷 Bấm ảnh để tải chân dung (JPG, PNG, WebP)</span>
             </div>
           </div>
           <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
             <input type="file" id="avatarFileInput" accept="image/png, image/jpeg, image/webp, image/gif" style="display:none;" onchange="handleAvatarFileSelect(event)">
             <div style="display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;">
               <button type="button" class="btn btn-dark" style="font-size:12.5px; padding:7px 15px; border-radius:99px; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.12);" onclick="document.getElementById('avatarFileInput').click()">
-                <span>📷</span> Thay Ảnh Avatar
+                <span>📷</span> Đổi Ảnh
               </button>
               <button type="button" class="btn btn-outline" id="btnResetAvatar" style="font-size:12px; padding:7px 12px; border-radius:99px; color:var(--text-secondary);" onclick="resetAvatarToInitial()" title="Xóa ảnh và dùng chữ cái tên">
-                ✕ Dùng Ký Tự
+                ✕ Ký Tự
               </button>
             </div>
-            <span id="avatarFileSizeNote" style="font-size:11px; color:var(--text-secondary);">Tối đa 15MB • Tự động nén sắc nét</span>
+            <span id="avatarFileSizeNote" style="font-size:11.5px; color:var(--text-secondary);">Tối đa 15MB &bull; Tự động nén</span>
           </div>
         </div>
 
         <div class="card-title-row">
-          <div>
-            <div class="card-title">👤 Thông Tin Cá Nhân &amp; Liên Lạc</div>
-            <div class="card-sub">Thông tin cơ bản hiển thị trên hệ thống và sử dụng khi bảo hành chính hãng.</div>
-          </div>
+          <div class="card-title">👤 Định Danh &amp; Liên Hệ</div>
+          <span class="status-tag" style="color:#248A3D; background:rgba(40,167,69,0.08); border-color:rgba(40,167,69,0.2);">✓ Phiếu bảo hành</span>
         </div>
 
         <div class="form-grid-2">
           <!-- Họ và tên -->
           <div class="form-group">
-            <label for="inputName">Họ và Tên Đầy Đủ *</label>
+            <label for="inputName">Họ và Tên *</label>
             <input type="text" class="form-control" id="inputName" placeholder="Ví dụ: Anh Thủy Nguyễn" required>
-            <div class="helper-text">Tên của bạn được in trên chứng thư bảo hành điện tử T-Flow.</div>
+            <div class="helper-text">In trên chứng thư bảo hành điện tử.</div>
           </div>
 
           <!-- Số điện thoại -->
           <div class="form-group">
-            <label for="inputPhone">Số Điện Thoại Liên Hệ (SĐT) *</label>
+            <label for="inputPhone">Số Điện Thoại *</label>
             <input type="tel" class="form-control" id="inputPhone" placeholder="Ví dụ: 0908 123 456" required>
-            <div class="helper-text" style="color:#0071E3;">Dùng để tra cứu bảo hành điện tử 1 đổi 1 và nhận tin nhắn mã OTP.</div>
+            <div class="helper-text" style="color:#0071E3;">Tra cứu bảo hành 1 đổi 1 &amp; OTP.</div>
           </div>
 
           <!-- Email -->
           <div class="form-group">
-            <label for="inputEmail">Địa Chỉ Email Tài Khoản</label>
+            <label for="inputEmail">Email Tài Khoản</label>
             <input type="email" class="form-control" id="inputEmail" readonly>
-            <div class="helper-text">Email được khóa cố định theo tài khoản Google OAuth bảo mật.</div>
+            <div class="helper-text">Cố định theo Google OAuth.</div>
           </div>
 
           <!-- Lĩnh vực sáng tạo -->
           <div class="form-group">
-            <label for="inputJobTitle">Lĩnh Vực Hoạt Động / Nghề Nghiệp</label>
-            <input type="text" class="form-control" id="inputJobTitle" placeholder="Ví dụ: Filmmaker / Content Creator / Nhiếp Ảnh Gia">
-            <div class="helper-text">Giúp đội ngũ T-Flow hỗ trợ tùy chỉnh thông số động cơ FOC tối ưu.</div>
+            <label for="inputJobTitle">Nghề Nghiệp / Lĩnh Vực</label>
+            <input type="text" class="form-control" id="inputJobTitle" placeholder="Filmmaker / Content Creator">
+            <div class="helper-text">Tối ưu thông số động cơ FOC.</div>
           </div>
 
           <!-- Tổ chức -->
@@ -765,10 +797,8 @@
       <!-- CARD 2: SHIPPING & WARRANTY ADDRESS -->
       <div class="card">
         <div class="card-title-row">
-          <div>
-            <div class="card-title">📦 Địa Chỉ Nhận Hàng &amp; Đổi Mới Bảo Hành</div>
-            <div class="card-sub">Địa chỉ gửi linh kiện thay thế, phụ kiện MagSafe hoặc nhận bảo hành tận nơi.</div>
-          </div>
+          <div class="card-title">📦 Địa Chỉ Nhận Hàng &amp; Bảo Hành</div>
+          <span class="status-tag">🚚 Giao nhận tận nơi</span>
         </div>
 
         <div class="form-grid-2">
@@ -812,16 +842,14 @@
       <!-- CARD 3: HARDWARE ECOSYSTEM & CAMERA SETUP -->
       <div class="card">
         <div class="card-title-row">
-          <div>
-            <div class="card-title">🎥 Hệ Sinh Thái Phần Cứng &amp; Thiết Bị Quay Phim</div>
-            <div class="card-sub">Cấu hình thông số thiết bị gimbal thực tế giúp hệ thống cá nhân hóa profile động cơ FOC.</div>
-          </div>
+          <div class="card-title">🎥 Thiết Bị Gimbal &amp; Camera</div>
+          <span class="status-tag">⚙️ Profile FOC</span>
         </div>
 
         <div class="form-grid-2">
           <!-- Dòng thiết bị gimbal -->
           <div class="form-group">
-            <label for="inputDeviceModel">Model Gimbal Đang Sử Dụng</label>
+            <label for="inputDeviceModel">Model Gimbal</label>
             <select class="form-control" id="inputDeviceModel">
               <option value="T-Flow Pro (TF-G31-PRO)">T-Flow Pro (TF-G31-PRO — Flagship)</option>
               <option value="T-Flow S1 Titanium">T-Flow S1 Titanium (3 Trục Chuẩn Flagship)</option>
@@ -834,16 +862,16 @@
 
           <!-- Mã serial điện tử -->
           <div class="form-group">
-            <label for="inputSerial">Mã Serial Điện Tử (E-Serial)</label>
+            <label for="inputSerial">Mã Serial (E-Serial)</label>
             <input type="text" class="form-control" id="inputSerial" placeholder="TF-G31-PRO-XXXX" style="font-family:var(--font-mono); text-transform:uppercase;">
-            <div class="helper-text">In dưới đáy tay cầm hoặc xem trong App T-Flow iOS mục Bluetooth.</div>
+            <div class="helper-text">Xem dưới tay cầm hoặc App T-Flow.</div>
           </div>
 
           <!-- Thiết bị gắn kèm -->
           <div class="form-group full-width">
-            <label for="inputCameraSetup">Combo Thiết Bị Quay Phim Thường Dùng (Camera Rig)</label>
-            <input type="text" class="form-control" id="inputCameraSetup" placeholder="Ví dụ: iPhone 16 Pro Max + FilMic Pro + Cage Kim Loại + Ngàm MagSafe 2.8kg">
-            <div class="helper-text">Hệ thống AI Consultant sẽ tự động tư vấn đối trọng và thông số cân bằng hoàn hảo.</div>
+            <label for="inputCameraSetup">Combo Camera Rig</label>
+            <input type="text" class="form-control" id="inputCameraSetup" placeholder="Ví dụ: iPhone 16 Pro Max + Cage + Ngàm MagSafe">
+            <div class="helper-text">AI gợi ý đối trọng &amp; cân bằng tối ưu.</div>
           </div>
         </div>
       </div>
@@ -851,16 +879,14 @@
       <!-- CARD 4: PREFERENCES & SECURITY -->
       <div class="card">
         <div class="card-title-row">
-          <div>
-            <div class="card-title">⚙️ Tùy Chọn Thông Báo &amp; Bảo Mật</div>
-            <div class="card-sub">Quản lý cách T-Flow liên lạc và cập nhật thông số hệ thống với bạn.</div>
-          </div>
+          <div class="card-title">⚙️ Thông Báo &amp; Đồng Bộ</div>
+          <span class="status-tag">🔔 OTA &amp; BLE</span>
         </div>
 
         <div class="switch-row">
           <div class="switch-text">
-            <h4>Thông Báo Cập Nhật Firmware OTA Qua Email &amp; SMS</h4>
-            <p>Nhận thông báo sớm nhất khi có bản vá vi điều khiển STM32 và thuật toán chống rung mới</p>
+            <h4>Cập Nhật Firmware OTA</h4>
+            <p>Nhận thông báo bản vá STM32 &amp; chống rung mới</p>
           </div>
           <label class="switch">
             <input type="checkbox" id="checkNotifyFirmware" checked>
@@ -870,8 +896,8 @@
 
         <div class="switch-row">
           <div class="switch-text">
-            <h4>Đồng Bộ Tự Động 7 Module Tính Năng iOS</h4>
-            <p>Tự động tải cấu hình 3D LUT và bảng quyền module xuống ứng dụng iOS khi kết nối BLE</p>
+            <h4>Tự Động Đồng Bộ 7 Module iOS</h4>
+            <p>Đồng bộ 3D LUT &amp; quyền module qua BLE</p>
           </div>
           <label class="switch">
             <input type="checkbox" id="checkAutoSyncModules" checked>
@@ -881,8 +907,8 @@
 
         <div class="switch-row">
           <div class="switch-text">
-            <h4>Thông Báo Ưu Đãi Phụ Kiện Chính Hãng T-Flow VIP</h4>
-            <p>Nhận mã giảm giá độc quyền cho ngàm MagSafe, chân tripod carbon và tay nối dài</p>
+            <h4>Ưu Đãi Phụ Kiện T-Flow VIP</h4>
+            <p>Mã giảm giá ngàm MagSafe &amp; tripod carbon</p>
           </div>
           <label class="switch">
             <input type="checkbox" id="checkNotifyPromo" checked>
@@ -920,7 +946,7 @@
         <div class="footer-col">
           <div class="footer-brand-title">T-Flow Enterprise</div>
           <p class="footer-col-desc">
-            Hệ sinh thái thiết bị ổn định 3 trục chuẩn điện ảnh cho iPhone và máy ảnh di động. Đổi mới sáng tạo với động cơ FOC 20kHz và trải nghiệm phần mềm chuẩn Apple.
+            Hệ sinh thái gimbal 3 trục FOC 20kHz &amp; AI Vision chuẩn điện ảnh.
           </p>
         </div>
         <div class="footer-col">
@@ -935,7 +961,7 @@
         <div class="footer-col">
           <div class="footer-col-title">Phần Mềm &amp; Hệ Thống</div>
           <ul class="footer-links-list">
-            <li><a href="/">Ứng Dụng T-Flow iOS</a></li>
+            <li><a href="/">Tải App T-Flow (iOS &amp; Android)</a></li>
             <li><a href="/account">Cổng Khách Hàng (T-Flow ID)</a></li>
             <li><a href="/profile">Chỉnh Sửa Hồ Sơ Cá Nhân</a></li>
             <li><a href="/account">Bảo Hành Điện Tử 1 Đổi 1</a></li>
@@ -1055,15 +1081,23 @@
 
     let currentAvatarValue = '';
 
+    function sanitizeAvatarUrl(val) {
+      return String(val || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
     function renderAvatarDisplay(avatarVal, userName) {
       const container = document.getElementById('profileAvatarContent');
       if (!container) return;
       const initial = (userName || 'K').trim().charAt(0).toUpperCase() || 'A';
       
-      if (avatarVal && (avatarVal.startsWith('data:image') || avatarVal.startsWith('http') || avatarVal.startsWith('/'))) {
-        container.innerHTML = `<img src="${avatarVal}" alt="Avatar" class="avatar-img-view">`;
+      if (avatarVal && (avatarVal.startsWith('data:image/') || avatarVal.startsWith('https://') || avatarVal.startsWith('http://') || avatarVal.startsWith('/'))) {
+        container.innerHTML = `<img src="${sanitizeAvatarUrl(avatarVal)}" alt="Avatar" class="avatar-img-view">`;
       } else {
-        container.innerHTML = `<span style="font-size:28px; font-weight:800; line-height:1;">${avatarVal || initial}</span>`;
+        container.innerHTML = '';
+        const span = document.createElement('span');
+        span.style.cssText = 'font-size:28px; font-weight:700; line-height:1;';
+        span.textContent = avatarVal || initial;
+        container.appendChild(span);
       }
     }
 

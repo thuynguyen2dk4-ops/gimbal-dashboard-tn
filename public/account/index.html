@@ -10,7 +10,8 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&subset=vietnamese&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -19,8 +20,8 @@
       --border: rgba(0, 0, 0, 0.08);
       --border-hover: rgba(0, 0, 0, 0.16);
       --text-main: #1D1D1F;
-      --text-secondary: #6E6E73;
-      --text-muted: #86868B;
+      --text-secondary: #52525B;
+      --text-muted: #6B7280;
       --accent: #1D1D1F;
       --link: #0071E3;
       --green: #28A745;
@@ -31,7 +32,7 @@
       --radius-md: 14px;
       --radius-lg: 20px;
       --radius-full: 9999px;
-      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --font-mono: "JetBrains Mono", monospace;
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -39,10 +40,14 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: var(--font);
+      font-kerning: normal;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: 0;
+      line-height: 1.55;
       background-color: var(--bg);
       color: var(--text-main);
-      line-height: 1.5;
-      -webkit-font-smoothing: antialiased;
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -70,8 +75,9 @@
       align-items: center;
       gap: 10px;
       font-size: 16px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
     }
     .brand-mark {
       width: 28px;
@@ -81,7 +87,7 @@
       color: #FFF;
       display: grid;
       place-items: center;
-      font-weight: 800;
+      font-weight: 700;
       font-size: 14px;
     }
     .nav-actions {
@@ -157,20 +163,41 @@
       color: #FFF;
       display: grid;
       place-items: center;
-      font-weight: 800;
+      font-weight: 700;
       font-size: 20px;
       margin: 0 auto 16px auto;
     }
     .auth-gate-title {
-      font-size: 22px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
       margin-bottom: 6px;
     }
     .auth-gate-sub {
       font-size: 13.5px;
       color: var(--text-secondary);
       line-height: 1.5;
+    }
+    .auth-perks-pills {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .perk-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.3;
     }
 
     .auth-tabs {
@@ -183,7 +210,7 @@
       text-align: center;
       padding: 12px 0;
       font-size: 14.5px;
-      font-weight: 700;
+      font-weight: 600;
       color: var(--text-secondary);
       border: none;
       background: transparent;
@@ -192,7 +219,7 @@
     }
     .auth-tab-btn.active {
       color: var(--text-main);
-      font-weight: 800;
+      font-weight: 700;
     }
     .auth-tab-btn.active::after {
       content: '';
@@ -270,11 +297,16 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 20px;
+      gap: 12px;
     }
     .card-title {
       font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     /* User Profile Card (iOS App Style) */
@@ -300,7 +332,7 @@
       align-items: center;
       justify-content: center;
       font-size: 24px;
-      font-weight: 800;
+      font-weight: 700;
       box-shadow: var(--shadow-sm);
       overflow: hidden;
       position: relative;
@@ -308,8 +340,9 @@
     }
     .profile-name {
       font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      line-height: 1.3;
+      letter-spacing: 0;
       margin-bottom: 4px;
     }
     .profile-meta {
@@ -407,7 +440,8 @@
     }
     .device-stat-val {
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 700;
+      line-height: 1.3;
     }
 
     /* Layout 2 Columns for Sliders & LUT */
@@ -502,9 +536,10 @@
     }
     .footer-brand-title {
       font-size: 17px;
-      font-weight: 800;
+      font-weight: 700;
+      line-height: 1.3;
       color: #FFFFFF;
-      letter-spacing: -0.01em;
+      letter-spacing: 0;
       margin-bottom: 12px;
     }
     .footer-col-desc {
@@ -644,8 +679,8 @@
         line-height: 1.2 !important;
       }
       .tier-badge {
-        font-size: 10px !important;
-        padding: 2px 7px !important;
+        font-size: 11px !important;
+        padding: 3px 8px !important;
         white-space: nowrap !important;
       }
       .profile-meta {
@@ -687,7 +722,7 @@
       }
       #modulesSyncStatus {
         align-self: flex-start !important;
-        font-size: 10px !important;
+        font-size: 11px !important;
         padding: 3px 8px !important;
       }
 
@@ -720,10 +755,10 @@
           <path d="M 50 34 L 50 82" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round" />
         </svg>
       </div>
-      <span>T-Flow ID &mdash; Cổng Khách Hàng</span>
+      <span>T-Flow ID</span>
     </div>
     <div class="nav-actions">
-      <a href="/" class="btn-nav-link">Trang Chủ</a>
+      <a href="/" class="btn-nav-link">🛍️ Web Shop</a>
       <a href="/admin" class="btn-nav-link" id="navAdminCmsBtn" style="display:none; color:#FFF; background:#1D1D1F; font-weight:700;">⚙️ Admin CMS</a>
       <button class="btn btn-outline" id="btnSwitchAccount" style="font-size:12.5px; display:none;" onclick="logoutUser()">Đăng Xuất</button>
     </div>
@@ -740,66 +775,69 @@
           </svg>
         </div>
         <h1 class="auth-gate-title">T-Flow ID</h1>
-        <p class="auth-gate-sub">
-          Vui lòng đăng nhập hoặc tạo tài khoản để quản lý thiết bị, kích hoạt bảo hành điện tử 12 tháng và đồng bộ 7 module tính năng.
-        </p>
+        <p class="auth-gate-sub">Quản lý thiết bị &amp; đồng bộ hệ sinh thái T-Flow.</p>
+        <div class="auth-perks-pills">
+          <span class="perk-pill">🛡️ Bảo hành 24T</span>
+          <span class="perk-pill">📱 Đồng bộ T-Flow</span>
+          <span class="perk-pill">📦 Theo dõi đơn</span>
+        </div>
       </div>
 
             <div class="auth-tabs">
         <button class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthTab('login')">Đăng Nhập</button>
-        <button class="auth-tab-btn" id="tabBtnRegister" onclick="switchAuthTab('register')">Đăng Ký Tài Khoản</button>
+        <button class="auth-tab-btn" id="tabBtnRegister" onclick="switchAuthTab('register')">Đăng Ký</button>
       </div>
       <!-- 1. FORM ĐĂNG NHẬP (CHUẨN HÓA BÌNH THƯỜNG + CƠ CHẾ GOOGLE) -->
       <form id="loginForm" onsubmit="return handleLoginSubmit(event)">
         <div class="form-group">
-          <label>Email Hoặc Số Điện Thoại</label>
-          <input type="text" class="form-control" id="loginEmail" autocomplete="username" placeholder="ví dụ: khachhang@gmail.com hoặc 0908888888">
+          <label>Email hoặc SĐT</label>
+          <input type="text" class="form-control" id="loginEmail" autocomplete="username" placeholder="name@gmail.com hoặc 090...">
         </div>
         <div class="form-group">
-          <label>Mật Khẩu</label>
-          <input type="password" class="form-control" id="loginPassword" autocomplete="current-password" placeholder="Nhập mật khẩu của bạn">
+          <label>Mật khẩu</label>
+          <input type="password" class="form-control" id="loginPassword" autocomplete="current-password" placeholder="Nhập mật khẩu">
         </div>
 
-        <button type="submit" class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:8px;">Đăng Nhập Vào Cổng Khách Hàng</button>
+        <button type="submit" class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:8px;">Đăng Nhập</button>
 
         <!-- DIVIDER HOẶC TIẾP TỤC VỚI GOOGLE -->
         <div style="display:flex; align-items:center; gap:12px; margin:20px 0 16px 0;">
           <div style="flex:1; height:1px; background:var(--border);"></div>
-          <span style="font-size:12px; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">hoặc tiếp tục với</span>
+          <span style="font-size:12px; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">hoặc</span>
           <div style="flex:1; height:1px; background:var(--border);"></div>
         </div>
 
         <!-- REAL GOOGLE OAUTH SIGN-IN BUTTON -->
         <button type="button" onclick="loginWithGoogleOAuth()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:10px; padding:12px 16px; background:#FFFFFF; border:1px solid #747775; border-radius:12px; font-size:14px; font-weight:600; color:#1F1F1F; cursor:pointer; box-shadow:0 1px 2px rgba(0,0,0,0.06); transition:background 0.2s;">
           <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-          Đăng nhập bằng tài khoản Google
+          Tiếp tục với Google
         </button>
       </form>
 
       <!-- 2. FORM ĐĂNG KÝ TÀI KHOẢN (CHUẨN HÓA BÌNH THƯỜNG) -->
       <form id="registerForm" style="display:none;" onsubmit="return handleRegisterSubmit(event)">
         <div class="form-group">
-          <label>Họ và Tên</label>
-          <input type="text" class="form-control" id="regName" autocomplete="name" placeholder="Ví dụ: Lê Minh Hoàng">
+          <label>Họ và tên</label>
+          <input type="text" class="form-control" id="regName" autocomplete="name" placeholder="Nguyễn Minh Hoàng">
         </div>
         <div class="form-group">
-          <label>Địa Chỉ Email</label>
-          <input type="email" class="form-control" id="regEmail" autocomplete="email" placeholder="hoang.film@gmail.com">
+          <label>Email</label>
+          <input type="email" class="form-control" id="regEmail" autocomplete="email" placeholder="name@gmail.com">
         </div>
         <div class="form-group">
-          <label>Số Điện Thoại</label>
+          <label>Số điện thoại</label>
           <input type="tel" class="form-control" id="regPhone" autocomplete="tel" placeholder="0918 888 999">
         </div>
         <div class="form-group">
-          <label>Mật Khẩu Khởi Tạo</label>
+          <label>Mật khẩu</label>
           <input type="password" class="form-control" id="regPassword" autocomplete="new-password" placeholder="Tối thiểu 6 ký tự">
         </div>
         <div class="form-group">
-          <label>Mã Serial Thiết Bị (Tùy Chọn)</label>
+          <label>Serial thiết bị (tùy chọn)</label>
           <input type="text" class="form-control" id="regSerial" placeholder="TF-G31-PRO-XXXX">
         </div>
 
-        <button type="submit" class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:12px;">Tạo Tài Khoản &amp; Đăng Nhập</button>
+        <button type="submit" class="btn btn-dark" style="width:100%; padding:12px 0; margin-top:12px;">Tạo Tài Khoản</button>
       </form>
     </div>
 
@@ -824,7 +862,7 @@
             </div>
           </div>
           <div class="profile-actions">
-            <a href="/profile" class="btn btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;"><span>✏️</span> Chỉnh Sửa Hồ Sơ</a>
+            <a href="/profile" class="btn btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;"><span>✏️</span> Sửa Hồ Sơ</a>
             <button class="btn btn-outline" onclick="logoutUser()">Đăng Xuất</button>
           </div>
         </div>
@@ -834,12 +872,15 @@
       <div class="card">
         <div class="card-title-row">
           <div>
-            <div class="card-title">7 Module Tính Năng Ứng Dụng iOS</div>
+            <div class="card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0071E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+              7 Module Ứng Dụng T-Flow
+            </div>
             <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
-              Đồng bộ thời gian thực từ Admin CMS theo cấp phép tài khoản và thiết bị của bạn.
+              Đồng bộ tức thì từ T-Flow Cloud.
             </p>
           </div>
-          <span class="tier-badge" id="modulesSyncStatus">Đã Đồng Bộ Cloud</span>
+          <span class="tier-badge" id="modulesSyncStatus">✓ Đồng Bộ Cloud</span>
         </div>
 
         <div class="modules-grid" id="modulesGrid">
@@ -851,12 +892,15 @@
       <div class="card">
         <div class="card-title-row">
           <div>
-            <div class="card-title">Thiết Bị Đã Liên Kết &amp; Bảo Hành Điện Tử</div>
+            <div class="card-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#28A745" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              Thiết Bị &amp; Bảo Hành Điện Tử
+            </div>
             <p style="font-size:13px; color:var(--text-secondary); margin-top:2px;">
-              Thông số kỹ thuật thời gian thực và thời hạn bảo hành chính hãng 1 đổi 1.
+              Thông số phần cứng &amp; bảo hành 1 đổi 1.
             </p>
           </div>
-          <button class="btn btn-outline" style="font-size:12px;" onclick="checkOtaUpdate()">Kiểm Tra Cập Nhật OTA</button>
+          <button class="btn btn-outline" style="font-size:12px;" onclick="checkOtaUpdate()">Kiểm Tra OTA</button>
         </div>
 
         <div class="device-info-grid">
@@ -873,7 +917,7 @@
             <div class="device-stat-val" id="deviceWarranty" style="color:var(--green);">Còn 342 Ngày (1 Đổi 1)</div>
           </div>
           <div class="device-stat-box">
-            <div class="device-stat-label">Dung Lượng Pin &amp; Firmware</div>
+            <div class="device-stat-label">Pin &amp; Firmware</div>
             <div class="device-stat-val" id="deviceBattery">92% &bull; v2.4.1 Mới Nhất</div>
           </div>
         </div>
@@ -882,8 +926,11 @@
       <!-- 4. WEB ORDER HISTORY -->
       <div class="card">
         <div class="card-title-row">
-          <div class="card-title">Lịch Sử Đơn Hàng Đã Mua Trên Web</div>
-          <a href="/" class="btn btn-outline" style="font-size:12px;">Mua Thêm Phụ Kiện &rarr;</a>
+          <div class="card-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            Đơn Hàng Của Tôi
+          </div>
+          <a href="/" class="btn btn-outline" style="font-size:12px;">Mua Phụ Kiện &rarr;</a>
         </div>
         <div id="ordersTableWrapper">
           <table class="orders-table">
@@ -891,7 +938,7 @@
               <tr>
                 <th>Mã Đơn</th>
                 <th>Ngày Đặt</th>
-                <th>Sản Phẩm &amp; Phân Cấp</th>
+                <th>Sản Phẩm &amp; Gói</th>
                 <th>Tổng Tiền</th>
                 <th>Trạng Thái</th>
               </tr>
@@ -908,14 +955,14 @@
         <!-- Sliders Column -->
         <div class="card">
           <div class="card-title-row">
-            <div class="card-title">Cấu Hình Động Cơ FOC &amp; Độ Mượt</div>
-            <span style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono);">OTA Sync BLE 4ms</span>
+            <div class="card-title">Động Cơ FOC &amp; Độ Mượt</div>
+            <span style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono);">BLE 4ms</span>
           </div>
 
           <div class="setting-row">
             <div class="setting-label">
-              <h4>Tốc Độ Xoay Trục Pan (Yaw Speed)</h4>
-              <p>Độ nhạy chuyển hướng khi rê tay ngang</p>
+              <h4>Tốc độ Pan (Yaw)</h4>
+              <p>Độ nhạy xoay ngang</p>
             </div>
             <div class="slider-box">
               <input type="range" min="1" max="100" value="65" oninput="this.nextElementSibling.innerText = this.value + '%'">
@@ -925,8 +972,8 @@
 
           <div class="setting-row">
             <div class="setting-label">
-              <h4>Tốc Độ Trục Tilt (Pitch Speed)</h4>
-              <p>Độ nhạy góc gập lên / chúi xuống</p>
+              <h4>Tốc độ Tilt (Pitch)</h4>
+              <p>Độ nhạy ngẩng / cúi</p>
             </div>
             <div class="slider-box">
               <input type="range" min="1" max="100" value="45" oninput="this.nextElementSibling.innerText = this.value + '%'">
@@ -936,8 +983,8 @@
 
           <div class="setting-row">
             <div class="setting-label">
-              <h4>Độ Mượt Chuyển Động (Smoothing Damping)</h4>
-              <p>Lực quán tính ảo triệt tiêu giật khựng</p>
+              <h4>Độ mượt (Damping)</h4>
+              <p>Triệt tiêu giật khựng</p>
             </div>
             <div class="slider-box">
               <input type="range" min="1" max="100" value="80" oninput="this.nextElementSibling.innerText = this.value + '%'">
@@ -947,8 +994,8 @@
 
           <div class="setting-row">
             <div class="setting-label">
-              <h4>Vùng Chết Cần Gạt Joystick (Deadband)</h4>
-              <p>Ngưỡng triệt tiêu trôi cần gạt do ngón tay chạm nhẹ</p>
+              <h4>Vùng chết Joystick</h4>
+              <p>Chống trôi khi chạm nhẹ</p>
             </div>
             <div class="slider-box">
               <input type="range" min="0" max="20" value="4" oninput="this.nextElementSibling.innerText = this.value + '°'">
@@ -964,19 +1011,21 @@
 
         <!-- 3D LUT Column -->
         <div class="card">
-          <div class="card-title">Nạp File Màu 3D LUT (.cube)</div>
+          <div class="card-title">Nạp 3D LUT (.cube)</div>
           <p style="font-size:13px; color:var(--text-secondary); margin:6px 0 20px 0;">
-            Tải lên bảng màu để xem trước màu điện ảnh trực tiếp trên viewfinder ứng dụng iOS.
+            Xem trước màu điện ảnh trên viewfinder.
           </p>
 
-          <div style="border:2px dashed var(--border); border-radius:var(--radius-md); padding:32px 20px; text-align:center; cursor:pointer;" onclick="alert('Mở hộp thoại tải file .cube...')">
-            <div style="font-size:24px; margin-bottom:8px;">&bull;</div>
-            <div style="font-size:13.5px; font-weight:700;">Kéo thả file .cube vào đây</div>
-            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Hỗ trợ format 17x17x17 hoặc 33x33x33</div>
+          <div style="border:2px dashed var(--border); border-radius:var(--radius-md); padding:28px 20px; text-align:center; cursor:pointer;" onclick="alert('Mở hộp thoại tải file .cube...')">
+            <div style="display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:12px; background:var(--bg); margin-bottom:10px;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div style="font-size:13.5px; font-weight:700;">Tải file .cube lên</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">17x17x17 hoặc 33x33x33</div>
           </div>
 
           <div style="margin-top:20px; font-size:12.5px; color:var(--text-secondary);">
-            <div style="font-weight:700; margin-bottom:6px;">LUTs đang nạp sẵn trên máy:</div>
+            <div style="font-weight:700; margin-bottom:6px;">LUT sẵn có:</div>
             <div>&bull; Teal &amp; Orange Cinema v2</div>
             <div>&bull; Kodak Portra 400 Natural</div>
             <div>&bull; Apple Log to Rec.709 Standard</div>
@@ -988,12 +1037,12 @@
       <div class="card" id="cardActiveSessionSection">
         <div class="card-title-row">
           <div>
-            <div style="display:flex; align-items:center; gap:10px;">
-              <div class="card-title">Thiết Bị &amp; Trạng Thái Hoạt Động</div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <div class="card-title">Thiết Bị &amp; Phiên Đăng Nhập</div>
               <span class="tier-badge" style="background:rgba(52,199,89,0.12); color:#248A3D;">🟢 Đang Hoạt Động</span>
             </div>
             <p style="font-size:13px; color:var(--text-secondary); margin-top:4px;">
-              Kiểm soát các thiết bị đang đăng nhập tài khoản của bạn, cập nhật thời gian truy cập và duy trì bảo mật an toàn.
+              Quản lý thiết bị đang đăng nhập tài khoản.
             </p>
           </div>
           <div style="display:flex; gap:8px;">
@@ -1069,12 +1118,12 @@
         <div class="footer-col">
           <div class="footer-brand-title">T-Flow Enterprise</div>
           <p class="footer-col-desc">
-            Hệ sinh thái thiết bị ổn định 3 trục chuẩn điện ảnh cho iPhone và máy ảnh di động. Đổi mới sáng tạo với động cơ FOC 20kHz và trải nghiệm phần mềm chuẩn Apple.
+            Hệ sinh thái gimbal 3 trục FOC 20kHz &amp; AI Vision chuẩn điện ảnh.
           </p>
           <div class="footer-contact-info">
-            <div><strong>Hotline Hỗ Trợ:</strong> 1900 8899 (8:00 - 21:00)</div>
-            <div><strong>Email Kỹ Thuật:</strong> enterprise@smartgimbal.vn</div>
-            <div><strong>Showroom &amp; R&amp;D:</strong> Tòa nhà R&amp;D TechHub, Khu Công Nghệ Cao, Hà Nội &amp; TP. Hồ Chí Minh</div>
+            <div><strong>Hotline:</strong> 1900 8899 (8:00 - 21:00)</div>
+            <div><strong>Email:</strong> enterprise@smartgimbal.vn</div>
+            <div><strong>Showroom:</strong> Hà Nội &amp; TP. Hồ Chí Minh</div>
           </div>
         </div>
 
@@ -1095,7 +1144,7 @@
         <div class="footer-col">
           <div class="footer-col-title">Phần Mềm &amp; Hệ Thống</div>
           <ul class="footer-links-list">
-            <li><a href="/">Ứng Dụng T-Flow iOS</a></li>
+            <li><a href="/">Tải App T-Flow (iOS &amp; Android)</a></li>
             <li><a href="/account">Cổng Khách Hàng (T-Flow ID)</a></li>
             <li><a href="/profile">Chỉnh Sửa Hồ Sơ Cá Nhân</a></li>
             <li id="footerAdminCmsLink" style="display:none;"><a href="/admin">Cổng Quản Trị Admin CMS</a></li>
@@ -1138,14 +1187,23 @@
   <script src="/shared/catalog_store.js"></script>
   <script>
     const MODULE_NAMES = [
-      { id: "ai_vision", name: "AI Vision Optical Tracking", desc: "Thuật toán bám nét chủ thể quang học 120fps" },
-      { id: "prores_log", name: "Apple Log & ProRes 4K/60fps", desc: "Mở khóa ghi hình 10-bit màu điện ảnh" },
-      { id: "motionlapse", name: "Motionlapse Waypoint 5-Point", desc: "Lập trình quỹ đạo quay tua nhanh 5 điểm mốc" },
-      { id: "multi_cam", name: "Multi-Cam Director Studio", desc: "Kết nối đồng bộ 4 góc máy qua Wi-Fi Direct" },
-      { id: "lut_3d", name: "3D LUT Real-time Preview", desc: "Xem trước bảng màu điện ảnh thời gian thực" },
-      { id: "foc_tuning", name: "FOC Motor Micro-Tuning", desc: "Tinh chỉnh tần số PWM và phản hồi động cơ" },
-      { id: "stream_500hz", name: "500Hz Gyro Raw Telemetry", desc: "Truyền dữ liệu cảm biến con quay thời gian thực" }
+      { id: "ai_vision", name: "AI Vision Optical Tracking", desc: "Bám nét quang học 120fps" },
+      { id: "prores_log", name: "Apple Log & ProRes 4K/60fps", desc: "Quay 10-bit màu điện ảnh" },
+      { id: "motionlapse", name: "Motionlapse Waypoint 5-Point", desc: "Quỹ đạo tua nhanh 5 điểm" },
+      { id: "multi_cam", name: "Multi-Cam Director Studio", desc: "Đồng bộ 4 góc máy Wi-Fi" },
+      { id: "lut_3d", name: "3D LUT Real-time Preview", desc: "Xem trước màu trực tiếp" },
+      { id: "foc_tuning", name: "FOC Motor Micro-Tuning", desc: "Tinh chỉnh tần số động cơ" },
+      { id: "stream_500hz", name: "500Hz Gyro Raw Telemetry", desc: "Cảm biến con quay 500Hz" }
     ];
+
+    function sanitizeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
 
     let currentUser = null;
 
@@ -1208,8 +1266,8 @@
       document.getElementById('userName').textContent = currentUser.name || 'Khách Hàng';
       const avatarEl = document.getElementById('userAvatar');
       const avatarVal = currentUser.avatar || '';
-      if (avatarVal && (avatarVal.startsWith('data:image') || avatarVal.startsWith('http') || avatarVal.startsWith('/'))) {
-        avatarEl.innerHTML = `<img src="${avatarVal}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;">`;
+      if (avatarVal && (avatarVal.startsWith('data:image/') || avatarVal.startsWith('https://') || avatarVal.startsWith('http://') || avatarVal.startsWith('/'))) {
+        avatarEl.innerHTML = `<img src="${sanitizeHtml(avatarVal)}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block; border-radius:50%;">`;
       } else {
         avatarEl.textContent = avatarVal || (currentUser.name || 'K').charAt(0).toUpperCase();
       }
@@ -1271,13 +1329,13 @@
 
       orders.forEach(ord => {
         const tr = document.createElement('tr');
-        const itemsSummary = (ord.items || []).map(i => `${i.productName || i.name || 'T-Flow Pro'} (${i.tierLabel || i.tierName || 'Tiêu Chuẩn'}) x${i.quantity || i.qty || 1}`).join('<br>');
+        const itemsSummary = (ord.items || []).map(i => `${sanitizeHtml(i.productName || i.name || 'T-Flow Pro')} (${sanitizeHtml(i.tierLabel || i.tierName || 'Tiêu Chuẩn')}) x${sanitizeHtml(i.quantity || i.qty || 1)}`).join('<br>');
         tr.innerHTML = `
-          <td><b style="font-family:var(--font-mono);">${ord.orderId || ord.id || 'TF-ORDER'}</b></td>
-          <td style="color:var(--text-secondary);">${ord.dateFormatted || ord.createdAt.split('T')[0]}</td>
+          <td><b style="font-family:var(--font-mono);">${sanitizeHtml(ord.orderId || ord.id || 'TF-ORDER')}</b></td>
+          <td style="color:var(--text-secondary);">${sanitizeHtml(ord.dateFormatted || (ord.createdAt || '').split('T')[0])}</td>
           <td>${itemsSummary || 'Sản phẩm T-Flow'}</td>
-          <td><b style="font-family:var(--font-mono);">${ord.totalFormatted || SmartGimbalCatalog.formatVND(ord.total)}</b></td>
-          <td><span style="color:${ord.statusColor || '#0071E3'}; font-weight:700;">${ord.status || 'Đang Giao Hàng'}</span></td>
+          <td><b style="font-family:var(--font-mono);">${sanitizeHtml(ord.totalFormatted || SmartGimbalCatalog.formatVND(ord.total))}</b></td>
+          <td><span style="color:${sanitizeHtml(ord.statusColor || '#0071E3')}; font-weight:700;">${sanitizeHtml(ord.status || 'Đang Giao Hàng')}</span></td>
         `;
         tbody.appendChild(tr);
       });
@@ -1487,14 +1545,14 @@
             const lastActiveStr = s.lastActiveAt ? new Date(s.lastActiveAt).toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) : 'Vừa xong';
             tr.innerHTML = `
               <td>
-                <div style="font-weight:700; color:var(--text-main); font-size:13px;">${s.devicePlatform || 'Trình duyệt Web'}</div>
-                ${isCurrent ? '<span style="font-size:10.5px; background:rgba(52,199,89,0.15); color:#248A3D; padding:2px 8px; border-radius:99px; font-weight:700; display:inline-block; margin-top:3px;">Thiết Bị Này</span>' : '<span style="font-size:10.5px; color:var(--text-muted); display:inline-block; margin-top:3px;">Thiết bị đã xác thực</span>'}
+                <div style="font-weight:700; color:var(--text-main); font-size:13px;">${sanitizeHtml(s.devicePlatform || 'Trình duyệt Web')}</div>
+                ${isCurrent ? '<span style="font-size:11px; background:rgba(52,199,89,0.15); color:#248A3D; padding:2px 8px; border-radius:99px; font-weight:700; display:inline-block; margin-top:3px;">Thiết Bị Này</span>' : '<span style="font-size:11px; color:var(--text-muted); display:inline-block; margin-top:3px;">Thiết bị đã xác thực</span>'}
               </td>
               <td><span style="font-size:12.5px; color:var(--text-secondary);">Hà Nội, Việt Nam</span></td>
-              <td style="color:var(--text-secondary); font-size:12px;">${timeStr}</td>
-              <td style="color:var(--text-secondary); font-size:12px;">${lastActiveStr}</td>
+              <td style="color:var(--text-secondary); font-size:12px;">${sanitizeHtml(timeStr)}</td>
+              <td style="color:var(--text-secondary); font-size:12px;">${sanitizeHtml(lastActiveStr)}</td>
               <td>
-                <span style="color:${isCurrent ? '#34C759' : '#8E8E93'}; font-weight:700; font-size:12px;">
+                <span style="color:${isCurrent ? '#34C759' : '#6B7280'}; font-weight:700; font-size:12px;">
                   ${isCurrent ? '🟢 Đang hoạt động' : '⚪ Đã đăng xuất'}
                 </span>
               </td>
@@ -1671,21 +1729,21 @@
     <div style="display:flex; align-items:flex-start; gap:14px;">
       <div style="font-size:24px; line-height:1; flex-shrink:0;">🍪</div>
       <div style="flex:1;">
-        <div style="font-size:13.5px; font-weight:700; margin-bottom:4px; letter-spacing:-0.01em;">
-          Thông Báo Cookie &amp; Duy Trì Phiên Đăng Nhập
+        <div style="font-size:13.5px; font-weight:700; margin-bottom:4px; letter-spacing:0;">
+          Cookie &amp; Phiên Đăng Nhập
         </div>
-        <div style="font-size:12px; color:rgba(255,255,255,0.8); line-height:1.45; margin-bottom:14px;">
-          T-Flow sử dụng Cookie (30 ngày) để duy trì phiên đăng nhập an toàn, lưu thiết bị và đồng bộ 7 module tính năng bản quyền gimbal theo tiêu chuẩn GDPR &amp; ePrivacy.
+        <div style="font-size:12px; color:rgba(255,255,255,0.85); line-height:1.45; margin-bottom:14px;">
+          Duy trì phiên đăng nhập &amp; đồng bộ thiết bị an toàn trong 30 ngày.
         </div>
         <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
           <button type="button" onclick="acceptCookieConsent(true)" style="background:#FFF; color:#1D1D1F; border:none; padding:8px 18px; border-radius:99px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.15s ease;">
-            Chấp Nhận Toàn Bộ
+            Chấp Nhận
           </button>
           <button type="button" onclick="acceptCookieConsent(false)" style="background:rgba(255,255,255,0.14); color:#FFF; border:1px solid rgba(255,255,255,0.2); padding:8px 16px; border-radius:99px; font-size:12px; font-weight:600; cursor:pointer; transition:all 0.15s ease;">
-            Chỉ Cookie Thiết Yếu
+            Chỉ Thiết Yếu
           </button>
-          <span style="font-size:11px; color:rgba(255,255,255,0.5); margin-left:auto;">
-            Bảo mật AES-256 &bull; SameSite=Lax
+          <span style="font-size:11px; color:rgba(255,255,255,0.72); margin-left:auto;">
+            AES-256 &bull; SameSite=Lax
           </span>
         </div>
       </div>

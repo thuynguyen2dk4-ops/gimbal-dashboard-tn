@@ -26,11 +26,13 @@
   var REVIEWS_EVENT = 'tflow_reviews_updated';
 
   var ADMIN_GMAILS = ['thuynguyen2dk4@gmail.com', 'thuy.nguyen@tflow.tech'];
+  var BUNDLED_CATALOG_VERSION = '3.6.0-visual-clean';
 
   // ==========================================================================
   // 1. DEFAULT DATA DEFINITIONS
   // ==========================================================================
   var DEFAULT_CATALOG = {
+    "catalogVersion": BUNDLED_CATALOG_VERSION,
     "mvpProductId": "tf-g31-pro",
     "brand": {
       "name": "T-Flow",
@@ -95,28 +97,28 @@
         "name": "Gimbal Cầm Tay",
         "icon": "bi-camera-reels",
         "prefix": "TF-G",
-        "desc": "Thiết bị ổn định 3 trục chuẩn điện ảnh cho Smartphone và Camera Creator."
+        "desc": "Gimbal chống rung 3 trục cho Smartphone & Camera."
       },
       {
         "id": "group-cam",
         "name": "Cụm Camera & Phụ Kiện AI",
         "icon": "bi-camera",
         "prefix": "TF-CAM",
-        "desc": "Mô-đun camera AI tracking nhận diện chủ thể độc lập và đèn trợ sáng MagSafe."
+        "desc": "Camera AI bám nét độc lập & đèn MagSafe."
       },
       {
         "id": "group-core",
         "name": "Bo Mạch Điều Khiển Lõi",
         "icon": "bi-cpu",
         "prefix": "TF-M / TF-D",
-        "desc": "Bo mạch chủ vi điều khiển 32-bit STM32 và mạch công suất Pure FOC 20kHz."
+        "desc": "Bo mạch vi điều khiển STM32 & Pure FOC 20kHz."
       },
       {
         "id": "group-sensor",
         "name": "Bo Mạch Mở Rộng & Cảm Biến",
         "icon": "bi-hdd-network",
         "prefix": "TF-X",
-        "desc": "Cảm biến gia tốc IMU 6 trục và cảm biến từ Magnetic Encoder độ phân giải 14-bit."
+        "desc": "Cảm biến IMU 6 trục & Encoder 14-bit."
       }
     ],
     "products": [
@@ -125,8 +127,8 @@
         "sku": "TF-G31-PRO",
         "groupId": "group-gimbal",
         "name": "T-Flow Pro",
-        "tagline": "Vững khung hình, Trọn cảm xúc. Đỉnh cao chống rung 3 trục cho Smartphone.",
-        "subtitle": "Chống rung siêu mượt khi vừa đi vừa quay cho iPhone & Smartphone. Hít nam châm MagSafe 1 giây gọn nhẹ, xoay bánh xe thu phóng tiện lợi và pin dùng suốt 18 giờ.",
+        "tagline": "Chống rung 3 trục • AI không cần App",
+        "subtitle": "Gắn MagSafe 1 chạm. Bám nét khuôn mặt ở mọi ứng dụng.",
         "badge": "Flagship 2026",
         "img": "/shared/img/tflow_pro_main.png",
         "status": "Đang Mở Bán",
@@ -151,7 +153,7 @@
             "price": 2490000,
             "origPrice": 2890000,
             "priceFormatted": "2.490.000₫",
-            "desc": "Trọn bộ gimbal T-Flow Pro, ngàm hít từ tính MagSafe, cáp sạc USB-C và chân đế Tripod mini."
+            "desc": "Gimbal T-Flow Pro + ngàm MagSafe + Tripod mini + cáp USB-C."
           },
           {
             "key": "creator",
@@ -160,7 +162,7 @@
             "price": 3190000,
             "origPrice": 3690000,
             "priceFormatted": "3.190.000₫",
-            "desc": "Gồm Standard Kit + Đèn trợ sáng từ tính T-Flow Glow RGB và Túi đeo chéo EVA chống sốc."
+            "desc": "Bộ Standard + đèn LED MagSafe RGB + túi EVA chống sốc."
           },
           {
             "key": "cinematic",
@@ -169,7 +171,7 @@
             "price": 3990000,
             "origPrice": 4590000,
             "priceFormatted": "3.990.000₫",
-            "desc": "Gồm Creator Kit + Micro thu âm không dây kép 2.4GHz chống ồn AI + Bộ tạ đối trọng Pro."
+            "desc": "Bộ Creator + micro kép chống ồn AI + tạ đối trọng Pro."
           },
           {
             "key": "master",
@@ -178,35 +180,38 @@
             "price": 5490000,
             "origPrice": 6290000,
             "priceFormatted": "5.490.000₫",
-            "desc": "Full bộ phụ kiện cao cấp + Vali nhôm hàng không nguyên khối + Khóa học MasterClass trọn đời."
+            "desc": "Full phụ kiện Pro + vali nhôm hàng không + MasterClass."
           }
         ],
         "highlights": [
           {
             "icon": "⚡",
-            "title": "Chống Rung Êm Ru Mọi Bước Chân",
-            "desc": "Tự động triệt tiêu rung lắc ngay cả khi bạn chạy bộ, leo cầu thang hay quay trên xe đang di chuyển."
+            "metric": "FOC 20kHz",
+            "title": "Chống Rung 3 Trục",
+            "desc": "Triệt tiêu rung lắc khi chạy bộ và leo cầu thang."
           },
           {
             "icon": "🧲",
-            "title": "Hít MagSafe Chắc Chắn Trong 1 Giây",
-            "desc": "Đưa điện thoại vào gần là hít gọn an toàn — gắn vào quay ngay, không tốn công kẹp siết hay cân chỉnh."
+            "metric": "MagSafe 1s",
+            "title": "Hít Từ Tính Nhanh",
+            "desc": "Đưa iPhone lại gần là hít gọn, quay ngay lập tức."
           },
           {
             "icon": "🎯",
-            "title": "Bánh Xe Xoay Thu Phóng Mượt Mà",
-            "desc": "Điều chỉnh zoom cận cảnh và chuyển nét bằng ngón cái, tạo hiệu ứng điện ảnh dễ dàng chỉ với một tay."
+            "metric": "Pin 18 Giờ",
+            "title": "Bám Nét & Thu Phóng",
+            "desc": "Bánh xe mượt bằng ngón cái, pin dùng trọn 18 giờ."
           }
         ],
         "specs": [
           { "label": "Mã Sản Phẩm (SKU)", "val": "TF-G31-PRO" },
-          { "label": "Tải Trọng Động Cơ", "val": "450g (Cân tốt iPhone 16 Pro Max kèm lens và mic)" },
-          { "label": "Thuật Toán Điều Khiển", "val": "Pure FOC 20kHz Vector Control (Zero Jitter)" },
+          { "label": "Tải Trọng Động Cơ", "val": "450g (Cân tốt iPhone Pro Max + lens)" },
+          { "label": "Thuật Toán Điều Khiển", "val": "Pure FOC 20kHz Vector Control" },
           { "label": "Cảm Biến Trục", "val": "14-bit Magnetic Encoder + 6-Axis IMU" },
-          { "label": "Thời Lượng Pin", "val": "18 giờ liên tục (Cell Lithium 3200mAh, sạc ngược không dây)" },
-          { "label": "Chất Liệu Khung", "val": "Hợp kim nhôm AL6061 hàng không CNC & Sợi Carbon dệt 8 lớp" },
-          { "label": "Kết Nối Không Dây", "val": "Bluetooth 5.3 Low Energy (Độ trễ < 5ms)" },
-          { "label": "Ứng Dụng Hỗ Trợ", "val": "T-Flow Cam (iOS 16+, Apple Log ProRes, AI Face Track)" }
+          { "label": "Thời Lượng Pin", "val": "18 giờ (3200mAh, sạc ngược không dây)" },
+          { "label": "Chất Liệu Khung", "val": "Nhôm hàng không AL6061 + Carbon 8 lớp" },
+          { "label": "Kết Nối Không Dây", "val": "Bluetooth 5.3 BLE (< 5ms)" },
+          { "label": "Ứng Dụng Hỗ Trợ", "val": "T-Flow Cam (iOS 16+, Apple Log ProRes)" }
         ],
         "boxContents": [
           { "name": "Gimbal 3 Trục T-Flow Pro", "qty": "01" },
@@ -221,8 +226,8 @@
         "sku": "TF-CAM-AI01",
         "groupId": "group-cam",
         "name": "T-Flow Eye — Mô-đun AI Tracking & Đèn RGB",
-        "tagline": "Theo dõi chủ thể thông minh độc lập không cần kết nối App qua Bluetooth.",
-        "subtitle": "Camera AI cảm biến quang học độc lập nhận diện khuôn mặt và cử chỉ tay ở khoảng cách 5m. Tích hợp đèn LED trợ sáng Bi-Color CRI 96+ đổi nhiệt độ màu 2500K-6500K, hít trực tiếp sau lưng ngàm MagSafe.",
+        "tagline": "Camera AI bám nét độc lập — Không cần App",
+        "subtitle": "Nhận diện khuôn mặt 5m và cử chỉ tay, kèm đèn LED CRI 96+.",
         "badge": "Phụ Kiện AI Mới",
         "img": "/shared/img/tflow_eye_module.svg",
         "status": "Đang Mở Bán",
@@ -242,18 +247,18 @@
             "price": 890000,
             "origPrice": 1090000,
             "priceFormatted": "890.000₫",
-            "desc": "Mô-đun Camera AI Tracking + Ngàm hít MagSafe + Cáp sạc Type-C."
+            "desc": "Camera AI Tracking + ngàm MagSafe + cáp USB-C."
           }
         ],
         "highlights": [
-          { "icon": "👁️", "title": "AI Tracking Độc Lập", "desc": "Tự động bám người livestream trên TikTok, Facebook, YouTube mà không cần app phụ trợ." },
-          { "icon": "💡", "title": "Đèn Trợ Sáng Bi-Color", "desc": "Tích hợp đèn LED đổi màu 2500K-6500K tôn da với độ hoàn màu CRI 96+ chuẩn studio." }
+          { "icon": "👁️", "metric": "AI 60fps", "title": "Bám Nét Độc Lập", "desc": "Quay TikTok, Facebook, YouTube không cần mở app." },
+          { "icon": "💡", "metric": "CRI 96+", "title": "Đèn LED Bi-Color", "desc": "Đổi màu 2500K–6500K tôn da chuẩn studio." }
         ],
         "specs": [
           { "label": "SKU", "val": "TF-CAM-AI01" },
-          { "label": "Tương Thích", "val": "T-Flow Pro & các thiết bị hỗ trợ MagSafe" },
-          { "label": "Khoảng Cách Nhận Diện", "val": "0.5m - 5m góc rộng 120°" },
-          { "label": "Thời Lượng Pin", "val": "4 giờ liên tục (Pin sạc riêng 800mAh)" }
+          { "label": "Tương Thích", "val": "T-Flow Pro & thiết bị MagSafe" },
+          { "label": "Khoảng Cách Nhận Diện", "val": "0.5m - 5m (Góc rộng 120°)" },
+          { "label": "Thời Lượng Pin", "val": "4 giờ (Pin rời 800mAh)" }
         ],
         "boxContents": [
           { "name": "Mô-đun T-Flow Eye", "qty": "01" },
@@ -265,8 +270,8 @@
         "sku": "TF-ACC-TRIPOD",
         "groupId": "group-gimbal",
         "name": "Chân Đế Mini Tripod Carbon T-Flow",
-        "tagline": "Vững chãi trên mọi địa hình, trọng lượng siêu nhẹ từ sợi Carbon 8 lớp.",
-        "subtitle": "Chân đế 3 chân mini hợp kim nhôm hàng không và sợi carbon dệt 8 lớp. Ren tiêu chuẩn 1/4 inch tương thích hoàn hảo với T-Flow Pro, máy ảnh mirrorless và rig quay phim.",
+        "tagline": "Tripod Carbon 8 lớp — Siêu nhẹ 85g",
+        "subtitle": "Nhôm CNC hàng không kết hợp ren 1/4 inch, chịu tải đến 5kg.",
         "badge": "Phụ Kiện Chính Hãng",
         "img": "/shared/img/tflow_mini_tripod.svg",
         "status": "Đang Mở Bán",
@@ -286,17 +291,17 @@
             "price": 390000,
             "origPrice": 490000,
             "priceFormatted": "390.000₫",
-            "desc": "Chân đế mini tripod Carbon + Khóa siết lục giác chống trượt."
+            "desc": "Tripod Carbon mini + khóa siết chống trượt."
           }
         ],
         "highlights": [
-          { "icon": "🪶", "title": "Trọng Lượng Chỉ 85g", "desc": "Sợi carbon 8 lớp siêu nhẹ nhưng chịu tải đứng lên đến 5kg." },
-          { "icon": "🔒", "title": "Đế Cao Su Chống Trượt", "desc": "Đệm silicon chống trầy xước và bám chặt bề mặt nghiêng." }
+          { "icon": "🪶", "metric": "85g / 5kg", "title": "Carbon Siêu Nhẹ", "desc": "Sợi Carbon 8 lớp, chịu tải đứng tối đa 5kg." },
+          { "icon": "🔒", "metric": "Ren 1/4\"", "title": "Đế Silicon Bám Chắc", "desc": "Chống trượt, bảo vệ bề mặt khi đặt góc nghiêng." }
         ],
         "specs": [
           { "label": "SKU", "val": "TF-ACC-TRIPOD" },
-          { "label": "Vật Liệu", "val": "Sợi Carbon 8 lớp & Nhôm AL6061 CNC" },
-          { "label": "Chuẩn Ren", "val": "1/4 inch tiêu chuẩn quốc tế" },
+          { "label": "Vật Liệu", "val": "Carbon 8 lớp & Nhôm AL6061 CNC" },
+          { "label": "Chuẩn Ren", "val": "1/4 inch quốc tế" },
           { "label": "Tải Trọng Chịu Đựng", "val": "5.0 kg" }
         ],
         "boxContents": [
@@ -308,8 +313,8 @@
         "sku": "TF-ACC-CASE",
         "groupId": "group-gimbal",
         "name": "Vali Hàng Không Chống Sốc T-Flow Master",
-        "tagline": "Bảo vệ toàn diện chuẩn quân đội cho toàn bộ bộ kit gimbal và phụ kiện.",
-        "subtitle": "Vali hợp kim nhôm nguyên khối bo góc kim loại. Khay mút EVA đúc laser định hình chính xác từng vị trí gimbal, đèn, mic và pin sạc. Kháng nước và chống bụi tiêu chuẩn IP67.",
+        "tagline": "Vali nhôm hàng không — Chuẩn kháng nước IP67",
+        "subtitle": "Khay mút EVA cắt laser vừa khít gimbal, đèn, mic và pin.",
         "badge": "Kháng Nước IP67",
         "img": "/shared/img/tflow_master_case.svg",
         "status": "Đang Mở Bán",
@@ -330,12 +335,12 @@
             "price": 1190000,
             "origPrice": 1490000,
             "priceFormatted": "1.190.000₫",
-            "desc": "Vali hợp kim nhôm nguyên khối + Quai xách bọc da + Dây đeo vai đệm khí."
+            "desc": "Vali nhôm nguyên khối + quai da + dây đeo vai."
           }
         ],
         "highlights": [
-          { "icon": "🛡️", "title": "Khung Nhôm Hàng Không", "desc": "Chống va đập lực nén 120kg, bảo vệ tuyệt đối thiết bị đắt tiền." },
-          { "icon": "💧", "title": "Kháng Nước IP67", "desc": "Gioăng cao su kép ngăn nước biển và cát bụi xâm nhập." }
+          { "icon": "🛡️", "metric": "Nén 120kg", "title": "Khung Nhôm Bảo Vệ", "desc": "Bo góc kim loại chịu lực va đập mạnh." },
+          { "icon": "💧", "metric": "Chuẩn IP67", "title": "Kháng Nước & Bụi", "desc": "Gioăng cao su kép chống nước biển và cát bụi." }
         ],
         "specs": [
           { "label": "SKU", "val": "TF-ACC-CASE" },
@@ -353,8 +358,8 @@
         "sku": "TF-M32-FOC-R1",
         "groupId": "group-core",
         "name": "Bo Mạch Điều Khiển Lõi 32-bit Pure FOC 20kHz",
-        "tagline": "Trái tim xử lý thuật toán động cơ 3 trục siêu êm mượt cho kỹ sư R&D.",
-        "subtitle": "Bo mạch chủ vi điều khiển ARM Cortex-M4 32-bit tần số xung nhịp 168MHz. Tích hợp mạch cầu H MOSFET công suất Pure FOC tần số 20kHz triệt tiêu tiếng rít và cổng giao tiếp CAN-Bus/UART.",
+        "tagline": "Bo mạch 32-bit Pure FOC 20kHz — Dành cho R&D",
+        "subtitle": "Vi điều khiển ARM Cortex-M4 168MHz, hỗ trợ CAN-Bus & UART.",
         "badge": "Linh Kiện R&D",
         "img": "/shared/img/pcb_mainboard.png",
         "status": "Sẵn Hàng",
@@ -374,12 +379,12 @@
             "price": 1450000,
             "origPrice": 1750000,
             "priceFormatted": "1.450.000₫",
-            "desc": "Bo mạch chủ FOC 32-bit nạp sẵn Bootloader + Bộ giắc cắm tín hiệu JST."
+            "desc": "Bo mạch FOC 32-bit + sẵn Bootloader + cáp JST."
           }
         ],
         "highlights": [
-          { "icon": "🧠", "title": "MCU Cortex-M4 168MHz", "desc": "Tính toán ma trận Euler & bộ lọc Madgwick/EKF chu kỳ 1000Hz." },
-          { "icon": "⚡", "title": "Mosfet FOC 20kHz", "desc": "Chuyển mạch êm ru không tạo tiếng ồn siêu âm làm phiền mic thu âm." }
+          { "icon": "🧠", "metric": "168 MHz", "title": "MCU Cortex-M4", "desc": "Tính toán Euler & bộ lọc EKF ở chu kỳ 1000Hz." },
+          { "icon": "⚡", "metric": "FOC 20kHz", "title": "Chuyển Mạch Siêu Êm", "desc": "Triệt tiêu tiếng rít MOSFET trên micro thu âm." }
         ],
         "specs": [
           { "label": "SKU", "val": "TF-M32-FOC-R1" },
@@ -397,8 +402,8 @@
         "sku": "TF-X14-IMU-R1",
         "groupId": "group-sensor",
         "name": "Mạch Cảm Biến Góc Mag-IMU 14-bit Siêu Nhạy",
-        "tagline": "Cảm biến từ trường góc quay 14-bit và gia tốc con quay hồi chuyển 6 trục.",
-        "subtitle": "Mô-đun cảm biến độ phân giải 16384 xung/vòng (14-bit) kết hợp IMU 6-DOF bù nhiệt độ. Cung cấp dữ liệu phản hồi góc nghiêng Roll/Pitch/Yaw chính xác đến 0.01 độ cho vòng lặp FOC.",
+        "tagline": "Cảm biến góc Mag-IMU 14-bit — Chính xác 0.01°",
+        "subtitle": "Encoder từ tính 16.384 xung/vòng kết hợp IMU 6 trục bù nhiệt.",
         "badge": "Độ Nhạy Cao",
         "img": "/shared/img/pcb_imu_head.png",
         "status": "Sẵn Hàng",
@@ -419,17 +424,17 @@
             "price": 650000,
             "origPrice": 800000,
             "priceFormatted": "650.000₫",
-            "desc": "Gồm 3 mạch cảm biến Encoder 14-bit + Nam châm từ tính định tâm CNC."
+            "desc": "Bộ 3 mạch Encoder 14-bit + nam châm định tâm."
           }
         ],
         "highlights": [
-          { "icon": "🧭", "title": "14-bit Magnetic Sensing", "desc": "Độ phân giải 16,384 xung/vòng cho chuyển động vi mô không gợn sóng." },
-          { "icon": "📐", "title": "Chống Nhiễu Từ Trường", "desc": "Mạch lọc phần cứng khử nhiễu từ động cơ và nguồn điện xung." }
+          { "icon": "🧭", "metric": "14-bit", "title": "Độ Phân Giải Cao", "desc": "16.384 xung/vòng cho chuyển động vi mô mượt mà." },
+          { "icon": "📐", "metric": "±0.01°", "title": "Chống Nhiễu Từ Trường", "desc": "Lọc phần cứng nhiễu từ động cơ và nguồn xung." }
         ],
         "specs": [
           { "label": "SKU", "val": "TF-X14-IMU-R1" },
-          { "label": "Độ Phân Giải", "val": "14-bit (0.022 độ/bước)" },
-          { "label": "Chuẩn Giao Tiếp", "val": "SPI / SSI tốc độ cao 10MHz" },
+          { "label": "Độ Phân Giải", "val": "14-bit (0.022°/bước)" },
+          { "label": "Chuẩn Giao Tiếp", "val": "SPI / SSI 10MHz" },
           { "label": "Kích Thước", "val": "15mm x 15mm siêu nhỏ gọn" }
         ],
         "boxContents": [
@@ -502,6 +507,9 @@
         saveCatalog(DEFAULT_CATALOG);
         return DEFAULT_CATALOG;
       }
+      var needsVersionMigration = parsed.catalogVersion !== BUNDLED_CATALOG_VERSION;
+      var defaultGroupById = {};
+      (DEFAULT_CATALOG.groups || []).forEach(function(dg) { defaultGroupById[dg.id] = dg; });
       // Normalize cached group names (remove internal numbering & B2C tags)
       if (parsed.groups && Array.isArray(parsed.groups)) {
         var groupsMigrated = false;
@@ -512,6 +520,10 @@
               g.name = cleaned;
               groupsMigrated = true;
             }
+          }
+          if (needsVersionMigration && defaultGroupById[g.id]) {
+            g.desc = defaultGroupById[g.id].desc;
+            groupsMigrated = true;
           }
         });
         if (groupsMigrated) {
@@ -567,16 +579,20 @@
         if (Array.isArray(p.overview)) {
           p.overview.forEach(function(o) { if (o && o.img) o.img = normImgPath(o.img, null); });
         }
-        if (p.id === 'tf-g31-pro') {
-          var defaultPro = DEFAULT_CATALOG.products[0];
-          if (typeof p.subtitle === 'string' && p.subtitle.indexOf('Động cơ tải trọng 450g, thuật toán Pure FOC 20kHz') !== -1) {
-            p.subtitle = defaultPro.subtitle;
-            mediaMigrated = true;
+        if (needsVersionMigration && defProd) {
+          p.tagline = defProd.tagline;
+          p.subtitle = defProd.subtitle;
+          p.highlights = JSON.parse(JSON.stringify(defProd.highlights || []));
+          p.specs = JSON.parse(JSON.stringify(defProd.specs || []));
+          if (Array.isArray(p.tiers) && Array.isArray(defProd.tiers)) {
+            var defTierByKey = {};
+            defProd.tiers.forEach(function(dt) { defTierByKey[dt.key] = dt; });
+            p.tiers.forEach(function(t) {
+              var dt = defTierByKey[t.key || t.id];
+              if (dt) t.desc = dt.desc;
+            });
           }
-          if (Array.isArray(p.highlights) && p.highlights[0] && p.highlights[0].title === 'Thuật Toán Pure FOC 20kHz') {
-            p.highlights = defaultPro.highlights;
-            mediaMigrated = true;
-          }
+          mediaMigrated = true;
         }
         if (p.tiers && Array.isArray(p.tiers)) {
           p.tiers.forEach(function(t, idx) {
@@ -591,6 +607,10 @@
           });
         }
       });
+      if (needsVersionMigration) {
+        parsed.catalogVersion = BUNDLED_CATALOG_VERSION;
+        mediaMigrated = true;
+      }
       if (mediaMigrated) {
         try { localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed)); } catch (e) {}
       }
@@ -2867,6 +2887,7 @@
   }
 
   return {
+    BUNDLED_CATALOG_VERSION: BUNDLED_CATALOG_VERSION,
     STORAGE_KEY: STORAGE_KEY,
     CART_KEY: CART_KEY,
     ORDERS_KEY: ORDERS_KEY,

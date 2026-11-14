@@ -9,7 +9,7 @@
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&subset=vietnamese&display=swap" rel="stylesheet">
   
   <style>
     /* ==========================================================================
@@ -22,8 +22,8 @@
       --border: rgba(0, 0, 0, 0.08);
       --border-hover: rgba(0, 0, 0, 0.2);
       --text-main: #1D1D1F;
-      --text-secondary: #6E6E73;
-      --text-muted: #86868B;
+      --text-secondary: #4B5563;
+      --text-muted: #4B5563;
       --accent: #1D1D1F;
       --link: #0071E3;
       --link-hover: #0077ED;
@@ -34,7 +34,7 @@
       --radius-md: 14px;
       --radius-lg: 20px;
       --radius-full: 9999px;
-      --font: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       --font-mono: "JetBrains Mono", monospace;
       --ease: cubic-bezier(0.16, 1, 0.3, 1);
       --nav-h: clamp(54px, 6.8vh, 62px);
@@ -53,8 +53,12 @@
       font-family: var(--font);
       background-color: var(--bg);
       color: var(--text-main);
-      line-height: 1.5;
+      line-height: 1.6;
+      letter-spacing: 0;
+      font-kerning: normal;
+      text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       overflow-x: hidden;
     }
     a { color: inherit; text-decoration: none; }
@@ -82,8 +86,9 @@
       gap: 10px;
       cursor: pointer;
       font-size: 16px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
     }
     .brand-mark {
       width: 28px;
@@ -93,7 +98,7 @@
       color: #FFF;
       display: grid;
       place-items: center;
-      font-weight: 800;
+      font-weight: 700;
       font-size: 14px;
     }
 
@@ -201,18 +206,18 @@
       margin: 0 auto clamp(16px, 2.8dvh, 36px) auto;
     }
     .tag-clean {
-      font-size: clamp(10.5px, 0.9vw, 12px);
-      font-weight: 700;
-      letter-spacing: 0.08em;
+      font-size: clamp(11px, 0.9vw, 12px);
+      font-weight: 600;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      color: var(--text-muted);
+      color: #4B5563;
       margin-bottom: clamp(4px, 0.8dvh, 10px);
     }
     .title-clean {
       font-size: clamp(24px, min(3.2vw, 4.4dvh), 40px);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.14;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
       margin-bottom: clamp(6px, 1dvh, 14px);
     }
     .sub-clean {
@@ -313,8 +318,8 @@
       background: var(--text-main);
       color: #FFF;
       font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.05em;
+      font-weight: 600;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       padding: 5px 12px;
       border-radius: var(--radius-full);
@@ -322,24 +327,43 @@
     }
 
     .flagship-info h1 {
-      font-size: clamp(28px, min(3.8vw, 5dvh), 44px);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1.12;
+      font-size: clamp(32px, min(3.8vw, 5dvh), 44px);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
       margin-bottom: clamp(6px, 0.9dvh, 12px);
     }
     .flagship-tagline {
       font-size: clamp(15px, min(1.7vw, 2.25dvh), 19px);
       font-weight: 600;
       color: var(--text-secondary);
-      margin-bottom: clamp(6px, 1.1dvh, 14px);
-      line-height: 1.38;
+      margin-bottom: clamp(6px, 1.1dvh, 12px);
+      line-height: 1.4;
     }
     .flagship-desc {
-      font-size: clamp(13px, min(1.22vw, 1.8dvh), 14.5px);
+      font-size: clamp(13.5px, min(1.22vw, 1.8dvh), 15px);
       color: var(--text-secondary);
-      margin-bottom: clamp(12px, 2dvh, 22px);
-      line-height: 1.52;
+      margin-bottom: clamp(10px, 1.5dvh, 16px);
+      line-height: 1.58;
+    }
+    .hero-spec-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: clamp(12px, 1.8dvh, 18px);
+    }
+    .hero-spec-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
     }
     .hero-field-label {
       margin-bottom: clamp(5px, 0.8dvh, 8px);
@@ -430,8 +454,9 @@
     }
     .hero-price-val {
       font-size: clamp(24px, min(2.8vw, 4.2dvh), 32px);
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
       font-family: var(--font-mono);
     }
     .hero-price-old {
@@ -507,9 +532,9 @@
       margin-bottom: 0;
     }
     .feature-icon-badge {
-      width: 26px;
-      height: 26px;
-      border-radius: 8px;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
       background: #FFFFFF;
       border: 1px solid var(--border);
       color: var(--text-main);
@@ -517,20 +542,24 @@
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .feature-icon-badge svg {
+      width: 21px;
+      height: 21px;
     }
     .feature-card-title {
       font-size: clamp(15px, min(1.48vw, 2.25dvh), 19px);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1.25;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
       color: var(--text-main);
       margin-bottom: clamp(3px, 0.6dvh, 6px);
     }
     .feature-card-desc {
       font-size: clamp(12.5px, min(1.06vw, 1.68dvh), 13.8px);
       color: var(--text-secondary);
-      line-height: 1.48;
+      line-height: 1.5;
     }
     .feature-stat-row {
       display: flex;
@@ -543,9 +572,9 @@
     }
     .feature-stat-val {
       font-size: clamp(18px, min(1.85vw, 2.85dvh), 25px);
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      line-height: 1.1;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
       color: var(--text-main);
     }
     .feature-stat-note {
@@ -587,8 +616,8 @@
       display: inline-block;
       width: fit-content;
       white-space: nowrap;
-      font-size: 10.5px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 600;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: #E5E5EA;
@@ -600,9 +629,9 @@
     }
     .feature-app-title {
       font-size: clamp(16px, min(1.6vw, 2.5dvh), 21px);
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      line-height: 1.22;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
       color: #FFFFFF;
       margin-bottom: clamp(6px, 1.1dvh, 12px);
     }
@@ -621,10 +650,12 @@
       background: transparent;
       color: rgba(255,255,255,0.75);
       border: none;
-      padding: 5px 10px;
+      padding: 5px 11px;
       border-radius: var(--radius-full);
-      font-size: clamp(10.5px, 0.85vw, 12px);
+      font-size: clamp(11px, 0.85vw, 12px);
       font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.2s var(--ease);
@@ -668,6 +699,27 @@
       background: #30D158;
       flex-shrink: 0;
     }
+    .app-studio-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: fit-content;
+      background: #FFFFFF;
+      color: #1D1D1F;
+      padding: 9px 16px;
+      border-radius: var(--radius-full);
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.28);
+      transition: transform 0.2s var(--ease), background 0.2s var(--ease);
+    }
+    .app-studio-cta:hover {
+      background: #F5F5F7;
+      transform: translateY(-1px);
+    }
     .feature-app-phone {
       display: flex;
       align-items: center;
@@ -695,8 +747,9 @@
     }
     .trust-heading {
       font-size: clamp(21px, min(2.4vw, 3.4dvh), 28px);
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
     }
     .trust-grid {
       display: grid;
@@ -767,7 +820,7 @@
       box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
     }
     .catalog-search-input::placeholder {
-      color: #86868B;
+      color: #4B5563;
     }
     .catalog-search-icon {
       position: absolute;
@@ -868,12 +921,12 @@
     }
     .dji-shelf-title {
       font-size: clamp(16px, 1.65vw, 22px);
-      font-weight: 800;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: -0.02em;
+      letter-spacing: 0.04em;
       color: var(--text-main);
       margin: 0;
-      line-height: 1.2;
+      line-height: 1.32;
     }
     .dji-category-shelf:not(.is-wide) .dji-shelf-title {
       font-size: clamp(14.5px, 1.3vw, 17px);
@@ -1020,7 +1073,7 @@
     .dji-card-title {
       font-size: clamp(14.5px, 1.3vw, 17px);
       font-weight: 700;
-      letter-spacing: -0.015em;
+      letter-spacing: 0;
       color: var(--text-main);
       line-height: 1.32;
       min-height: 2.64em;
@@ -1050,14 +1103,15 @@
     }
     .dji-card-price {
       font-size: clamp(15px, 1.4vw, 17.5px);
-      font-weight: 800;
+      font-weight: 700;
       color: #0071E3;
       font-variant-numeric: tabular-nums;
-      letter-spacing: -0.02em;
+      letter-spacing: 0;
+      line-height: 1.32;
     }
     .dji-card-orig {
       font-size: 12px;
-      color: #86868B;
+      color: #4B5563;
       text-decoration: line-through;
       font-variant-numeric: tabular-nums;
     }
@@ -1089,15 +1143,15 @@
       color: #0071E3;
     }
     .dji-compare-circle {
-      width: 15px;
-      height: 15px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
-      border: 1.5px solid #8E8E93;
+      border: 1.5px solid #4B5563;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 9.5px;
-      font-weight: 800;
+      font-size: 11px;
+      font-weight: 700;
       color: #FFFFFF;
       background: #FFFFFF;
       transition: all 0.18s ease;
@@ -1241,7 +1295,7 @@
       .compare-table.is-two-cols th {
         width: 76px;
         padding: 8px 6px 8px 2px;
-        font-size: 10.5px;
+        font-size: 11px;
       }
       .compare-table.is-two-cols td {
         padding: 8px 6px;
@@ -1330,9 +1384,9 @@
     }
     .detail-heading h1 {
       font-size: clamp(24px, min(2.7vw, 3.8dvh), 34px);
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      line-height: 1.12;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
       margin-bottom: 0;
     }
     .detail-overview-lead {
@@ -1344,11 +1398,11 @@
     }
     .detail-tagline {
       font-size: clamp(18px, min(2vw, 2.8dvh), 24px);
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      letter-spacing: 0;
       color: var(--text-main);
       margin: 6px 0 10px 0;
-      line-height: 1.3;
+      line-height: 1.32;
     }
     .detail-short-desc {
       font-size: clamp(14px, 1.25vw, 15.5px);
@@ -1405,7 +1459,9 @@
     }
     .tier-card-price {
       font-size: clamp(14px, 1.2vw, 15.5px);
-      font-weight: 800;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
       font-family: var(--font-mono);
       text-align: right;
       white-space: nowrap;
@@ -1446,7 +1502,9 @@
     }
     .summary-current-price {
       font-size: clamp(24px, min(2.5vw, 3.4dvh), 30px);
-      font-weight: 800;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
       font-family: var(--font-mono);
     }
     .summary-old-price {
@@ -1507,7 +1565,8 @@
     }
     .deep-tab-btn.active {
       color: var(--text-main);
-      font-weight: 800;
+      font-weight: 700;
+      letter-spacing: 0;
     }
     .deep-tab-btn.active::after {
       content: '';
@@ -1515,6 +1574,132 @@
       bottom: -1px; left: 0; right: 0;
       height: 2px;
       background: var(--text-main);
+    }
+
+    /* Overview Visual Icon+Metric Cards */
+    .detail-metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+    .detail-metric-card {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+    }
+    .detail-metric-card:hover {
+      background: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .detail-metric-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .detail-metric-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: var(--shadow-sm);
+    }
+    .detail-metric-pill {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #1D1D1F;
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      font-family: var(--font-mono);
+    }
+    .detail-metric-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+    .detail-metric-card p {
+      font-size: 13.5px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+    .detail-metric-thumb {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      height: 148px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .detail-metric-thumb img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    .warranty-visual-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .warranty-visual-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .warranty-visual-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--bg-alt);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+    .warranty-visual-card h4 {
+      font-size: 15.5px;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
+      color: var(--text-main);
+    }
+    .warranty-visual-card p {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin: 0;
+    }
+    @media (max-width: 768px) {
+      .warranty-visual-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
     /* Overview Highlights (Alternating) */
@@ -1533,8 +1718,9 @@
     }
     .overview-text-box h3 {
       font-size: clamp(20px, 2.2vw, 26px);
-      font-weight: 800;
-      letter-spacing: -0.02em;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
       margin-bottom: 10px;
     }
     .overview-text-box p {
@@ -1735,8 +1921,9 @@
     }
     .cart-header h3 {
       font-size: 17px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
     }
     .btn-close-cart {
       background: transparent;
@@ -1820,7 +2007,7 @@
     }
     .cart-item-price {
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 700;
       font-family: var(--font-mono);
     }
     .cart-item-del {
@@ -1847,7 +2034,7 @@
       display: flex;
       justify-content: space-between;
       font-size: 18px;
-      font-weight: 800;
+      font-weight: 700;
       color: var(--text-main);
       margin-top: 14px;
       padding-top: 12px;
@@ -1895,7 +2082,9 @@
     }
     .modal-title {
       font-size: 22px;
-      font-weight: 800;
+      font-weight: 700;
+      letter-spacing: 0;
+      line-height: 1.32;
       margin-bottom: 6px;
     }
     .modal-sub {
@@ -1963,9 +2152,10 @@
     }
     .footer-brand-title {
       font-size: 17px;
-      font-weight: 800;
+      font-weight: 700;
       color: #FFFFFF;
-      letter-spacing: -0.01em;
+      letter-spacing: 0;
+      line-height: 1.32;
       margin-bottom: 12px;
     }
     .footer-col-desc {
@@ -2083,10 +2273,10 @@
     }
     .scorecard-big-num {
       font-size: 56px;
-      font-weight: 800;
-      letter-spacing: -0.04em;
+      font-weight: 700;
+      letter-spacing: 0;
       color: var(--text-main);
-      line-height: 1;
+      line-height: 1.1;
     }
     .scorecard-stars {
       display: flex;
@@ -2382,11 +2572,11 @@
       gap: 6px;
     }
     .rev-card-verified-badge {
-      font-size: 10px;
-      font-weight: 700;
+      font-size: 11px;
+      font-weight: 600;
       background: rgba(52,199,89,0.12);
-      color: #28CD41;
-      padding: 1px 7px;
+      color: #15803D;
+      padding: 2px 8px;
       border-radius: 99px;
     }
     .rev-card-role {
@@ -2405,10 +2595,11 @@
     }
     .rev-card-title {
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 700;
+      letter-spacing: 0;
       color: var(--text-main);
       margin-bottom: 8px;
-      line-height: 1.4;
+      line-height: 1.35;
     }
     .rev-card-quote {
       font-size: 13.5px;
@@ -2450,7 +2641,7 @@
       border: 1px solid rgba(255,255,255,0.16);
       box-shadow: 0 12px 32px rgba(0,0,0,0.28), 0 4px 20px rgba(0,0,0,0.3);
       cursor: pointer;
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: var(--font);
       transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s;
     }
     .tflow-ai-fab:hover {
@@ -2478,12 +2669,12 @@
     }
     .tflow-ai-fab-title {
       font-size: 13.5px;
-      font-weight: 800;
-      letter-spacing: -0.01em;
+      font-weight: 700;
+      letter-spacing: 0;
     }
     .tflow-ai-fab-sub {
-      font-size: 10.5px;
-      color: rgba(255,255,255,0.7);
+      font-size: 11px;
+      color: rgba(255,255,255,0.82);
       display: flex;
       align-items: center;
       gap: 4px;
@@ -2552,7 +2743,7 @@
       display: none;
       flex-direction: column;
       overflow: hidden;
-      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      font-family: var(--font);
       animation: slideUpAi 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .ai-drawer-header {
@@ -3083,9 +3274,9 @@
       }
       .nav-brand span:first-child {
         font-size: 18px !important;
-        font-weight: 800 !important;
-        letter-spacing: -0.03em !important;
-        line-height: 1 !important;
+        font-weight: 700 !important;
+        letter-spacing: 0 !important;
+        line-height: 1.2 !important;
       }
       .nav-brand span:last-child {
         display: none !important;
@@ -3230,9 +3421,9 @@
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
         color: #FFFFFF !important;
-        font-size: 9.5px !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.04em !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+        letter-spacing: 0.06em !important;
         text-transform: uppercase !important;
         padding: 4px 10px !important;
         border-radius: 99px !important;
@@ -3244,14 +3435,14 @@
         width: 100% !important;
       }
       .flagship-info .tag-clean {
-        font-size: 10px !important;
+        font-size: 11px !important;
         margin-bottom: 3px !important;
       }
       .flagship-info h1 {
         font-size: clamp(22px, min(6vw, 3.4dvh), 28px) !important;
-        line-height: 1.12 !important;
-        font-weight: 800 !important;
-        letter-spacing: -0.03em !important;
+        line-height: 1.25 !important;
+        font-weight: 700 !important;
+        letter-spacing: 0 !important;
         margin-bottom: 3px !important;
       }
       .flagship-tagline {
@@ -3339,15 +3530,16 @@
       }
       .hero-price-val {
         font-size: clamp(21px, 5.6vw, 26px) !important;
-        font-weight: 800 !important;
+        font-weight: 700 !important;
+        letter-spacing: 0 !important;
         color: #1D1D1F !important;
       }
       .hero-price-old {
         font-size: 13px !important;
-        color: #8E8E93 !important;
+        color: #4B5563 !important;
       }
       .hero-price-save {
-        font-size: 10.5px !important;
+        font-size: 11px !important;
         padding: 3px 8px !important;
       }
 
@@ -3419,21 +3611,21 @@
         margin-bottom: 4px !important;
       }
       .feature-card-head .tag-clean {
-        font-size: 9px !important;
+        font-size: 11px !important;
       }
       .feature-icon-badge {
-        width: 22px !important;
-        height: 22px !important;
-        border-radius: 6px !important;
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 7px !important;
       }
       .feature-card-title {
         font-size: clamp(12.5px, 3.35vw, 14.5px) !important;
-        line-height: 1.24 !important;
+        line-height: 1.32 !important;
         margin-bottom: 3px !important;
       }
       .feature-card-desc {
-        font-size: clamp(10.5px, 2.75vw, 11.5px) !important;
-        line-height: 1.36 !important;
+        font-size: clamp(11px, 2.75vw, 12px) !important;
+        line-height: 1.4 !important;
       }
       .feature-stat-row {
         padding-top: 5px !important;
@@ -3457,7 +3649,7 @@
         gap: 6px !important;
       }
       .feature-app-eyebrow {
-        font-size: 9px !important;
+        font-size: 11px !important;
         padding: 3px 8px !important;
         margin-bottom: 4px !important;
       }
@@ -3471,7 +3663,7 @@
       }
       .app-mode-tab {
         padding: 4px 9px !important;
-        font-size: 10.5px !important;
+        font-size: 11px !important;
       }
       .feature-app-desc {
         font-size: 11px !important;
@@ -3479,7 +3671,7 @@
       }
       .app-perk-chip {
         padding: 4px 8px !important;
-        font-size: 10.5px !important;
+        font-size: 11px !important;
         border-radius: 8px !important;
       }
       .app-perk-chip:nth-child(3) {
@@ -3644,7 +3836,7 @@
         transform: none !important;
       }
       .dji-discount-ribbon {
-        font-size: 10px !important;
+        font-size: 11px !important;
         padding: 2px 8px !important;
         border-radius: 0 0 8px 0 !important;
       }
@@ -4070,7 +4262,7 @@
         margin-bottom: 6px !important;
       }
       .features-section .tag-clean {
-        font-size: 9px !important;
+        font-size: 11px !important;
         margin-bottom: 1px !important;
       }
       .features-section .title-clean {
@@ -4079,7 +4271,7 @@
       }
       .features-section .sub-clean {
         font-size: 11px !important;
-        line-height: 1.28 !important;
+        line-height: 1.32 !important;
       }
       .features-bento-grid {
         gap: 6px !important;
@@ -4090,19 +4282,24 @@
         gap: 4px !important;
       }
       .feature-icon-badge {
-        display: none !important;
+        width: 24px !important;
+        height: 24px !important;
+      }
+      .feature-icon-badge svg {
+        width: 14px !important;
+        height: 14px !important;
       }
       .feature-card-head {
         margin-bottom: 2px !important;
       }
       .feature-card-title {
         font-size: 12px !important;
-        line-height: 1.22 !important;
+        line-height: 1.32 !important;
         margin-bottom: 2px !important;
       }
       .feature-card-desc {
-        font-size: 10px !important;
-        line-height: 1.26 !important;
+        font-size: 11px !important;
+        line-height: 1.32 !important;
       }
       .feature-stat-row {
         padding-top: 3px !important;
@@ -4122,12 +4319,12 @@
         margin-bottom: 4px !important;
       }
       .feature-app-desc {
-        font-size: 10px !important;
-        line-height: 1.26 !important;
+        font-size: 11px !important;
+        line-height: 1.32 !important;
       }
       .app-perk-chip {
         padding: 3px 6px !important;
-        font-size: 9.5px !important;
+        font-size: 11px !important;
       }
       .app-perk-chip:nth-child(3) {
         display: none !important;
@@ -4310,7 +4507,7 @@
         margin-bottom: 6px !important;
       }
       .section-header-clean .tag-clean {
-        font-size: 9.5px !important;
+        font-size: 11px !important;
         margin-bottom: 1px !important;
       }
       .section-header-clean .title-clean {
@@ -4319,7 +4516,7 @@
       }
       .section-header-clean .sub-clean {
         font-size: 11px !important;
-        line-height: 1.25 !important;
+        line-height: 1.32 !important;
       }
       .features-bento-grid {
         grid-template-columns: 1fr 1fr 1.46fr !important;
@@ -4338,16 +4535,16 @@
         margin-bottom: 1px !important;
       }
       .feature-card-head .tag-clean {
-        font-size: 8.5px !important;
+        font-size: 11px !important;
       }
       .feature-card-title {
         font-size: 12px !important;
-        line-height: 1.18 !important;
+        line-height: 1.25 !important;
         margin-bottom: 2px !important;
       }
       .feature-card-desc {
-        font-size: 10px !important;
-        line-height: 1.24 !important;
+        font-size: 11px !important;
+        line-height: 1.3 !important;
       }
       .feature-stat-row {
         padding-top: 3px !important;
@@ -4373,11 +4570,11 @@
       }
       .app-mode-tab {
         padding: 3px 8px !important;
-        font-size: 10px !important;
+        font-size: 11px !important;
       }
       .feature-app-desc {
-        font-size: 10px !important;
-        line-height: 1.26 !important;
+        font-size: 11px !important;
+        line-height: 1.3 !important;
       }
       .feature-app-perks {
         display: none !important;
@@ -4720,7 +4917,7 @@
         gap: 4px !important;
       }
       .nav-links li button {
-        font-size: 10.5px !important;
+        font-size: 11px !important;
         padding: 4px 5px !important;
         min-height: 31px !important;
       }
@@ -4747,7 +4944,7 @@
       }
       .hero-tier-btn .hero-tier-name,
       .hero-tier-btn .hero-tier-price {
-        font-size: 10px !important;
+        font-size: 11px !important;
       }
       .hero-action-buttons {
         grid-template-columns: 1fr 1fr !important;
@@ -4779,8 +4976,8 @@
         font-size: 11px !important;
       }
       .feature-card-desc {
-        font-size: 9.5px !important;
-        line-height: 1.24 !important;
+        font-size: 11px !important;
+        line-height: 1.28 !important;
       }
       .feature-stat-val {
         font-size: 12px !important;
@@ -4816,7 +5013,7 @@
         font-size: 13px !important;
       }
       .dji-compare-btn {
-        font-size: 10.5px !important;
+        font-size: 11px !important;
       }
     }
 
@@ -4912,9 +5109,9 @@
           <path d="M 50 34 L 50 82" stroke="currentColor" stroke-width="12" stroke-linecap="round" />
         </svg>
       </div>
-      <div style="display:flex; flex-direction:column; line-height:1;">
-        <span style="font-size:20px; font-weight:800; letter-spacing:-0.03em; color:var(--text-main); font-family:'Plus Jakarta Sans', sans-serif;">t-flow</span>
-        <span style="font-size:9.5px; font-weight:600; color:var(--text-secondary); letter-spacing:0.02em; text-transform:lowercase; margin-top:2px;">mượt mà từng khoảnh khắc</span>
+      <div style="display:flex; flex-direction:column; line-height:1.15;">
+        <span style="font-size:20px; font-weight:700; letter-spacing:0; color:var(--text-main); font-family:var(--font);">t-flow</span>
+        <span style="font-size:11px; font-weight:600; color:var(--text-secondary); letter-spacing:0.02em; text-transform:lowercase; margin-top:2px;">mượt mà từng khoảnh khắc</span>
       </div>
     </div>
 
@@ -4957,12 +5154,17 @@
 
           <!-- Right: Flagship Info & Configurator -->
           <div class="flagship-info">
-            <div class="tag-clean">Phiên Bản 2026 &bull; Chống Rung 3 Trục</div>
+            <div class="tag-clean">Flagship 2026 &bull; Gimbal 3 Trục AI</div>
             <h1 id="heroFlagshipTitle">T-Flow Pro</h1>
-            <div class="flagship-tagline" id="heroFlagshipTagline">Vững khung hình, Trọn cảm xúc. Đỉnh cao chống rung 3 trục cho Smartphone.</div>
+            <div class="flagship-tagline" id="heroFlagshipTagline">Chống rung 3 trục • AI không cần App</div>
             <p class="flagship-desc" id="heroFlagshipDesc">
-              Chống rung siêu mượt khi vừa đi vừa quay cho iPhone &amp; Smartphone. Hít nam châm MagSafe 1 giây gọn nhẹ, xoay bánh xe thu phóng tiện lợi và pin dùng suốt 18 giờ.
+              Gắn MagSafe 1 chạm. Bám nét khuôn mặt ở mọi ứng dụng.
             </p>
+            <div class="hero-spec-badges" aria-label="Thông số nổi bật">
+              <span class="hero-spec-pill">⚡ FOC 20kHz</span>
+              <span class="hero-spec-pill">🎯 AI 60fps</span>
+              <span class="hero-spec-pill">🔋 Pin 18h</span>
+            </div>
 
             <!-- Tiers selector on Hero -->
             <div class="hero-field-label">Chọn Phiên Bản:</div>
@@ -4999,8 +5201,8 @@
       <div class="container">
         <div class="section-header-clean">
           <div class="tag-clean">Tính Năng Nổi Bật</div>
-          <h2 class="title-clean">Quay mượt như phim, gắn nhanh 1 giây</h2>
-          <p class="sub-clean">Chống rung thông minh kết hợp ứng dụng quay phim đi kèm &mdash; bấm máy là có ngay thước phim đẹp.</p>
+          <h2 class="title-clean">Quay mượt, gắn nhanh 1 giây</h2>
+          <p class="sub-clean">Chống rung Pure FOC &amp; App T-Flow tự động bám nét.</p>
         </div>
 
         <div class="features-bento-grid">
@@ -5009,17 +5211,17 @@
             <div class="feature-card-body">
               <div class="feature-card-head">
                 <span class="feature-icon-badge" aria-hidden="true">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/><circle cx="12" cy="12" r="9" opacity="0.28"/></svg>
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2-4 4-4 6 0s4 4 6 0 4-4 6 0"/><circle cx="12" cy="12" r="9" opacity="0.28"/></svg>
                 </span>
-                <div class="tag-clean">Chống Rung Toàn Diện</div>
+                <div class="tag-clean">Chống Rung 3 Trục</div>
               </div>
-              <div class="feature-card-title">Đi hay chạy, hình vẫn êm ru</div>
+              <div class="feature-card-title">Đi hay chạy, hình vẫn êm</div>
               <p class="feature-card-desc">
-                Tự giữ thăng bằng mọi bước chân &mdash; đi hay chạy đều mượt.
+                Pure FOC 20kHz cân bằng mọi bước chân.
               </p>
             </div>
             <div class="feature-stat-row">
-              <span class="feature-stat-val">Êm Mượt</span>
+              <span class="feature-stat-val">FOC 20kHz</span>
               <span class="feature-stat-note">Cân bằng tức thì</span>
             </div>
           </div>
@@ -5029,18 +5231,18 @@
             <div class="feature-card-body">
               <div class="feature-card-head">
                 <span class="feature-icon-badge" aria-hidden="true">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15-4-4 6.75-6.77a7.79 7.79 0 0 1 11 11L13 22l-4-4 6.39-6.36a2.14 2.14 0 0 0-3-3L6 15"/><path d="m5 8 4 4"/><path d="m12 15 4 4"/></svg>
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15-4-4 6.75-6.77a7.79 7.79 0 0 1 11 11L13 22l-4-4 6.39-6.36a2.14 2.14 0 0 0-3-3L6 15"/><path d="m5 8 4 4"/><path d="m12 15 4 4"/></svg>
                 </span>
-                <div class="tag-clean">Hít Nam Châm MagSafe</div>
+                <div class="tag-clean">Hít Từ Tính</div>
               </div>
-              <div class="feature-card-title">Đưa máy vào là hít, quay ngay</div>
+              <div class="feature-card-title">Gắn MagSafe trong 1 giây</div>
               <p class="feature-card-desc">
-                Gắn mở máy trong tích tắc, hít chắc mà khỏi kẹp rườm rà.
+                Hít nam châm N52, đặt vào là quay ngay.
               </p>
             </div>
             <div class="feature-stat-row">
               <span class="feature-stat-val">1 Giây</span>
-              <span class="feature-stat-note">Gắn mở nhanh gọn</span>
+              <span class="feature-stat-note">Lực hút 2.8kg</span>
             </div>
           </div>
 
@@ -5049,18 +5251,18 @@
             <div class="feature-card-body">
               <div class="feature-card-head">
                 <span class="feature-icon-badge" aria-hidden="true">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2"/><path d="M11 9.5 8.5 12h3L9 14.5"/></svg>
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="18" height="10" rx="2"/><path d="M22 11v2"/><path d="M11 9.5 8.5 12h3L9 14.5"/></svg>
                 </span>
-                <div class="tag-clean">Pin Khỏe Cả Ngày</div>
+                <div class="tag-clean">Pin Siêu Bền</div>
               </div>
-              <div class="feature-card-title">Quay 18 tiếng &amp; sạc cho máy</div>
+              <div class="feature-card-title">Quay 18 giờ &amp; sạc ngược</div>
               <p class="feature-card-desc">
-                Quay trọn cả ngày dài, cắm dây từ tay cầm sạc cho iPhone.
+                Sạc ngược PD 18W ngay khi đang quay.
               </p>
             </div>
             <div class="feature-stat-row">
               <span class="feature-stat-val">18 Giờ</span>
-              <span class="feature-stat-note">Kiêm sạc dự phòng</span>
+              <span class="feature-stat-note">Sạc ngược 18W</span>
             </div>
           </div>
 
@@ -5069,42 +5271,42 @@
             <div class="feature-card-body">
               <div class="feature-card-head">
                 <span class="feature-icon-badge" aria-hidden="true">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 5h4"/></svg>
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 5h4"/></svg>
                 </span>
-                <div class="tag-clean">Điều Khiển Một Tay</div>
+                <div class="tag-clean">Điều Khiển 1 Tay</div>
               </div>
-              <div class="feature-card-title">Chỉnh nét một tay, xem pin iPhone</div>
+              <div class="feature-card-title">Bánh xe chỉnh nét &amp; zoom</div>
               <p class="feature-card-desc">
-                Xoay nút thu phóng một tay, xem pin trên Dynamic Island.
+                Xoay ngón cái mượt mà, hiện pin Dynamic Island.
               </p>
             </div>
             <div class="feature-stat-row">
               <span class="feature-stat-val">1 Ngón Tay</span>
-              <span class="feature-stat-note">Hỗ trợ Dynamic Island</span>
+              <span class="feature-stat-note">Dynamic Island</span>
             </div>
           </div>
 
-          <!-- Feature 5 (Unified Interactive iOS App Showcase) -->
+          <!-- Feature 5 (Unified Interactive iOS App Showcase - Synced with Figma Flow) -->
           <div class="feature-app-showcase">
             <div class="feature-app-left">
               <div>
-                <div class="feature-app-eyebrow">Ứng Dụng Đi Kèm</div>
-                <h3 class="feature-app-title">Chọn chế độ quay hợp mọi phong cách</h3>
+                <div class="feature-app-eyebrow">App T-Flow Studio</div>
+                <h3 class="feature-app-title">Basic / Cơ Bản &amp; Pro / Chuyên Nghiệp</h3>
 
                 <div class="app-mode-switcher" role="tablist" aria-label="Chế độ ứng dụng T-Flow">
-                  <button type="button" class="app-mode-tab active" data-mode="basic" onclick="switchHomeAppMode('basic', this)">Chụp Nhanh AI</button>
-                  <button type="button" class="app-mode-tab" data-mode="pro" onclick="switchHomeAppMode('pro', this)">Pro Cinema</button>
+                  <button type="button" class="app-mode-tab active" data-mode="basic" onclick="switchHomeAppMode('basic', this)">Cơ Bản (Basic)</button>
+                  <button type="button" class="app-mode-tab" data-mode="pro" onclick="switchHomeAppMode('pro', this)">Chuyên Nghiệp (Pro)</button>
                 </div>
 
                 <p class="feature-app-desc" id="homeAppModeDesc">
-                  Tự xoay bám khuôn mặt khi bạn bước đi, đổi quay dọc 1 chạm.
+                  Quay nhanh AI bám mặt, xoay dọc TikTok 1 chạm.
                 </p>
               </div>
 
               <div class="feature-app-perks" id="homeAppModePerks">
-                <div class="app-perk-chip"><span class="perk-dot"></span> Tự bám khuôn mặt khi quay một mình</div>
-                <div class="app-perk-chip"><span class="perk-dot"></span> Đổi khung dọc TikTok / Reels 1 chạm</div>
-                <div class="app-perk-chip"><span class="perk-dot"></span> Tự nhận gimbal ngay khi vừa mở app</div>
+                <div class="app-perk-chip"><span class="perk-dot"></span> AI bám nét 60fps &amp; xoay dọc 1 chạm</div>
+                <div class="app-perk-chip"><span class="perk-dot"></span> 5 Widget Customizer: ISO, Horizon, Histogram, Auto-Hide, Khóa chạm</div>
+                <div class="app-perk-chip"><span class="perk-dot"></span> 3 Theme: Tối / Sáng / Tự Động</div>
               </div>
             </div>
 
@@ -5124,19 +5326,19 @@
         <div class="trust-grid">
           <div class="trust-item">
             <h4>Bảo Hành 12 Tháng</h4>
-            <p>1 đổi 1 ngay lập tức nếu phát sinh lỗi kỹ thuật từ nhà sản xuất.</p>
+            <p>1 đổi 1 ngay khi có lỗi kỹ thuật.</p>
           </div>
           <div class="trust-item">
             <h4>30 Ngày Dùng Thử</h4>
-            <p>Đổi mới miễn phí trong 30 ngày đầu trải nghiệm sản phẩm.</p>
+            <p>Đổi mới miễn phí trong 30 ngày đầu.</p>
           </div>
           <div class="trust-item">
             <h4>Miễn Phí Vận Chuyển</h4>
-            <p>Giao hàng hỏa tốc toàn quốc, kiểm tra hàng trước khi thanh toán.</p>
+            <p>Giao hỏa tốc, đồng kiểm toàn quốc.</p>
           </div>
           <div class="trust-item">
             <h4>Cập Nhật Miễn Phí</h4>
-            <p>Tự động nâng cấp tính năng quay và chống rung mới qua ứng dụng.</p>
+            <p>Nâng cấp tính năng mới qua ứng dụng.</p>
           </div>
         </div>
       </div>
@@ -5252,14 +5454,14 @@
         <!-- Deep Tab 1: Overview / Mô Tả Sản Phẩm -->
         <div id="deepTabOverview" class="deep-tab-panel">
           <div class="detail-overview-lead" id="detailOverviewLead">
-            <div class="tag-clean">Mô Tả Sản Phẩm</div>
-            <div class="detail-tagline" id="detailTagline">Vững khung hình, Trọn cảm xúc. Đỉnh cao chống rung 3 trục cho Smartphone.</div>
+            <div class="tag-clean">Điểm Nhấn Cốt Lõi</div>
+            <div class="detail-tagline" id="detailTagline">Chống rung 3 trục • AI không cần App</div>
             <p class="detail-short-desc" id="detailShortDesc">
-              Chống rung siêu mượt khi vừa đi vừa quay cho iPhone &amp; Smartphone. Hít nam châm MagSafe 1 giây gọn nhẹ, xoay bánh xe thu phóng tiện lợi và pin dùng suốt 18 giờ.
+              Gắn MagSafe 1 chạm. Bám nét khuôn mặt ở mọi ứng dụng.
             </p>
           </div>
           <div id="detailOverviewContainer">
-            <!-- Dynamically populated highlight blocks -->
+            <!-- Dynamically populated visual icon+metric cards -->
           </div>
         </div>
 
@@ -5279,11 +5481,28 @@
 
         <!-- Deep Tab 4: Warranty -->
         <div id="deepTabWarranty" class="deep-tab-panel" style="display:none;">
-          <div style="background:var(--bg-alt); padding:36px; border-radius:var(--radius-lg); border:1px solid var(--border);">
-            <h3 style="font-size:20px; font-weight:800; margin-bottom:12px;">Chính Sách Bảo Hành &amp; Dịch Vụ Khách Hàng</h3>
-            <p id="detailWarrantyText" style="font-size:15px; color:var(--text-secondary); line-height:1.7;">
-              Bảo hành 12 tháng 1 đổi 1 chính hãng, 30 ngày dùng thử đổi mới, hỗ trợ cập nhật firmware OTA trọn đời.
+          <div style="background:var(--bg-alt); padding:28px; border-radius:var(--radius-lg); border:1px solid var(--border);">
+            <h3 style="font-size:20px; font-weight:700; letter-spacing:0; line-height:1.32; margin-bottom:8px;">Bảo Hành Vàng T-Flow Tech</h3>
+            <p id="detailWarrantyText" style="font-size:14px; color:var(--text-secondary); line-height:1.55;">
+              12 tháng 1 đổi 1 • 30 ngày dùng thử • Cập nhật OTA trọn đời.
             </p>
+            <div class="warranty-visual-grid">
+              <div class="warranty-visual-card">
+                <div class="warranty-visual-icon" aria-hidden="true">🛡️</div>
+                <h4>12 Tháng 1 Đổi 1</h4>
+                <p>Đổi mới trong 24h nếu có lỗi phần cứng.</p>
+              </div>
+              <div class="warranty-visual-card">
+                <div class="warranty-visual-icon" aria-hidden="true">🔄</div>
+                <h4>30 Ngày Dùng Thử</h4>
+                <p>Đổi trả linh hoạt miễn phí trong 30 ngày đầu.</p>
+              </div>
+              <div class="warranty-visual-card">
+                <div class="warranty-visual-icon" aria-hidden="true">⚡</div>
+                <h4>OTA Trọn Đời</h4>
+                <p>Nâng cấp thuật toán FOC &amp; AI qua app.</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -5303,7 +5522,7 @@
         <div class="section-header-clean">
           <div class="tag-clean">Đánh Giá Thực Tế</div>
           <h2 class="title-clean">Cảm Nhận Trải Nghiệm T-Flow Pro</h2>
-          <p class="sub-clean">Toàn bộ nhận xét và đánh giá được gửi trực tiếp từ khách hàng và nhà sáng tạo nội dung đã trải nghiệm thực tế.</p>
+          <p class="sub-clean">Nhận xét thực tế từ khách hàng đã sử dụng T-Flow Pro.</p>
         </div>
 
         <!-- DYNAMIC REVIEWS SCORECARD (CALCULATED FROM REAL REVIEWS) -->
@@ -5351,8 +5570,8 @@
 
           <!-- CALL TO ACTION -->
           <div class="scorecard-right">
-            <div style="font-size:14.5px; font-weight:800; color:var(--text-main); margin-bottom:6px;">Bạn Đã Trải Nghiệm?</div>
-            <div style="font-size:12px; color:var(--text-secondary); text-align:center; margin-bottom:12px;">Gửi cảm nhận của bạn ngay bên dưới để cùng xây dựng cộng đồng T-Flow.</div>
+            <div style="font-size:14.5px; font-weight:700; color:var(--text-main); margin-bottom:6px;">Bạn Đã Trải Nghiệm?</div>
+            <div style="font-size:12px; color:var(--text-secondary); text-align:center; margin-bottom:12px;">Chia sẻ cảm nhận nhanh của bạn ngay bên dưới.</div>
             <a href="#tflowReviewFormCard" style="font-size:12.5px; font-weight:700; color:#0071E3; text-decoration:none;">Đi đến form viết đánh giá &darr;</a>
           </div>
         </div>
@@ -5363,18 +5582,18 @@
             <div style="display:flex; align-items:center; gap:12px;">
               <div style="width:36px; height:36px; border-radius:10px; background:#1D1D1F; color:#FFF; display:flex; align-items:center; justify-content:center; font-size:16px;">✍️</div>
               <div>
-                <h3 style="font-size:18px; font-weight:800; color:var(--text-main); margin:0;">Gửi Đánh Giá Trải Nghiệm T-Flow Pro</h3>
-                <p style="font-size:12.5px; color:var(--text-secondary); margin:2px 0 0 0;">Yêu cầu đăng nhập tài khoản để bảo đảm tính trung thực và minh bạch 100%.</p>
+                <h3 style="font-size:18px; font-weight:700; color:var(--text-main); margin:0;">Gửi Đánh Giá Trải Nghiệm T-Flow Pro</h3>
+                <p style="font-size:12.5px; color:var(--text-secondary); margin:2px 0 0 0;">Đăng nhập để xác thực người dùng thực tế.</p>
               </div>
             </div>
           </div>
 
           <!-- PROMPT YÊU CẦU ĐĂNG NHẬP NẾU CHƯA ĐĂNG NHẬP -->
-          <div id="reviewLoginRequiredPrompt" style="text-align:center; padding:36px 20px; background:#F5F5F7; border-radius:16px; border:1px dashed #D2D2D7; margin-bottom:16px; display:block;">
+          <div id="reviewLoginRequiredPrompt" style="text-align:center; padding:32px 20px; background:#F5F5F7; border-radius:16px; border:1px dashed #D2D2D7; margin-bottom:16px; display:block;">
             <div style="width:48px; height:48px; border-radius:50%; background:#1D1D1F; color:#FFF; display:inline-flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:12px;">🔒</div>
-            <h4 style="font-size:17px; font-weight:800; color:#1D1D1F; margin-bottom:6px;">Vui Lòng Đăng Nhập Để Gửi Đánh Giá</h4>
-            <p style="font-size:13.5px; color:#86868B; max-width:440px; margin:0 auto 18px auto; line-height:1.5;">
-              Để đảm bảo 100% đánh giá là từ người dùng thực tế và loại trừ đánh giá ảo, bạn cần đăng nhập tài khoản trước khi gửi nhận xét.
+            <h4 style="font-size:17px; font-weight:700; color:#1D1D1F; margin-bottom:6px;">Đăng Nhập Để Gửi Đánh Giá</h4>
+            <p style="font-size:13.5px; color:#4B5563; max-width:440px; margin:0 auto 18px auto; line-height:1.5;">
+              Xác thực tài khoản để đảm bảo 100% đánh giá từ người dùng thật.
             </p>
             <button type="button" onclick="loginWithGoogleOAuth()" style="display:inline-flex; align-items:center; gap:10px; padding:11px 22px; background:#FFFFFF; border:1px solid #747775; border-radius:99px; font-size:13.5px; font-weight:600; color:#1F1F1F; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.08); transition:background 0.2s;">
               <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
@@ -5409,7 +5628,7 @@
                   <div style="font-size:11.5px; color:var(--text-secondary);" id="reviewUserEmailBadge"></div>
                 </div>
               </div>
-              <span style="font-size:10.5px; font-weight:700; background:rgba(52,199,89,0.15); color:#28CD41; padding:2px 8px; border-radius:99px;">✓ Tài khoản đã xác thực</span>
+              <span style="font-size:11px; font-weight:700; background:rgba(52,199,89,0.15); color:#15803D; padding:2px 8px; border-radius:99px;">✓ Tài khoản đã xác thực</span>
             </div>
 
             <div id="reviewGuestFields" style="display:none;"></div>
@@ -5447,7 +5666,7 @@
 
         <!-- REVIEWS LIST SECTION -->
         <div style="margin-bottom:20px; display:flex; align-items:center; justify-content:space-between;">
-          <h3 style="font-size:18px; font-weight:800; color:var(--text-main); margin:0;">
+          <h3 style="font-size:18px; font-weight:700; color:var(--text-main); margin:0;">
             Danh Sách Đánh Giá Thực Tế (<span id="realReviewsCountHeader">0</span>)
           </h3>
           <div style="font-size:12px; color:var(--text-secondary);">Cập nhật thời gian thực</div>
@@ -5459,6 +5678,7 @@
         </div>
 
         <!-- FAQ SECTION (UPDATED TO T-FLOW PRO) -->
+        <div id="faqSection">
         <div class="section-header-clean" style="margin-top:70px;">
           <div class="tag-clean">Giải Đáp Thắc Mắc</div>
           <h2 class="title-clean">Câu Hỏi Thường Gặp Về T-Flow Pro</h2>
@@ -5471,7 +5691,7 @@
               <span class="faq-toggle-icon">+</span>
             </div>
             <div class="faq-answer">
-              T-Flow Pro tương thích hoàn hảo với mọi dòng iPhone từ iPhone 12 trở lên có MagSafe nguyên bản. Với các dòng điện thoại khác hoặc ốp lưng không có từ tính, sản phẩm đi kèm sẵn vòng từ tính trợ lực siêu mỏng dán mặt lưng.
+              Tương thích iPhone 12 trở lên có MagSafe, máy khác gắn vòng từ tính kèm theo.
             </div>
           </div>
 
@@ -5481,7 +5701,7 @@
               <span class="faq-toggle-icon">+</span>
             </div>
             <div class="faq-answer">
-              Ngàm được chế tác từ nam châm Neodymium N52 phân bố đa cực với lực hút đạt 2.8kg, gấp gần 10 lần trọng lượng của một chiếc iPhone 16 Pro Max, đảm bảo cố định chắc chắn ngay cả khi chạy nhanh hoặc leo núi.
+              Nam châm Neodymium N52 lực hút 2.8kg giữ chắc iPhone ngay cả khi chạy nhảy mạnh.
             </div>
           </div>
 
@@ -5491,7 +5711,7 @@
               <span class="faq-toggle-icon">+</span>
             </div>
             <div class="faq-answer">
-              Có. T-Flow Pro tích hợp cổng Type-C hỗ trợ chuẩn sạc nhanh PD 18W, vừa cân bằng chống rung vừa truyền nguồn sạc ngược cho iPhone khi đang quay phim dài hoặc livestream.
+              Có, cổng USB-C hỗ trợ sạc ngược PD 18W ngay trong lúc quay.
             </div>
           </div>
 
@@ -5501,9 +5721,10 @@
               <span class="faq-toggle-icon">+</span>
             </div>
             <div class="faq-answer">
-              Tất cả sản phẩm T-Flow Pro được bảo hành chính hãng 12 tháng từ Công ty TNHH Công nghệ T-Flow Việt Nam. Nếu phát sinh lỗi cơ học hoặc mạch điều khiển FOC từ nhà sản xuất, khách hàng được đổi mới thiết bị 100% trong vòng 24 giờ.
+              Bảo hành chính hãng 12 tháng, đổi mới 100% trong 24h nếu có lỗi phần cứng.
             </div>
           </div>
+        </div>
         </div>
 
       </div>
@@ -5533,7 +5754,7 @@
         </div>
         <div class="cart-total-row">
           <span>Tổng thanh toán</span>
-          <span id="cartGrandTotal" style="font-family:var(--font-mono); font-weight:800; font-size:20px;">0₫</span>
+          <span id="cartGrandTotal" style="font-family:var(--font-mono); font-weight:700; font-size:20px;">0₫</span>
         </div>
         <button class="btn-dark btn-checkout" onclick="openCheckoutModal()">Tiến Hành Đặt Hàng</button>
       </div>
@@ -5620,13 +5841,13 @@
               </svg>
             </div>
             <div>
-              <div style="font-size:24px; font-weight:800; letter-spacing:-0.03em; line-height:1; color:#FFF;">t-flow</div>
-              <div style="font-size:11px; font-weight:600; color:#86868B; margin-top:3px; letter-spacing:0.02em;">mượt mà từng khoảnh khắc</div>
+              <div style="font-size:24px; font-weight:700; letter-spacing:0; line-height:1.2; color:#FFF;">t-flow</div>
+              <div style="font-size:11px; font-weight:600; color:#9CA3AF; margin-top:3px; letter-spacing:0.02em;">mượt mà từng khoảnh khắc</div>
             </div>
           </div>
           <div style="font-size:16px; font-weight:700; color:#FFF; margin-bottom:6px;">Công ty TNHH Công nghệ T-Flow Việt Nam</div>
           <div style="font-size:13px; color:#A1A1A6; margin-bottom:14px;">T-Flow Tech Co., Ltd. • Giấy phép ĐKKD: 0109888888 do Sở KH&amp;ĐT Hà Nội cấp</div>
-          <div style="font-size:13px; color:#86868B; line-height:1.7;">
+          <div style="font-size:13px; color:#9CA3AF; line-height:1.7;">
             Trụ sở chính: Tòa nhà Công nghệ T-Flow, Hà Nội, Việt Nam.<br>
             Hotline CSKH: 1900 8888 (8:00 - 21:00) • Email: support@tflow.tech
           </div>
@@ -5727,21 +5948,21 @@
         <!-- COMPACT USER PILL WITH CLICKABLE POPOVER DROPDOWN (100% CLEAN ON MOBILE) -->
         <div class="user-nav-dropdown-wrapper" id="userNavDropdownWrapper">
           <div class="user-pill-trigger" onclick="toggleUserDropdown(event)" title="Tài khoản: ${displayName}">
-            <div style="width:24px; height:24px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <div style="width:24px; height:24px; border-radius:50%; background:#1D1D1F; color:#FFF; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; overflow:hidden;">
               ${avatarSrc ? `<img src="${avatarSrc}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block;">` : (isAdmin ? 'TN' : initialLetter)}
             </div>
             <span class="nav-desktop-only" style="font-size:12px; font-weight:600; max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${displayName}</span>
-            <span style="font-size:9.5px; font-weight:700; background:${isAdmin ? 'rgba(0,113,227,0.12)' : 'rgba(0,0,0,0.06)'}; color:${isAdmin ? '#0071E3' : '#1D1D1F'}; padding:1px 6px; border-radius:99px;">
+            <span style="font-size:11px; font-weight:700; background:${isAdmin ? 'rgba(0,113,227,0.12)' : 'rgba(0,0,0,0.06)'}; color:${isAdmin ? '#0071E3' : '#1D1D1F'}; padding:2px 7px; border-radius:99px;">
               ${isAdmin ? 'Admin' : 'TV'}
             </span>
-            <span style="font-size:9px; color:#8E8E93;">▼</span>
+            <span style="font-size:11px; color:#4B5563;">▼</span>
           </div>
 
           <!-- POPOVER DROPDOWN MENU -->
           <div class="user-nav-dropdown-menu" id="userNavDropdownMenu">
             <div class="user-dropdown-header">
               <div style="font-weight:700; font-size:13px; color:#1D1D1F;">${displayName}</div>
-              <div style="font-size:11px; color:#8E8E93; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${user.email || ''}</div>
+              <div style="font-size:11px; color:#4B5563; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${user.email || ''}</div>
             </div>
             ${isAdmin ? `
               <a href="/admin" class="dropdown-item-link" style="color:#0071E3; font-weight:700;">
@@ -6024,9 +6245,9 @@
       const isLogin = (tab === 'login');
       document.getElementById('modalLoginForm').style.display = isLogin ? 'block' : 'none';
       document.getElementById('modalRegisterForm').style.display = isLogin ? 'none' : 'block';
-      document.getElementById('modalTabBtnLogin').style.color = isLogin ? '#1D1D1F' : '#86868B';
+      document.getElementById('modalTabBtnLogin').style.color = isLogin ? '#1D1D1F' : '#4B5563';
       document.getElementById('modalTabBtnLogin').style.borderBottomColor = isLogin ? '#1D1D1F' : 'transparent';
-      document.getElementById('modalTabBtnRegister').style.color = isLogin ? '#86868B' : '#1D1D1F';
+      document.getElementById('modalTabBtnRegister').style.color = isLogin ? '#4B5563' : '#1D1D1F';
       document.getElementById('modalTabBtnRegister').style.borderBottomColor = isLogin ? 'transparent' : '#1D1D1F';
     }
 
@@ -6486,22 +6707,22 @@
     const HOME_APP_MODES = {
       basic: {
         img: '/shared/img/app_camera_basic.svg',
-        alt: 'Giao diện Chụp Nhanh AI trên iPhone',
-        desc: 'Tự xoay bám khuôn mặt khi bạn bước đi, đổi quay dọc 1 chạm.',
+        alt: 'Giao diện Cơ Bản (Basic) trên iPhone',
+        desc: 'Quay nhanh AI bám mặt, xoay dọc TikTok 1 chạm.',
         perks: [
-          'Tự bám khuôn mặt khi quay một mình',
-          'Đổi khung dọc TikTok / Reels 1 chạm',
-          'Tự nhận gimbal ngay khi vừa mở app'
+          'AI bám nét 60fps & xoay dọc 1 chạm',
+          '5 Widget Customizer: ISO, Horizon, Histogram, Auto-Hide, Khóa chạm',
+          '3 Theme: Tối / Sáng / Tự Động'
         ]
       },
       pro: {
         img: '/shared/img/app_camera_pro.svg',
-        alt: 'Giao diện Pro Cinema trên iPhone',
-        desc: 'Tự chỉnh màu phim, ánh sáng và kéo nét mượt như máy quay rạp.',
+        alt: 'Giao diện Chuyên Nghiệp (Pro) trên iPhone',
+        desc: 'Chỉnh tay ISO, Shutter, WB & biểu đồ RGB Histogram.',
         perks: [
-          'Quay 4K sắc nét & áp màu phim sẵn',
-          'Chỉnh sáng tối, nhiệt màu trực tiếp',
-          'Kết hợp bánh xe kéo nét mượt chuẩn rạp'
+          'Quay 4K Apple Log ProRes & nạp 3D LUT',
+          '5 Widget Customizer: ISO, Horizon, Histogram, Auto-Hide, Khóa chạm',
+          'Bánh xe kéo nét & thu phóng chuẩn điện ảnh'
         ]
       }
     };
@@ -6865,9 +7086,9 @@
         return `
           <td class="compare-prod-col">
             <img src="${escapeCatalogHtml(safeImg)}" alt="${escapeCatalogHtml(p.name)}" class="compare-prod-thumb">
-            <div style="font-weight:800; font-size:13.5px; color:#1D1D1F; margin-bottom:4px; cursor:pointer; line-height:1.3;" onclick="closeCompareModal(); openProductDetail('${escapeCatalogHtml(p.id)}')">${escapeCatalogHtml(p.name)}</div>
-            <div style="font-weight:800; font-size:14px; color:#0071E3;">${escapeCatalogHtml(meta.priceDisplay)}</div>
-            ${meta.origDisplay ? `<div style="font-size:11px; color:#86868B; text-decoration:line-through;">${escapeCatalogHtml(meta.origDisplay)}</div>` : ''}
+            <div style="font-weight:700; font-size:13.5px; color:#1D1D1F; margin-bottom:4px; cursor:pointer; line-height:1.32;" onclick="closeCompareModal(); openProductDetail('${escapeCatalogHtml(p.id)}')">${escapeCatalogHtml(p.name)}</div>
+            <div style="font-weight:700; font-size:14px; color:#0071E3;">${escapeCatalogHtml(meta.priceDisplay)}</div>
+            ${meta.origDisplay ? `<div style="font-size:11px; color:#4B5563; text-decoration:line-through;">${escapeCatalogHtml(meta.origDisplay)}</div>` : ''}
           </td>
         `;
       }).join('');
@@ -7016,28 +7237,36 @@
 
       updateDetailPriceBox();
 
-      // Deep Tab 1: Overview / Mô Tả Sản Phẩm (overview or highlights fallback)
+      // Deep Tab 1: Overview / Mô Tả Sản Phẩm (Visual Icon+Metric Cards)
       const overviewContainer = document.getElementById('detailOverviewContainer');
       if (overviewContainer) {
         overviewContainer.innerHTML = '';
         const overviewItems = (prod.overview && prod.overview.length > 0) ? prod.overview : (prod.highlights || []);
         const galleryList = (prod.gallery && prod.gallery.length > 0) ? prod.gallery : [prod.img || '/shared/img/tflow_pro_main.png'];
+        const grid = document.createElement('div');
+        grid.className = 'detail-metric-grid';
         overviewItems.forEach((h, idx) => {
-          const row = document.createElement('div');
-          row.className = `overview-row ${idx % 2 === 1 ? 'reverse' : ''}`;
+          const card = document.createElement('div');
+          card.className = 'detail-metric-card';
           const rowImg = h.img || galleryList[idx % galleryList.length] || prod.img;
-          row.innerHTML = `
-            <div class="overview-text-box">
-              <div class="tag-clean">Điểm Nhấn 0${idx + 1}</div>
-              <h3>${h.title || prod.name}</h3>
-              <p>${h.desc || ''}</p>
+          const metricLabel = h.metric || `Điểm Nhấn 0${idx + 1}`;
+          const iconSymbol = h.icon || '⚡';
+          card.innerHTML = `
+            <div>
+              <div class="detail-metric-head">
+                <div class="detail-metric-icon" aria-hidden="true">${iconSymbol}</div>
+                <span class="detail-metric-pill">${escapeCatalogHtml(metricLabel)}</span>
+              </div>
+              <h3 style="margin-top:12px;">${escapeCatalogHtml(h.title || prod.name)}</h3>
+              <p>${escapeCatalogHtml(h.desc || '')}</p>
             </div>
-            <div class="overview-img-box">
-              <img src="${rowImg}" alt="${h.title || prod.name}">
+            <div class="detail-metric-thumb">
+              <img src="${escapeCatalogHtml(rowImg)}" alt="${escapeCatalogHtml(h.title || prod.name)}">
             </div>
           `;
-          overviewContainer.appendChild(row);
+          grid.appendChild(card);
         });
+        overviewContainer.appendChild(grid);
       }
 
       // Reset to default Mô Tả Sản Phẩm tab cleanly on product switch
@@ -7388,9 +7617,9 @@
         container.innerHTML = `
           <div style="grid-column:1/-1; text-align:center; padding:54px 24px; background:var(--bg-alt); border-radius:24px; border:1px dashed var(--border);">
             <div style="font-size:36px; margin-bottom:12px;">🌟</div>
-            <div style="font-size:17px; font-weight:800; color:var(--text-main); margin-bottom:6px;">Chưa Có Đánh Giá Nào Từ Khách Hàng</div>
-            <div style="font-size:13.5px; color:var(--text-secondary); max-width:480px; margin:0 auto; line-height:1.6;">
-              T-Flow Pro là sản phẩm mới ra mắt! Bạn hãy sử dụng form bên trên để chia sẻ cảm nhận trải nghiệm thực tế đầu tiên.
+            <div style="font-size:17px; font-weight:700; color:var(--text-main); margin-bottom:6px;">Chưa Có Đánh Giá Nào</div>
+            <div style="font-size:13.5px; color:var(--text-secondary); max-width:460px; margin:0 auto; line-height:1.55;">
+              Hãy chia sẻ đánh giá thực tế đầu tiên của bạn bằng biểu mẫu phía trên.
             </div>
           </div>
         `;
@@ -7514,9 +7743,9 @@
     const AI_DOMAIN_CONFIG = {
       sales: {
         badge: 'BÁN HÀNG',
-        subtitle: 'Tư vấn bán hàng',
-        placeholder: 'Hỏi về giá 4 gói, ngàm MagSafe, bảo hành, ship...',
-        welcome: '👋 Xin chào quý khách! Em là **T-Flow Bot** — Trợ lý ảo chuyên trách **Tư Vấn Bán Hàng & Chính Sách**.\n\nEm sẵn sàng tư vấn ngay:\n• Báo giá chính hãng **4 bộ T-Flow Pro** theo nhu cầu quay\n• Chống rung siêu êm & ngàm **MagSafe hít 1 giây** chắc chắn\n• Chính sách **Bảo hành 1 đổi 1 trong 12 tháng** và **30 ngày dùng thử miễn phí**.\n\nAnh/chị đang quan tâm đến gói thiết bị nào ạ?',
+        subtitle: 'Tư vấn sản phẩm & Giá',
+        placeholder: 'Hỏi giá 4 gói, MagSafe, bảo hành 12 tháng...',
+        welcome: '👋 Chào bạn! Mình là **T-Flow Bot** — Tư vấn nhanh **giá 4 gói T-Flow Pro**, lực hút **MagSafe N52** & **Bảo hành 1 đổi 1**.\nBạn đang quan tâm phiên bản nào?',
         actions: [
           { label: '📦 Xem Bảng Giá 4 Gói', view: 'catalog' },
           { label: '⚡ Khả Năng Chống Rung', action: "sendQuickPrompt('Thuật toán Pure FOC 20kHz khác gì gimbal thường?')" },
@@ -7532,9 +7761,9 @@
       },
       creative: {
         badge: 'QUAY & EDIT',
-        subtitle: '🎬 2. Kỹ thuật quay chụp & hậu kỳ dựng phim',
-        placeholder: 'Hỏi về góc máy điện ảnh, FOC, Apple Log, CapCut, LUT...',
-        welcome: '🎬 Xin chào nhà sáng tạo! Tôi là **T-Flow Bot** (Chuyên gia sáng tạo & dựng phim).\n\nTôi đồng hành cùng bạn thiết lập góc máy và quy trình hậu kỳ chuẩn điện ảnh:\n• **Kỹ thuật lia máy FOC damping 20kHz** mượt như ray trượt dolly\n• **Quy trình Apple Log ProRes 4K** & nạp file **3D LUT .cube** xem trước trực tiếp\n• **Hiệu ứng Inception 360° Roll** & mẹo bước chân **Ninja Walk** triệt tiêu rung Z-axis\n• **Mẹo cắt dựng CapCut & Premiere Pro** xuất video 4K sắc nét.\n\nBạn đang chuẩn bị quay cảnh nào?',
+        subtitle: 'Quay phim & Dựng màu 3D LUT',
+        placeholder: 'Hỏi góc quay, Apple Log, 3D LUT, CapCut...',
+        welcome: '🎬 Chào nhà sáng tạo! Mình là **T-Flow Bot** — Hỗ trợ nhanh **Apple Log 4K**, nạp **3D LUT .cube** & **Inception 360°**.\nBạn chuẩn bị quay cảnh nào hôm nay?',
         actions: [
           { label: '🌅 Quay Hoàng Hôn Biển', action: "sendQuickPrompt('Kỹ thuật quay cảnh hoàng hôn trên biển ngược sáng')" },
           { label: '🏎️ Thể Thao Tốc Độ', action: "sendQuickPrompt('Quay thể thao xe chạy hành động chuyển động nhanh 120fps')" },
@@ -7550,9 +7779,9 @@
       },
       smart_vision: {
         badge: 'NHẬN DIỆN AI',
-        subtitle: '🧠 3. Tính năng nhận diện AI thông minh 120fps',
-        placeholder: 'Hỏi về bám nét người, thú cưng, vật thể, cam góc rộng, cử chỉ...',
-        welcome: '🧠 Chào bạn! Tôi là **T-Flow Bot** (Chuyên gia thị giác máy tính AI) — Chuyên gia phụ trách hệ thống Thị Giác Máy Tính AI của T-Flow Pro.\n\nCác tính năng AI đỉnh cao đã sẵn sàng:\n• **Bám nét người & mặt quang học 120fps** (độ trễ <5ms, không hao pin)\n• **Bám nét thú cưng thông minh (Pet Tracking)** bám dính chó mèo chạy nhảy\n• **Khóa vật thể Bounding Box** chạm khoanh vùng bất kỳ vật thể nào\n• **Tự động kích hoạt camera góc rộng 0.5x Ultra-Wide** khi phát hiện nhóm đông\n• **Cử chỉ tay Gesture**: ✋ Bắt đầu bám nét, ✌️ Chụp/quay, 🤙 Xoay ngang dọc.\n\nBạn muốn tìm hiểu tính năng nhận diện nào trước?',
+        subtitle: 'Nhận diện AI Tracking 120fps',
+        placeholder: 'Hỏi bám nét người, thú cưng, góc rộng, cử chỉ...',
+        welcome: '🧠 Chào bạn! Mình là **T-Flow Bot** — Chuyên gia **AI Tracking 120fps**, **Pet Tracking** & **cử chỉ tay không chạm**.\nBạn muốn xem tính năng AI nào trước?',
         actions: [
           { label: '🎯 Bám Nét Người 120fps', action: "sendQuickPrompt('Bám nét người và khuôn mặt quang học 120fps')" },
           { label: '🐕 Bám Nét Thú Cưng', action: "sendQuickPrompt('Bám nét thú cưng chó mèo chuyển động nhanh')" },
@@ -7874,14 +8103,14 @@
 
   <!-- AUTHENTICATION MODAL (STANDARD LOGIN / REGISTER + GOOGLE SIGN-IN) -->
   <div class="cart-drawer-overlay" id="authModalOverlay" onclick="toggleAuthModal(false)"></div>
-  <div id="authModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:420px; max-width:92vw; background:#FFF; border-radius:24px; padding:32px 28px; box-shadow:0 24px 64px rgba(0,0,0,0.18); border:1px solid rgba(0,0,0,0.08); z-index:99999; font-family:'Plus Jakarta Sans', sans-serif;">
+  <div id="authModal" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:420px; max-width:92vw; background:#FFF; border-radius:24px; padding:32px 28px; box-shadow:0 24px 64px rgba(0,0,0,0.18); border:1px solid rgba(0,0,0,0.08); z-index:99999; font-family:var(--font);">
     
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
       <div style="display:flex; gap:16px;">
-        <button id="modalTabBtnLogin" onclick="switchModalAuthTab('login')" style="background:none; border:none; font-size:16px; font-weight:800; color:#1D1D1F; cursor:pointer; padding-bottom:4px; border-bottom:2px solid #1D1D1F;">Đăng Nhập</button>
-        <button id="modalTabBtnRegister" onclick="switchModalAuthTab('register')" style="background:none; border:none; font-size:16px; font-weight:700; color:#86868B; cursor:pointer; padding-bottom:4px; border-bottom:2px solid transparent;">Đăng Ký</button>
+        <button id="modalTabBtnLogin" onclick="switchModalAuthTab('login')" style="background:none; border:none; font-size:16px; font-weight:700; color:#1D1D1F; cursor:pointer; padding-bottom:4px; border-bottom:2px solid #1D1D1F;">Đăng Nhập</button>
+        <button id="modalTabBtnRegister" onclick="switchModalAuthTab('register')" style="background:none; border:none; font-size:16px; font-weight:700; color:#4B5563; cursor:pointer; padding-bottom:4px; border-bottom:2px solid transparent;">Đăng Ký</button>
       </div>
-      <button onclick="toggleAuthModal(false)" style="background:#F5F5F7; border:none; width:28px; height:28px; border-radius:50%; font-size:16px; cursor:pointer; color:#86868B;">&times;</button>
+      <button onclick="toggleAuthModal(false)" style="background:#F5F5F7; border:none; width:28px; height:28px; border-radius:50%; font-size:16px; cursor:pointer; color:#4B5563;">&times;</button>
     </div>
 
     <!-- OPTIONAL REASON BANNER (WHEN TRIGGERED BY CART / BUY ACTIONS) -->
@@ -7902,7 +8131,7 @@
       <!-- DIVIDER -->
       <div style="display:flex; align-items:center; gap:10px; margin:18px 0 14px 0;">
         <div style="flex:1; height:1px; background:#E5E5EA;"></div>
-        <span style="font-size:11.5px; color:#86868B; text-transform:uppercase; font-weight:600;">hoặc tiếp tục với</span>
+        <span style="font-size:11.5px; color:#4B5563; text-transform:uppercase; font-weight:600;">hoặc tiếp tục với</span>
         <div style="flex:1; height:1px; background:#E5E5EA;"></div>
       </div>
 
@@ -7966,7 +8195,7 @@
           </svg>
         </div>
         <div>
-          <div style="font-size:14.5px; font-weight:800; color:#FFF; display:flex; align-items:center; gap:6px;">
+          <div style="font-size:14.5px; font-weight:700; color:#FFF; display:flex; align-items:center; gap:6px;">
             T-Flow Bot
           </div>
           <div style="font-size:11.5px; color:rgba(255,255,255,0.7); font-weight:500;" id="aiDrawerSubtitle">Tư vấn bán hàng</div>
@@ -7999,7 +8228,7 @@
     <div style="display:flex; align-items:flex-start; gap:14px;">
       <div style="font-size:24px; line-height:1; flex-shrink:0;">🍪</div>
       <div style="flex:1;">
-        <div style="font-size:13.5px; font-weight:700; margin-bottom:4px; letter-spacing:-0.01em;">
+        <div style="font-size:13.5px; font-weight:700; margin-bottom:4px; letter-spacing:0;">
           Thông Báo Cookie &amp; Duy Trì Phiên Đăng Nhập
         </div>
         <div style="font-size:12px; color:rgba(255,255,255,0.8); line-height:1.45; margin-bottom:14px;">
