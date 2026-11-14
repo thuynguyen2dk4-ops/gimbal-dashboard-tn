@@ -6335,13 +6335,15 @@
             if (response && response.credential) {
               const payload = decodeGoogleJwt(response.credential);
               if (payload && payload.email) {
-                SmartGimbalCatalog.loginWithGmail(payload.email, payload.name || payload.email);
-                toggleAuthModal(false);
-                renderNavUserSection();
-                renderReviewsList();
-      initCookieBanner();
-      setTimeout(initGoogleOneTap, 800);
-                showToast('✓ Đăng nhập Google thành công (' + payload.email + ')');
+                const p = (typeof SmartGimbalCatalog.loginWithGmailAsync === 'function')
+                  ? SmartGimbalCatalog.loginWithGmailAsync(payload.email, payload.name || payload.email, { authProvider: 'google', avatarUrl: payload.picture || '' })
+                  : Promise.resolve(SmartGimbalCatalog.loginWithGmail(payload.email, payload.name || payload.email, { authProvider: 'google', avatarUrl: payload.picture || '' }));
+                p.then(() => {
+                  toggleAuthModal(false);
+                  renderNavUserSection();
+                  renderReviewsList();
+                  showToast('✓ Đăng nhập Google thành công (' + payload.email + ')');
+                });
               }
             }
           },
@@ -6379,16 +6381,20 @@
                 .then(res => res.json())
                 .then(profile => {
                   if (profile && profile.email) {
-                    SmartGimbalCatalog.loginWithGmail(profile.email, profile.name || profile.email);
-                    toggleAuthModal(false);
-                    renderNavUserSection();
-                    renderReviewsList();
-                    showToast('✓ Đăng nhập Google thành công (' + profile.email + ')');
+                    const p = (typeof SmartGimbalCatalog.loginWithGmailAsync === 'function')
+                      ? SmartGimbalCatalog.loginWithGmailAsync(profile.email, profile.name || profile.email, { authProvider: 'google', avatarUrl: profile.picture || '' })
+                      : Promise.resolve(SmartGimbalCatalog.loginWithGmail(profile.email, profile.name || profile.email, { authProvider: 'google', avatarUrl: profile.picture || '' }));
+                    p.then(() => {
+                      toggleAuthModal(false);
+                      renderNavUserSection();
+                      renderReviewsList();
+                      showToast('✓ Đăng nhập Google thành công (' + profile.email + ')');
+                    });
                   }
                 })
                 .catch(err => {
                   console.error('Fetch Google profile error:', err);
-                  openSimulatedGoogleOAuth();
+                  openGoogleOAuthPopup();
                 });
               }
             }
@@ -6400,11 +6406,10 @@
         }
       }
 
-      // CASE 2: SIMULATED GOOGLE POPUP (Active when no Client ID is configured yet, allowing zero-block testing)
-      openSimulatedGoogleOAuth();
+      openGoogleOAuthPopup();
     }
 
-    function openSimulatedGoogleOAuth() {
+    function openGoogleOAuthPopup() {
       const width = 480;
       const height = 640;
       const left = window.screenX + (window.outerWidth - width) / 2;
@@ -6412,47 +6417,55 @@
 
       try {
         const popup = window.open(
-          '/auth/google/',
+          '/auth/google/?redirect=' + encodeURIComponent(window.location.pathname || '/'),
           'GoogleAccountsOAuth',
           `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
         );
 
         if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-          // If popup is blocked by browser, redirect smoothly
-          window.location.href = '/auth/google/';
+          window.location.href = '/auth/google/?redirect=' + encodeURIComponent(window.location.pathname || '/');
         } else if (popup && popup.focus) {
           popup.focus();
         }
       } catch (e) {
-        window.location.href = '/auth/google/';
+        window.location.href = '/auth/google/?redirect=' + encodeURIComponent(window.location.pathname || '/');
       }
     }
 
     // Listen for Google & Apple OAuth success messages from /auth/google/ and /auth/apple/ popups
     window.addEventListener('message', function(event) {
-      if (event.data && event.data.type === 'GOOGLE_OAUTH_SUCCESS') {
-        const googleUser = event.data.user;
-        if (googleUser && googleUser.email && typeof SmartGimbalCatalog !== 'undefined') {
-          SmartGimbalCatalog.loginWithGmail(googleUser.email, googleUser.name);
-          toggleAuthModal(false);
-          renderNavUserSection();
-          renderReviewsList();
-          if (typeof renderTflowAppSimulator === 'function') renderTflowAppSimulator();
-          showToast('✓ Đăng nhập Google thành công (' + googleUser.email + ')');
+      if (event.origin !== window.location.origin) return;
+      const data = event.data || {};
+      if ((data.type === 'TFLOW_GOOGLE_AUTH_SUCCESS' || data.type === 'GOOGLE_OAUTH_SUCCESS') && data.verified) {
+        const email = data.email || (data.user && data.user.email);
+        const name = data.name || (data.user && data.user.name) || '';
+        const pic = data.picture || '';
+        if (email && typeof SmartGimbalCatalog !== 'undefined') {
+          const p = (typeof SmartGimbalCatalog.loginWithGmailAsync === 'function')
+            ? SmartGimbalCatalog.loginWithGmailAsync(email, name, { authProvider: 'google', avatarUrl: pic })
+            : Promise.resolve(SmartGimbalCatalog.loginWithGmail(email, name, { authProvider: 'google', avatarUrl: pic }));
+          p.then(() => {
+            toggleAuthModal(false);
+            renderNavUserSection();
+            renderReviewsList();
+            if (typeof renderTflowAppSimulator === 'function') renderTflowAppSimulator();
+            showToast('✓ Đăng nhập Google thành công (' + email + ')');
+          });
         }
-      } else if (event.data && event.data.type === 'APPLE_OAUTH_SUCCESS') {
-        const appleUser = event.data.user;
-        if (appleUser && appleUser.email && typeof SmartGimbalCatalog !== 'undefined') {
-          if (SmartGimbalCatalog.loginWithApple) {
-            SmartGimbalCatalog.loginWithApple(appleUser.email, appleUser.name);
-          } else {
-            SmartGimbalCatalog.loginWithGmail(appleUser.email, appleUser.name);
-          }
-          toggleAuthModal(false);
-          renderNavUserSection();
-          renderReviewsList();
-          if (typeof renderTflowAppSimulator === 'function') renderTflowAppSimulator();
-          showToast('✓ Đăng nhập Apple thành công (' + appleUser.email + ')');
+      } else if ((data.type === 'TFLOW_APPLE_AUTH_SUCCESS' || data.type === 'APPLE_OAUTH_SUCCESS') && data.verified) {
+        const email = data.email || (data.user && data.user.email);
+        const name = data.name || (data.user && data.user.name) || '';
+        if (email && typeof SmartGimbalCatalog !== 'undefined') {
+          const p = (typeof SmartGimbalCatalog.loginWithAppleAsync === 'function')
+            ? SmartGimbalCatalog.loginWithAppleAsync(email, name, { authProvider: 'apple' })
+            : Promise.resolve((SmartGimbalCatalog.loginWithApple || SmartGimbalCatalog.loginWithGmail)(email, name, { authProvider: 'apple' }));
+          p.then(() => {
+            toggleAuthModal(false);
+            renderNavUserSection();
+            renderReviewsList();
+            if (typeof renderTflowAppSimulator === 'function') renderTflowAppSimulator();
+            showToast('✓ Đăng nhập Apple thành công (' + email + ')');
+          });
         }
       }
     });
@@ -6504,35 +6517,15 @@
       }
     } catch(err) {}
 
-    function toggleGoogleAuthModal(open) {
-      const modal = document.getElementById('googleAuthModal');
-      const overlay = document.getElementById('googleAuthOverlay');
-      if (modal && overlay) {
-        modal.style.display = open ? 'block' : 'none';
-        overlay.classList.toggle('open', open);
-      }
+    function escSafeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
-    function loginStoreWithGmail(email, name) {
-      if (typeof SmartGimbalCatalog !== 'undefined') {
-        SmartGimbalCatalog.loginWithGmail(email, name);
-      }
-      toggleGoogleAuthModal(false);
-      renderNavUserSection();
-      renderReviewsList();
-      alert('Đăng nhập thành công với tài khoản: ' + email);
-    }
-
-    function loginStoreWithCustomEmail() {
-      const email = (document.getElementById('storeCustomEmailInput').value || '').trim();
-      if (!email || !email.includes('@')) {
-        alert('Vui lòng nhập địa chỉ email hợp lệ!');
-        return;
-      }
-      loginStoreWithGmail(email);
-    }
-
-    
     function toggleAuthModal(open, reason) {
       const modal = document.getElementById('authModal');
       const overlay = document.getElementById('authModalOverlay');
@@ -6586,18 +6579,27 @@
         if (emailInput) emailInput.focus();
         return false;
       }
+      if (!pass) {
+        alert('Vui lòng nhập mật khẩu!');
+        if (passInput) passInput.focus();
+        return false;
+      }
       if (typeof SmartGimbalCatalog !== 'undefined') {
-        const res = SmartGimbalCatalog.loginUser(email, pass);
-        if (res.success) {
-          toggleAuthModal(false);
-          syncUserAuthState();
-          showToast('Đăng nhập thành công!');
-        } else {
-          alert(res.message);
-          if (passInput && res.message && res.message.toLowerCase().includes('mật khẩu')) {
-            passInput.focus();
+        const loginPromise = (typeof SmartGimbalCatalog.loginUserAsync === 'function')
+          ? SmartGimbalCatalog.loginUserAsync(email, pass)
+          : Promise.resolve(SmartGimbalCatalog.loginUser(email, pass));
+        loginPromise.then(res => {
+          if (res && res.success) {
+            toggleAuthModal(false);
+            syncUserAuthState();
+            showToast('Đăng nhập thành công!');
+          } else {
+            alert((res && res.message) || 'Đăng nhập thất bại.');
+            if (passInput && res && res.message && res.message.toLowerCase().includes('mật khẩu')) {
+              passInput.focus();
+            }
           }
-        }
+        });
       }
       return false;
     }
@@ -6606,10 +6608,11 @@
       if (event && event.preventDefault) event.preventDefault();
       const nameInput = document.getElementById('modalRegName');
       const emailInput = document.getElementById('modalRegEmail');
+      const passInput = document.getElementById('modalRegPassword');
       const name = ((nameInput && nameInput.value) || '').trim();
       const email = ((emailInput && emailInput.value) || '').trim();
       const phone = (document.getElementById('modalRegPhone').value || '').trim();
-      const pass = (document.getElementById('modalRegPassword').value || '').trim();
+      const pass = ((passInput && passInput.value) || '').trim();
 
       if (!name || !email) {
         alert('Vui lòng nhập Họ Tên và Email!');
@@ -6617,40 +6620,32 @@
         else if (!email && emailInput) emailInput.focus();
         return false;
       }
+      if (!pass || pass.length < 6) {
+        alert('Vui lòng nhập mật khẩu tối thiểu 6 ký tự!');
+        if (passInput) passInput.focus();
+        return false;
+      }
       if (typeof SmartGimbalCatalog !== 'undefined') {
-        const res = SmartGimbalCatalog.registerUser({
+        const payload = {
           name: name,
           email: email,
           phone: phone,
           password: pass
+        };
+        const regPromise = (typeof SmartGimbalCatalog.registerUserAsync === 'function')
+          ? SmartGimbalCatalog.registerUserAsync(payload)
+          : Promise.resolve(SmartGimbalCatalog.registerUser(payload));
+        regPromise.then(res => {
+          if (res && res.success) {
+            toggleAuthModal(false);
+            syncUserAuthState();
+            showToast('Tạo tài khoản và đồng bộ Cloud thành công!');
+          } else {
+            alert((res && res.message) || 'Đăng ký thất bại.');
+          }
         });
-        if (res.success) {
-          toggleAuthModal(false);
-          syncUserAuthState();
-          showToast('Tạo tài khoản thành công!');
-        } else {
-          alert(res.message);
-        }
       }
       return false;
-    }
-
-    function loginStoreWithGmail(email, name) {
-      if (typeof SmartGimbalCatalog !== 'undefined') {
-        SmartGimbalCatalog.loginWithGmail(email, name);
-      }
-      toggleAuthModal(false);
-      syncUserAuthState();
-      alert('Đăng nhập Google thành công với: ' + email);
-    }
-
-    function loginModalWithOtherGmail() {
-      const email = (document.getElementById('modalOtherGmailInput').value || '').trim();
-      if (!email || !email.includes('@')) {
-        alert('Vui lòng nhập email hợp lệ!');
-        return;
-      }
-      loginStoreWithGmail(email);
     }
 
     function handleStoreLogout() {
@@ -7016,13 +7011,16 @@
     }
 
     function selectHeroColor(colorId) {
+      if (!currentMvp || !Array.isArray(currentMvp.colors) || currentMvp.colors.length === 0) return;
       currentMvpColorId = colorId;
       document.querySelectorAll('#heroColorSwatches .color-dot').forEach((dot, idx) => {
-        dot.classList.toggle('active', currentMvp.colors[idx].id === colorId);
+        const cItem = currentMvp.colors[idx];
+        dot.classList.toggle('active', Boolean(cItem && cItem.id === colorId));
       });
-      const c = currentMvp.colors.find(cl => cl.id === colorId);
-      if (c && document.getElementById('heroColorNameDisplay')) {
-        document.getElementById('heroColorNameDisplay').textContent = c.name;
+      const c = currentMvp.colors.find(cl => cl && cl.id === colorId);
+      const disp = document.getElementById('heroColorNameDisplay');
+      if (c && disp) {
+        disp.textContent = c.name;
       }
     }
 
@@ -7693,13 +7691,13 @@
           if (Array.isArray(prod.specs)) {
             prod.specs.forEach(s => {
               const tr = document.createElement('tr');
-              tr.innerHTML = `<td>${s.label}</td><td>${s.val}</td>`;
+              tr.innerHTML = `<td>${escSafeHtml(s && s.label)}</td><td>${escSafeHtml(s && s.val)}</td>`;
               specsTable.appendChild(tr);
             });
           } else {
             Object.entries(prod.specs).forEach(([k, v]) => {
               const tr = document.createElement('tr');
-              tr.innerHTML = `<td>${k}</td><td>${v}</td>`;
+              tr.innerHTML = `<td>${escSafeHtml(k)}</td><td>${escSafeHtml(v)}</td>`;
               specsTable.appendChild(tr);
             });
           }
@@ -7981,21 +7979,26 @@
     }
 
     function selectDetailTier(tierKey) {
+      if (!currentDetailProduct || !Array.isArray(currentDetailProduct.tiers)) return;
       currentDetailTierKey = tierKey;
       document.querySelectorAll('#detailTierCards .tier-select-card').forEach((card, idx) => {
-        card.classList.toggle('active', currentDetailProduct.tiers[idx].key === tierKey);
+        const tItem = currentDetailProduct.tiers[idx];
+        card.classList.toggle('active', Boolean(tItem && tItem.key === tierKey));
       });
       updateDetailPriceBox();
     }
 
     function selectDetailColor(colorId) {
+      if (!currentDetailProduct || !Array.isArray(currentDetailProduct.colors) || currentDetailProduct.colors.length === 0) return;
       currentDetailColorId = colorId;
       document.querySelectorAll('#detailColorList .color-swatch-btn').forEach((btn, idx) => {
-        btn.classList.toggle('active', currentDetailProduct.colors[idx].id === colorId);
+        const cItem = currentDetailProduct.colors[idx];
+        btn.classList.toggle('active', Boolean(cItem && cItem.id === colorId));
       });
-      const c = currentDetailProduct.colors.find(cl => cl.id === colorId);
-      if (c) {
-        document.getElementById('detailSelectedColorName').textContent = c.name;
+      const c = currentDetailProduct.colors.find(cl => cl && cl.id === colorId);
+      const disp = document.getElementById('detailSelectedColorName');
+      if (c && disp) {
+        disp.textContent = c.name;
       }
     }
 
@@ -8084,20 +8087,20 @@
         row.className = 'cart-item-row';
         row.innerHTML = `
           <div class="cart-item-thumb">
-            <img src="${item.img || '/shared/img/tflow_pro_main.png'}" alt="${pName}">
+            <img src="${escSafeHtml(item.img || '/shared/img/tflow_pro_main.png')}" alt="${escSafeHtml(pName)}">
           </div>
           <div class="cart-item-details">
-            <div class="cart-item-title">${pName}</div>
-            <div class="cart-item-meta">${tLabel} &bull; ${item.colorName || 'Natural Titanium'}</div>
+            <div class="cart-item-title">${escSafeHtml(pName)}</div>
+            <div class="cart-item-meta">${escSafeHtml(tLabel)} &bull; ${escSafeHtml(item.colorName || 'Natural Titanium')}</div>
             <div class="cart-item-bottom">
               <div class="cart-qty-ctrl">
-                <button class="cart-qty-btn" onclick="adjustCartQty('${cId}', -1)">&minus;</button>
+                <button class="cart-qty-btn" data-cid="${escSafeHtml(cId)}" onclick="adjustCartQty(this.dataset.cid, -1)">&minus;</button>
                 <span class="cart-qty-val">${qtyVal}</span>
-                <button class="cart-qty-btn" onclick="adjustCartQty('${cId}', 1)">&#43;</button>
+                <button class="cart-qty-btn" data-cid="${escSafeHtml(cId)}" onclick="adjustCartQty(this.dataset.cid, 1)">&#43;</button>
               </div>
               <div style="display:flex; align-items:center;">
                 <span class="cart-item-price">${SmartGimbalCatalog.formatVND(unitPrice * qtyVal)}</span>
-                <span class="cart-item-del" onclick="removeCartItem('${cId}')">Xóa</span>
+                <span class="cart-item-del" data-cid="${escSafeHtml(cId)}" onclick="removeCartItem(this.dataset.cid)">Xóa</span>
               </div>
             </div>
           </div>
@@ -8535,7 +8538,7 @@
             backdrop.style.display = 'none';
           }
         }
-        // renderQuickPromptsBar(currentAiDomain);
+        renderQuickPromptsBar(currentAiDomain);
         renderAiMessages();
         // Only autofocus on Desktop to prevent popping up mobile virtual keyboard uncontrollably
         if (window.innerWidth > 768) {
@@ -8857,13 +8860,19 @@
         </div>
         <div>
           <div style="font-size:14.5px; font-weight:700; color:#FFF; display:flex; align-items:center; gap:6px;">
-            T-Flow Bot
+            T-Flow Bot <span id="aiDomainBadge" style="font-size:10px; font-weight:700; background:rgba(255,255,255,0.16); color:#FFF; padding:2px 7px; border-radius:99px;">TƯ VẤN MUA HÀNG</span>
           </div>
           <div style="font-size:11.5px; color:rgba(255,255,255,0.7); font-weight:500;" id="aiDrawerSubtitle">Tư vấn bán hàng</div>
         </div>
       </div>
       <button class="btn-ai-close" onclick="toggleTflowAiChat(false)" title="Đóng" aria-label="Đóng"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button>
     </div>
+    <div style="display:flex; gap:6px; padding:8px 14px; background:#F5F5F7; border-bottom:1px solid rgba(0,0,0,0.06); overflow-x:auto;">
+      <button type="button" id="domainTabSales" class="ai-prompt-pill active" onclick="switchAiChatDomain('sales')" style="font-size:11.5px; padding:4px 10px;">🛍️ Tư vấn mua</button>
+      <button type="button" id="domainTabCreative" class="ai-prompt-pill" onclick="switchAiChatDomain('creative')" style="font-size:11.5px; padding:4px 10px;">🎬 Đạo diễn AI</button>
+      <button type="button" id="domainTabVision" class="ai-prompt-pill" onclick="switchAiChatDomain('smart_vision')" style="font-size:11.5px; padding:4px 10px;">🧠 AI Vision</button>
+    </div>
+    <div id="aiQuickPromptsBar" style="display:flex; gap:6px; padding:8px 14px; border-bottom:1px solid rgba(0,0,0,0.05); overflow-x:auto; background:#FFFFFF;"></div>
 
 
 

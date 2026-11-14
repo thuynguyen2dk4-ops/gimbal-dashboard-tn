@@ -23,9 +23,15 @@ struct AspectLetterboxMaskView: View {
 
     private let goldAccent = Color(red: 1.0, green: 0.84, blue: 0.04)
 
+    private var isPhysicalLandscape: Bool {
+        screenSize.width > screenSize.height
+    }
+
     private var numericRatio: CGFloat? {
         switch ratio {
-        case "9:16": return nil // Full-bleed default screen
+        case "9:16":
+            // Portrait: 9:16 is full-bleed. Landscape: show vertical 9:16 pillarbox frame.
+            return (isLandscape || isPhysicalLandscape) ? (9.0 / 16.0) : nil
         case "3:4": return 3.0 / 4.0
         case "4:3": return 4.0 / 3.0
         case "1:1": return 1.0
@@ -57,7 +63,9 @@ struct AspectLetterboxMaskView: View {
             : Color.black.opacity(0.84)
 
         if let baseAspect = numericRatio {
-            let effectiveAspect = isLandscape ? (1.0 / baseAspect) : baseAspect
+            let physicalLandscape = isPhysicalLandscape
+            let simulatedLandscape = isLandscape && !physicalLandscape
+            let effectiveAspect = simulatedLandscape ? (1.0 / baseAspect) : baseAspect
             let screenAspect = w / h
             let fitW = screenAspect > effectiveAspect ? (h * effectiveAspect) : w
             let fitH = screenAspect > effectiveAspect ? h : (w / effectiveAspect)
@@ -132,7 +140,7 @@ struct AspectLetterboxMaskView: View {
                 .foregroundColor(isCinema ? goldAccent : (isLight ? Color.black.opacity(0.75) : Color.white.opacity(0.88)))
                 .tracking(0.4)
 
-            if let onResetToFullFrame = onResetToFullFrame {
+            if ratio != "9:16", let onResetToFullFrame = onResetToFullFrame {
                 Button {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     onResetToFullFrame()
@@ -162,13 +170,17 @@ struct AspectLetterboxMaskView: View {
                 .stroke((isCinema ? goldAccent : Color.white).opacity(0.28), lineWidth: 0.6)
         )
 
-        if isLandscape {
-            // In 90°-clockwise rotated landscape HUD, the visual top edge sits along portrait's right edge.
+        if isLandscape && !isPhysicalLandscape {
+            // In 90°-clockwise rotated simulated landscape HUD, the visual top edge sits along portrait's right edge.
             let targetX = max(56, min(w - 30, w - sideBarW - 22))
             let targetY = h * 0.5
             badgeContent
                 .rotationEffect(.degrees(90))
                 .position(x: targetX, y: targetY)
+        } else if isPhysicalLandscape {
+            let targetY = max(58, topBarH > 28 ? (topBarH - 16) : 58)
+            badgeContent
+                .position(x: w * 0.5, y: targetY)
         } else {
             // Keep safely below top bar in portrait
             let targetY = max(124, topBarH - 18)

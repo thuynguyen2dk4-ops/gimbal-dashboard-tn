@@ -15,8 +15,12 @@ import UIKit
 // =====================================================================
 
 final class BLEGimbalManager: NSObject, ObservableObject, CBCentralManagerDelegate, CBPeripheralDelegate {
-    @Published var isConnected: Bool = true
-    @Published var batteryLevel: Int = 94
+    @Published var isConnected: Bool = false
+    @Published var batteryLevel: Int = 0
+    @Published var bluetoothStateText: String = "Đang kiểm tra Bluetooth"
+    @Published var isScanning: Bool = false
+    @Published var discoveredPeripherals: [CBPeripheral] = []
+    @Published var connectedPeripheralName: String = ""
     @Published var gimbalMode: String = "PF" // PF, LOCK, Follow, FPV, POV, 360°
     @Published var rollAngle: Double = 0.02
     @Published var pitchAngle: Double = 12.4
@@ -30,7 +34,7 @@ final class BLEGimbalManager: NSObject, ObservableObject, CBCentralManagerDelega
     @Published var smoothPan: Double = 0.70
     @Published var smoothTilt: Double = 0.60
     @Published var smoothRoll: Double = 0.50
-    @Published var firmwareVersion: String = "v2.4.1"
+    @Published var firmwareVersion: String = ""
     @Published var latestFirmwareVersion: String = "v2.4.2"
     @Published var isUpdatingFirmware: Bool = false
     @Published var firmwareUpdateProgress: Double = 0.0
@@ -46,14 +50,65 @@ final class BLEGimbalManager: NSObject, ObservableObject, CBCentralManagerDelega
     @Published var hudToastMessage: String? = nil
 
     private var centralManager: CBCentralManager?
+    private var connectedPeripheral: CBPeripheral?
+    private var controlCharacteristic: CBCharacteristic?
     private var simulatedTimer: AnyCancellable?
     private var calibrationTimer: Timer?
     private var firmwareTimer: Timer?
 
+    private static let gimbalServiceUUID = CBUUID(string: "FFE0")
+    private static let telemetryCharUUID = CBUUID(string: "FFE1")
+    private static let batteryServiceUUID = CBUUID(string: "180F")
+    private static let batteryLevelCharUUID = CBUUID(string: "2A19")
+
     override init() {
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
-        startTelemetrySimulation()
+    }
+
+    func startScan() {
+        guard let central = centralManager else { return }
+        guard central.state == .poweredOn else {
+            bluetoothStateText = "Hãy bật Bluetooth trên iPhone để tìm T-Flow Pro"
+            return
+        }
+        discoveredPeripherals.removeAll()
+        isScanning = true
+        bluetoothStateText = "Đang quét thiết bị T-Flow Pro..."
+        central.scanForPeripherals(withServices: nil, options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
+    }
+
+    func stopScan() {
+        centralManager?.stopScan()
+        isScanning = false
+        if !isConnected {
+            bluetoothStateText = discoveredPeripherals.isEmpty
+                ? "Chưa tìm thấy thiết bị Gimbal"
+                : "Tìm thấy \(discoveredPeripherals.count) thiết bị khả dụng"
+        }
+    }
+
+    func connect(to peripheral: CBPeripheral) {
+        stopScan()
+        peripheral.delegate = self
+        connectedPeripheral = peripheral
+        bluetoothStateText = "Đang ghép nối với \(peripheral.name ?? "T-Flow Pro")..."
+        centralManager?.connect(peripheral, options: nil)
+    }
+
+    func disconnect() {
+        if let peripheral = connectedPeripheral {
+            centralManager?.cancelPeripheralConnection(peripheral)
+        }
+        connectedPeripheral = nil
+        controlCharacteristic = nil
+        isConnected = false
+        batteryLevel = 0
+        firmwareVersion = ""
+        connectedPeripheralName = ""
+        simulatedTimer?.cancel()
+        simulatedTimer = nil
+        bluetoothStateText = "Đã ngắt kết nối Gimbal"
     }
 
     deinit {
@@ -172,5 +227,98 @@ final class BLEGimbalManager: NSObject, ObservableObject, CBCentralManagerDelega
         pitchAngle = max(-45, min(45, pitchAngle - y * speed))
     }
 
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {}
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        switch central.state {
+        case .poweredOn:
+            bluetoothStateText = isConnected ? "Đã kết nối \(connectedPeripheralName)" : "Bluetooth sẵn sàng • Chạm để quét Gimbal"
+        case .poweredOff:
+            isConnected = false
+            isScanning = false
+            batteryLevel = 0
+            firmwareVersion = ""
+            bluetoothStateText = "Bluetooth đang tắt"
+        case .unauthorized:
+            bluetoothStateText = "Chưa cấp quyền Bluetooth trong Cài đặt iOS"
+        case .unsupported:
+            bluetoothStateText = "Thiết bị không hỗ trợ Bluetooth Low Energy"
+        case .resetting:
+            bluetoothStateText = "Đang khởi động lại kết nối Bluetooth..."
+        case .unknown:
+            bluetoothStateText = "Đang chờ trạng thái Bluetooth..."
+        @unknown default:
+            bluetoothStateText = "Trạng thái Bluetooth không xác định"
+        }
+    }
+
+    func centralManager(
+        _ central: CBCentralManager,
+        didDiscover peripheral: CBPeripheral,
+        advertisementData: [String: Any],
+        rssi RSSI: NSNumber
+    ) {
+        let name = peripheral.name ?? (advertisementData[CBAdvertisementDataLocalNameKey] as? String) ?? ""
+        let lower = name.lowercased()
+        guard lower.contains("t-flow") || lower.contains("tflow") || lower.contains("gimbal") || !name.isEmpty else {
+            return
+        }
+        if !discoveredPeripherals.contains(where: { $0.identifier == peripheral.identifier }) {
+            discoveredPeripherals.append(peripheral)
+            bluetoothStateText = "Tìm thấy \(discoveredPeripherals.count) thiết bị gần đây"
+        }
+    }
+
+    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+        connectedPeripheral = peripheral
+        connectedPeripheralName = peripheral.name ?? "T-Flow Pro"
+        isConnected = true
+        bluetoothStateText = "Đã kết nối \(connectedPeripheralName)"
+        peripheral.delegate = self
+        peripheral.discoverServices([Self.gimbalServiceUUID, Self.batteryServiceUUID])
+    }
+
+    func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
+        isConnected = false
+        connectedPeripheral = nil
+        bluetoothStateText = "Không thể kết nối: \(error?.localizedDescription ?? "Lỗi BLE")"
+    }
+
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        connectedPeripheral = nil
+        controlCharacteristic = nil
+        isConnected = false
+        batteryLevel = 0
+        firmwareVersion = ""
+        connectedPeripheralName = ""
+        bluetoothStateText = error != nil ? "Mất kết nối BLE: \(error!.localizedDescription)" : "Đã ngắt kết nối Gimbal"
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        guard error == nil, let services = peripheral.services else { return }
+        for service in services {
+            peripheral.discoverCharacteristics([Self.telemetryCharUUID, Self.batteryLevelCharUUID], for: service)
+        }
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        guard error == nil, let chars = service.characteristics else { return }
+        for char in chars {
+            if char.uuid == Self.telemetryCharUUID {
+                controlCharacteristic = char
+                peripheral.setNotifyValue(true, for: char)
+            } else if char.uuid == Self.batteryLevelCharUUID {
+                peripheral.readValue(for: char)
+                peripheral.setNotifyValue(true, for: char)
+            }
+        }
+    }
+
+    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        guard error == nil, let data = characteristic.value, !data.isEmpty else { return }
+        if characteristic.uuid == Self.batteryLevelCharUUID {
+            let level = Int(data[0])
+            DispatchQueue.main.async {
+                self.batteryLevel = max(0, min(100, level))
+            }
+        }
+    }
 }

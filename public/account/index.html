@@ -854,18 +854,18 @@
       <div class="card">
         <div class="user-profile-header">
           <div class="profile-left">
-            <div class="profile-avatar" id="userAvatar">D</div>
+            <div class="profile-avatar" id="userAvatar">T</div>
             <div>
               <div style="display:flex; align-items:center; gap:10px;">
-                <h1 class="profile-name" id="userName">Thủy Nguyễn</h1>
-                <span class="tier-badge" id="userTierBadge">Pro Cinema Tier</span>
+                <h1 class="profile-name" id="userName">Đang tải hồ sơ...</h1>
+                <span class="tier-badge" id="userTierBadge">--</span>
               </div>
               <div class="profile-meta">
-                <span id="userEmail">thuynguyen2dk4@gmail.com</span>
+                <span id="userEmail">--</span>
                 <span>&bull;</span>
-                <span id="userPhone">0908 123 456</span>
+                <span id="userPhone">Chưa cập nhật SĐT</span>
                 <span>&bull;</span>
-                <span>Thành viên từ <span id="userMemberSince">Tháng 03/2025</span></span>
+                <span>Thành viên từ <span id="userMemberSince">--</span></span>
               </div>
             </div>
           </div>
@@ -1420,28 +1420,6 @@
       }
     }
 
-    function handlePortalGmailSubmit() {
-      const input = document.getElementById('loginPortalEmail');
-      const email = ((input && input.value) || '').trim();
-      if (!email || !email.includes('@')) {
-        alert('Vui lòng nhập email hợp lệ!');
-        if (input) input.focus();
-        return;
-      }
-      loginUserPortalWithGmail(email);
-    }
-
-    function handleOtherGoogleSubmit() {
-      const input = document.getElementById('loginPortalOtherEmail');
-      const email = ((input && input.value) || '').trim();
-      if (!email || !email.includes('@')) {
-        alert('Vui lòng nhập địa chỉ email Google hợp lệ!');
-        if (input) input.focus();
-        return;
-      }
-      loginUserPortalWithGmail(email);
-    }
-
     function updatePortalAdminBanner() {
       if (typeof SmartGimbalCatalog === 'undefined') return;
       const user = SmartGimbalCatalog.getCurrentUser();
@@ -1477,25 +1455,27 @@
         if (emailInput) emailInput.focus();
         return false;
       }
+      if (!pass) {
+        alert('Vui lòng nhập mật khẩu!');
+        if (passInput) passInput.focus();
+        return false;
+      }
       if (typeof SmartGimbalCatalog !== 'undefined') {
-        const res = SmartGimbalCatalog.loginUser(email, pass);
-        if (res.success) {
-          loadUserData();
-        } else {
-          alert(res.message);
-          if (passInput && res.message && res.message.toLowerCase().includes('mật khẩu')) {
-            passInput.focus();
+        const loginPromise = (typeof SmartGimbalCatalog.loginUserAsync === 'function')
+          ? SmartGimbalCatalog.loginUserAsync(email, pass)
+          : Promise.resolve(SmartGimbalCatalog.loginUser(email, pass));
+        loginPromise.then(res => {
+          if (res && res.success) {
+            loadUserData();
+          } else {
+            alert((res && res.message) || 'Đăng nhập thất bại.');
+            if (passInput && res && res.message && res.message.toLowerCase().includes('mật khẩu')) {
+              passInput.focus();
+            }
           }
-        }
+        });
       }
       return false;
-    }
-
-    function quickLoginDemo(email) {
-      SmartGimbalCatalog.loginUser(email, '123456');
-      loadUserData();
-      initCookieBanner();
-      setTimeout(initGoogleOneTap, 600);
     }
 
     function handleRegisterSubmit(event) {
@@ -1522,21 +1502,31 @@
         if (emailInput) emailInput.focus();
         return false;
       }
+      if (!pass || pass.length < 6) {
+        alert('Vui lòng nhập mật khẩu tối thiểu 6 ký tự!');
+        if (passInput) passInput.focus();
+        return false;
+      }
       if (typeof SmartGimbalCatalog !== 'undefined') {
-        const res = SmartGimbalCatalog.registerUser({
+        const payload = {
           name: name,
           email: email,
           phone: phone,
           password: pass,
           serial: serial,
           tier: 'Basic Creator'
+        };
+        const regPromise = (typeof SmartGimbalCatalog.registerUserAsync === 'function')
+          ? SmartGimbalCatalog.registerUserAsync(payload)
+          : Promise.resolve(SmartGimbalCatalog.registerUser(payload));
+        regPromise.then(res => {
+          if (res && res.success) {
+            loadUserData();
+            alert(`Chúc mừng ${name}! Tài khoản của bạn đã được khởi tạo và đồng bộ Cloud thành công.`);
+          } else {
+            alert((res && res.message) || 'Đăng ký thất bại.');
+          }
         });
-        if (res.success) {
-          loadUserData();
-          alert(`Chúc mừng ${name}! Tài khoản của bạn đã được khởi tạo thành công.`);
-        } else {
-          alert(res.message);
-        }
       }
       return false;
     }
@@ -1679,8 +1669,10 @@
             if (response && response.credential) {
               const payload = decodeGoogleJwt(response.credential);
               if (payload && payload.email) {
-                SmartGimbalCatalog.loginWithGmail(payload.email, payload.name || payload.email);
-                loadUserData();
+                const p = (typeof SmartGimbalCatalog.loginWithGmailAsync === 'function')
+                  ? SmartGimbalCatalog.loginWithGmailAsync(payload.email, payload.name || payload.email, { authProvider: 'google', avatarUrl: payload.picture || '' })
+                  : Promise.resolve(SmartGimbalCatalog.loginWithGmail(payload.email, payload.name || payload.email, { authProvider: 'google', avatarUrl: payload.picture || '' }));
+                p.then(() => loadUserData());
               }
             }
           },
@@ -1716,16 +1708,20 @@
                 .then(res => res.json())
                 .then(profile => {
                   if (profile && profile.email) {
-                    SmartGimbalCatalog.loginWithGmail(profile.email, profile.name || profile.email);
-                    loadUserData();
-                    if (typeof showNotification === 'function') {
-                      showNotification('✓ Đăng nhập Google thành công (' + profile.email + ')');
-                    }
+                    const p = (typeof SmartGimbalCatalog.loginWithGmailAsync === 'function')
+                      ? SmartGimbalCatalog.loginWithGmailAsync(profile.email, profile.name || profile.email, { authProvider: 'google', avatarUrl: profile.picture || '' })
+                      : Promise.resolve(SmartGimbalCatalog.loginWithGmail(profile.email, profile.name || profile.email, { authProvider: 'google', avatarUrl: profile.picture || '' }));
+                    p.then(() => {
+                      loadUserData();
+                      if (typeof showNotification === 'function') {
+                        showNotification('✓ Đăng nhập Google thành công (' + profile.email + ')');
+                      }
+                    });
                   }
                 })
                 .catch(err => {
                   console.error('Fetch Google profile error:', err);
-                  openSimulatedGoogleOAuth();
+                  openGoogleOAuthPopup();
                 });
               }
             }
@@ -1737,17 +1733,17 @@
         }
       }
 
-      openSimulatedGoogleOAuth();
+      openGoogleOAuthPopup();
     }
 
-    function openSimulatedGoogleOAuth() {
+    function openGoogleOAuthPopup() {
       const width = 480;
       const height = 620;
       const left = window.screenX + (window.outerWidth - width) / 2;
       const top = window.screenY + (window.outerHeight - height) / 2;
 
       const popup = window.open(
-        '/auth/google/',
+        '/auth/google/?redirect=' + encodeURIComponent('/account'),
         'GoogleAccountsOAuth',
         `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
       );
@@ -1763,7 +1759,7 @@
       const left = window.screenX + (window.outerWidth - width) / 2;
       const top = window.screenY + (window.outerHeight - height) / 2;
       const popup = window.open(
-        '/auth/apple/',
+        '/auth/apple/?redirect=' + encodeURIComponent('/account'),
         'AppleIdOAuth',
         `width=${width},height=${height},left=${left},top=${top},status=no,resizable=yes,scrollbars=yes`
       );
@@ -1771,17 +1767,26 @@
     }
 
     window.addEventListener('message', function(event) {
-      if (event.data && event.data.type === 'GOOGLE_OAUTH_SUCCESS') {
-        const googleUser = event.data.user;
-        if (googleUser && googleUser.email && typeof SmartGimbalCatalog !== 'undefined') {
-          SmartGimbalCatalog.loginWithGmail(googleUser.email, googleUser.name);
-          loadUserData();
+      if (event.origin !== window.location.origin) return;
+      const data = event.data || {};
+      if ((data.type === 'TFLOW_GOOGLE_AUTH_SUCCESS' || data.type === 'GOOGLE_OAUTH_SUCCESS') && data.verified) {
+        const email = data.email || (data.user && data.user.email);
+        const name = data.name || (data.user && data.user.name) || '';
+        const pic = data.picture || '';
+        if (email && typeof SmartGimbalCatalog !== 'undefined') {
+          const p = (typeof SmartGimbalCatalog.loginWithGmailAsync === 'function')
+            ? SmartGimbalCatalog.loginWithGmailAsync(email, name, { authProvider: 'google', avatarUrl: pic })
+            : Promise.resolve(SmartGimbalCatalog.loginWithGmail(email, name, { authProvider: 'google', avatarUrl: pic }));
+          p.then(() => loadUserData());
         }
-      } else if (event.data && event.data.type === 'APPLE_OAUTH_SUCCESS') {
-        const appleUser = event.data.user;
-        if (appleUser && appleUser.email && typeof SmartGimbalCatalog !== 'undefined') {
-          (SmartGimbalCatalog.loginWithApple || SmartGimbalCatalog.loginWithGmail)(appleUser.email, appleUser.name);
-          loadUserData();
+      } else if ((data.type === 'TFLOW_APPLE_AUTH_SUCCESS' || data.type === 'APPLE_OAUTH_SUCCESS') && data.verified) {
+        const email = data.email || (data.user && data.user.email);
+        const name = data.name || (data.user && data.user.name) || '';
+        if (email && typeof SmartGimbalCatalog !== 'undefined') {
+          const p = (typeof SmartGimbalCatalog.loginWithAppleAsync === 'function')
+            ? SmartGimbalCatalog.loginWithAppleAsync(email, name, { authProvider: 'apple' })
+            : Promise.resolve((SmartGimbalCatalog.loginWithApple || SmartGimbalCatalog.loginWithGmail)(email, name, { authProvider: 'apple' }));
+          p.then(() => loadUserData());
         }
       }
     });

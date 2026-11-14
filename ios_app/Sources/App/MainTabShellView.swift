@@ -50,7 +50,7 @@ struct MainTabShellView: View {
 
                     MediaGallerySheetView(camera: camera, isEmbeddedTab: true)
                         .tabItem {
-                            Label("Thư viện", systemImage: "photo.on.rectangle.angled")
+                            Label("Thư viện thiết bị", systemImage: "photo.on.rectangle.angled")
                         }
                         .tag(1)
 

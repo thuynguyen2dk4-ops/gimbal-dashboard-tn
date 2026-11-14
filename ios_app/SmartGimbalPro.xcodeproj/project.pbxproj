@@ -35,6 +35,7 @@
 		AA11002129B7F10000000001 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA11000529B7F10000000001 /* SmartGimbalPro.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SmartGimbalPro.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA11000429B7F10000000001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA11000E29B7F10000000001 /* SmartGimbalPro.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SmartGimbalPro.entitlements; sourceTree = "<group>"; };
 		AA11010229B7F10000000001 /* SmartGimbalApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartGimbalApp.swift; sourceTree = "<group>"; };
 		AA11010429B7F10000000001 /* MainTabShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabShellView.swift; sourceTree = "<group>"; };
 		AA11010729B7F10000000001 /* GimbalModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GimbalModels.swift; sourceTree = "<group>"; };
@@ -86,6 +87,7 @@
 				AA11012329B7F10000000001 /* Views */,
 				AA11002129B7F10000000001 /* Assets.xcassets */,
 				AA11000429B7F10000000001 /* Info.plist */,
+				AA11000E29B7F10000000001 /* SmartGimbalPro.entitlements */,
 			);
 			path = Sources;
 			sourceTree = "<group>";
@@ -335,6 +337,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/SmartGimbalPro.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 241;
 				DEVELOPMENT_TEAM = "";
@@ -357,6 +360,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Sources/SmartGimbalPro.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 241;
 				DEVELOPMENT_TEAM = "";

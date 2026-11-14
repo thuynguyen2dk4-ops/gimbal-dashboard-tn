@@ -16,7 +16,7 @@ import UIKit
 // 5. CAMERA SERVICE & CAPTURE CONTROLLER
 // =====================================================================
 
-final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate {
+final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVCapturePhotoCaptureDelegate, AVCaptureFileOutputRecordingDelegate {
     @Published var isSessionRunning: Bool = false
     @Published var isRecording: Bool = false
     @Published var recordingDuration: String = "00:00:00"
@@ -27,6 +27,8 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     @Published var latestThumbnail: UIImage? = nil
     @Published var capturedMedia: [CapturedMediaItem] = []
     @Published var detectedFaceRect: CGRect? = nil
+    @Published var trackedObjectRect: CGRect? = nil
+    @Published var lastCaptureError: String? = nil
 
     // Camera Mode, Flash & Zoom State
     @Published var selectedMode: String = "VIDEO"
@@ -36,9 +38,6 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     // Customizable Figma UI States (Node 96:3)
     @Published var isProMode: Bool = false {
         didSet {
-            if oldValue && !isProMode {
-                selectedAspectRatio = "9:16"
-            }
             persistUiPreferences()
         }
     }
@@ -138,7 +137,13 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     private var isSessionConfigured: Bool = false
     private var activePositionFront: Bool = false
     private var currentVideoInput: AVCaptureDeviceInput?
+    private var currentAudioInput: AVCaptureDeviceInput?
     private var videoOutput: AVCaptureVideoDataOutput?
+    private var photoOutput: AVCapturePhotoOutput?
+    private var movieOutput: AVCaptureMovieFileOutput?
+    private var visionSequenceHandler = VNSequenceRequestHandler()
+    private var activeTrackObservation: VNDetectedObjectObservation?
+    private var pendingRecordingDuration: String = "00:00:00"
     private var recordingTimer: Timer?
     private var vuTimer: Timer?
     private var recordingSecondsCount: Int = 0
@@ -215,6 +220,7 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     // MARK: - Figma Customizer & AI Target Controls
 
     func setAspectRatio(_ ratio: String) {
+        guard !isRecording else { return }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         selectedAspectRatio = ratio
     }
@@ -227,7 +233,19 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     func lockObjectAtNormalizedPoint(_ point: CGPoint, label: String = "Vật thể đã chọn") {
         let clampedX = min(0.95, max(0.05, point.x))
         let clampedY = min(0.95, max(0.05, point.y))
+        let boxSize: CGFloat = 0.22
+        let visionRect = CGRect(
+            x: min(max(0.0, clampedX - boxSize * 0.5), 1.0 - boxSize),
+            y: min(max(0.0, (1.0 - clampedY) - boxSize * 0.5), 1.0 - boxSize),
+            width: boxSize,
+            height: boxSize
+        )
+        visionQueue.async { [weak self] in
+            self?.visionSequenceHandler = VNSequenceRequestHandler()
+            self?.activeTrackObservation = VNDetectedObjectObservation(boundingBox: visionRect)
+        }
         customObjectLockedPoint = CGPoint(x: clampedX, y: clampedY)
+        trackedObjectRect = CGRect(x: clampedX - boxSize * 0.5, y: clampedY - boxSize * 0.5, width: boxSize, height: boxSize)
         customObjectLabel = label
         aiTargetMode = .object
         aiTrackingEnabled = true
@@ -235,7 +253,12 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     }
 
     func clearLockedObject() {
+        visionQueue.async { [weak self] in
+            self?.activeTrackObservation = nil
+            self?.visionSequenceHandler = VNSequenceRequestHandler()
+        }
         customObjectLockedPoint = nil
+        trackedObjectRect = nil
         customObjectLabel = "Vật thể đã chọn"
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
     }
@@ -411,22 +434,44 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
         var loaded: [CapturedMediaItem] = []
         for record in records {
             let fileURL = mediaDirectoryURL.appendingPathComponent(record.fileName)
-            guard let imgData = try? Data(contentsOf: fileURL),
-                  let image = UIImage(data: imgData) else {
+            guard FileManager.default.fileExists(atPath: fileURL.path) else {
                 continue
             }
-            let diskSize = Int64(imgData.count)
+            var itemVideoURL: URL? = nil
+            var previewImage: UIImage? = nil
+            var diskSize: Int64 = record.fileSizeBytes
+
+            if record.isVideo && record.fileName.lowercased().hasSuffix(".mov") {
+                itemVideoURL = fileURL
+                let thumbURL = mediaDirectoryURL.appendingPathComponent("\(record.id.uuidString).thumb.jpg")
+                if let thumbData = try? Data(contentsOf: thumbURL), let img = UIImage(data: thumbData) {
+                    previewImage = img
+                } else {
+                    previewImage = generateVideoThumbnailSync(for: fileURL)
+                }
+                if let attrs = try? FileManager.default.attributesOfItem(atPath: fileURL.path),
+                   let sizeNum = attrs[.size] as? NSNumber {
+                    diskSize = sizeNum.int64Value
+                }
+            } else if let imgData = try? Data(contentsOf: fileURL),
+                      let image = UIImage(data: imgData) {
+                previewImage = image
+                diskSize = Int64(imgData.count)
+            }
+
+            guard let finalImage = previewImage else { continue }
             loaded.append(
                 CapturedMediaItem(
                     id: record.id,
-                    image: image,
+                    image: finalImage,
                     isVideo: record.isVideo,
                     duration: record.duration,
                     timestamp: record.timestamp,
                     resolution: record.resolution,
                     profile: record.profile,
                     fileName: record.fileName,
-                    fileSizeBytes: record.fileSizeBytes > 0 ? record.fileSizeBytes : diskSize
+                    fileSizeBytes: record.fileSizeBytes > 0 ? record.fileSizeBytes : diskSize,
+                    videoURL: itemVideoURL
                 )
             )
         }
@@ -456,17 +501,89 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     func addAndPersistMedia(_ item: CapturedMediaItem) {
         ensureMediaDirectoryExists()
         var stored = item
-        if stored.fileName.isEmpty {
-            stored.fileName = "\(stored.id.uuidString).jpg"
-        }
-        let targetURL = mediaDirectoryURL.appendingPathComponent(stored.fileName)
-        if let encoded = stored.image.jpegData(compressionQuality: 0.9) ?? stored.image.pngData() {
-            try? encoded.write(to: targetURL, options: .atomic)
-            stored.fileSizeBytes = Int64(encoded.count)
+        if stored.isVideo, let sourceVideoURL = stored.videoURL {
+            if stored.fileName.isEmpty {
+                stored.fileName = "\(stored.id.uuidString).mov"
+            }
+            let targetVideoURL = mediaDirectoryURL.appendingPathComponent(stored.fileName)
+            if sourceVideoURL != targetVideoURL {
+                try? FileManager.default.removeItem(at: targetVideoURL)
+                do {
+                    try FileManager.default.moveItem(at: sourceVideoURL, to: targetVideoURL)
+                } catch {
+                    try? FileManager.default.copyItem(at: sourceVideoURL, to: targetVideoURL)
+                }
+            }
+            stored.videoURL = targetVideoURL
+            let thumbURL = mediaDirectoryURL.appendingPathComponent("\(stored.id.uuidString).thumb.jpg")
+            if let thumbData = stored.image.jpegData(compressionQuality: 0.85) {
+                try? thumbData.write(to: thumbURL, options: .atomic)
+            }
+            if let attrs = try? FileManager.default.attributesOfItem(atPath: targetVideoURL.path),
+               let sizeNum = attrs[.size] as? NSNumber {
+                stored.fileSizeBytes = sizeNum.int64Value
+            }
+        } else {
+            if stored.fileName.isEmpty {
+                stored.fileName = "\(stored.id.uuidString).jpg"
+            }
+            let targetURL = mediaDirectoryURL.appendingPathComponent(stored.fileName)
+            if let encoded = stored.image.jpegData(compressionQuality: 0.92) ?? stored.image.pngData() {
+                try? encoded.write(to: targetURL, options: .atomic)
+                stored.fileSizeBytes = Int64(encoded.count)
+            }
         }
         capturedMedia.insert(stored, at: 0)
         latestThumbnail = stored.image
         saveManifestToDisk()
+    }
+
+    private func generateVideoThumbnailSync(for url: URL) -> UIImage? {
+        let asset = AVURLAsset(url: url)
+        let generator = AVAssetImageGenerator(asset: asset)
+        generator.appliesPreferredTrackTransform = true
+        let time = CMTime(seconds: 0.1, preferredTimescale: 600)
+        guard let cgImg = try? generator.copyCGImage(at: time, actualTime: nil) else {
+            return nil
+        }
+        return UIImage(cgImage: cgImg)
+    }
+
+    private func saveImageToPhotosLibraryIfAllowed(_ imageData: Data) {
+        let saveBlock = {
+            PHPhotoLibrary.shared().performChanges({
+                let req = PHAssetCreationRequest.forAsset()
+                req.addResource(with: .photo, data: imageData, options: nil)
+            }, completionHandler: nil)
+        }
+        let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        if status == .authorized || status == .limited {
+            saveBlock()
+        } else if status == .notDetermined {
+            PHPhotoLibrary.requestAuthorization(for: .addOnly) { newStatus in
+                if newStatus == .authorized || newStatus == .limited {
+                    saveBlock()
+                }
+            }
+        }
+    }
+
+    private func saveVideoToPhotosLibraryIfAllowed(_ videoURL: URL) {
+        let saveBlock = {
+            PHPhotoLibrary.shared().performChanges({
+                PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: videoURL)
+            }, completionHandler: nil)
+        }
+        let status = PHPhotoLibrary.authorizationStatus(for: .addOnly)
+        if status == .authorized || status == .limited {
+            saveBlock()
+        } else if status == .notDetermined {
+            PHPhotoLibrary.requestAuthorization(for: .addOnly) { newStatus in
+                if newStatus == .authorized || newStatus == .limited {
+                    saveBlock()
+                }
+            }
+        }
     }
 
     private func startAudioVUAnimation() {
@@ -481,6 +598,26 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     // MARK: - AVCaptureSession Pipeline (Preserved IOS-BUG-01)
 
     func setupSession() {
+        let authStatus = AVCaptureDevice.authorizationStatus(for: .video)
+        if authStatus == .notDetermined {
+            AVCaptureDevice.requestAccess(for: .video) { [weak self] granted in
+                if granted {
+                    self?.setupSession()
+                } else {
+                    DispatchQueue.main.async {
+                        self?.lastCaptureError = "Vui lòng cấp quyền Camera trong Cài đặt iPhone."
+                    }
+                }
+            }
+            return
+        }
+        guard authStatus == .authorized else {
+            DispatchQueue.main.async { [weak self] in
+                self?.lastCaptureError = "Quyền truy cập Camera đang bị từ chối."
+            }
+            return
+        }
+
         let wantFront = isFrontCamera
         sessionQueue.async { [weak self] in
             guard let self = self else { return }
@@ -506,12 +643,32 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
                     self.currentVideoInput = input
                 }
 
+                if AVCaptureDevice.authorizationStatus(for: .audio) == .authorized,
+                   let audioDev = AVCaptureDevice.default(for: .audio),
+                   let audioInput = try? AVCaptureDeviceInput(device: audioDev),
+                   self.captureSession.canAddInput(audioInput) {
+                    self.captureSession.addInput(audioInput)
+                    self.currentAudioInput = audioInput
+                }
+
                 let output = AVCaptureVideoDataOutput()
                 output.alwaysDiscardsLateVideoFrames = true
                 output.setSampleBufferDelegate(self, queue: self.visionQueue)
                 if self.captureSession.canAddOutput(output) {
                     self.captureSession.addOutput(output)
                     self.videoOutput = output
+                }
+
+                let photoOut = AVCapturePhotoOutput()
+                if self.captureSession.canAddOutput(photoOut) {
+                    self.captureSession.addOutput(photoOut)
+                    self.photoOutput = photoOut
+                }
+
+                let movieOut = AVCaptureMovieFileOutput()
+                if self.captureSession.canAddOutput(movieOut) {
+                    self.captureSession.addOutput(movieOut)
+                    self.movieOutput = movieOut
                 }
 
                 self.activePositionFront = wantFront
@@ -524,6 +681,19 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
             }
             DispatchQueue.main.async {
                 self.isSessionRunning = self.captureSession.isRunning
+                self.lastCaptureError = nil
+            }
+        }
+    }
+
+    func stopSession() {
+        sessionQueue.async { [weak self] in
+            guard let self = self else { return }
+            if self.captureSession.isRunning {
+                self.captureSession.stopRunning()
+            }
+            DispatchQueue.main.async {
+                self.isSessionRunning = false
             }
         }
     }
@@ -600,6 +770,11 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
             let fileURL = mediaDirectoryURL.appendingPathComponent(item.fileName)
             try? FileManager.default.removeItem(at: fileURL)
         }
+        if let videoURL = item.videoURL {
+            try? FileManager.default.removeItem(at: videoURL)
+        }
+        let thumbURL = mediaDirectoryURL.appendingPathComponent("\(item.id.uuidString).thumb.jpg")
+        try? FileManager.default.removeItem(at: thumbURL)
         capturedMedia.removeAll { $0.id == item.id }
         latestThumbnail = capturedMedia.first?.image
         saveManifestToDisk()
@@ -613,92 +788,186 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
             self?.shutterFlash = false
         }
 
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 400, height: 400))
-        let photo = renderer.image { ctx in
-            UIColor(red: 0.15, green: 0.16, blue: 0.20, alpha: 1.0).setFill()
-            ctx.fill(CGRect(x: 0, y: 0, width: 400, height: 400))
+        let resSnapshot = selectedResolution
+        let lutSnapshot = activeLut
+        sessionQueue.async { [weak self] in
+            guard let self = self,
+                  self.captureSession.isRunning,
+                  let photoOut = self.photoOutput,
+                  photoOut.connection(with: .video) != nil else {
+                DispatchQueue.main.async {
+                    self?.lastCaptureError = "Camera chưa sẵn sàng để chụp ảnh (hãy dùng iPhone thực hoặc cấp quyền Camera)."
+                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                }
+                return
+            }
+            let settings = AVCapturePhotoSettings()
+            if photoOut.supportedFlashModes.contains(self.isFlashEnabled ? .on : .off) {
+                settings.flashMode = self.isFlashEnabled ? .on : .off
+            }
+            photoOut.capturePhoto(with: settings, delegate: self)
+        }
+    }
 
-            let paragraph = NSMutableParagraphStyle()
-            paragraph.alignment = .center
-            let attrs: [NSAttributedString.Key: Any] = [
-                .font: UIFont.systemFont(ofSize: 18, weight: .bold),
-                .foregroundColor: UIColor.white,
-                .paragraphStyle: paragraph
-            ]
-            let dateStr = DateFormatter.localizedString(from: Date(), dateStyle: .none, timeStyle: .medium)
-            let snapText = ("T-FLOW S1 PRO • " + selectedResolution + " • " + dateStr) as NSString
-            snapText.draw(
-                in: CGRect(x: 20, y: 160, width: 360, height: 80),
-                withAttributes: attrs
-            )
+    func photoOutput(
+        _ output: AVCapturePhotoOutput,
+        didFinishProcessingPhoto photo: AVCapturePhoto,
+        error: Error?
+    ) {
+        if let error = error {
+            DispatchQueue.main.async { [weak self] in
+                self?.lastCaptureError = "Lỗi chụp ảnh: \(error.localizedDescription)"
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+            }
+            return
+        }
+        guard let imageData = photo.fileDataRepresentation(),
+              let image = UIImage(data: imageData) else {
+            DispatchQueue.main.async { [weak self] in
+                self?.lastCaptureError = "Không thể đọc dữ liệu ảnh từ cảm biến Camera."
+            }
+            return
         }
 
-        let newItem = CapturedMediaItem(
-            image: photo,
-            isVideo: false,
-            duration: nil,
-            resolution: selectedResolution,
-            profile: activeLut
-        )
-        addAndPersistMedia(newItem)
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        saveImageToPhotosLibraryIfAllowed(imageData)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let newItem = CapturedMediaItem(
+                image: image,
+                isVideo: false,
+                duration: nil,
+                resolution: self.selectedResolution,
+                profile: self.activeLut
+            )
+            self.addAndPersistMedia(newItem)
+            self.lastCaptureError = nil
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+        }
     }
 
     func toggleRecording() {
         if isRecording {
+            pendingRecordingDuration = recordingDuration
             isRecording = false
             recordingTimer?.invalidate()
             recordingTimer = nil
+            recordingDuration = "00:00:00"
             UINotificationFeedbackGenerator().notificationOccurred(.success)
 
-            let durationStr = recordingDuration
-            recordingDuration = "00:00:00"
-
-            let renderer = UIGraphicsImageRenderer(size: CGSize(width: 400, height: 400))
-            let clipThumb = renderer.image { ctx in
-                UIColor(red: 0.18, green: 0.12, blue: 0.14, alpha: 1.0).setFill()
-                ctx.fill(CGRect(x: 0, y: 0, width: 400, height: 400))
-                let paragraph = NSMutableParagraphStyle()
-                paragraph.alignment = .center
-                let attrs: [NSAttributedString.Key: Any] = [
-                    .font: UIFont.systemFont(ofSize: 18, weight: .bold),
-                    .foregroundColor: UIColor.red,
-                    .paragraphStyle: paragraph
-                ]
-                let clipText = ("CLIP 4K PRORES • " + durationStr + " • " + activeLut) as NSString
-                clipText.draw(
-                    in: CGRect(x: 20, y: 160, width: 360, height: 80),
-                    withAttributes: attrs
-                )
-            }
-
-            let newItem = CapturedMediaItem(
-                image: clipThumb,
-                isVideo: true,
-                duration: durationStr,
-                resolution: selectedResolution,
-                profile: activeLut
-            )
-            addAndPersistMedia(newItem)
-        } else {
-            isRecording = true
-            UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
-            recordingSecondsCount = 0
-            recordingDuration = "00:00:00"
-
-            recordingTimer?.invalidate()
-            recordingTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            sessionQueue.async { [weak self] in
                 guard let self = self else { return }
-                self.recordingSecondsCount += 1
-                let m = self.recordingSecondsCount / 60
-                let s = self.recordingSecondsCount % 60
-                self.recordingDuration = String(format: "00:%02d:%02d", m, s)
+                if let movieOut = self.movieOutput, movieOut.isRecording {
+                    movieOut.stopRecording()
+                }
             }
+        } else {
+            sessionQueue.async { [weak self] in
+                guard let self = self,
+                      self.captureSession.isRunning,
+                      let movieOut = self.movieOutput,
+                      let videoConn = movieOut.connection(with: .video) else {
+                    DispatchQueue.main.async {
+                        self?.lastCaptureError = "Camera chưa sẵn sàng để quay video."
+                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                    }
+                    return
+                }
+                if videoConn.isVideoMirroringSupported {
+                    videoConn.automaticallyAdjustsVideoMirroring = false
+                    videoConn.isVideoMirrored = self.activePositionFront
+                }
+                let tempURL = FileManager.default.temporaryDirectory
+                    .appendingPathComponent("tflow_rec_\(UUID().uuidString).mov")
+                try? FileManager.default.removeItem(at: tempURL)
+                movieOut.startRecording(to: tempURL, recordingDelegate: self)
+
+                DispatchQueue.main.async {
+                    self.isRecording = true
+                    self.lastCaptureError = nil
+                    UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                    self.recordingSecondsCount = 0
+                    self.recordingDuration = "00:00:00"
+                    self.recordingTimer?.invalidate()
+                    self.recordingTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+                        guard let self = self else { return }
+                        self.recordingSecondsCount += 1
+                        let m = self.recordingSecondsCount / 60
+                        let s = self.recordingSecondsCount % 60
+                        self.recordingDuration = String(format: "00:%02d:%02d", m, s)
+                    }
+                }
+            }
+        }
+    }
+
+    func fileOutput(
+        _ output: AVCaptureFileOutput,
+        didFinishRecordingTo outputFileURL: URL,
+        from connections: [AVCaptureConnection],
+        error: Error?
+    ) {
+        if let error = error {
+            try? FileManager.default.removeItem(at: outputFileURL)
+            DispatchQueue.main.async { [weak self] in
+                self?.isRecording = false
+                self?.recordingTimer?.invalidate()
+                self?.recordingTimer = nil
+                self?.lastCaptureError = "Lỗi ghi hình video: \(error.localizedDescription)"
+            }
+            return
+        }
+
+        let thumb = generateVideoThumbnailSync(for: outputFileURL) ?? UIImage()
+        let savedDuration = pendingRecordingDuration == "00:00:00" ? "00:00:01" : pendingRecordingDuration
+        let itemId = UUID()
+        let movFileName = "\(itemId.uuidString).mov"
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            let newItem = CapturedMediaItem(
+                id: itemId,
+                image: thumb,
+                isVideo: true,
+                duration: savedDuration,
+                resolution: self.selectedResolution,
+                profile: self.activeLut,
+                fileName: movFileName,
+                videoURL: outputFileURL
+            )
+            self.addAndPersistMedia(newItem)
+            if let finalURL = self.capturedMedia.first(where: { $0.id == itemId })?.videoURL {
+                self.saveVideoToPhotosLibraryIfAllowed(finalURL)
+            }
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
         }
     }
 
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return }
+        let orientation: CGImagePropertyOrientation = activePositionFront ? .leftMirrored : .right
+
+        if aiTrackingEnabled, let trackedObs = activeTrackObservation {
+            let trackReq = VNTrackObjectRequest(detectedObjectObservation: trackedObs) { [weak self] req, _ in
+                guard let self = self else { return }
+                if let updated = req.results?.first as? VNDetectedObjectObservation, updated.confidence > 0.3 {
+                    self.activeTrackObservation = updated
+                    let box = updated.boundingBox
+                    let normalized = CGRect(
+                        x: box.minX,
+                        y: 1.0 - box.maxY,
+                        width: box.width,
+                        height: box.height
+                    )
+                    DispatchQueue.main.async {
+                        self.trackedObjectRect = normalized
+                        self.customObjectLockedPoint = CGPoint(x: normalized.midX, y: normalized.midY)
+                    }
+                }
+            }
+            trackReq.trackingLevel = .fast
+            try? visionSequenceHandler.perform([trackReq], on: pixelBuffer, orientation: orientation)
+            return
+        }
 
         let request = VNDetectFaceRectanglesRequest { [weak self] req, _ in
             guard let results = req.results as? [VNFaceObservation], let firstFace = results.first else {
@@ -721,7 +990,6 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
             }
         }
 
-        let orientation: CGImagePropertyOrientation = activePositionFront ? .leftMirrored : .right
         let handler = VNImageRequestHandler(cvPixelBuffer: pixelBuffer, orientation: orientation, options: [:])
         try? handler.perform([request])
     }

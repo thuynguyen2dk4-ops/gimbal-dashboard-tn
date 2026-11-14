@@ -36,10 +36,83 @@
   var _syncPromise = null;
 
   var ADMIN_GMAILS = ['thuynguyen2dk4@gmail.com', 'thuy.nguyen@tflow.tech'];
-  var BUNDLED_CATALOG_VERSION = '3.7.0-single-product-dynamic';
+  var BUNDLED_CATALOG_VERSION = '3.8.0-real-sync';
   var REMOVED_LEGACY_USER_IDS = ['usr-mailinh', 'usr-minh', 'usr-long', 'usr-huong', 'usr-ngoc', 'usr-dung'];
   var REMOVED_LEGACY_USER_EMAILS = ['mailinh.film@gmail.com', 'minh.vlog@gmail.com', 'long.cinema@film.vn', 'huong.media@gmail.com', 'ngoc.agency@film.vn', 'dung.travel@gmail.com'];
   var REMOVED_LEGACY_PRODUCT_IDS = ['tf-cam-eye', 'tf-acc-tripod', 'tf-acc-case', 'tf-m32-core', 'tf-x14-imu', 's1', 's2', 's1-air', 'p1', 'x2', 'acc-mic', 'acc-magsafe', 'acc-light', 'acc-tripod', 'acc-case'];
+
+  function sha256Hex(str) {
+    var input = String(str || '');
+    var bytes = [];
+    if (typeof TextEncoder !== 'undefined') {
+      var encoded = new TextEncoder().encode(input);
+      for (var ei = 0; ei < encoded.length; ei++) bytes.push(encoded[ei]);
+    } else {
+      var utf8 = unescape(encodeURIComponent(input));
+      for (var ui = 0; ui < utf8.length; ui++) bytes.push(utf8.charCodeAt(ui));
+    }
+
+    var K = [
+      0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+      0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+      0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+      0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+      0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+      0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+      0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+      0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+    ];
+    var H = [
+      0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+      0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
+    ];
+
+    var bitLen = bytes.length * 8;
+    bytes.push(0x80);
+    while ((bytes.length % 64) !== 56) bytes.push(0);
+    var hiBits = Math.floor(bitLen / 0x100000000);
+    var loBits = bitLen >>> 0;
+    bytes.push((hiBits >>> 24) & 0xff, (hiBits >>> 16) & 0xff, (hiBits >>> 8) & 0xff, hiBits & 0xff);
+    bytes.push((loBits >>> 24) & 0xff, (loBits >>> 16) & 0xff, (loBits >>> 8) & 0xff, loBits & 0xff);
+
+    var rotr = function (x, n) { return (x >>> n) | (x << (32 - n)); };
+    var w = new Array(64);
+    for (var offset = 0; offset < bytes.length; offset += 64) {
+      for (var t = 0; t < 16; t++) {
+        var j = offset + t * 4;
+        w[t] = ((bytes[j] << 24) | (bytes[j + 1] << 16) | (bytes[j + 2] << 8) | bytes[j + 3]) >>> 0;
+      }
+      for (var t2 = 16; t2 < 64; t2++) {
+        var s0 = rotr(w[t2 - 15], 7) ^ rotr(w[t2 - 15], 18) ^ (w[t2 - 15] >>> 3);
+        var s1 = rotr(w[t2 - 2], 17) ^ rotr(w[t2 - 2], 19) ^ (w[t2 - 2] >>> 10);
+        w[t2] = (w[t2 - 16] + s0 + w[t2 - 7] + s1) >>> 0;
+      }
+      var a = H[0], b = H[1], c = H[2], d = H[3];
+      var e = H[4], f = H[5], g = H[6], h = H[7];
+      for (var t3 = 0; t3 < 64; t3++) {
+        var S1 = rotr(e, 6) ^ rotr(e, 11) ^ rotr(e, 25);
+        var ch = (e & f) ^ ((~e) & g);
+        var temp1 = (h + S1 + ch + K[t3] + w[t3]) >>> 0;
+        var S0 = rotr(a, 2) ^ rotr(a, 13) ^ rotr(a, 22);
+        var maj = (a & b) ^ (a & c) ^ (b & c);
+        var temp2 = (S0 + maj) >>> 0;
+        h = g; g = f; f = e; e = (d + temp1) >>> 0;
+        d = c; c = b; b = a; a = (temp1 + temp2) >>> 0;
+      }
+      H[0] = (H[0] + a) >>> 0; H[1] = (H[1] + b) >>> 0;
+      H[2] = (H[2] + c) >>> 0; H[3] = (H[3] + d) >>> 0;
+      H[4] = (H[4] + e) >>> 0; H[5] = (H[5] + f) >>> 0;
+      H[6] = (H[6] + g) >>> 0; H[7] = (H[7] + h) >>> 0;
+    }
+
+    var hex = '';
+    for (var hi = 0; hi < 8; hi++) {
+      var part = (H[hi] >>> 0).toString(16);
+      while (part.length < 8) part = '0' + part;
+      hex += part;
+    }
+    return hex;
+  }
 
   function isRemovedLegacyUser(u) {
     if (!u) return true;
@@ -65,27 +138,40 @@
     var ex = existingLocal || {};
     var email = String(row.email || ex.email || '').trim().toLowerCase();
     var tier = row.tier || ex.tier || 'Basic Creator';
-    var device = row.device || ex.device || ex.registeredDevice || 'Smart Gimbal S1 Titanium';
+    var rawDevice = (row.device !== undefined && row.device !== null) ? row.device : (ex.device || ex.registeredDevice || '');
+    var device = (rawDevice && rawDevice !== 'Smart Gimbal S1 Titanium') ? rawDevice : 'Chưa kết nối thiết bị';
     var isAdmin = (typeof row.is_admin === 'boolean')
       ? row.is_admin
       : (typeof ex.isAdmin === 'boolean' ? ex.isAdmin : ADMIN_GMAILS.indexOf(email) !== -1);
+    var avatarUrl = (row.avatar_url !== undefined && row.avatar_url !== null) ? row.avatar_url : (ex.avatarUrl || '');
+    var localAvatar = (ex.avatar && ex.avatar !== 'photo_avatar') ? ex.avatar : avatarUrl;
+    var jobTitle = (row.job_title !== undefined && row.job_title !== null && row.job_title !== '') ? row.job_title : (ex.jobTitle || ex.role || (isAdmin ? 'Master Administrator' : 'Khách Hàng Thành Viên'));
     return Object.assign({}, ex, {
       id: row.id || ex.id || ('usr-' + (email || 'guest').replace(/[^a-z0-9]/g, '-')),
-      name: row.name || ex.name || 'T-FLOW User',
+      name: row.name || ex.name || (email ? email.split('@')[0] : 'T-FLOW User'),
       email: email,
       phone: (row.phone !== undefined && row.phone !== null) ? row.phone : (ex.phone || ''),
-      address: ex.address || '',
-      password: ex.password || '',
-      avatar: ex.avatar || '',
+      address: (row.address !== undefined && row.address !== null) ? row.address : (ex.address || ''),
+      city: (row.city !== undefined && row.city !== null) ? row.city : (ex.city || ''),
+      district: (row.district !== undefined && row.district !== null) ? row.district : (ex.district || ''),
+      shippingNotes: (row.shipping_notes !== undefined && row.shipping_notes !== null) ? row.shipping_notes : (ex.shippingNotes || ''),
+      jobTitle: jobTitle,
+      role: jobTitle,
+      cameraSetup: (row.camera_setup !== undefined && row.camera_setup !== null) ? row.camera_setup : (ex.cameraSetup || ''),
+      authProvider: (row.auth_provider !== undefined && row.auth_provider !== null && row.auth_provider !== '') ? row.auth_provider : (ex.authProvider || 'email'),
+      passwordHash: (row.password_hash !== undefined && row.password_hash !== null && row.password_hash !== '') ? row.password_hash : (ex.passwordHash || ''),
+      password: '',
+      avatarUrl: avatarUrl,
+      avatar: localAvatar,
       device: device,
       registeredDevice: device,
       tier: tier,
       tierBadge: row.tier_badge || (tier + ' Tier') || ex.tierBadge || 'Basic Creator Tier',
       memberSince: row.member_since || ex.memberSince || new Date().toISOString().slice(0, 10),
       serial: (row.serial !== undefined && row.serial !== null) ? row.serial : (ex.serial || ''),
-      warrantyDays: (typeof row.warranty_days === 'number') ? row.warranty_days : (typeof ex.warrantyDays === 'number' ? ex.warrantyDays : 365),
-      battery: (typeof row.battery === 'number') ? row.battery : (typeof ex.battery === 'number' ? ex.battery : 88),
-      firmware: row.firmware || ex.firmware || 'v2.4.2',
+      warrantyDays: (typeof row.warranty_days === 'number') ? row.warranty_days : (typeof ex.warrantyDays === 'number' ? ex.warrantyDays : 0),
+      battery: (typeof row.battery === 'number') ? row.battery : (typeof ex.battery === 'number' ? ex.battery : 0),
+      firmware: (row.firmware !== undefined && row.firmware !== null) ? row.firmware : (ex.firmware || ''),
       status: row.status || ex.status || 'Hoạt động',
       modules: normalizeModulesArray(row.modules, ex.modules),
       isAdmin: isAdmin,
@@ -99,24 +185,41 @@
     var emailLower = String(u.email || '').trim().toLowerCase();
     var fallbackId = 'usr-' + (emailLower || 'guest').replace(/[^a-z0-9]/g, '-');
     var tier = u.tier || 'Basic Creator';
-    return {
+    var avatarUrl = u.avatarUrl || '';
+    if (!avatarUrl && u.avatar && String(u.avatar).indexOf('http') === 0) {
+      avatarUrl = u.avatar;
+    }
+    var payload = {
       id: cloudIdOverride || u.id || fallbackId,
-      name: u.name || 'T-FLOW User',
+      name: u.name || (emailLower ? emailLower.split('@')[0] : 'T-FLOW User'),
       email: emailLower,
       phone: u.phone || '',
-      device: u.device || u.registeredDevice || 'Smart Gimbal S1 Titanium',
+      address: u.address || '',
+      city: u.city || '',
+      district: u.district || '',
+      shipping_notes: u.shippingNotes || '',
+      job_title: u.jobTitle || u.role || '',
+      camera_setup: u.cameraSetup || '',
+      avatar_url: avatarUrl,
+      auth_provider: u.authProvider || 'email',
+      device: (u.device && u.device !== 'Smart Gimbal S1 Titanium') ? u.device : ((u.registeredDevice && u.registeredDevice !== 'Smart Gimbal S1 Titanium') ? u.registeredDevice : 'Chưa kết nối thiết bị'),
       tier: tier,
       tier_badge: u.tierBadge || (tier + ' Tier'),
       member_since: u.memberSince || new Date().toISOString().slice(0, 10),
       serial: u.serial || '',
-      warranty_days: typeof u.warrantyDays === 'number' ? u.warrantyDays : 365,
-      battery: typeof u.battery === 'number' ? u.battery : 88,
-      firmware: u.firmware || 'v2.4.2',
+      warranty_days: typeof u.warrantyDays === 'number' ? u.warrantyDays : 0,
+      battery: typeof u.battery === 'number' ? u.battery : 0,
+      firmware: u.firmware || '',
       status: u.status || 'Hoạt động',
       modules: normalizeModulesArray(u.modules),
       is_admin: typeof u.isAdmin === 'boolean' ? u.isAdmin : (ADMIN_GMAILS.indexOf(emailLower) !== -1),
       last_active: new Date().toISOString()
     };
+    var pHash = u.passwordHash || (u.password ? sha256Hex(u.password) : '');
+    if (pHash) {
+      payload.password_hash = pHash;
+    }
+    return payload;
   }
 
   function postRealtimeBridge(msgType, payload) {
@@ -257,6 +360,218 @@
     return nextQueue;
   }
 
+  function mapCloudProductToLocal(row, existingLocal, cloudTiers) {
+    row = row || {};
+    var ex = existingLocal || {};
+    var tiersList = (Array.isArray(cloudTiers) && cloudTiers.length > 0)
+      ? cloudTiers.map(function (t) {
+          var p = Number(t.price) || 0;
+          return {
+            key: t.tier_key || t.id,
+            name: t.name || t.label || t.tier_key,
+            label: t.label || t.name || t.tier_key,
+            tag: t.save_text || '',
+            price: p,
+            priceFormatted: t.price_formatted || formatVND(p).replace(/\s+₫$/, '₫'),
+            oldPriceFormatted: t.old_price_formatted || '',
+            save: t.save_text || '',
+            gift: t.gift || '',
+            sku: t.sku || '',
+            stock: t.stock,
+            specsSummary: t.specs_summary || '',
+            highlights: Array.isArray(t.highlights) ? t.highlights : [],
+            desc: t.specs_summary || ''
+          };
+        })
+      : (Array.isArray(ex.tiers) ? ex.tiers : []);
+    return Object.assign({}, ex, {
+      id: row.id || ex.id,
+      slug: row.slug || ex.slug || row.id,
+      sku: row.sku || ex.sku || '',
+      groupId: row.group_id || ex.groupId || 'group-gimbal',
+      name: row.name || ex.name || 'T-Flow Pro',
+      heroBadge: row.hero_badge || ex.heroBadge || row.badge || '',
+      overviewBadge: row.overview_badge || ex.overviewBadge || '',
+      tagline: row.tagline !== undefined && row.tagline !== null ? row.tagline : (ex.tagline || ''),
+      subtitle: row.subtitle !== undefined && row.subtitle !== null ? row.subtitle : (ex.subtitle || ''),
+      badge: row.badge || ex.badge || '',
+      img: row.img || ex.img || '/shared/img/tflow_pro_main.png',
+      status: row.status || ex.status || 'Đang Mở Bán',
+      totalOrders: typeof row.total_orders === 'number' ? row.total_orders : (ex.totalOrders || 0),
+      orderGrowth: row.order_growth !== undefined && row.order_growth !== null ? row.order_growth : (ex.orderGrowth || ''),
+      is_flagship: typeof row.is_flagship === 'boolean' ? row.is_flagship : Boolean(ex.is_flagship),
+      gallery: Array.isArray(row.gallery) && row.gallery.length ? row.gallery : (ex.gallery || []),
+      colors: Array.isArray(row.colors) && row.colors.length ? row.colors : (ex.colors || []),
+      pillTags: Array.isArray(row.pill_tags) ? row.pill_tags : (ex.pillTags || []),
+      perks: Array.isArray(row.perks) && row.perks.length ? row.perks : (ex.perks || []),
+      highlights: Array.isArray(row.highlights) && row.highlights.length ? row.highlights : (ex.highlights || []),
+      customBlocks: Array.isArray(row.custom_blocks) ? row.custom_blocks : (ex.customBlocks || []),
+      boxContents: Array.isArray(row.box_contents) && row.box_contents.length ? row.box_contents : (ex.boxContents || ex.inTheBox || []),
+      inTheBox: Array.isArray(row.box_contents) && row.box_contents.length ? row.box_contents : (ex.inTheBox || ex.boxContents || []),
+      specs: (Array.isArray(row.specs) || (row.specs && typeof row.specs === 'object')) ? row.specs : (ex.specs || []),
+      warranty: row.warranty || ex.warranty || '',
+      tiers: tiersList
+    });
+  }
+
+  function pushProductToCloud(prodObj) {
+    if (!prodObj || !prodObj.id || typeof fetch !== 'function') {
+      return Promise.resolve({ ok: false, skipped: true });
+    }
+    var headers = {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'resolution=merge-duplicates,return=representation'
+    };
+    var payload = {
+      id: prodObj.id,
+      slug: prodObj.slug || prodObj.id,
+      sku: prodObj.sku || '',
+      group_id: prodObj.groupId || 'group-gimbal',
+      name: prodObj.name || 'T-Flow Pro',
+      tagline: prodObj.tagline || '',
+      subtitle: prodObj.subtitle || '',
+      badge: prodObj.badge || '',
+      hero_badge: prodObj.heroBadge || prodObj.badge || '',
+      overview_badge: prodObj.overviewBadge || '',
+      img: prodObj.img || '/shared/img/tflow_pro_main.png',
+      status: prodObj.status || 'Đang Mở Bán',
+      total_orders: typeof prodObj.totalOrders === 'number' ? prodObj.totalOrders : 0,
+      order_growth: prodObj.orderGrowth || '',
+      is_flagship: Boolean(prodObj.is_flagship),
+      gallery: Array.isArray(prodObj.gallery) ? prodObj.gallery : [],
+      colors: Array.isArray(prodObj.colors) ? prodObj.colors : [],
+      pill_tags: Array.isArray(prodObj.pillTags) ? prodObj.pillTags : [],
+      perks: Array.isArray(prodObj.perks) ? prodObj.perks : [],
+      highlights: Array.isArray(prodObj.highlights) ? prodObj.highlights : [],
+      custom_blocks: Array.isArray(prodObj.customBlocks) ? prodObj.customBlocks : [],
+      box_contents: Array.isArray(prodObj.inTheBox) ? prodObj.inTheBox : (Array.isArray(prodObj.boxContents) ? prodObj.boxContents : []),
+      specs: prodObj.specs || [],
+      warranty: prodObj.warranty || '',
+      updated_at: new Date().toISOString()
+    };
+    return fetch(SUPABASE_URL + '/products?on_conflict=id', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(payload)
+    }).then(function (res) {
+      if (!res || !res.ok) return { ok: false, status: res ? res.status : 0 };
+      if (Array.isArray(prodObj.tiers) && prodObj.tiers.length > 0) {
+        var tierRows = prodObj.tiers.map(function (t, idx) {
+          var tKey = t.key || ('tier-' + idx);
+          return {
+            id: prodObj.id + '__' + tKey,
+            product_id: prodObj.id,
+            tier_key: tKey,
+            label: t.label || t.name || tKey,
+            name: t.name || t.label || tKey,
+            price: Number(t.price) || 0,
+            price_formatted: t.priceFormatted || formatVND(Number(t.price) || 0).replace(/\s+₫$/, '₫'),
+            old_price_formatted: t.oldPriceFormatted || '',
+            save_text: t.tag || t.save || '',
+            gift: t.gift || '',
+            sku: t.sku || '',
+            stock: typeof t.stock === 'number' ? t.stock : 100,
+            specs_summary: t.desc || t.specsSummary || '',
+            highlights: Array.isArray(t.highlights) ? t.highlights : [],
+            sort_order: idx
+          };
+        });
+        fetch(SUPABASE_URL + '/product_tiers?on_conflict=id', {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(tierRows)
+        }).catch(function () {});
+      }
+      return { ok: true };
+    }).catch(function (err) {
+      return { ok: false, error: err && err.message ? err.message : String(err) };
+    });
+  }
+
+  function deleteProductFromCloud(productId) {
+    if (!productId || productId === 'tf-g31-pro' || typeof fetch !== 'function') {
+      return Promise.resolve({ ok: false, skipped: true });
+    }
+    return fetch(SUPABASE_URL + '/products?id=eq.' + encodeURIComponent(productId), {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+      }
+    }).then(function (res) { return { ok: Boolean(res && res.ok) }; })
+      .catch(function () { return { ok: false }; });
+  }
+
+  function pushOrderToCloud(orderObj) {
+    if (!orderObj || typeof fetch !== 'function') return Promise.resolve({ ok: false, skipped: true });
+    var orderId = orderObj.id || orderObj.orderId || ('TF-' + Date.now());
+    var payload = {
+      id: orderId,
+      user_id: orderObj.userId || null,
+      order_code: orderObj.orderId || orderId,
+      customer_name: orderObj.customerName || orderObj.name || '',
+      customer_phone: orderObj.customerPhone || orderObj.phone || '',
+      customer_address: orderObj.customerAddress || orderObj.address || '',
+      items: Array.isArray(orderObj.items) ? orderObj.items : [],
+      total_amount: Number(orderObj.totalAmount || orderObj.total || 0),
+      status: orderObj.status || 'Chờ Xác Nhận',
+      payment_method: orderObj.paymentMethod || 'COD'
+    };
+    return fetch(SUPABASE_URL + '/orders?on_conflict=id', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=representation'
+      },
+      body: JSON.stringify(payload)
+    }).then(function (res) { return { ok: Boolean(res && res.ok) }; })
+      .catch(function () { return { ok: false }; });
+  }
+
+  function pushReviewToCloud(reviewObj) {
+    if (!reviewObj || typeof fetch !== 'function') return Promise.resolve({ ok: false, skipped: true });
+    var payload = {
+      id: reviewObj.id || ('rev-' + Date.now()),
+      product_id: reviewObj.productId || 'tf-g31-pro',
+      user_id: reviewObj.userId || null,
+      user_email: reviewObj.email || '',
+      author: reviewObj.author || 'Người Dùng T-Flow',
+      role: reviewObj.role || '',
+      tier: reviewObj.package || '',
+      rating: Number(reviewObj.rating) || 5,
+      title: reviewObj.title || '',
+      content: reviewObj.comment || reviewObj.content || '',
+      verified: Boolean(reviewObj.verified)
+    };
+    return fetch(SUPABASE_URL + '/reviews?on_conflict=id', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=representation'
+      },
+      body: JSON.stringify(payload)
+    }).then(function (res) { return { ok: Boolean(res && res.ok) }; })
+      .catch(function () { return { ok: false }; });
+  }
+
+  function deleteReviewFromCloud(reviewId) {
+    if (!reviewId || typeof fetch !== 'function') return Promise.resolve({ ok: false, skipped: true });
+    return fetch(SUPABASE_URL + '/reviews?id=eq.' + encodeURIComponent(reviewId), {
+      method: 'DELETE',
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+      }
+    }).then(function (res) { return { ok: Boolean(res && res.ok) }; })
+      .catch(function () { return { ok: false }; });
+  }
+
   function syncFromCloud(callback) {
     if (typeof fetch !== 'function') {
       var fallbackRes = { ok: false, skipped: true, users: getCatalog().users || [] };
@@ -270,16 +585,28 @@
       'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
     };
 
-    _syncPromise = fetch(SUPABASE_URL + '/users?select=*&order=last_active.desc', {
-      method: 'GET',
-      headers: headers
-    })
+    var usersFetch = fetch(SUPABASE_URL + '/users?select=*&order=last_active.desc', { method: 'GET', headers: headers })
       .then(function (res) {
         if (!res.ok) throw new Error('Supabase GET users HTTP ' + res.status);
         return res.json();
-      })
-      .then(function (rows) {
-        if (!Array.isArray(rows)) rows = [];
+      });
+    var productsFetch = fetch(SUPABASE_URL + '/products?select=*&order=sort_order.asc', { method: 'GET', headers: headers })
+      .then(function (res) { return res.ok ? res.json() : null; }).catch(function () { return null; });
+    var tiersFetch = fetch(SUPABASE_URL + '/product_tiers?select=*&order=sort_order.asc', { method: 'GET', headers: headers })
+      .then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; });
+    var ordersFetch = fetch(SUPABASE_URL + '/orders?select=*&order=created_at.desc', { method: 'GET', headers: headers })
+      .then(function (res) { return res.ok ? res.json() : null; }).catch(function () { return null; });
+    var reviewsFetch = fetch(SUPABASE_URL + '/reviews?select=*&order=created_at.desc', { method: 'GET', headers: headers })
+      .then(function (res) { return res.ok ? res.json() : null; }).catch(function () { return null; });
+
+    _syncPromise = Promise.all([usersFetch, productsFetch, tiersFetch, ordersFetch, reviewsFetch])
+      .then(function (results) {
+        var rows = Array.isArray(results[0]) ? results[0] : [];
+        var cloudProducts = Array.isArray(results[1]) ? results[1] : null;
+        var cloudTiers = Array.isArray(results[2]) ? results[2] : [];
+        var cloudOrders = Array.isArray(results[3]) ? results[3] : null;
+        var cloudReviews = Array.isArray(results[4]) ? results[4] : null;
+
         var cat = getCatalog();
         if (!cat.users) cat.users = [];
 
@@ -310,13 +637,104 @@
           if (lEmail && !seenEmails[lEmail]) {
             mergedList.push(localOnly);
             seenEmails[lEmail] = true;
-            if (lEmail === 'thuynguyen2dk4@gmail.com' || (cur && cur.email && cur.email.toLowerCase() === lEmail)) {
+            if (cur && cur.email && cur.email.toLowerCase() === lEmail) {
               missingSeeds.push(localOnly);
             }
           }
         }
 
         cat.users = mergedList;
+
+        if (cloudProducts && cloudProducts.length > 0) {
+          var tiersByProd = {};
+          cloudTiers.forEach(function (t) {
+            if (!t || !t.product_id) return;
+            if (!tiersByProd[t.product_id]) tiersByProd[t.product_id] = [];
+            tiersByProd[t.product_id].push(t);
+          });
+          var localProdById = {};
+          (cat.products || []).forEach(function (p) { if (p && p.id) localProdById[p.id] = p; });
+          var mergedProds = [];
+          cloudProducts.forEach(function (cp) {
+            if (!cp || !cp.id || REMOVED_LEGACY_PRODUCT_IDS.indexOf(cp.id) !== -1) return;
+            mergedProds.push(mapCloudProductToLocal(cp, localProdById[cp.id], tiersByProd[cp.id]));
+          });
+          if (mergedProds.length > 0) {
+            cat.products = mergedProds;
+            var flagship = mergedProds.find(function (p) { return p.is_flagship; });
+            cat.mvpProductId = flagship ? flagship.id : mergedProds[0].id;
+          }
+        }
+
+        if (cloudOrders && typeof localStorage !== 'undefined') {
+          try {
+            var localOrders = getOrders();
+            var orderMap = {};
+            cloudOrders.forEach(function (co) {
+              if (!co || !co.id) return;
+              orderMap[co.id] = {
+                id: co.id,
+                orderId: co.order_code || co.id,
+                userId: co.user_id || '',
+                customerName: co.customer_name || '',
+                customerPhone: co.customer_phone || '',
+                customerAddress: co.customer_address || '',
+                items: Array.isArray(co.items) ? co.items : [],
+                totalAmount: Number(co.total_amount) || 0,
+                status: co.status || 'Chờ Xác Nhận',
+                paymentMethod: co.payment_method || 'COD',
+                createdAt: co.created_at || new Date().toISOString()
+              };
+            });
+            localOrders.forEach(function (lo) {
+              if (lo && lo.id && !orderMap[lo.id]) {
+                orderMap[lo.id] = lo;
+              }
+            });
+            var combinedOrders = Object.keys(orderMap).map(function (k2) { return orderMap[k2]; });
+            combinedOrders.sort(function (a, b) {
+              return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+            });
+            localStorage.setItem(ORDERS_KEY, JSON.stringify(combinedOrders));
+          } catch (e) {}
+        }
+
+        if (cloudReviews && typeof localStorage !== 'undefined') {
+          try {
+            var localRevs = getReviews();
+            var revMap = {};
+            cloudReviews.forEach(function (cr) {
+              if (!cr || !cr.id) return;
+              var dt = cr.created_at ? new Date(cr.created_at) : new Date();
+              var dateStr = ('0' + dt.getDate()).slice(-2) + '/' + ('0' + (dt.getMonth() + 1)).slice(-2) + '/' + dt.getFullYear();
+              revMap[cr.id] = {
+                id: cr.id,
+                productId: cr.product_id || 'tf-g31-pro',
+                userId: cr.user_id || '',
+                email: cr.user_email || '',
+                author: cr.author || 'Người Dùng T-Flow',
+                avatar: (cr.author || 'T').charAt(0).toUpperCase(),
+                role: cr.role || '',
+                package: cr.tier || 'T-Flow Pro',
+                rating: cr.rating || 5,
+                date: dateStr,
+                title: cr.title || '',
+                comment: cr.content || '',
+                verified: Boolean(cr.verified),
+                createdAt: cr.created_at || new Date().toISOString()
+              };
+            });
+            localRevs.forEach(function (lr) {
+              if (lr && lr.id && !revMap[lr.id]) revMap[lr.id] = lr;
+            });
+            var combinedRevs = Object.keys(revMap).map(function (k3) { return revMap[k3]; });
+            localStorage.setItem(REVIEWS_KEY, JSON.stringify(combinedRevs));
+            if (typeof window !== 'undefined') {
+              try { window.dispatchEvent(new CustomEvent(REVIEWS_EVENT, { detail: combinedRevs })); } catch (e2) {}
+            }
+          } catch (e) {}
+        }
+
         if (typeof localStorage !== 'undefined') {
           try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(cat));
@@ -330,9 +748,10 @@
           });
           if (updatedUser) {
             cur = Object.assign({}, cur, updatedUser, {
-              password: cur.password || updatedUser.password || '',
-              address: cur.address || updatedUser.address || '',
-              avatar: cur.avatar || updatedUser.avatar || ''
+              password: '',
+              passwordHash: updatedUser.passwordHash || cur.passwordHash || '',
+              address: updatedUser.address !== undefined && updatedUser.address !== '' ? updatedUser.address : (cur.address || ''),
+              avatar: (cur.avatar && cur.avatar !== 'photo_avatar') ? cur.avatar : (updatedUser.avatar || '')
             });
             persistCurrentUserLocally(cur, true);
           }
@@ -350,7 +769,7 @@
           });
         }
 
-        var result = { ok: true, users: cat.users, count: rows.length, currentUser: cur };
+        var result = { ok: true, users: cat.users, products: cat.products, count: rows.length, currentUser: cur };
         _syncPromise = null;
         if (typeof callback === 'function') callback(result);
         return result;
@@ -493,7 +912,7 @@
         "badge": "Flagship 2026",
         "img": "/shared/img/tflow_pro_main.png",
         "status": "Đang Mở Bán",
-        "totalOrders": 1420,
+        "totalOrders": 0,
         "is_flagship": true,
         "gallery": [
           "/shared/img/tflow_pro_main.png",
@@ -606,24 +1025,7 @@
         "customBlocks": []
       }
     ],
-    "users": [
-      {
-        "id": "thuy-nguyen",
-        "name": "Thuy Nguyen",
-        "email": "thuynguyen2dk4@gmail.com",
-        "password": "admin",
-        "phone": "0908 888 888",
-        "role": "Master Administrator & Founder",
-        "company": "Công ty TNHH Công nghệ T-Flow Việt Nam",
-        "tierBadge": "Master Admin",
-        "registeredDevice": "T-Flow Pro (TF-G31-PRO)",
-        "serial": "HQYVYFYFR4",
-        "battery": 98,
-        "firmware": "FW-TF-G31-v1.2.0 (Mới nhất)",
-        "status": "Đang Hoạt Động",
-        "modules": [true, true, true, true, true, true, true]
-      }
-    ]
+    "users": [] // 100% REAL DATA FROM SUPABASE - NO FAKE SEED USERS
   };
 
   var DEFAULT_REVIEWS = []; // 100% REAL DATA - NO FAKE REVIEWS
@@ -646,6 +1048,8 @@
       p.is_flagship = (p.id === productId);
     });
     saveCatalog(cat);
+    var mvp = cat.products.find(function (p) { return p.id === productId; });
+    if (mvp) pushProductToCloud(mvp);
     broadcastSync();
     return true;
   }
@@ -676,6 +1080,22 @@
       if (Array.isArray(parsed.users)) {
         var beforeUserLen = parsed.users.length;
         parsed.users = parsed.users.filter(function(u) { return !isRemovedLegacyUser(u); });
+        if (needsVersionMigration) {
+          parsed.users.forEach(function(u) {
+            if (!u) return;
+            if (u.phone === '0908 888 888') u.phone = '';
+            if (u.serial === 'HQYVYFYFR4' || u.serial === 'TF-G31-PRO') u.serial = '';
+            if (u.password === 'admin') { u.password = ''; }
+            if (u.device === 'Smart Gimbal S1 Titanium' || u.device === 'T-Flow Pro (TF-G31-PRO)' || u.device === 'T-Flow Pro (Chưa kích hoạt)') {
+              u.device = 'Chưa kết nối thiết bị';
+              u.registeredDevice = 'Chưa kết nối thiết bị';
+              u.battery = 0;
+              u.firmware = '';
+              u.warrantyDays = 0;
+            }
+          });
+          mediaMigrated = true;
+        }
         if (parsed.users.length !== beforeUserLen) mediaMigrated = true;
       }
 
@@ -927,6 +1347,7 @@
     if (!prodObj.id) prodObj.id = 'prod-' + Date.now();
     cat.products.push(prodObj);
     saveCatalog(cat);
+    pushProductToCloud(prodObj);
     return prodObj;
   }
 
@@ -936,15 +1357,20 @@
     if (idx === -1) return false;
     Object.assign(cat.products[idx], updateData);
     saveCatalog(cat);
+    pushProductToCloud(cat.products[idx]);
     return true;
   }
 
   function deleteProduct(productId) {
     var cat = getCatalog();
+    if (!Array.isArray(cat.products) || productId === 'tf-g31-pro' || cat.products.length <= 1) {
+      return false;
+    }
     var idx = cat.products.findIndex(function (p) { return p.id === productId; });
     if (idx === -1) return false;
     cat.products.splice(idx, 1);
     saveCatalog(cat);
+    deleteProductFromCloud(productId);
     return true;
   }
 
@@ -955,6 +1381,7 @@
     if (!prod.tiers) prod.tiers = [];
     prod.tiers.push(tierObj);
     saveCatalog(cat);
+    pushProductToCloud(prod);
     return true;
   }
 
@@ -966,6 +1393,7 @@
     if (idx === -1) return false;
     Object.assign(prod.tiers[idx], updateData);
     saveCatalog(cat);
+    pushProductToCloud(prod);
     return true;
   }
 
@@ -977,6 +1405,7 @@
     if (idx === -1) return false;
     prod.tiers.splice(idx, 1);
     saveCatalog(cat);
+    pushProductToCloud(prod);
     return true;
   }
 
@@ -1215,6 +1644,7 @@
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem(ORDERS_KEY, JSON.stringify(orders));
     }
+    pushOrderToCloud(newOrder);
     return newOrder;
   }
 
@@ -1321,9 +1751,10 @@
       sessionStorage.setItem(ACTIVE_SESSION_KEY, JSON.stringify(sessionData));
     }
 
-    // 2. Set Session Cookie (No expires tag = true session cookie expiring when browser closes)
+    // 2. Set Session Cookies (No expires tag = true session cookies expiring when browser closes)
     if (typeof document !== 'undefined') {
       document.cookie = "tflow_session_id=" + encodeURIComponent(sessId) + ";path=/;SameSite=Lax";
+      document.cookie = "tflow_session_token=" + encodeURIComponent(sessId) + ";path=/;SameSite=Lax";
     }
 
     // 3. Register to persistent sessions list in catalog
@@ -1372,6 +1803,7 @@
     }
     if (typeof document !== 'undefined') {
       document.cookie = "tflow_session_id=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax";
+      document.cookie = "tflow_session_token=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax";
     }
   }
 
@@ -1437,7 +1869,6 @@
         setCookie('tflow_user_session', cookieUser, 30);
         if (typeof localStorage !== 'undefined') {
           localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-          setCookie('tflow_user_session', user, 30);
           setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
           if (typeof sessionStorage !== 'undefined' && !sessionStorage.getItem(ACTIVE_SESSION_KEY)) {
             createSession(user);
@@ -1449,10 +1880,35 @@
     return user;
   }
 
+  function finalizeUserSession(userObj) {
+    if (!userObj) return { success: false, isAdmin: false };
+    var isAdmin = isUserAdmin(userObj);
+    userObj.isAdmin = isAdmin;
+    userObj.password = '';
+    if (typeof localStorage !== 'undefined') {
+      persistCurrentUserLocally(userObj, true);
+      setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
+    }
+    if (typeof sessionStorage !== 'undefined') {
+      if (isAdmin) {
+        sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
+      } else {
+        sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
+      }
+    }
+    if (typeof window !== 'undefined') {
+      postRealtimeBridge('USER_UPDATED', userObj);
+    }
+    return { success: true, user: userObj, isAdmin: isAdmin };
+  }
+
   // 6.1 Standard Email & Password Login
   function loginUser(emailOrPhone, password) {
     if (!emailOrPhone) {
       return { success: false, message: 'Vui lòng nhập Email hoặc Số điện thoại.' };
+    }
+    if (!password) {
+      return { success: false, message: 'Vui lòng nhập mật khẩu.' };
     }
     var cleanInput = emailOrPhone.trim().toLowerCase();
     var cleanPhone = emailOrPhone.replace(/\s+/g, '');
@@ -1467,38 +1923,71 @@
       return { success: false, message: 'Tài khoản không tồn tại. Vui lòng đăng ký tài khoản mới.' };
     }
 
-    if (found.password) {
-      if (!password) {
-        return { success: false, message: 'Vui lòng nhập mật khẩu.' };
+    var inputHash = sha256Hex(String(password));
+    if (found.passwordHash) {
+      if (found.passwordHash !== inputHash) {
+        return { success: false, message: 'Mật khẩu không chính xác. Vui lòng thử lại.' };
       }
+    } else if (found.password) {
       if (String(password) !== found.password) {
         return { success: false, message: 'Mật khẩu không chính xác. Vui lòng thử lại.' };
       }
+      found.passwordHash = inputHash;
+      found.password = '';
+    } else {
+      var prov = found.authProvider === 'apple' ? 'Apple ID' : 'Google';
+      return { success: false, message: 'Tài khoản này chưa đặt mật khẩu (đăng nhập bằng ' + prov + '). Vui lòng đăng nhập bằng ' + prov + '.' };
     }
 
-    var isAdmin = isUserAdmin(found);
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(found));
-      setCookie('tflow_user_session', found, 30);
-      setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
-      createSession(found);
-    }
-    if (typeof sessionStorage !== 'undefined') {
-      if (isAdmin) {
-        sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
-      } else {
-        sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
-      }
-    }
-
-    if (typeof window !== 'undefined') {
-      var evt = new CustomEvent(USER_EVENT, { detail: found });
-      window.dispatchEvent(evt);
-      postRealtimeBridge('USER_UPDATED', found);
-    }
-
+    var res = finalizeUserSession(found);
     pushUserToCloud(found);
-    return { success: true, user: found, isAdmin: isAdmin };
+    return res;
+  }
+
+  function loginUserAsync(emailOrPhone, password) {
+    if (!emailOrPhone) {
+      return Promise.resolve({ success: false, message: 'Vui lòng nhập Email hoặc Số điện thoại.' });
+    }
+    if (!password) {
+      return Promise.resolve({ success: false, message: 'Vui lòng nhập mật khẩu.' });
+    }
+    var localRes = loginUser(emailOrPhone, password);
+    if (localRes && localRes.success) {
+      return Promise.resolve(localRes);
+    }
+    if (typeof fetch !== 'function') {
+      return Promise.resolve(localRes);
+    }
+    var cleanInput = emailOrPhone.trim().toLowerCase();
+    var cleanPhone = emailOrPhone.replace(/\s+/g, '');
+    var headers = {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+    };
+    var url = SUPABASE_URL + '/users?or=(email.eq.' + encodeURIComponent(cleanInput) + ',phone.eq.' + encodeURIComponent(cleanPhone) + ')&select=*';
+    return fetch(url, { method: 'GET', headers: headers })
+      .then(function (res) { return res.ok ? res.json() : []; })
+      .then(function (rows) {
+        if (!Array.isArray(rows) || rows.length === 0) {
+          return { success: false, message: 'Tài khoản không tồn tại hoặc chưa đồng bộ.' };
+        }
+        var row = rows[0];
+        var merged = mergeSingleCloudRowLocally(row) || mapCloudUserToLocal(row, null);
+        var inputHash = sha256Hex(String(password));
+        if (!merged.passwordHash) {
+          var prov = merged.authProvider === 'apple' ? 'Apple ID' : 'Google';
+          return { success: false, message: 'Tài khoản này chưa có mật khẩu. Vui lòng đăng nhập bằng ' + prov + '.' };
+        }
+        if (merged.passwordHash !== inputHash) {
+          return { success: false, message: 'Mật khẩu không chính xác. Vui lòng thử lại.' };
+        }
+        var out = finalizeUserSession(merged);
+        pushUserToCloud(merged);
+        return out;
+      })
+      .catch(function () {
+        return localRes;
+      });
   }
 
   // 6.2 Standard User Registration
@@ -1506,10 +1995,14 @@
     if (!userData || !userData.email) {
       return { success: false, message: 'Vui lòng cung cấp địa chỉ Email.' };
     }
+    if (!userData.password || String(userData.password).length < 6) {
+      return { success: false, message: 'Vui lòng nhập mật khẩu tối thiểu 6 ký tự.' };
+    }
     var cat = getCatalog();
+    if (!cat.users) cat.users = [];
     var cleanEmail = userData.email.trim().toLowerCase();
 
-    var exists = (cat.users || []).some(function (u) {
+    var exists = cat.users.some(function (u) {
       return u.email && u.email.toLowerCase() === cleanEmail;
     });
 
@@ -1518,138 +2011,196 @@
     }
 
     var isAdmin = isUserAdmin({ email: cleanEmail });
-    var defaultDevice = userData.device || (userData.serial ? 'Smart Gimbal S1 Titanium' : 'T-Flow Pro (Chưa kích hoạt)');
+    var pwHash = sha256Hex(String(userData.password));
     var newUser = {
-      id: 'user-' + Date.now(),
-      name: userData.name || cleanEmail.split('@')[0],
+      id: 'usr-' + cleanEmail.replace(/[^a-z0-9]/g, '-'),
+      name: (userData.name || '').trim() || cleanEmail.split('@')[0],
       email: cleanEmail,
-      password: userData.password || '123456',
+      password: '',
+      passwordHash: pwHash,
+      authProvider: 'email',
       phone: userData.phone || '',
+      address: userData.address || '',
+      city: userData.city || '',
+      district: userData.district || '',
+      shippingNotes: userData.shippingNotes || '',
+      jobTitle: userData.jobTitle || (isAdmin ? 'Master Administrator & Founder' : 'Khách Hàng Thành Viên'),
       role: isAdmin ? 'Master Administrator & Founder' : 'Khách Hàng Thành Viên',
+      cameraSetup: userData.cameraSetup || '',
+      avatarUrl: userData.avatarUrl || '',
+      avatar: userData.avatarUrl || '',
       company: userData.company || 'Công ty TNHH Công nghệ T-Flow Việt Nam',
       tier: isAdmin ? 'Enterprise Studio' : 'Basic Creator',
       tierBadge: isAdmin ? 'Master Admin' : 'Thành Viên Mới',
       memberSince: new Date().toISOString().slice(0, 10),
-      device: defaultDevice,
-      registeredDevice: defaultDevice,
+      device: userData.device || 'Chưa kết nối thiết bị',
+      registeredDevice: userData.device || 'Chưa kết nối thiết bị',
       serial: userData.serial || '',
-      warrantyDays: 365,
-      battery: 100,
-      firmware: 'v2.4.2',
+      warrantyDays: 0,
+      battery: 0,
+      firmware: '',
       status: 'Đang Hoạt Động',
-      modules: isAdmin ? [true, true, true, true, true, true, true] : [true, false, false, false, false, false, false]
+      modules: isAdmin ? [true, true, true, true, true, true, true] : [false, false, false, false, false, false, false],
+      isAdmin: isAdmin
     };
 
     cat.users.push(newUser);
     saveCatalog(cat);
 
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(newUser));
-      setCookie('tflow_user_session', newUser, 30);
-      setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
-      createSession(newUser);
-    }
-    if (typeof sessionStorage !== 'undefined') {
-      if (isAdmin) {
-        sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
-      } else {
-        sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
-      }
-    }
-
-    if (typeof window !== 'undefined') {
-      var evt = new CustomEvent(USER_EVENT, { detail: newUser });
-      window.dispatchEvent(evt);
-      postRealtimeBridge('USER_UPDATED', newUser);
-    }
-
+    var res = finalizeUserSession(newUser);
     pushUserToCloud(newUser);
-    return { success: true, user: newUser, isAdmin: isAdmin };
+    return res;
   }
 
-  // 6.3 Google Account Sign-In (Cơ chế đăng nhập bổ sung bằng Google)
-  function loginWithGmail(email, displayName) {
-    if (!email) return { success: false, message: 'Vui lòng cung cấp địa chỉ Email Google (Gmail).' };
+  function registerUserAsync(userData) {
+    if (!userData || !userData.email) {
+      return Promise.resolve({ success: false, message: 'Vui lòng cung cấp địa chỉ Email.' });
+    }
+    if (!userData.password || String(userData.password).length < 6) {
+      return Promise.resolve({ success: false, message: 'Vui lòng nhập mật khẩu tối thiểu 6 ký tự.' });
+    }
+    var cleanEmail = userData.email.trim().toLowerCase();
+    if (typeof fetch !== 'function') {
+      return Promise.resolve(registerUser(userData));
+    }
+    var headers = {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+    };
+    return fetch(SUPABASE_URL + '/users?email=eq.' + encodeURIComponent(cleanEmail) + '&select=id,email', {
+      method: 'GET',
+      headers: headers
+    })
+      .then(function (res) { return res.ok ? res.json() : []; })
+      .then(function (rows) {
+        if (Array.isArray(rows) && rows.length > 0) {
+          return { success: false, message: 'Email này đã được đăng ký trên hệ thống. Vui lòng đăng nhập.' };
+        }
+        return registerUser(userData);
+      })
+      .catch(function () {
+        return registerUser(userData);
+      });
+  }
+
+  // 6.3 Google Account Sign-In (Đồng bộ tài khoản Google giữa Web & App iOS)
+  function upsertOAuthUser(email, displayName, extra) {
+    if (!email) return { success: false, message: 'Vui lòng cung cấp địa chỉ Email hợp lệ.' };
+    extra = extra || {};
     var cleanEmail = email.trim().toLowerCase();
     var isAdmin = isUserAdmin({ email: cleanEmail });
+    var provider = extra.authProvider || 'google';
+    var avatarUrl = extra.avatarUrl || '';
 
     var cat = getCatalog();
-    var user = (cat.users || []).find(function (u) {
+    if (!cat.users) cat.users = [];
+    var idx = cat.users.findIndex(function (u) {
       return u.email && u.email.toLowerCase() === cleanEmail;
     });
 
-    if (!user) {
+    var user;
+    if (idx === -1) {
       user = {
-        id: cleanEmail.replace(/[^a-zA-Z0-9]/g, '-'),
-        name: displayName || (isAdmin ? 'Thuy Nguyen' : cleanEmail.split('@')[0]),
+        id: 'usr-' + cleanEmail.replace(/[^a-z0-9]/g, '-'),
+        name: (displayName || '').trim() || cleanEmail.split('@')[0],
         email: cleanEmail,
         password: '',
-        phone: isAdmin ? '0908 888 888' : '',
+        passwordHash: '',
+        authProvider: provider,
+        phone: '',
+        address: '',
+        city: '',
+        district: '',
+        shippingNotes: '',
+        jobTitle: isAdmin ? 'Master Administrator & Founder' : 'Khách Hàng Thành Viên',
         role: isAdmin ? 'Master Administrator & Founder' : 'Khách Hàng Thành Viên',
+        cameraSetup: '',
+        avatarUrl: avatarUrl,
+        avatar: avatarUrl,
         company: 'Công ty TNHH Công nghệ T-Flow Việt Nam',
         tier: isAdmin ? 'Enterprise Studio' : 'Basic Creator',
         tierBadge: isAdmin ? 'Master Admin' : 'Thành Viên Mới',
         memberSince: new Date().toISOString().slice(0, 10),
-        device: 'Smart Gimbal S1 Titanium',
-        registeredDevice: 'Smart Gimbal S1 Titanium',
-        serial: isAdmin ? 'HQYVYFYFR4' : '',
-        warrantyDays: 365,
-        battery: 98,
-        firmware: 'v2.4.2',
+        device: 'Chưa kết nối thiết bị',
+        registeredDevice: 'Chưa kết nối thiết bị',
+        serial: '',
+        warrantyDays: 0,
+        battery: 0,
+        firmware: '',
         status: 'Đang Hoạt Động',
-        modules: isAdmin ? [true, true, true, true, true, true, true] : [true, false, false, false, false, false, false]
+        modules: isAdmin ? [true, true, true, true, true, true, true] : [false, false, false, false, false, false, false],
+        isAdmin: isAdmin
       };
       cat.users.push(user);
       saveCatalog(cat);
-    } else if (isAdmin) {
-      user.modules = [true, true, true, true, true, true, true];
-      user.role = 'Master Administrator & Founder';
-      user.tier = user.tier || 'Enterprise Studio';
-      user.tierBadge = 'Master Admin';
+    } else {
+      user = cat.users[idx];
+      if (displayName && (!user.name || user.name === 'T-FLOW User' || user.name === cleanEmail.split('@')[0])) {
+        user.name = displayName.trim();
+      }
+      if (avatarUrl) {
+        user.avatarUrl = avatarUrl;
+        if (!user.avatar || user.avatar.indexOf('http') === 0 || user.avatar === 'photo_avatar') {
+          user.avatar = avatarUrl;
+        }
+      }
+      user.authProvider = provider;
+      if (isAdmin) {
+        user.modules = [true, true, true, true, true, true, true];
+        user.role = 'Master Administrator & Founder';
+        user.jobTitle = user.jobTitle || user.role;
+        user.tier = user.tier || 'Enterprise Studio';
+        user.tierBadge = 'Master Admin';
+        user.isAdmin = true;
+      }
       saveCatalog(cat);
     }
 
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-      setCookie('tflow_user_session', user, 30);
-      setCookie('tflow_auth_token', 'token_' + Date.now(), 30);
-      createSession(user);
-    }
-    if (typeof sessionStorage !== 'undefined') {
-      if (isAdmin) {
-        sessionStorage.setItem('TFLOW_ADMIN_AUTH', 'true');
-      } else {
-        sessionStorage.removeItem('TFLOW_ADMIN_AUTH');
-      }
-    }
-
-    if (typeof window !== 'undefined') {
-      var evt = new CustomEvent(USER_EVENT, { detail: user });
-      window.dispatchEvent(evt);
-      postRealtimeBridge('USER_UPDATED', user);
-    }
-
+    var res = finalizeUserSession(user);
     pushUserToCloud(user);
-    return { success: true, user: user, isAdmin: isAdmin };
+    return res;
+  }
+
+  function loginWithGmail(email, displayName, extra) {
+    if (!email) return { success: false, message: 'Vui lòng cung cấp địa chỉ Email Google (Gmail).' };
+    return upsertOAuthUser(email, displayName, Object.assign({ authProvider: 'google' }, extra || {}));
+  }
+
+  function loginWithGmailAsync(email, displayName, extra) {
+    if (!email) return Promise.resolve({ success: false, message: 'Vui lòng cung cấp địa chỉ Email Google (Gmail).' });
+    var cleanEmail = email.trim().toLowerCase();
+    extra = Object.assign({ authProvider: 'google' }, extra || {});
+    if (typeof fetch !== 'function') {
+      return Promise.resolve(loginWithGmail(cleanEmail, displayName, extra));
+    }
+    var headers = {
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+    };
+    return fetch(SUPABASE_URL + '/users?email=eq.' + encodeURIComponent(cleanEmail) + '&select=*', {
+      method: 'GET',
+      headers: headers
+    })
+      .then(function (res) { return res.ok ? res.json() : []; })
+      .then(function (rows) {
+        if (Array.isArray(rows) && rows.length > 0) {
+          mergeSingleCloudRowLocally(rows[0]);
+        }
+        return upsertOAuthUser(cleanEmail, displayName, extra);
+      })
+      .catch(function () {
+        return upsertOAuthUser(cleanEmail, displayName, extra);
+      });
   }
 
   // 6.4 Apple ID Sign-In (Đồng bộ tài khoản Apple giữa Web & App iOS)
-  function loginWithApple(email, displayName) {
+  function loginWithApple(email, displayName, extra) {
     if (!email) return { success: false, message: 'Vui lòng cung cấp địa chỉ Email Apple ID.' };
-    var res = loginWithGmail(email, displayName);
-    if (res && res.success && res.user) {
-      res.user.authProvider = 'apple';
-      var cat = getCatalog();
-      var idx = (cat.users || []).findIndex(function (u) { return u.id === res.user.id; });
-      if (idx !== -1) {
-        cat.users[idx].authProvider = 'apple';
-        saveCatalog(cat);
-      }
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(res.user));
-      }
-    }
-    return res;
+    return upsertOAuthUser(email, displayName, Object.assign({ authProvider: 'apple' }, extra || {}));
+  }
+
+  function loginWithAppleAsync(email, displayName, extra) {
+    return loginWithGmailAsync(email, displayName, Object.assign({ authProvider: 'apple' }, extra || {}));
   }
 
   function logoutUser() {
@@ -1814,6 +2365,8 @@
       } catch (e) {}
     }
 
+    pushReviewToCloud(newRev);
+
     if (typeof window !== 'undefined') {
       try {
         var evt = new CustomEvent(REVIEWS_EVENT, { detail: reviews });
@@ -1831,6 +2384,7 @@
         localStorage.setItem(REVIEWS_KEY, JSON.stringify(filtered));
       } catch (e) {}
     }
+    deleteReviewFromCloud(reviewId);
     if (typeof window !== 'undefined') {
       try {
         var evt = new CustomEvent(REVIEWS_EVENT, { detail: filtered });
@@ -3223,15 +3777,23 @@
 
     // Users & Auth & Cloud Sync
     SUPABASE_URL: SUPABASE_URL,
+    sha256Hex: sha256Hex,
     syncFromCloud: syncFromCloud,
     pushUserToCloud: pushUserToCloud,
+    pushProductToCloud: pushProductToCloud,
+    pushOrderToCloud: pushOrderToCloud,
+    pushReviewToCloud: pushReviewToCloud,
     getUsers: getUsers,
     getCurrentUser: getCurrentUser,
     isUserAdmin: isUserAdmin,
     loginUser: loginUser,
+    loginUserAsync: loginUserAsync,
     registerUser: registerUser,
+    registerUserAsync: registerUserAsync,
     loginWithGmail: loginWithGmail,
+    loginWithGmailAsync: loginWithGmailAsync,
     loginWithApple: loginWithApple,
+    loginWithAppleAsync: loginWithAppleAsync,
     logoutUser: logoutUser,
     updateUserProfile: updateUserProfile,
     updateUserModules: updateUserModules,

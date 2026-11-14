@@ -17,7 +17,7 @@ final class AppOrientationDelegate: NSObject, UIApplicationDelegate {
         _ application: UIApplication,
         supportedInterfaceOrientationsFor window: UIWindow?
     ) -> UIInterfaceOrientationMask {
-        return .portrait
+        return .allButUpsideDown
     }
 }
 

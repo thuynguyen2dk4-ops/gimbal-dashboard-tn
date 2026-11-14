@@ -45,11 +45,37 @@ final class CameraViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .black
         bindPreviewLayer()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleOrientationChange),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         previewLayer?.frame = view.bounds
+        updateVideoOrientation()
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: { _ in
+            self.previewLayer?.frame = self.view.bounds
+            self.updateVideoOrientation()
+        }, completion: { _ in
+            self.previewLayer?.frame = self.view.bounds
+            self.updateVideoOrientation()
+        })
+    }
+
+    @objc private func handleOrientationChange() {
+        updateVideoOrientation()
     }
 
     private func bindPreviewLayer() {
@@ -58,7 +84,31 @@ final class CameraViewController: UIViewController {
         layer.frame = view.bounds
         view.layer.addSublayer(layer)
         self.previewLayer = layer
+        updateVideoOrientation()
         updateMirroring(isFrontCamera: initialFrontCamera)
+    }
+
+    func updateVideoOrientation() {
+        guard let conn = previewLayer?.connection, conn.isVideoOrientationSupported else { return }
+        let interfaceOrientation = view.window?.windowScene?.interfaceOrientation
+            ?? (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.interfaceOrientation
+            ?? .portrait
+        let target: AVCaptureVideoOrientation
+        switch interfaceOrientation {
+        case .portrait:
+            target = .portrait
+        case .portraitUpsideDown:
+            target = .portraitUpsideDown
+        case .landscapeLeft:
+            target = .landscapeLeft
+        case .landscapeRight:
+            target = .landscapeRight
+        default:
+            target = .portrait
+        }
+        if conn.videoOrientation != target {
+            conn.videoOrientation = target
+        }
     }
 
     func updateMirroring(isFrontCamera: Bool) {

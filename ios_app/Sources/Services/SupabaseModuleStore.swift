@@ -9,6 +9,48 @@
 import SwiftUI
 import Combine
 import UIKit
+import CryptoKit
+import Security
+
+private enum KeychainHelper {
+    private static let service = "com.smartgimbal.s1pro.secure"
+
+    static func save(data: Data, forKey key: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key
+        ]
+        SecItemDelete(query as CFDictionary)
+        var attributes = query
+        attributes[kSecValueData as String] = data
+        attributes[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
+        SecItemAdd(attributes as CFDictionary, nil)
+    }
+
+    static func loadData(forKey key: String) -> Data? {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        guard status == errSecSuccess else { return nil }
+        return result as? Data
+    }
+
+    static func delete(forKey key: String) {
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: key
+        ]
+        SecItemDelete(query as CFDictionary)
+    }
+}
 
 // MARK: - =====================================================================
 // 3. CLOUD SUPABASE MODULE & AUTH SESSION STORE
@@ -17,15 +59,15 @@ import UIKit
 final class SupabaseModuleStore: ObservableObject {
     // Existing Cloud & 7-Module Permissions State (Preserved)
     @Published var userName: String = ""
-    @Published var userTier: String = "Standard"
-    @Published var deviceName: String = "Smart Gimbal S1 Titanium"
-    @Published var deviceBattery: Int = 94
-    @Published var deviceFirmware: String = "v2.4.1"
+    @Published var userTier: String = "Free Starter"
+    @Published var deviceName: String = "Chưa kết nối thiết bị"
+    @Published var deviceBattery: Int = 0
+    @Published var deviceFirmware: String = ""
     @Published var cloudUsersCount: Int = 0
     @Published var isOnline: Bool = true
     @Published var isSyncing: Bool = false
-    @Published var lastSyncTime: String = "Vừa xong"
-    @Published var modules: [Bool] = [true, true, true, true, true, true, true]
+    @Published var lastSyncTime: String = "Chưa đồng bộ"
+    @Published var modules: [Bool] = [false, false, false, false, false, false, false]
 
     // Navigation & Modal Coordination State (Figma Node 96:3)
     @Published var activeMainTab: Int = 0
@@ -42,7 +84,8 @@ final class SupabaseModuleStore: ObservableObject {
         email: "",
         phone: "",
         address: "",
-        gimbalSerial: "TF-G31-PRO",
+        gimbalSerial: "",
+        warrantyDays: 0,
         memberSince: ""
     )
 
@@ -74,8 +117,13 @@ final class SupabaseModuleStore: ObservableObject {
     @Published var autoReconnectBLE: Bool = true
 
     private struct StoredAccount: Codable {
-        var password: String
+        var passwordHash: String
         var profile: UserAccountProfile
+    }
+
+    static func sha256Hex(_ input: String) -> String {
+        let digest = SHA256.hash(data: Data(input.utf8))
+        return digest.map { String(format: "%02x", $0) }.joined()
     }
 
     private struct PersistedSession: Codable {
@@ -114,6 +162,15 @@ final class SupabaseModuleStore: ObservableObject {
         var name: String?
         var email: String?
         var phone: String?
+        var address: String?
+        var city: String?
+        var district: String?
+        var shipping_notes: String?
+        var job_title: String?
+        var camera_setup: String?
+        var avatar_url: String?
+        var auth_provider: String?
+        var password_hash: String?
         var device: String?
         var tier: String?
         var tier_badge: String?
@@ -133,6 +190,15 @@ final class SupabaseModuleStore: ObservableObject {
         var name: String
         var email: String
         var phone: String
+        var address: String
+        var city: String
+        var district: String
+        var shipping_notes: String
+        var job_title: String
+        var camera_setup: String
+        var avatar_url: String
+        var auth_provider: String
+        var password_hash: String?
         var device: String
         var tier: String
         var tier_badge: String
@@ -151,7 +217,17 @@ final class SupabaseModuleStore: ObservableObject {
         var name: String
         var email: String
         var phone: String
+        var address: String
+        var city: String
+        var district: String
+        var shipping_notes: String
+        var job_title: String
+        var camera_setup: String
+        var avatar_url: String
+        var auth_provider: String
         var serial: String
+        var warranty_days: Int
+        var password_hash: String?
         var last_active: String
     }
 
@@ -184,22 +260,47 @@ final class SupabaseModuleStore: ObservableObject {
         if let savedModules = defaults.array(forKey: modulesStorageKey) as? [Bool], savedModules.count == 7 {
             modules = savedModules
         }
-        if let savedDevice = defaults.string(forKey: deviceNameStorageKey), !savedDevice.isEmpty {
+        if let savedDevice = defaults.string(forKey: deviceNameStorageKey),
+           !savedDevice.isEmpty,
+           savedDevice != "Smart Gimbal S1 Titanium" {
             deviceName = savedDevice
+        } else {
+            defaults.removeObject(forKey: deviceNameStorageKey)
+            deviceName = "Chưa kết nối thiết bị"
         }
-        if defaults.object(forKey: deviceBatteryStorageKey) != nil {
+        if defaults.object(forKey: deviceBatteryStorageKey) != nil && deviceName != "Chưa kết nối thiết bị" {
             deviceBattery = defaults.integer(forKey: deviceBatteryStorageKey)
+        } else {
+            defaults.removeObject(forKey: deviceBatteryStorageKey)
+            deviceBattery = 0
         }
-        if let savedFw = defaults.string(forKey: deviceFirmwareStorageKey), !savedFw.isEmpty {
+        if let savedFw = defaults.string(forKey: deviceFirmwareStorageKey),
+           !savedFw.isEmpty,
+           deviceName != "Chưa kết nối thiết bị" {
             deviceFirmware = savedFw
+        } else {
+            defaults.removeObject(forKey: deviceFirmwareStorageKey)
+            deviceFirmware = ""
         }
-        if let sessionData = defaults.data(forKey: authSessionStorageKey),
+
+        // Migrate any legacy UserDefaults auth session into iOS Keychain
+        if let legacySession = defaults.data(forKey: authSessionStorageKey) {
+            if KeychainHelper.loadData(forKey: authSessionStorageKey) == nil {
+                KeychainHelper.save(data: legacySession, forKey: authSessionStorageKey)
+            }
+            defaults.removeObject(forKey: authSessionStorageKey)
+        }
+
+        if let sessionData = KeychainHelper.loadData(forKey: authSessionStorageKey),
            let savedSession = try? JSONDecoder().decode(PersistedSession.self, from: sessionData),
            !savedSession.sessionCookieToken.isEmpty,
            !Self.legacyFakeDemoEmails.contains(savedSession.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()) {
             if let profileData = defaults.data(forKey: userProfileStorageKey),
-               let decodedProfile = try? JSONDecoder().decode(UserAccountProfile.self, from: profileData),
+               var decodedProfile = try? JSONDecoder().decode(UserAccountProfile.self, from: profileData),
                !Self.legacyFakeDemoEmails.contains(decodedProfile.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()) {
+                if decodedProfile.gimbalSerial == "TF-G31-PRO" && !decodedProfile.email.isEmpty && decodedProfile.warrantyDays == 0 {
+                    decodedProfile.gimbalSerial = ""
+                }
                 currentUser = decodedProfile
             }
             sessionId = savedSession.sessionId
@@ -210,17 +311,21 @@ final class SupabaseModuleStore: ObservableObject {
             userName = currentUser.fullName
             writeSessionCookie(token: savedSession.sessionCookieToken)
         } else {
+            KeychainHelper.delete(forKey: authSessionStorageKey)
             defaults.removeObject(forKey: authSessionStorageKey)
             defaults.removeObject(forKey: userProfileStorageKey)
             clearSessionCookies()
             isLoggedIn = false
             userName = ""
+            userTier = "Free Starter"
+            modules = [false, false, false, false, false, false, false]
             currentUser = UserAccountProfile(
                 fullName: "",
                 email: "",
                 phone: "",
                 address: "",
-                gimbalSerial: "TF-G31-PRO",
+                gimbalSerial: "",
+                warrantyDays: 0,
                 memberSince: ""
             )
         }
@@ -240,7 +345,13 @@ final class SupabaseModuleStore: ObservableObject {
 
     private func loadRegisteredAccounts() -> [StoredAccount] {
         let defaults = UserDefaults.standard
-        guard let data = defaults.data(forKey: registeredAccountsStorageKey),
+        if let legacyData = defaults.data(forKey: registeredAccountsStorageKey) {
+            if KeychainHelper.loadData(forKey: registeredAccountsStorageKey) == nil {
+                KeychainHelper.save(data: legacyData, forKey: registeredAccountsStorageKey)
+            }
+            defaults.removeObject(forKey: registeredAccountsStorageKey)
+        }
+        guard let data = KeychainHelper.loadData(forKey: registeredAccountsStorageKey),
               let accounts = try? JSONDecoder().decode([StoredAccount].self, from: data) else {
             return []
         }
@@ -255,8 +366,9 @@ final class SupabaseModuleStore: ObservableObject {
 
     private func saveRegisteredAccounts(_ accounts: [StoredAccount]) {
         if let data = try? JSONEncoder().encode(accounts) {
-            UserDefaults.standard.set(data, forKey: registeredAccountsStorageKey)
+            KeychainHelper.save(data: data, forKey: registeredAccountsStorageKey)
         }
+        UserDefaults.standard.removeObject(forKey: registeredAccountsStorageKey)
     }
 
     private func createAndPersistSession(for profile: UserAccountProfile) {
@@ -280,8 +392,9 @@ final class SupabaseModuleStore: ObservableObject {
             email: profile.email
         )
         if let data = try? JSONEncoder().encode(persisted) {
-            UserDefaults.standard.set(data, forKey: authSessionStorageKey)
+            KeychainHelper.save(data: data, forKey: authSessionStorageKey)
         }
+        UserDefaults.standard.removeObject(forKey: authSessionStorageKey)
         writeSessionCookie(token: newToken)
         persistState()
     }
@@ -324,31 +437,118 @@ final class SupabaseModuleStore: ObservableObject {
         return "Chưa có Cookie phiên"
     }
 
-    // MARK: - Authentication Actions
+    // MARK: - Authentication Actions (Cloud + Keychain SHA-256 Synchronized)
 
-    func login(identifier: String, password: String) -> (ok: Bool, message: String) {
+    private func profile(from row: SupabaseUserRow, fallback: UserAccountProfile? = nil) -> UserAccountProfile {
+        let emailLower = (row.email ?? fallback?.email ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let rowSerial = (row.serial ?? "").trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let fallbackSerial = (fallback?.gimbalSerial ?? "").trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let cleanSerial = !rowSerial.isEmpty ? rowSerial : (fallbackSerial == "TF-G31-PRO" ? "" : fallbackSerial)
+        return UserAccountProfile(
+            fullName: (row.name?.isEmpty == false) ? row.name! : (fallback?.fullName ?? ""),
+            email: emailLower,
+            phone: (row.phone?.isEmpty == false) ? row.phone! : (fallback?.phone ?? ""),
+            address: (row.address?.isEmpty == false) ? row.address! : (fallback?.address ?? ""),
+            city: (row.city?.isEmpty == false) ? row.city! : (fallback?.city ?? ""),
+            district: (row.district?.isEmpty == false) ? row.district! : (fallback?.district ?? ""),
+            shippingNotes: (row.shipping_notes?.isEmpty == false) ? row.shipping_notes! : (fallback?.shippingNotes ?? ""),
+            jobTitle: (row.job_title?.isEmpty == false) ? row.job_title! : (fallback?.jobTitle ?? ""),
+            cameraSetup: (row.camera_setup?.isEmpty == false) ? row.camera_setup! : (fallback?.cameraSetup ?? ""),
+            avatarUrl: (row.avatar_url?.isEmpty == false) ? row.avatar_url! : (fallback?.avatarUrl ?? ""),
+            authProvider: (row.auth_provider?.isEmpty == false) ? row.auth_provider!.lowercased() : (fallback?.authProvider ?? "email"),
+            passwordHash: (row.password_hash?.isEmpty == false) ? row.password_hash!.lowercased() : (fallback?.passwordHash ?? ""),
+            gimbalSerial: cleanSerial,
+            warrantyDays: row.warranty_days ?? fallback?.warrantyDays ?? (cleanSerial.isEmpty ? 0 : 365),
+            memberSince: (row.member_since?.isEmpty == false) ? row.member_since! : (fallback?.memberSince ?? "")
+        )
+    }
+
+    func login(identifier: String, password: String, completion: @escaping (Bool, String) -> Void) {
         let idTrimmed = identifier.trimmingCharacters(in: .whitespacesAndNewlines)
         let idLower = idTrimmed.lowercased()
         let pwTrimmed = password.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !idTrimmed.isEmpty, !pwTrimmed.isEmpty else {
-            return (false, "Vui lòng nhập Email/SĐT và mật khẩu.")
+            completion(false, "Vui lòng nhập Email/SĐT và mật khẩu.")
+            return
         }
 
-        // Check user-registered accounts first
-        let accounts = loadRegisteredAccounts()
+        let pwHash = Self.sha256Hex(pwTrimmed)
         let normalizedPhoneInput = idTrimmed.replacingOccurrences(of: " ", with: "")
-        if let matched = accounts.first(where: { acc in
-            let accPhone = acc.profile.phone.replacingOccurrences(of: " ", with: "")
-            return (acc.profile.email.lowercased() == idLower || accPhone == normalizedPhoneInput)
-                && acc.password == pwTrimmed
-        }) {
-            createAndPersistSession(for: matched.profile)
-            syncUserRecordAfterLogin(for: matched.profile)
-            return (true, "Đăng nhập thành công")
+
+        // Query Supabase cloud first so Web-created/updated accounts always work identically on iOS
+        if let req = makeSupabaseRequest(
+            endpoint: "/users",
+            queryItems: [URLQueryItem(name: "select", value: "*")],
+            method: "GET"
+        ) {
+            URLSession.shared.dataTask(with: req) { [weak self] data, response, error in
+                guard let self = self else { return }
+                if error == nil,
+                   let http = response as? HTTPURLResponse,
+                   (200...299).contains(http.statusCode),
+                   let data = data,
+                   let rows = try? JSONDecoder().decode([SupabaseUserRow].self, from: data) {
+                    let matchedRow = rows.first { row in
+                        let rowEmail = (row.email ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                        let rowPhone = (row.phone ?? "").replacingOccurrences(of: " ", with: "")
+                        return !rowEmail.isEmpty && (rowEmail == idLower || (!normalizedPhoneInput.isEmpty && rowPhone == normalizedPhoneInput))
+                    }
+
+                    if let matched = matchedRow {
+                        let cloudHash = (matched.password_hash ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                        let provider = (matched.auth_provider ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                        if cloudHash.isEmpty {
+                            let msg = (provider == "google" || provider == "apple")
+                                ? "Tài khoản này đăng nhập qua \(provider.capitalized). Vui lòng dùng nút Tiếp tục với \(provider.capitalized)."
+                                : "Tài khoản chưa thiết lập mật khẩu. Vui lòng đăng nhập qua Google/Apple hoặc đặt lại mật khẩu."
+                            DispatchQueue.main.async { completion(false, msg) }
+                            return
+                        }
+                        if cloudHash != pwHash {
+                            DispatchQueue.main.async { completion(false, "Email/SĐT hoặc mật khẩu chưa chính xác.") }
+                            return
+                        }
+
+                        DispatchQueue.main.async {
+                            let mergedProfile = self.profile(from: matched)
+                            var accounts = self.loadRegisteredAccounts()
+                            accounts.removeAll { $0.profile.email.lowercased() == mergedProfile.email.lowercased() }
+                            accounts.append(StoredAccount(passwordHash: pwHash, profile: mergedProfile))
+                            self.saveRegisteredAccounts(accounts)
+                            self.applyCloudRowToCurrentState(matched)
+                            self.createAndPersistSession(for: mergedProfile)
+                            self.pushCurrentUserToSupabase(mode: .telemetryOnly)
+                            completion(true, "Đăng nhập thành công")
+                        }
+                        return
+                    }
+                    DispatchQueue.main.async {
+                        completion(false, "Email/SĐT hoặc mật khẩu chưa chính xác.")
+                    }
+                    return
+                }
+
+                // Offline fallback via local iOS Keychain
+                DispatchQueue.main.async {
+                    let accounts = self.loadRegisteredAccounts()
+                    if let matched = accounts.first(where: { acc in
+                        let accPhone = acc.profile.phone.replacingOccurrences(of: " ", with: "")
+                        return (acc.profile.email.lowercased() == idLower || (!normalizedPhoneInput.isEmpty && accPhone == normalizedPhoneInput))
+                            && acc.passwordHash.lowercased() == pwHash
+                    }) {
+                        self.createAndPersistSession(for: matched.profile)
+                        self.syncUserRecordAfterLogin(for: matched.profile)
+                        completion(true, "Đăng nhập thành công (Offline)")
+                    } else {
+                        completion(false, "Không thể xác thực tài khoản. Kiểm tra kết nối mạng hoặc thông tin đăng nhập.")
+                    }
+                }
+            }.resume()
+            return
         }
 
-        return (false, "Email/SĐT hoặc mật khẩu chưa chính xác.")
+        completion(false, "Không thể tạo yêu cầu đăng nhập.")
     }
 
     func register(
@@ -356,100 +556,212 @@ final class SupabaseModuleStore: ObservableObject {
         email: String,
         phone: String,
         password: String,
-        gimbalSerial: String
-    ) -> (ok: Bool, message: String) {
+        gimbalSerial: String,
+        completion: @escaping (Bool, String) -> Void
+    ) {
         let cleanName = fullName.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleanEmail = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         let cleanPhone = phone.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleanPassword = password.trimmingCharacters(in: .whitespacesAndNewlines)
-        let cleanSerial = gimbalSerial.trimmingCharacters(in: .whitespacesAndNewlines)
+        let cleanSerial = gimbalSerial.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
 
         guard !cleanName.isEmpty else {
-            return (false, "Vui lòng nhập họ và tên.")
+            completion(false, "Vui lòng nhập họ và tên.")
+            return
         }
-        guard cleanEmail.contains("@") && cleanEmail.contains(".") else {
-            return (false, "Email không hợp lệ.")
+        guard cleanEmail.contains("@") && cleanEmail.contains("."), !Self.legacyFakeDemoEmails.contains(cleanEmail) else {
+            completion(false, "Email không hợp lệ.")
+            return
         }
-        guard cleanPassword.count >= 4 else {
-            return (false, "Mật khẩu cần tối thiểu 4 ký tự.")
+        guard cleanPassword.count >= 6 else {
+            completion(false, "Mật khẩu cần tối thiểu 6 ký tự.")
+            return
         }
 
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM/yyyy"
-        let profile = UserAccountProfile(
-            fullName: cleanName,
-            email: cleanEmail,
-            phone: cleanPhone,
-            address: currentUser.address,
-            gimbalSerial: cleanSerial.isEmpty ? "TF-G31-PRO" : cleanSerial.uppercased(),
-            memberSince: formatter.string(from: Date())
-        )
+        let pwHash = Self.sha256Hex(cleanPassword)
 
-        var accounts = loadRegisteredAccounts()
-        accounts.removeAll { $0.profile.email.lowercased() == cleanEmail.lowercased() }
-        accounts.append(StoredAccount(password: cleanPassword, profile: profile))
-        saveRegisteredAccounts(accounts)
+        guard let checkReq = makeSupabaseRequest(
+            endpoint: "/users",
+            queryItems: [
+                URLQueryItem(name: "email", value: "eq.\(cleanEmail)"),
+                URLQueryItem(name: "select", value: "id,email")
+            ],
+            method: "GET"
+        ) else {
+            completion(false, "Không thể kết nối máy chủ đăng ký.")
+            return
+        }
 
-        createAndPersistSession(for: profile)
-        pushCurrentUserToSupabase(mode: .full)
-        return (true, "Đăng ký tài khoản thành công")
+        URLSession.shared.dataTask(with: checkReq) { [weak self] data, response, error in
+            guard let self = self else { return }
+            if let error = error {
+                DispatchQueue.main.async {
+                    completion(false, "Lỗi kết nối mạng: \(error.localizedDescription)")
+                }
+                return
+            }
+            if let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode),
+               let data = data,
+               let existing = try? JSONDecoder().decode([SupabaseUserRow].self, from: data),
+               !existing.isEmpty {
+                DispatchQueue.main.async {
+                    completion(false, "Email này đã được đăng ký. Vui lòng chuyển sang tab Đăng nhập.")
+                }
+                return
+            }
+
+            DispatchQueue.main.async {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "MM/yyyy"
+                let profile = UserAccountProfile(
+                    fullName: cleanName,
+                    email: cleanEmail,
+                    phone: cleanPhone,
+                    address: "",
+                    authProvider: "email",
+                    passwordHash: pwHash,
+                    gimbalSerial: cleanSerial,
+                    warrantyDays: cleanSerial.isEmpty ? 0 : 365,
+                    memberSince: formatter.string(from: Date())
+                )
+
+                var accounts = self.loadRegisteredAccounts()
+                accounts.removeAll { $0.profile.email.lowercased() == cleanEmail }
+                accounts.append(StoredAccount(passwordHash: pwHash, profile: profile))
+                self.saveRegisteredAccounts(accounts)
+
+                self.userTier = "Free Starter"
+                self.modules = [false, false, false, false, false, false, false]
+                self.deviceName = "Chưa kết nối thiết bị"
+                self.deviceBattery = 0
+                self.deviceFirmware = ""
+
+                self.createAndPersistSession(for: profile)
+                self.pushCurrentUserToSupabase(mode: .full)
+                completion(true, "Đăng ký tài khoản thành công")
+            }
+        }.resume()
     }
 
     func signInWithOAuthAccount(
         email: String,
         fullName: String,
-        provider: String
-    ) -> (ok: Bool, message: String) {
+        provider: String,
+        avatarUrl: String = "",
+        completion: @escaping (Bool, String) -> Void
+    ) {
         let cleanEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard cleanEmail.contains("@"),
               cleanEmail.contains("."),
               !Self.legacyFakeDemoEmails.contains(cleanEmail) else {
-            return (false, "Vui lòng nhập địa chỉ email \(provider) hợp lệ.")
+            completion(false, "Không nhận được địa chỉ email \(provider) hợp lệ.")
+            return
         }
-
-        var accounts = loadRegisteredAccounts()
-        let existingIdx = accounts.firstIndex { $0.profile.email.lowercased() == cleanEmail }
-        let existingProfile = existingIdx.map { accounts[$0].profile }
 
         let cleanedInputName = fullName.trimmingCharacters(in: .whitespacesAndNewlines)
-        let fallbackLocalName = cleanEmail.components(separatedBy: "@").first?
-            .replacingOccurrences(of: ".", with: " ")
-            .capitalized ?? cleanEmail
-        let resolvedName: String
-        if !cleanedInputName.isEmpty {
-            resolvedName = cleanedInputName
-        } else if let existingName = existingProfile?.fullName, !existingName.isEmpty {
-            resolvedName = existingName
-        } else {
-            resolvedName = fallbackLocalName
+        let providerLower = provider.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+
+        guard let req = makeSupabaseRequest(
+            endpoint: "/users",
+            queryItems: [
+                URLQueryItem(name: "email", value: "eq.\(cleanEmail)"),
+                URLQueryItem(name: "select", value: "*")
+            ],
+            method: "GET"
+        ) else {
+            completion(false, "Không thể tạo kết nối đồng bộ \(provider).")
+            return
         }
 
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MM/yyyy"
-        let profile = UserAccountProfile(
-            fullName: resolvedName,
-            email: cleanEmail,
-            phone: existingProfile?.phone ?? "",
-            address: existingProfile?.address ?? "",
-            gimbalSerial: existingProfile?.gimbalSerial ?? "TF-G31-PRO",
-            memberSince: (existingProfile?.memberSince.isEmpty == false)
-                ? existingProfile!.memberSince
-                : formatter.string(from: Date())
-        )
+        URLSession.shared.dataTask(with: req) { [weak self] data, response, error in
+            guard let self = self else { return }
+            let existingCloudRow: SupabaseUserRow? = {
+                guard error == nil,
+                      let http = response as? HTTPURLResponse,
+                      (200...299).contains(http.statusCode),
+                      let data = data,
+                      let rows = try? JSONDecoder().decode([SupabaseUserRow].self, from: data) else {
+                    return nil
+                }
+                return rows.first
+            }()
 
-        if let idx = existingIdx {
-            accounts[idx].profile = profile
-        } else {
-            let oauthCredential = "oauth_\(provider.lowercased())_\(UUID().uuidString)"
-            accounts.append(StoredAccount(password: oauthCredential, profile: profile))
-        }
-        saveRegisteredAccounts(accounts)
+            DispatchQueue.main.async {
+                var accounts = self.loadRegisteredAccounts()
+                let existingIdx = accounts.firstIndex { $0.profile.email.lowercased() == cleanEmail }
+                let existingProfile = existingIdx.map { accounts[$0].profile }
 
-        hasCompletedOnboarding = true
-        createAndPersistSession(for: profile)
-        syncUserRecordAfterLogin(for: profile)
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
-        return (true, "Đăng nhập \(provider) thành công")
+                let merged: UserAccountProfile
+                if let cloud = existingCloudRow {
+                    self.applyCloudRowToCurrentState(cloud)
+                    var base = self.profile(from: cloud, fallback: existingProfile)
+                    if base.fullName.isEmpty && !cleanedInputName.isEmpty {
+                        base.fullName = cleanedInputName
+                    }
+                    if base.avatarUrl.isEmpty && !avatarUrl.isEmpty {
+                        base.avatarUrl = avatarUrl
+                    }
+                    if base.authProvider.isEmpty || base.authProvider == "email" {
+                        base.authProvider = providerLower
+                    }
+                    merged = base
+                } else {
+                    let fallbackLocalName = cleanEmail.components(separatedBy: "@").first?
+                        .replacingOccurrences(of: ".", with: " ")
+                        .capitalized ?? cleanEmail
+                    let resolvedName = !cleanedInputName.isEmpty
+                        ? cleanedInputName
+                        : ((existingProfile?.fullName.isEmpty == false) ? existingProfile!.fullName : fallbackLocalName)
+
+                    let formatter = DateFormatter()
+                    formatter.dateFormat = "MM/yyyy"
+                    merged = UserAccountProfile(
+                        fullName: resolvedName,
+                        email: cleanEmail,
+                        phone: existingProfile?.phone ?? "",
+                        address: existingProfile?.address ?? "",
+                        city: existingProfile?.city ?? "",
+                        district: existingProfile?.district ?? "",
+                        shippingNotes: existingProfile?.shippingNotes ?? "",
+                        jobTitle: existingProfile?.jobTitle ?? "",
+                        cameraSetup: existingProfile?.cameraSetup ?? "",
+                        avatarUrl: !avatarUrl.isEmpty ? avatarUrl : (existingProfile?.avatarUrl ?? ""),
+                        authProvider: providerLower,
+                        passwordHash: existingProfile?.passwordHash ?? "",
+                        gimbalSerial: existingProfile?.gimbalSerial == "TF-G31-PRO" ? "" : (existingProfile?.gimbalSerial ?? ""),
+                        warrantyDays: existingProfile?.warrantyDays ?? 0,
+                        memberSince: (existingProfile?.memberSince.isEmpty == false)
+                            ? existingProfile!.memberSince
+                            : formatter.string(from: Date())
+                    )
+                    self.userTier = "Free Starter"
+                    self.modules = [false, false, false, false, false, false, false]
+                    self.deviceName = "Chưa kết nối thiết bị"
+                    self.deviceBattery = 0
+                    self.deviceFirmware = ""
+                }
+
+                let credentialHash = !merged.passwordHash.isEmpty
+                    ? merged.passwordHash
+                    : "oauth_\(providerLower)_\(UUID().uuidString)"
+
+                if let idx = existingIdx {
+                    accounts[idx].profile = merged
+                    if !merged.passwordHash.isEmpty {
+                        accounts[idx].passwordHash = merged.passwordHash
+                    }
+                } else {
+                    accounts.append(StoredAccount(passwordHash: credentialHash, profile: merged))
+                }
+                self.saveRegisteredAccounts(accounts)
+
+                self.hasCompletedOnboarding = true
+                self.createAndPersistSession(for: merged)
+                self.pushCurrentUserToSupabase(mode: existingCloudRow != nil ? .profileOnly : .full)
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+                completion(true, "Đăng nhập \(provider) thành công")
+            }
+        }.resume()
     }
 
     func refreshSessionCookie() {
@@ -466,8 +778,9 @@ final class SupabaseModuleStore: ObservableObject {
             email: currentUser.email
         )
         if let data = try? JSONEncoder().encode(persisted) {
-            UserDefaults.standard.set(data, forKey: authSessionStorageKey)
+            KeychainHelper.save(data: data, forKey: authSessionStorageKey)
         }
+        UserDefaults.standard.removeObject(forKey: authSessionStorageKey)
         writeSessionCookie(token: newToken)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
@@ -477,15 +790,33 @@ final class SupabaseModuleStore: ObservableObject {
         email: String,
         phone: String,
         address: String,
+        city: String? = nil,
+        district: String? = nil,
+        shippingNotes: String? = nil,
+        jobTitle: String? = nil,
+        cameraSetup: String? = nil,
         gimbalSerial: String,
         newPassword: String? = nil
     ) {
+        let cleanSerial = gimbalSerial.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+        let cleanedNewPw = newPassword?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let nextHash = cleanedNewPw.count >= 6 ? Self.sha256Hex(cleanedNewPw) : currentUser.passwordHash
+
         let updated = UserAccountProfile(
             fullName: fullName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? currentUser.fullName : fullName.trimmingCharacters(in: .whitespacesAndNewlines),
-            email: email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? currentUser.email : email.trimmingCharacters(in: .whitespacesAndNewlines),
+            email: email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? currentUser.email : email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
             phone: phone.trimmingCharacters(in: .whitespacesAndNewlines),
             address: address.trimmingCharacters(in: .whitespacesAndNewlines),
-            gimbalSerial: gimbalSerial.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(),
+            city: city?.trimmingCharacters(in: .whitespacesAndNewlines) ?? currentUser.city,
+            district: district?.trimmingCharacters(in: .whitespacesAndNewlines) ?? currentUser.district,
+            shippingNotes: shippingNotes?.trimmingCharacters(in: .whitespacesAndNewlines) ?? currentUser.shippingNotes,
+            jobTitle: jobTitle?.trimmingCharacters(in: .whitespacesAndNewlines) ?? currentUser.jobTitle,
+            cameraSetup: cameraSetup?.trimmingCharacters(in: .whitespacesAndNewlines) ?? currentUser.cameraSetup,
+            avatarUrl: currentUser.avatarUrl,
+            authProvider: currentUser.authProvider.isEmpty ? "email" : currentUser.authProvider,
+            passwordHash: nextHash,
+            gimbalSerial: cleanSerial,
+            warrantyDays: cleanSerial.isEmpty ? 0 : max(currentUser.warrantyDays, 365),
             memberSince: currentUser.memberSince
         )
 
@@ -495,37 +826,79 @@ final class SupabaseModuleStore: ObservableObject {
         persistState()
 
         var accounts = loadRegisteredAccounts()
-        let cleanedNewPw = newPassword?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         if let idx = accounts.firstIndex(where: { $0.profile.email.lowercased() == oldEmail || $0.profile.email.lowercased() == updated.email.lowercased() }) {
             accounts[idx].profile = updated
-            if !cleanedNewPw.isEmpty {
-                accounts[idx].password = cleanedNewPw
+            if !nextHash.isEmpty {
+                accounts[idx].passwordHash = nextHash
             }
             saveRegisteredAccounts(accounts)
-        } else if !cleanedNewPw.isEmpty {
-            accounts.append(StoredAccount(password: cleanedNewPw, profile: updated))
+        } else if !updated.email.isEmpty {
+            accounts.append(StoredAccount(passwordHash: nextHash, profile: updated))
             saveRegisteredAccounts(accounts)
         }
         pushCurrentUserToSupabase(mode: .profileOnly)
         UINotificationFeedbackGenerator().notificationOccurred(.success)
     }
 
+    func deleteCurrentAccount(completion: @escaping (Bool, String) -> Void) {
+        let emailLower = currentUser.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        var accounts = loadRegisteredAccounts()
+        accounts.removeAll { $0.profile.email.lowercased() == emailLower }
+        saveRegisteredAccounts(accounts)
+
+        guard !emailLower.isEmpty,
+              let req = makeSupabaseRequest(
+                endpoint: "/users",
+                queryItems: [URLQueryItem(name: "email", value: "eq.\(emailLower)")],
+                method: "DELETE"
+              ) else {
+            DispatchQueue.main.async {
+                self.logout()
+                completion(true, "Đã xóa dữ liệu tài khoản cục bộ")
+            }
+            return
+        }
+
+        URLSession.shared.dataTask(with: req) { [weak self] _, response, error in
+            DispatchQueue.main.async {
+                self?.logout()
+                if error == nil, let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) {
+                    completion(true, "Đã xóa tài khoản hoàn toàn khỏi Cloud và thiết bị")
+                } else {
+                    completion(true, "Đã xóa phiên đăng nhập trên thiết bị")
+                }
+            }
+        }.resume()
+    }
+
     func logout() {
         clearSessionCookies()
-        UserDefaults.standard.removeObject(forKey: authSessionStorageKey)
-        UserDefaults.standard.removeObject(forKey: userProfileStorageKey)
+        KeychainHelper.delete(forKey: authSessionStorageKey)
+        let defaults = UserDefaults.standard
+        defaults.removeObject(forKey: authSessionStorageKey)
+        defaults.removeObject(forKey: userProfileStorageKey)
+        defaults.removeObject(forKey: tierStorageKey)
+        defaults.removeObject(forKey: modulesStorageKey)
+        defaults.removeObject(forKey: deviceNameStorageKey)
+        defaults.removeObject(forKey: deviceBatteryStorageKey)
+        defaults.removeObject(forKey: deviceFirmwareStorageKey)
         sessionId = ""
         sessionCookieToken = ""
         sessionCreatedAt = nil
         isLoggedIn = false
         userName = ""
-        userTier = "Standard"
+        userTier = "Free Starter"
+        modules = [false, false, false, false, false, false, false]
+        deviceName = "Chưa kết nối thiết bị"
+        deviceBattery = 0
+        deviceFirmware = ""
         currentUser = UserAccountProfile(
             fullName: "",
             email: "",
             phone: "",
             address: "",
-            gimbalSerial: "TF-G31-PRO",
+            gimbalSerial: "",
+            warrantyDays: 0,
             memberSince: ""
         )
         activeMainTab = 0
@@ -616,7 +989,7 @@ final class SupabaseModuleStore: ObservableObject {
 
             DispatchQueue.main.async {
                 let realRows = rows.filter { row in
-                    let rowId = row.id.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+                    let rowId = (row.id ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                     let rowEmail = (row.email ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
                     return !Self.legacyFakeDemoIds.contains(rowId) && !Self.legacyFakeDemoEmails.contains(rowEmail)
                 }
@@ -703,31 +1076,19 @@ final class SupabaseModuleStore: ObservableObject {
     }
 
     private func applyCloudRowToCurrentState(_ row: SupabaseUserRow) {
-        let resolvedName = (row.name?.isEmpty == false) ? row.name! : currentUser.fullName
-        let resolvedEmail = (row.email?.isEmpty == false) ? row.email!.lowercased() : currentUser.email
-        let resolvedPhone = row.phone ?? currentUser.phone
-        let resolvedSerial = (row.serial?.isEmpty == false) ? row.serial!.uppercased() : currentUser.gimbalSerial
-        let resolvedMember = (row.member_since?.isEmpty == false) ? row.member_since! : currentUser.memberSince
-
-        currentUser = UserAccountProfile(
-            fullName: resolvedName,
-            email: resolvedEmail,
-            phone: resolvedPhone,
-            address: currentUser.address,
-            gimbalSerial: resolvedSerial,
-            memberSince: resolvedMember
-        )
-        userName = resolvedName
+        let merged = profile(from: row, fallback: currentUser)
+        currentUser = merged
+        userName = merged.fullName
         if let tier = row.tier, !tier.isEmpty {
             userTier = tier
         }
-        if let dev = row.device, !dev.isEmpty {
+        if let dev = row.device, !dev.isEmpty, dev != "Smart Gimbal S1 Titanium" {
             deviceName = dev
         }
         if let bat = row.battery {
             deviceBattery = bat
         }
-        if let fw = row.firmware, !fw.isEmpty {
+        if let fw = row.firmware {
             deviceFirmware = fw
         }
         if let cloudMods = row.modules, cloudMods.count == 7 {
@@ -738,28 +1099,27 @@ final class SupabaseModuleStore: ObservableObject {
     private func mergeCloudRowsIntoLocalAccounts(_ rows: [SupabaseUserRow]) {
         var accounts = loadRegisteredAccounts()
         for row in rows {
-            let rowId = row.id.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            let rowId = (row.id ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
             guard !Self.legacyFakeDemoIds.contains(rowId),
                   let rawEmail = row.email?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
                   !rawEmail.isEmpty,
                   !Self.legacyFakeDemoEmails.contains(rawEmail) else { continue }
             let existingIdx = accounts.firstIndex(where: { $0.profile.email.lowercased() == rawEmail })
             let existingProfile = existingIdx != nil ? accounts[existingIdx!].profile : nil
-            let existingPassword = existingIdx != nil ? accounts[existingIdx!].password : "oauth_cloud_\(UUID().uuidString)"
+            let cloudHash = (row.password_hash ?? "").trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+            let existingHash = !cloudHash.isEmpty
+                ? cloudHash
+                : (existingIdx != nil ? accounts[existingIdx!].passwordHash : "oauth_cloud_\(UUID().uuidString)")
 
-            let mergedProfile = UserAccountProfile(
-                fullName: (row.name?.isEmpty == false) ? row.name! : (existingProfile?.fullName ?? rawEmail),
-                email: rawEmail,
-                phone: row.phone ?? existingProfile?.phone ?? "",
-                address: existingProfile?.address ?? currentUser.address,
-                gimbalSerial: (row.serial?.isEmpty == false) ? row.serial!.uppercased() : (existingProfile?.gimbalSerial ?? "TF-G31-PRO"),
-                memberSince: (row.member_since?.isEmpty == false) ? row.member_since! : (existingProfile?.memberSince ?? "11/2025")
-            )
+            let mergedProfile = profile(from: row, fallback: existingProfile)
 
             if let idx = existingIdx {
                 accounts[idx].profile = mergedProfile
+                if !cloudHash.isEmpty {
+                    accounts[idx].passwordHash = cloudHash
+                }
             } else {
-                accounts.append(StoredAccount(password: existingPassword, profile: mergedProfile))
+                accounts.append(StoredAccount(passwordHash: existingHash, profile: mergedProfile))
             }
         }
         saveRegisteredAccounts(accounts)
@@ -806,15 +1166,32 @@ final class SupabaseModuleStore: ObservableObject {
         }.resume()
     }
 
+    private func finishPush(writeSuccess: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.activePushCount = max(0, self.activePushCount - 1)
+            self.isSyncing = (self.activePushCount > 0)
+            if writeSuccess {
+                self.isOnline = true
+                self.lastSyncTime = self.formattedSyncTimestamp()
+                UINotificationFeedbackGenerator().notificationOccurred(.success)
+            } else {
+                self.isOnline = false
+            }
+        }
+    }
+
     private func pushCurrentUserToSupabase(mode: SyncPayloadMode) {
         let profileSnapshot = currentUser
         let emailLower = profileSnapshot.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         guard !emailLower.isEmpty else { return }
 
         let tierSnapshot = userTier
-        let deviceSnapshot = deviceName.isEmpty ? "Smart Gimbal S1 Titanium" : deviceName
+        let deviceSnapshot = deviceName.isEmpty ? "Chưa kết nối thiết bị" : deviceName
         let batterySnapshot = deviceBattery
-        let firmwareSnapshot = deviceFirmware.isEmpty ? "v2.4.1" : deviceFirmware
+        let firmwareSnapshot = deviceFirmware
+        let warrantySnapshot = profileSnapshot.gimbalSerial.isEmpty ? 0 : max(profileSnapshot.warrantyDays, 365)
+        let passwordHashSnapshot: String? = profileSnapshot.passwordHash.isEmpty ? nil : profileSnapshot.passwordHash.lowercased()
         let modulesSnapshot = normalizedModules(modules, fallback: modules)
         let nowIso = ISO8601DateFormatter().string(from: Date())
         let isAdminEmail = ["thuynguyen2dk4@gmail.com", "thuy.nguyen@tflow.tech"].contains(emailLower)
@@ -836,34 +1213,14 @@ final class SupabaseModuleStore: ObservableObject {
             self.isSyncing = true
         }
 
-        supabaseWriteQueue.async { [weak self] in
+        URLSession.shared.dataTask(with: lookupReq) { [weak self] data, _, error in
             guard let self = self else { return }
-            let lookupSem = DispatchSemaphore(value: 0)
-            var existingRows: [SupabaseUserRow] = []
-            var lookupFailed = false
-
-            URLSession.shared.dataTask(with: lookupReq) { data, _, error in
-                defer { lookupSem.signal() }
-                if error != nil {
-                    lookupFailed = true
-                    return
-                }
-                if let data = data {
-                    existingRows = (try? JSONDecoder().decode([SupabaseUserRow].self, from: data)) ?? []
-                }
-            }.resume()
-
-            _ = lookupSem.wait(timeout: .now() + 15)
-
-            if lookupFailed {
-                DispatchQueue.main.async {
-                    self.activePushCount = max(0, self.activePushCount - 1)
-                    self.isSyncing = (self.activePushCount > 0)
-                    self.isOnline = false
-                }
+            if error != nil {
+                self.finishPush(writeSuccess: false)
                 return
             }
 
+            let existingRows: [SupabaseUserRow] = data.flatMap { try? JSONDecoder().decode([SupabaseUserRow].self, from: $0) } ?? []
             let cloudId = existingRows.first?.id
             let encoder = JSONEncoder()
             var writeReq: URLRequest?
@@ -876,7 +1233,17 @@ final class SupabaseModuleStore: ObservableObject {
                         name: profileSnapshot.fullName,
                         email: emailLower,
                         phone: profileSnapshot.phone,
+                        address: profileSnapshot.address,
+                        city: profileSnapshot.city,
+                        district: profileSnapshot.district,
+                        shipping_notes: profileSnapshot.shippingNotes,
+                        job_title: profileSnapshot.jobTitle,
+                        camera_setup: profileSnapshot.cameraSetup,
+                        avatar_url: profileSnapshot.avatarUrl,
+                        auth_provider: profileSnapshot.authProvider.isEmpty ? "email" : profileSnapshot.authProvider,
                         serial: profileSnapshot.gimbalSerial,
+                        warranty_days: warrantySnapshot,
+                        password_hash: passwordHashSnapshot,
                         last_active: nowIso
                     ))
                 case .modulesOnly:
@@ -894,17 +1261,27 @@ final class SupabaseModuleStore: ObservableObject {
                         last_active: nowIso
                     ))
                 case .full:
+                    let memberSinceValue = profileSnapshot.memberSince.isEmpty ? "11/2025" : profileSnapshot.memberSince
                     patchData = try? encoder.encode(SupabaseFullPayload(
                         id: cloudId,
                         name: profileSnapshot.fullName,
                         email: emailLower,
                         phone: profileSnapshot.phone,
+                        address: profileSnapshot.address,
+                        city: profileSnapshot.city,
+                        district: profileSnapshot.district,
+                        shipping_notes: profileSnapshot.shippingNotes,
+                        job_title: profileSnapshot.jobTitle,
+                        camera_setup: profileSnapshot.cameraSetup,
+                        avatar_url: profileSnapshot.avatarUrl,
+                        auth_provider: profileSnapshot.authProvider.isEmpty ? "email" : profileSnapshot.authProvider,
+                        password_hash: passwordHashSnapshot,
                         device: deviceSnapshot,
                         tier: tierSnapshot,
                         tier_badge: isAdminEmail ? "Master Admin" : "\(tierSnapshot) Tier",
-                        member_since: profileSnapshot.memberSince.isEmpty ? "11/2025" : profileSnapshot.memberSince,
+                        member_since: memberSinceValue,
                         serial: profileSnapshot.gimbalSerial,
-                        warranty_days: 365,
+                        warranty_days: warrantySnapshot,
                         battery: batterySnapshot,
                         firmware: firmwareSnapshot,
                         status: "Hoạt động",
@@ -921,17 +1298,27 @@ final class SupabaseModuleStore: ObservableObject {
                     bodyData: patchData
                 )
             } else {
+                let memberSinceValue = profileSnapshot.memberSince.isEmpty ? "11/2025" : profileSnapshot.memberSince
                 let insertPayload = SupabaseFullPayload(
                     id: self.makeStableCloudId(for: emailLower),
                     name: profileSnapshot.fullName,
                     email: emailLower,
                     phone: profileSnapshot.phone,
+                    address: profileSnapshot.address,
+                    city: profileSnapshot.city,
+                    district: profileSnapshot.district,
+                    shipping_notes: profileSnapshot.shippingNotes,
+                    job_title: profileSnapshot.jobTitle,
+                    camera_setup: profileSnapshot.cameraSetup,
+                    avatar_url: profileSnapshot.avatarUrl,
+                    auth_provider: profileSnapshot.authProvider.isEmpty ? "email" : profileSnapshot.authProvider,
+                    password_hash: passwordHashSnapshot,
                     device: deviceSnapshot,
                     tier: tierSnapshot,
                     tier_badge: isAdminEmail ? "Master Admin" : "\(tierSnapshot) Tier",
-                    member_since: profileSnapshot.memberSince.isEmpty ? "11/2025" : profileSnapshot.memberSince,
+                    member_since: memberSinceValue,
                     serial: profileSnapshot.gimbalSerial,
-                    warranty_days: 365,
+                    warranty_days: warrantySnapshot,
                     battery: batterySnapshot,
                     firmware: firmwareSnapshot,
                     status: "Hoạt động",
@@ -950,37 +1337,15 @@ final class SupabaseModuleStore: ObservableObject {
             }
 
             guard let finalReq = writeReq else {
-                DispatchQueue.main.async {
-                    self.activePushCount = max(0, self.activePushCount - 1)
-                    self.isSyncing = (self.activePushCount > 0)
-                }
+                self.finishPush(writeSuccess: false)
                 return
             }
 
-            let writeSem = DispatchSemaphore(value: 0)
-            var writeSuccess = false
-
-            URLSession.shared.dataTask(with: finalReq) { _, writeResp, writeErr in
-                defer { writeSem.signal() }
-                if writeErr == nil, let http = writeResp as? HTTPURLResponse, (200...299).contains(http.statusCode) {
-                    writeSuccess = true
-                }
+            URLSession.shared.dataTask(with: finalReq) { [weak self] _, writeResp, writeErr in
+                let writeSuccess = (writeErr == nil) && ((writeResp as? HTTPURLResponse).map { (200...299).contains($0.statusCode) } ?? false)
+                self?.finishPush(writeSuccess: writeSuccess)
             }.resume()
-
-            _ = writeSem.wait(timeout: .now() + 15)
-
-            DispatchQueue.main.async {
-                self.activePushCount = max(0, self.activePushCount - 1)
-                self.isSyncing = (self.activePushCount > 0)
-                if writeSuccess {
-                    self.isOnline = true
-                    self.lastSyncTime = self.formattedSyncTimestamp()
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                } else {
-                    self.isOnline = false
-                }
-            }
-        }
+        }.resume()
     }
 
     private func formattedSyncTimestamp() -> String {

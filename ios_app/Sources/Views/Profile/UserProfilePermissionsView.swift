@@ -8,8 +8,10 @@
 //
 
 import SwiftUI
+import AuthenticationServices
 import AVFoundation
 import CoreBluetooth
+import CryptoKit
 import Photos
 import UIKit
 
@@ -27,6 +29,8 @@ struct UserProfilePermissionsView: View {
     @State private var showPairingSheet: Bool = false
     @State private var showPermissionsSheet: Bool = false
     @State private var showModuleMatrix: Bool = false
+    @State private var showDeleteAccountConfirm: Bool = false
+    @State private var isDeletingAccount: Bool = false
 
     private var accentGold: Color {
         colorScheme == .light
@@ -174,7 +178,8 @@ struct UserProfilePermissionsView: View {
                         .lineLimit(1)
 
                     if store.isLoggedIn {
-                        Text("Serial: \(store.currentUser.gimbalSerial) • \(store.userTier)")
+                        let serialLabel = store.currentUser.gimbalSerial.isEmpty ? "Chưa kích hoạt Serial" : "Serial: \(store.currentUser.gimbalSerial)"
+                        Text("\(serialLabel) • \(store.userTier)")
                             .font(.system(size: 11.5, weight: .medium))
                             .foregroundColor(Color(UIColor.tertiaryLabel))
                             .lineLimit(1)
@@ -312,7 +317,9 @@ struct UserProfilePermissionsView: View {
                 iconBg: Color(UIColor.systemBlue),
                 iconFg: .white,
                 title: "Thiết bị của tôi",
-                subtitle: "\(store.deviceName) • Pin \(ble.batteryLevel)% • FW \(ble.firmwareVersion)"
+                subtitle: ble.isConnected
+                    ? "\(store.deviceName) • Pin \(ble.batteryLevel)%\(ble.firmwareVersion.isEmpty ? "" : " • FW \(ble.firmwareVersion)")"
+                    : "Chưa kết nối thiết bị • Chạm để quét BLE"
             ) {
                 showPairingSheet = true
             }
@@ -453,16 +460,50 @@ struct UserProfilePermissionsView: View {
             } label: {
                 Text("Đăng xuất tài khoản")
                     .font(.system(size: 16.5, weight: .medium))
-                    .foregroundColor(Color(UIColor.systemRed))
+                    .foregroundColor(Color(UIColor.systemOrange))
                     .frame(maxWidth: .infinity, minHeight: 46)
             }
             .buttonStyle(.plain)
+
+            Divider()
+
+            Button {
+                UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                showDeleteAccountConfirm = true
+            } label: {
+                HStack(spacing: 8) {
+                    if isDeletingAccount {
+                        ProgressView().scaleEffect(0.85)
+                    }
+                    Text("Xóa vĩnh viễn tài khoản")
+                        .font(.system(size: 16.5, weight: .semibold))
+                        .foregroundColor(Color(UIColor.systemRed))
+                }
+                .frame(maxWidth: .infinity, minHeight: 46)
+            }
+            .buttonStyle(.plain)
+            .disabled(isDeletingAccount || !store.isLoggedIn)
         }
         .background(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .fill(Color(UIColor.secondarySystemGroupedBackground))
         )
         .padding(.horizontal, 16)
+        .confirmationDialog(
+            "Xóa vĩnh viễn tài khoản T-Flow?",
+            isPresented: $showDeleteAccountConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Xóa tài khoản và dữ liệu Cloud", role: .destructive) {
+                isDeletingAccount = true
+                store.deleteCurrentAccount { _, _ in
+                    isDeletingAccount = false
+                }
+            }
+            Button("Hủy", role: .cancel) {}
+        } message: {
+            Text("Hồ sơ, phiên đăng nhập và quyền đồng bộ trên Cloud sẽ bị xóa và không thể khôi phục.")
+        }
     }
 
     private func profileActionRow(
@@ -517,16 +558,223 @@ struct UserProfilePermissionsView: View {
 
 // MARK: - 2. AUTH SIGN-IN & ONBOARDING GATE (21_onboarding + 22_signin)
 
-enum OAuthProviderType: String, Identifiable {
-    case apple
-    case google
+@MainActor
+private final class NativeOAuthCoordinator: NSObject, ObservableObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, ASWebAuthenticationPresentationContextProviding {
+    static let googleClientId = "725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com"
+    static let googleCallbackScheme = "com.googleusercontent.apps.725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac"
+    static let googleRedirectUri = "com.googleusercontent.apps.725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac:/oauth2redirect"
 
-    var id: String { rawValue }
-    var displayTitle: String {
-        switch self {
-        case .apple: return "Apple"
-        case .google: return "Google"
+    private var appleCompletion: ((Result<(email: String, fullName: String), Error>) -> Void)?
+    private var webAuthSession: ASWebAuthenticationSession?
+
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        Self.activeWindow()
+    }
+
+    func presentationAnchor(for session: ASWebAuthenticationSession) -> ASPresentationAnchor {
+        Self.activeWindow()
+    }
+
+    private static func activeWindow() -> ASPresentationAnchor {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        for scene in scenes {
+            if let key = scene.windows.first(where: { $0.isKeyWindow }) {
+                return key
+            }
         }
+        return scenes.first?.windows.first ?? ASPresentationAnchor()
+    }
+
+    func signInWithApple(completion: @escaping (Result<(email: String, fullName: String), Error>) -> Void) {
+        self.appleCompletion = completion
+        let provider = ASAuthorizationAppleIDProvider()
+        let request = provider.createRequest()
+        request.requestedScopes = [.fullName, .email]
+        let controller = ASAuthorizationController(authorizationRequests: [request])
+        controller.delegate = self
+        controller.presentationContextProvider = self
+        controller.performRequests()
+    }
+
+    nonisolated func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        Task { @MainActor in
+            guard let cred = authorization.credential as? ASAuthorizationAppleIDCredential else {
+                self.appleCompletion?(.failure(NSError(domain: "TFlowOAuth", code: -1, userInfo: [NSLocalizedDescriptionKey: "Không nhận được thông tin Apple ID."])))
+                self.appleCompletion = nil
+                return
+            }
+            var resolvedEmail = cred.email ?? ""
+            if resolvedEmail.isEmpty, let tokenData = cred.identityToken, let jwt = Self.decodeJWTPayload(tokenData) {
+                resolvedEmail = (jwt["email"] as? String) ?? ""
+            }
+            var assembledName = ""
+            if let nameComponents = cred.fullName {
+                assembledName = PersonNameComponentsFormatter().string(from: nameComponents).trimmingCharacters(in: .whitespacesAndNewlines)
+            }
+            if resolvedEmail.isEmpty {
+                self.appleCompletion?(.failure(NSError(domain: "TFlowOAuth", code: -2, userInfo: [NSLocalizedDescriptionKey: "Apple ID chưa chia sẻ email. Hãy bật quyền chia sẻ Email trong cài đặt Apple ID hoặc dùng đăng nhập Email."])))
+            } else {
+                self.appleCompletion?(.success((resolvedEmail.lowercased(), assembledName)))
+            }
+            self.appleCompletion = nil
+        }
+    }
+
+    nonisolated func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        Task { @MainActor in
+            self.appleCompletion?(.failure(error))
+            self.appleCompletion = nil
+        }
+    }
+
+    func signInWithGoogle(completion: @escaping (Result<(email: String, fullName: String, avatarUrl: String), Error>) -> Void) {
+        let verifier = Self.randomURLSafeString(length: 64)
+        let challengeData = SHA256.hash(data: Data(verifier.utf8))
+        let challenge = Data(challengeData).base64EncodedString()
+            .replacingOccurrences(of: "+", with: "-")
+            .replacingOccurrences(of: "/", with: "_")
+            .replacingOccurrences(of: "=", with: "")
+
+        var components = URLComponents(string: "https://accounts.google.com/o/oauth2/v2/auth")!
+        components.queryItems = [
+            URLQueryItem(name: "client_id", value: Self.googleClientId),
+            URLQueryItem(name: "redirect_uri", value: Self.googleRedirectUri),
+            URLQueryItem(name: "response_type", value: "code"),
+            URLQueryItem(name: "scope", value: "openid email profile"),
+            URLQueryItem(name: "code_challenge", value: challenge),
+            URLQueryItem(name: "code_challenge_method", value: "S256"),
+            URLQueryItem(name: "prompt", value: "select_account")
+        ]
+        guard let authURL = components.url else {
+            completion(.failure(NSError(domain: "TFlowOAuth", code: -3, userInfo: [NSLocalizedDescriptionKey: "URL Google OAuth không hợp lệ."])))
+            return
+        }
+
+        let session = ASWebAuthenticationSession(url: authURL, callbackURLScheme: Self.googleCallbackScheme) { [weak self] callbackURL, error in
+            Task { @MainActor in
+                self?.webAuthSession = nil
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+                guard let callbackURL = callbackURL,
+                      let cbComponents = URLComponents(url: callbackURL, resolvingAgainstBaseURL: false),
+                      let code = cbComponents.queryItems?.first(where: { $0.name == "code" })?.value,
+                      !code.isEmpty else {
+                    let errDesc = callbackURL.flatMap { URLComponents(url: $0, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "error" })?.value } ?? "Không nhận được mã xác thực Google"
+                    completion(.failure(NSError(domain: "TFlowOAuth", code: -4, userInfo: [NSLocalizedDescriptionKey: errDesc])))
+                    return
+                }
+                Self.exchangeGoogleCode(code: code, codeVerifier: verifier, completion: completion)
+            }
+        }
+        session.presentationContextProvider = self
+        session.prefersEphemeralWebBrowserSession = false
+        self.webAuthSession = session
+        session.start()
+    }
+
+    private static func exchangeGoogleCode(
+        code: String,
+        codeVerifier: String,
+        completion: @escaping (Result<(email: String, fullName: String, avatarUrl: String), Error>) -> Void
+    ) {
+        var req = URLRequest(url: URL(string: "https://oauth2.googleapis.com/token")!)
+        req.httpMethod = "POST"
+        req.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        var bodyItems = URLComponents()
+        bodyItems.queryItems = [
+            URLQueryItem(name: "client_id", value: googleClientId),
+            URLQueryItem(name: "code", value: code),
+            URLQueryItem(name: "code_verifier", value: codeVerifier),
+            URLQueryItem(name: "grant_type", value: "authorization_code"),
+            URLQueryItem(name: "redirect_uri", value: googleRedirectUri)
+        ]
+        req.httpBody = bodyItems.percentEncodedQuery?.data(using: .utf8)
+
+        URLSession.shared.dataTask(with: req) { data, _, error in
+            if let error = error {
+                DispatchQueue.main.async { completion(.failure(error)) }
+                return
+            }
+            guard let data = data,
+                  let json = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else {
+                DispatchQueue.main.async {
+                    completion(.failure(NSError(domain: "TFlowOAuth", code: -5, userInfo: [NSLocalizedDescriptionKey: "Phản hồi token Google không hợp lệ."])))
+                }
+                return
+            }
+            if let errMsg = json["error_description"] as? String ?? json["error"] as? String {
+                DispatchQueue.main.async {
+                    completion(.failure(NSError(domain: "TFlowOAuth", code: -6, userInfo: [NSLocalizedDescriptionKey: "Google OAuth: \(errMsg)"])))
+                }
+                return
+            }
+            let accessToken = json["access_token"] as? String ?? ""
+            let idToken = json["id_token"] as? String ?? ""
+            if !accessToken.isEmpty {
+                var userReq = URLRequest(url: URL(string: "https://www.googleapis.com/oauth2/v3/userinfo")!)
+                userReq.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+                URLSession.shared.dataTask(with: userReq) { uData, _, _ in
+                    if let uData = uData,
+                       let uJson = (try? JSONSerialization.jsonObject(with: uData)) as? [String: Any],
+                       let email = (uJson["email"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+                       !email.isEmpty {
+                        let name = (uJson["name"] as? String) ?? ""
+                        let pic = (uJson["picture"] as? String) ?? ""
+                        DispatchQueue.main.async { completion(.success((email, name, pic))) }
+                        return
+                    }
+                    Self.fallbackFromIdToken(idToken, completion: completion)
+                }.resume()
+            } else {
+                Self.fallbackFromIdToken(idToken, completion: completion)
+            }
+        }.resume()
+    }
+
+    private static func fallbackFromIdToken(
+        _ idToken: String,
+        completion: @escaping (Result<(email: String, fullName: String, avatarUrl: String), Error>) -> Void
+    ) {
+        if let tokenData = idToken.data(using: .utf8),
+           let jwt = decodeJWTPayloadString(idToken) ?? decodeJWTPayload(tokenData),
+           let email = (jwt["email"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased(),
+           !email.isEmpty {
+            let name = (jwt["name"] as? String) ?? ""
+            let pic = (jwt["picture"] as? String) ?? ""
+            DispatchQueue.main.async { completion(.success((email, name, pic))) }
+            return
+        }
+        DispatchQueue.main.async {
+            completion(.failure(NSError(domain: "TFlowOAuth", code: -7, userInfo: [NSLocalizedDescriptionKey: "Không đọc được thông tin email Google."])))
+        }
+    }
+
+    private static func decodeJWTPayload(_ tokenData: Data) -> [String: Any]? {
+        guard let str = String(data: tokenData, encoding: .utf8) else { return nil }
+        return decodeJWTPayloadString(str)
+    }
+
+    private static func decodeJWTPayloadString(_ token: String) -> [String: Any]? {
+        let parts = token.split(separator: ".")
+        guard parts.count >= 2 else { return nil }
+        var base64 = String(parts[1])
+            .replacingOccurrences(of: "-", with: "+")
+            .replacingOccurrences(of: "_", with: "/")
+        while base64.count % 4 != 0 { base64.append("=") }
+        guard let payloadData = Data(base64Encoded: base64),
+              let obj = try? JSONSerialization.jsonObject(with: payloadData) as? [String: Any] else {
+            return nil
+        }
+        return obj
+    }
+
+    private static func randomURLSafeString(length: Int) -> String {
+        let charset = Array("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~")
+        var bytes = [UInt8](repeating: 0, count: length)
+        _ = SecRandomCopyBytes(kSecRandomDefault, length, &bytes)
+        return String(bytes.map { charset[Int($0) % charset.count] })
     }
 }
 
@@ -534,26 +782,59 @@ struct GoogleGLogoView: View {
     var size: CGFloat = 20
 
     var body: some View {
-        ZStack {
-            Circle()
-                .trim(from: 0.585, to: 0.89)
-                .stroke(Color(red: 0.92, green: 0.26, blue: 0.21), style: StrokeStyle(lineWidth: size * 0.21, lineCap: .butt))
-            Circle()
-                .trim(from: 0.395, to: 0.595)
-                .stroke(Color(red: 0.98, green: 0.74, blue: 0.02), style: StrokeStyle(lineWidth: size * 0.21, lineCap: .butt))
-            Circle()
-                .trim(from: 0.105, to: 0.405)
-                .stroke(Color(red: 0.20, green: 0.66, blue: 0.33), style: StrokeStyle(lineWidth: size * 0.21, lineCap: .butt))
-            Circle()
-                .trim(from: 0.0, to: 0.115)
-                .stroke(Color(red: 0.26, green: 0.52, blue: 0.96), style: StrokeStyle(lineWidth: size * 0.21, lineCap: .butt))
-            Rectangle()
-                .fill(Color(red: 0.26, green: 0.52, blue: 0.96))
-                .frame(width: size * 0.50, height: size * 0.21)
-                .offset(x: size * 0.24)
+        Canvas { ctx, canvasSize in
+            let s = min(canvasSize.width, canvasSize.height) / 24.0
+            let t = CGAffineTransform(scaleX: s, y: s)
+
+            // Red top arc
+            var red = Path()
+            red.move(to: CGPoint(x: 12, y: 5.38))
+            red.addCurve(to: CGPoint(x: 16.21, y: 7.01), control1: CGPoint(x: 13.62, y: 5.38), control2: CGPoint(x: 15.06, y: 5.94))
+            red.addLine(to: CGPoint(x: 19.36, y: 3.86))
+            red.addCurve(to: CGPoint(x: 12, y: 1.0), control1: CGPoint(x: 17.45, y: 2.09), control2: CGPoint(x: 14.97, y: 1.0))
+            red.addCurve(to: CGPoint(x: 2.18, y: 7.07), control1: CGPoint(x: 7.7, y: 1.0), control2: CGPoint(x: 3.99, y: 3.47))
+            red.addLine(to: CGPoint(x: 5.84, y: 9.91))
+            red.addCurve(to: CGPoint(x: 12, y: 5.38), control1: CGPoint(x: 6.71, y: 7.31), control2: CGPoint(x: 9.14, y: 5.38))
+            red.closeSubpath()
+            ctx.fill(red.applying(t), with: .color(Color(red: 234/255, green: 67/255, blue: 53/255)))
+
+            // Blue right bar
+            var blue = Path()
+            blue.move(to: CGPoint(x: 22.56, y: 12.25))
+            blue.addCurve(to: CGPoint(x: 22.36, y: 10.0), control1: CGPoint(x: 22.56, y: 11.47), control2: CGPoint(x: 22.49, y: 10.72))
+            blue.addLine(to: CGPoint(x: 12, y: 10.0))
+            blue.addLine(to: CGPoint(x: 12, y: 14.26))
+            blue.addLine(to: CGPoint(x: 17.92, y: 14.26))
+            blue.addCurve(to: CGPoint(x: 15.71, y: 17.57), control1: CGPoint(x: 17.66, y: 15.63), control2: CGPoint(x: 16.88, y: 16.79))
+            blue.addLine(to: CGPoint(x: 19.28, y: 20.34))
+            blue.addCurve(to: CGPoint(x: 22.56, y: 12.25), control1: CGPoint(x: 21.36, y: 18.42), control2: CGPoint(x: 22.56, y: 15.6))
+            blue.closeSubpath()
+            ctx.fill(blue.applying(t), with: .color(Color(red: 66/255, green: 133/255, blue: 244/255)))
+
+            // Yellow left arc
+            var yellow = Path()
+            yellow.move(to: CGPoint(x: 5.84, y: 14.09))
+            yellow.addCurve(to: CGPoint(x: 5.49, y: 12.0), control1: CGPoint(x: 5.62, y: 13.43), control2: CGPoint(x: 5.49, y: 12.73))
+            yellow.addCurve(to: CGPoint(x: 5.84, y: 9.91), control1: CGPoint(x: 5.49, y: 11.27), control2: CGPoint(x: 5.62, y: 10.57))
+            yellow.addLine(to: CGPoint(x: 2.18, y: 7.07))
+            yellow.addCurve(to: CGPoint(x: 1.0, y: 12.0), control1: CGPoint(x: 1.43, y: 8.55), control2: CGPoint(x: 1.0, y: 10.22))
+            yellow.addCurve(to: CGPoint(x: 2.18, y: 16.93), control1: CGPoint(x: 1.0, y: 13.78), control2: CGPoint(x: 1.43, y: 15.45))
+            yellow.addLine(to: CGPoint(x: 5.84, y: 14.09))
+            yellow.closeSubpath()
+            ctx.fill(yellow.applying(t), with: .color(Color(red: 251/255, green: 188/255, blue: 5/255)))
+
+            // Green bottom arc
+            var green = Path()
+            green.move(to: CGPoint(x: 12, y: 23.0))
+            green.addCurve(to: CGPoint(x: 19.28, y: 20.34), control1: CGPoint(x: 14.97, y: 23.0), control2: CGPoint(x: 17.46, y: 22.02))
+            green.addLine(to: CGPoint(x: 15.71, y: 17.57))
+            green.addCurve(to: CGPoint(x: 12, y: 18.62), control1: CGPoint(x: 14.73, y: 18.23), control2: CGPoint(x: 13.48, y: 18.62))
+            green.addCurve(to: CGPoint(x: 5.84, y: 14.09), control1: CGPoint(x: 9.14, y: 18.62), control2: CGPoint(x: 6.71, y: 16.69))
+            green.addLine(to: CGPoint(x: 2.18, y: 16.93))
+            green.addCurve(to: CGPoint(x: 12, y: 23.0), control1: CGPoint(x: 3.99, y: 20.53), control2: CGPoint(x: 7.7, y: 23.0))
+            green.closeSubpath()
+            ctx.fill(green.applying(t), with: .color(Color(red: 52/255, green: 168/255, blue: 83/255)))
         }
-        .frame(width: size * 0.79, height: size * 0.79)
-        .clipShape(Circle())
         .frame(width: size, height: size)
     }
 }
@@ -566,7 +847,8 @@ struct AuthSignInGateView: View {
     @State private var showOnboarding: Bool = false
     @State private var onboardingPage: Int = 0
     @State private var selectedTab: Int = 0 // 0 = Đăng nhập, 1 = Đăng ký
-    @State private var activeOAuthProvider: OAuthProviderType? = nil
+    @StateObject private var oauthCoordinator = NativeOAuthCoordinator()
+    @State private var isAuthBusy: Bool = false
 
     @State private var loginIdentifier: String = ""
     @State private var loginPassword: String = ""
@@ -576,7 +858,7 @@ struct AuthSignInGateView: View {
     @State private var regEmail: String = ""
     @State private var regPhone: String = ""
     @State private var regPassword: String = ""
-    @State private var regSerial: String = "TF-G31-PRO"
+    @State private var regSerial: String = ""
     @State private var showRegPassword: Bool = false
 
     @State private var authError: String = ""
@@ -628,17 +910,6 @@ struct AuthSignInGateView: View {
             }
             .onAppear {
                 showOnboarding = !store.hasCompletedOnboarding && !store.isLoggedIn
-            }
-            .sheet(item: $activeOAuthProvider) { provider in
-                OAuthAccountSignInSheetView(
-                    provider: provider,
-                    accentGold: accentGold
-                ) {
-                    store.hasCompletedOnboarding = true
-                    store.showSignInSheet = false
-                    dismiss()
-                }
-                .environmentObject(store)
             }
         }
     }
@@ -873,29 +1144,39 @@ struct AuthSignInGateView: View {
             }
 
             Button {
-                let res = store.login(identifier: loginIdentifier, password: loginPassword)
-                if res.ok {
-                    authError = ""
-                    store.hasCompletedOnboarding = true
-                    store.showSignInSheet = false
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    dismiss()
-                } else {
-                    authError = res.message
-                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                isAuthBusy = true
+                authError = ""
+                store.login(identifier: loginIdentifier, password: loginPassword) { ok, message in
+                    isAuthBusy = false
+                    if ok {
+                        authError = ""
+                        store.hasCompletedOnboarding = true
+                        store.showSignInSheet = false
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        dismiss()
+                    } else {
+                        authError = message
+                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                    }
                 }
             } label: {
-                Text("Đăng nhập")
-                    .font(.system(size: 17, weight: .bold))
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(accentGold)
-                    )
+                HStack(spacing: 8) {
+                    if isAuthBusy {
+                        ProgressView().tint(.black)
+                    }
+                    Text("Đăng nhập")
+                        .font(.system(size: 17, weight: .bold))
+                }
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(accentGold)
+                )
             }
             .buttonStyle(.plain)
+            .disabled(isAuthBusy)
 
             HStack(spacing: 12) {
                 Rectangle().fill(Color(UIColor.separator)).frame(height: 0.5)
@@ -909,7 +1190,31 @@ struct AuthSignInGateView: View {
             Button {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 authError = ""
-                activeOAuthProvider = .apple
+                isAuthBusy = true
+                oauthCoordinator.signInWithApple { result in
+                    switch result {
+                    case .success(let info):
+                        store.signInWithOAuthAccount(email: info.email, fullName: info.fullName, provider: "Apple") { ok, msg in
+                            isAuthBusy = false
+                            if ok {
+                                authError = ""
+                                store.hasCompletedOnboarding = true
+                                store.showSignInSheet = false
+                                dismiss()
+                            } else {
+                                authError = msg
+                                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                            }
+                        }
+                    case .failure(let error):
+                        isAuthBusy = false
+                        let nsErr = error as NSError
+                        if nsErr.domain != ASAuthorizationError.errorDomain || nsErr.code != ASAuthorizationError.canceled.rawValue {
+                            authError = "Apple Sign-In: \(error.localizedDescription)"
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        }
+                    }
+                }
             } label: {
                 HStack(spacing: 10) {
                     Image(systemName: "applelogo")
@@ -926,11 +1231,41 @@ struct AuthSignInGateView: View {
                 )
             }
             .buttonStyle(.plain)
+            .disabled(isAuthBusy)
 
             Button {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 authError = ""
-                activeOAuthProvider = .google
+                isAuthBusy = true
+                oauthCoordinator.signInWithGoogle { result in
+                    switch result {
+                    case .success(let info):
+                        store.signInWithOAuthAccount(
+                            email: info.email,
+                            fullName: info.fullName,
+                            provider: "Google",
+                            avatarUrl: info.avatarUrl
+                        ) { ok, msg in
+                            isAuthBusy = false
+                            if ok {
+                                authError = ""
+                                store.hasCompletedOnboarding = true
+                                store.showSignInSheet = false
+                                dismiss()
+                            } else {
+                                authError = msg
+                                UINotificationFeedbackGenerator().notificationOccurred(.error)
+                            }
+                        }
+                    case .failure(let error):
+                        isAuthBusy = false
+                        let nsErr = error as NSError
+                        if nsErr.domain != ASWebAuthenticationSessionError.errorDomain || nsErr.code != ASWebAuthenticationSessionError.canceledLogin.rawValue {
+                            authError = "Google OAuth: \(error.localizedDescription)"
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        }
+                    }
+                }
             } label: {
                 HStack(spacing: 10) {
                     GoogleGLogoView(size: 20)
@@ -950,6 +1285,7 @@ struct AuthSignInGateView: View {
                 )
             }
             .buttonStyle(.plain)
+            .disabled(isAuthBusy)
         }
     }
 
@@ -964,11 +1300,11 @@ struct AuthSignInGateView: View {
                     .foregroundColor(.secondary)
                     .frame(width: 22)
                 if showRegPassword {
-                    TextField("Mật khẩu (tối thiểu 4 ký tự)", text: $regPassword)
+                    TextField("Mật khẩu (tối thiểu 6 ký tự)", text: $regPassword)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                 } else {
-                    SecureField("Mật khẩu (tối thiểu 4 ký tự)", text: $regPassword)
+                    SecureField("Mật khẩu (tối thiểu 6 ký tự)", text: $regPassword)
                 }
                 Button {
                     showRegPassword.toggle()
@@ -984,38 +1320,48 @@ struct AuthSignInGateView: View {
                     .fill(Color(UIColor.secondarySystemGroupedBackground))
             )
 
-            authFieldRow(icon: "barcode.viewfinder", placeholder: "Mã Serial Gimbal (VD: TF-G31-PRO)", text: $regSerial, autocap: .characters)
+            authFieldRow(icon: "barcode.viewfinder", placeholder: "Mã Serial Gimbal (không bắt buộc)", text: $regSerial, autocap: .characters)
 
             Button {
-                let res = store.register(
+                isAuthBusy = true
+                authError = ""
+                store.register(
                     fullName: regFullName,
                     email: regEmail,
                     phone: regPhone,
                     password: regPassword,
                     gimbalSerial: regSerial
-                )
-                if res.ok {
-                    authError = ""
-                    store.hasCompletedOnboarding = true
-                    store.showSignInSheet = false
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    dismiss()
-                } else {
-                    authError = res.message
-                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                ) { ok, message in
+                    isAuthBusy = false
+                    if ok {
+                        authError = ""
+                        store.hasCompletedOnboarding = true
+                        store.showSignInSheet = false
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+                        dismiss()
+                    } else {
+                        authError = message
+                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                    }
                 }
             } label: {
-                Text("Đăng ký")
-                    .font(.system(size: 16.5, weight: .bold))
-                    .foregroundColor(.black)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(accentGold)
-                    )
+                HStack(spacing: 8) {
+                    if isAuthBusy {
+                        ProgressView().tint(.black)
+                    }
+                    Text("Đăng ký")
+                        .font(.system(size: 16.5, weight: .bold))
+                }
+                .foregroundColor(.black)
+                .frame(maxWidth: .infinity)
+                .frame(height: 50)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(accentGold)
+                )
             }
             .buttonStyle(.plain)
+            .disabled(isAuthBusy)
             .padding(.top, 4)
         }
     }
@@ -1044,105 +1390,6 @@ struct AuthSignInGateView: View {
     }
 }
 
-// MARK: - 2B. INTERACTIVE OAUTH SIGN-IN (APPLE ID & GOOGLE ACCOUNT)
-
-struct OAuthAccountSignInSheetView: View {
-    @EnvironmentObject var store: SupabaseModuleStore
-    @Environment(\.dismiss) private var dismiss
-
-    let provider: OAuthProviderType
-    let accentGold: Color
-    let onCompleted: () -> Void
-
-    @State private var email: String = ""
-    @State private var fullName: String = ""
-    @State private var errorMsg: String = ""
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    HStack(spacing: 12) {
-                        if provider == .apple {
-                            Image(systemName: "applelogo")
-                                .font(.system(size: 24, weight: .semibold))
-                                .frame(width: 34, height: 34)
-                        } else {
-                            GoogleGLogoView(size: 26)
-                                .frame(width: 34, height: 34)
-                        }
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Đăng nhập bằng \(provider.displayTitle)")
-                                .font(.system(size: 17, weight: .bold))
-                            Text("Đồng bộ trực tiếp với tài khoản trên T-Flow Web & Cloud")
-                                .font(.system(size: 12.5))
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    .padding(.vertical, 4)
-                }
-
-                if !errorMsg.isEmpty {
-                    Section {
-                        Text(errorMsg)
-                            .font(.system(size: 13.5, weight: .medium))
-                            .foregroundColor(Color(UIColor.systemRed))
-                    }
-                }
-
-                Section("Thông tin tài khoản \(provider.displayTitle)") {
-                    TextField(
-                        provider == .apple ? "Apple ID Email (VD: ten@icloud.com)" : "Google Email (VD: ten@gmail.com)",
-                        text: $email
-                    )
-                    .keyboardType(.emailAddress)
-                    .textInputAutocapitalization(.never)
-                    .autocorrectionDisabled()
-
-                    TextField("Họ và tên hiển thị (không bắt buộc nếu đã có)", text: $fullName)
-                        .textInputAutocapitalization(.words)
-                }
-
-                Section {
-                    Button {
-                        let res = store.signInWithOAuthAccount(
-                            email: email,
-                            fullName: fullName,
-                            provider: provider.displayTitle
-                        )
-                        if res.ok {
-                            errorMsg = ""
-                            dismiss()
-                            onCompleted()
-                        } else {
-                            errorMsg = res.message
-                        }
-                    } label: {
-                        Text("Tiếp tục với \(provider.displayTitle)")
-                            .font(.system(size: 16.5, weight: .bold))
-                            .foregroundColor(.black)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 44)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .fill(accentGold)
-                            )
-                    }
-                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
-                    .listRowBackground(Color.clear)
-                }
-            }
-            .navigationTitle("Tài khoản \(provider.displayTitle)")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Huỷ") { dismiss() }
-                }
-            }
-        }
-    }
-}
-
 // MARK: - 3. PERSONAL INFO EDITOR
 
 struct PersonalInfoEditSheetView: View {
@@ -1154,9 +1401,15 @@ struct PersonalInfoEditSheetView: View {
     @State private var email: String = ""
     @State private var phone: String = ""
     @State private var address: String = ""
+    @State private var city: String = ""
+    @State private var district: String = ""
+    @State private var shippingNotes: String = ""
+    @State private var jobTitle: String = ""
+    @State private var cameraSetup: String = ""
     @State private var gimbalSerial: String = ""
     @State private var newPassword: String = ""
     @State private var statusBanner: String? = nil
+    @State private var errorBanner: String? = nil
 
     private var accentGold: Color {
         colorScheme == .light
@@ -1198,6 +1451,14 @@ struct PersonalInfoEditSheetView: View {
                     .padding(.vertical, 4)
                 }
 
+                if let err = errorBanner {
+                    Section {
+                        Text(err)
+                            .font(.system(size: 13.5, weight: .semibold))
+                            .foregroundColor(Color(UIColor.systemRed))
+                    }
+                }
+
                 if let banner = statusBanner {
                     Section {
                         Text(banner)
@@ -1223,35 +1484,71 @@ struct PersonalInfoEditSheetView: View {
                             .multilineTextAlignment(.trailing)
                             .keyboardType(.phonePad)
                     }
-                    LabeledContent("Địa chỉ") {
-                        TextField("Địa chỉ giao nhận / BH", text: $address)
+                    LabeledContent("Nghề nghiệp / Vai trò") {
+                        TextField("VD: Filmmaker / Vlogger", text: $jobTitle)
+                            .multilineTextAlignment(.trailing)
+                    }
+                    LabeledContent("Thiết bị quay chính") {
+                        TextField("VD: iPhone 16 Pro Max", text: $cameraSetup)
                             .multilineTextAlignment(.trailing)
                     }
                     LabeledContent("Serial Gimbal") {
-                        TextField("TF-G31-PRO", text: $gimbalSerial)
+                        TextField("Nhập mã Serial (nếu có)", text: $gimbalSerial)
                             .multilineTextAlignment(.trailing)
                             .textInputAutocapitalization(.characters)
                             .autocorrectionDisabled()
                     }
                     LabeledContent("Đổi mật khẩu") {
-                        SecureField("Để trống nếu giữ nguyên", text: $newPassword)
+                        SecureField("Tối thiểu 6 ký tự (để trống nếu giữ)", text: $newPassword)
+                            .multilineTextAlignment(.trailing)
+                    }
+                }
+
+                Section("Địa chỉ giao nhận & Bảo hành") {
+                    LabeledContent("Địa chỉ") {
+                        TextField("Số nhà, đường, phường/xã", text: $address)
+                            .multilineTextAlignment(.trailing)
+                    }
+                    LabeledContent("Quận / Huyện") {
+                        TextField("Quận / Huyện", text: $district)
+                            .multilineTextAlignment(.trailing)
+                    }
+                    LabeledContent("Tỉnh / Thành phố") {
+                        TextField("TP. Hồ Chí Minh / Hà Nội...", text: $city)
+                            .multilineTextAlignment(.trailing)
+                    }
+                    LabeledContent("Ghi chú giao nhận") {
+                        TextField("Thời gian nhận hàng / bảo hành", text: $shippingNotes)
                             .multilineTextAlignment(.trailing)
                     }
                 }
 
                 Section {
                     Button {
+                        let cleanPw = newPassword.trimmingCharacters(in: .whitespacesAndNewlines)
+                        if !cleanPw.isEmpty && cleanPw.count < 6 {
+                            errorBanner = "Mật khẩu mới cần tối thiểu 6 ký tự."
+                            statusBanner = nil
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                            return
+                        }
+                        errorBanner = nil
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                         store.updatePersonalProfile(
                             fullName: fullName,
                             email: email,
                             phone: phone,
                             address: address,
+                            city: city,
+                            district: district,
+                            shippingNotes: shippingNotes,
+                            jobTitle: jobTitle,
+                            cameraSetup: cameraSetup,
                             gimbalSerial: gimbalSerial,
                             newPassword: newPassword
                         )
                         newPassword = ""
-                        statusBanner = "✓ Đã lưu thông tin cá nhân & đồng bộ Cloud"
+                        statusBanner = "✓ Đã lưu thông tin cá nhân & đồng bộ Web / Cloud"
                     } label: {
                         Text("Lưu thông tin cá nhân")
                             .font(.system(size: 16.5, weight: .bold))
@@ -1282,7 +1579,12 @@ struct PersonalInfoEditSheetView: View {
                 email = store.currentUser.email
                 phone = store.currentUser.phone
                 address = store.currentUser.address
-                gimbalSerial = store.currentUser.gimbalSerial
+                city = store.currentUser.city
+                district = store.currentUser.district
+                shippingNotes = store.currentUser.shippingNotes
+                jobTitle = store.currentUser.jobTitle
+                cameraSetup = store.currentUser.cameraSetup
+                gimbalSerial = store.currentUser.gimbalSerial == "TF-G31-PRO" ? "" : store.currentUser.gimbalSerial
             }
         }
     }
@@ -1299,7 +1601,7 @@ struct BLEPairingScanSheetView: View {
     @State private var pulseRadar: Bool = false
     @State private var connectingDeviceName: String? = nil
     @State private var isPairedSuccess: Bool = false
-    @State private var pairedDeviceName: String = "Smart Gimbal S1"
+    @State private var pairedDeviceName: String = "T-Flow Pro"
 
     private var accentGold: Color {
         colorScheme == .light
@@ -1310,14 +1612,14 @@ struct BLEPairingScanSheetView: View {
     var body: some View {
         NavigationStack {
             ScrollView(showsIndicators: false) {
-                if isPairedSuccess {
+                if isPairedSuccess || ble.isConnected {
                     pairedSuccessContent
                 } else {
                     scanningContent
                 }
             }
             .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
-            .navigationTitle(isPairedSuccess ? "Kết nối thành công" : "Ghép đôi Bluetooth")
+            .navigationTitle((isPairedSuccess || ble.isConnected) ? "Kết nối thành công" : "Ghép đôi Bluetooth")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -1330,6 +1632,37 @@ struct BLEPairingScanSheetView: View {
             .onAppear {
                 withAnimation(.easeInOut(duration: 1.4).repeatForever(autoreverses: true)) {
                     pulseRadar = true
+                }
+                if !ble.isConnected {
+                    ble.startScan()
+                } else {
+                    pairedDeviceName = ble.connectedPeripheralName.isEmpty ? store.deviceName : ble.connectedPeripheralName
+                    isPairedSuccess = true
+                }
+            }
+            .onDisappear {
+                ble.stopScan()
+            }
+            .onChange(of: ble.isConnected) { connected in
+                if connected {
+                    let finalName = ble.connectedPeripheralName.isEmpty
+                        ? (connectingDeviceName ?? "T-Flow Pro")
+                        : ble.connectedPeripheralName
+                    pairedDeviceName = finalName
+                    store.deviceName = finalName
+                    store.updateDeviceTelemetry(
+                        deviceName: finalName,
+                        battery: ble.batteryLevel,
+                        firmware: ble.firmwareVersion
+                    )
+                    connectingDeviceName = nil
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        isPairedSuccess = true
+                    }
+                } else {
+                    connectingDeviceName = nil
+                    isPairedSuccess = false
                 }
             }
         }
@@ -1361,11 +1694,11 @@ struct BLEPairingScanSheetView: View {
                 .frame(width: 140, height: 140)
                 .padding(.top, 12)
 
-                Text("Đang tìm kiếm Gimbal...")
+                Text(ble.isScanning ? "Đang tìm kiếm Gimbal..." : "Ghép nối Bluetooth BLE")
                     .font(.system(size: 24, weight: .bold))
                     .foregroundColor(.primary)
 
-                Text("Giữ gimbal gần iPhone và đảm bảo Bluetooth đã bật")
+                Text(ble.bluetoothStateText)
                     .font(.system(size: 14))
                     .foregroundColor(.secondary)
                     .multilineTextAlignment(.center)
@@ -1374,39 +1707,84 @@ struct BLEPairingScanSheetView: View {
             .frame(maxWidth: .infinity)
 
             VStack(alignment: .leading, spacing: 8) {
-                Text("THIẾT BỊ TÌM THẤY")
-                    .font(.system(size: 13))
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal, 32)
-
-                VStack(spacing: 0) {
-                    discoveredDeviceRow(
-                        name: "Smart Gimbal S1",
-                        badge: "Gần nhất",
-                        subtitle: "Tín hiệu cực mạnh (-42 dBm) • Sẵn sàng ghép đôi",
-                        icon: "antenna.radiowaves.left.and.right",
-                        iconBg: Color(UIColor.systemGreen),
-                        buttonTitle: "Kết nối",
-                        isPrimary: true
-                    )
-
-                    Divider().padding(.leading, 56)
-
-                    discoveredDeviceRow(
-                        name: "Smart Gimbal S2",
-                        badge: nil,
-                        subtitle: "Tín hiệu trung bình (-78 dBm)",
-                        icon: "gyroscope",
-                        iconBg: Color(UIColor.systemGray),
-                        buttonTitle: "Ghép",
-                        isPrimary: false
-                    )
+                HStack {
+                    Text("THIẾT BỊ TÌM THẤY (\(ble.discoveredPeripherals.count))")
+                        .font(.system(size: 13))
+                        .foregroundColor(.secondary)
+                    Spacer()
+                    Button {
+                        if ble.isScanning {
+                            ble.stopScan()
+                        } else {
+                            ble.startScan()
+                        }
+                    } label: {
+                        Text(ble.isScanning ? "Dừng quét" : "Quét lại")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(accentGold)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(Color(UIColor.secondarySystemGroupedBackground))
-                )
-                .padding(.horizontal, 16)
+                .padding(.horizontal, 20)
+
+                if ble.discoveredPeripherals.isEmpty {
+                    VStack(spacing: 10) {
+                        Image(systemName: "antenna.radiowaves.left.and.right.slash")
+                            .font(.system(size: 26))
+                            .foregroundColor(.secondary)
+                        Text(ble.isScanning
+                             ? "Đang dò sóng Bluetooth Low Energy xung quanh..."
+                             : "Chưa phát hiện phần cứng Gimbal ở chế độ chờ ghép nối.")
+                            .font(.system(size: 13.5))
+                            .foregroundColor(.secondary)
+                            .multilineTextAlignment(.center)
+                        Button {
+                            ble.startScan()
+                        } label: {
+                            Text("Bắt đầu quét thiết bị")
+                                .font(.system(size: 13.5, weight: .semibold))
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 8)
+                                .background(Capsule().fill(accentGold))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(20)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color(UIColor.secondarySystemGroupedBackground))
+                    )
+                    .padding(.horizontal, 16)
+                } else {
+                    VStack(spacing: 0) {
+                        ForEach(Array(ble.discoveredPeripherals.enumerated()), id: \.element.identifier) { idx, peripheral in
+                            if idx > 0 {
+                                Divider().padding(.leading, 56)
+                            }
+                            let pName = peripheral.name ?? "Thiết bị T-Flow BLE"
+                            discoveredDeviceRow(
+                                name: pName,
+                                badge: idx == 0 ? "Gần nhất" : nil,
+                                subtitle: "UUID: \(peripheral.identifier.uuidString.prefix(8)) • BLE 5.3",
+                                icon: "antenna.radiowaves.left.and.right",
+                                iconBg: idx == 0 ? Color(UIColor.systemGreen) : Color(UIColor.systemGray),
+                                buttonTitle: "Kết nối",
+                                isPrimary: idx == 0
+                            ) {
+                                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                                connectingDeviceName = pName
+                                ble.connect(to: peripheral)
+                            }
+                        }
+                    }
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color(UIColor.secondarySystemGroupedBackground))
+                    )
+                    .padding(.horizontal, 16)
+                }
             }
         }
         .padding(.bottom, 24)
@@ -1419,7 +1797,8 @@ struct BLEPairingScanSheetView: View {
         icon: String,
         iconBg: Color,
         buttonTitle: String,
-        isPrimary: Bool
+        isPrimary: Bool,
+        onTap: @escaping () -> Void
     ) -> some View {
         HStack(spacing: 12) {
             ZStack {
@@ -1460,7 +1839,7 @@ struct BLEPairingScanSheetView: View {
             Spacer()
 
             Button {
-                connectToDevice(name)
+                onTap()
             } label: {
                 Group {
                     if connectingDeviceName == name {
@@ -1523,14 +1902,14 @@ struct BLEPairingScanSheetView: View {
                     icon: "battery.100",
                     iconBg: Color(UIColor.systemGreen),
                     title: "Mức pin thiết bị",
-                    trailing: "\(ble.batteryLevel)% (Khoảng 8.5 giờ)"
+                    trailing: ble.batteryLevel > 0 ? "\(ble.batteryLevel)%" : "Đang đọc telemetry BLE"
                 )
                 Divider().padding(.leading, 56)
                 successStatusRow(
                     icon: "info.circle.fill",
                     iconBg: Color(UIColor.systemBlue),
                     title: "Phiên bản Firmware",
-                    trailing: "\(ble.firmwareVersion) (Mới nhất)"
+                    trailing: ble.firmwareVersion.isEmpty ? "Chưa rõ" : ble.firmwareVersion
                 )
                 Divider().padding(.leading, 56)
                 successStatusRow(
@@ -1580,6 +1959,19 @@ struct BLEPairingScanSheetView: View {
                         )
                 }
                 .buttonStyle(.plain)
+
+                Button {
+                    ble.disconnect()
+                    isPairedSuccess = false
+                    ble.startScan()
+                } label: {
+                    Text("Ngắt kết nối Gimbal")
+                        .font(.system(size: 14.5, weight: .medium))
+                        .foregroundColor(Color(UIColor.systemRed))
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 40)
+                }
+                .buttonStyle(.plain)
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 24)
@@ -1606,26 +1998,6 @@ struct BLEPairingScanSheetView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)
-    }
-
-    private func connectToDevice(_ name: String) {
-        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-        connectingDeviceName = name
-        pairedDeviceName = name
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            ble.isConnected = true
-            store.deviceName = name
-            store.updateDeviceTelemetry(
-                deviceName: name,
-                battery: ble.batteryLevel,
-                firmware: ble.firmwareVersion
-            )
-            connectingDeviceName = nil
-            UINotificationFeedbackGenerator().notificationOccurred(.success)
-            withAnimation(.easeInOut(duration: 0.25)) {
-                isPairedSuccess = true
-            }
-        }
     }
 }
 

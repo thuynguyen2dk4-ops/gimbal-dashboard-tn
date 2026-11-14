@@ -67,7 +67,10 @@ struct CameraStudioNativeView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let hudSize = camera.isLandscapeMode
+            let physicalLandscape = geo.size.width > geo.size.height
+            let simulatedLandscape = camera.isLandscapeMode && !physicalLandscape
+            let effectiveLandscape = physicalLandscape || camera.isLandscapeMode
+            let hudSize = simulatedLandscape
                 ? CGSize(width: geo.size.height, height: geo.size.width)
                 : geo.size
 
@@ -85,7 +88,9 @@ struct CameraStudioNativeView: View {
                     screenSize: geo.size,
                     isLandscape: camera.isLandscapeMode,
                     onResetToFullFrame: {
-                        camera.setAspectRatio("9:16")
+                        if !camera.isRecording {
+                            camera.setAspectRatio("9:16")
+                        }
                     }
                 )
 
@@ -93,24 +98,32 @@ struct CameraStudioNativeView: View {
                 viewfinderOverlayLayer(size: geo.size)
 
                 // 5. Internal Portrait / 90° Rotated Landscape HUD Chrome
-                hudChrome(hudSize: hudSize, isLandscape: camera.isLandscapeMode)
+                hudChrome(hudSize: hudSize, isLandscape: effectiveLandscape)
                     .frame(width: hudSize.width, height: hudSize.height)
-                    .rotationEffect(.degrees(camera.isLandscapeMode ? 90 : 0))
+                    .rotationEffect(.degrees(simulatedLandscape ? 90 : 0))
                     .position(x: geo.size.width * 0.5, y: geo.size.height * 0.5)
-                    .animation(.spring(response: 0.36, dampingFraction: 0.86), value: camera.isLandscapeMode)
+                    .animation(.spring(response: 0.36, dampingFraction: 0.86), value: effectiveLandscape)
                     .allowsHitTesting(!camera.touchLockEnabled)
 
                 // 6. Floating Touch-Lock Unlock Pill & BLE Toast (Always above hit-block)
-                floatingTopBanners
+                floatingTopBanners(isLandscape: effectiveLandscape)
                     .frame(width: hudSize.width, height: hudSize.height)
-                    .rotationEffect(.degrees(camera.isLandscapeMode ? 90 : 0))
+                    .rotationEffect(.degrees(simulatedLandscape ? 90 : 0))
                     .position(x: geo.size.width * 0.5, y: geo.size.height * 0.5)
-                    .animation(.spring(response: 0.36, dampingFraction: 0.86), value: camera.isLandscapeMode)
+                    .animation(.spring(response: 0.36, dampingFraction: 0.86), value: effectiveLandscape)
             }
         }
         .onAppear {
             camera.setupSession()
             enforceModulePermissions()
+        }
+        .onDisappear {
+            camera.stopSession()
+        }
+        .onChange(of: camera.lastCaptureError) { err in
+            if let err = err, !err.isEmpty {
+                ble.showToast(err)
+            }
         }
         .onChange(of: store.modules) { _ in
             enforceModulePermissions()
@@ -157,7 +170,9 @@ struct CameraStudioNativeView: View {
         }
         .sheet(isPresented: $showAspectSheet) {
             AspectPickerSheetView(selectedRatio: $camera.selectedAspectRatio) { ratio in
-                camera.setAspectRatio(ratio)
+                if !camera.isRecording {
+                    camera.setAspectRatio(ratio)
+                }
             }
             .presentationDetents([.medium, .large])
         }
@@ -299,9 +314,12 @@ struct CameraStudioNativeView: View {
                     .allowsHitTesting(false)
             }
 
+            let physicalLandscape = size.width > size.height
+            let rotate90 = camera.isLandscapeMode && !physicalLandscape
+
             if camera.isProMode && camera.showHorizonLevel && !hasTransientOverlayOpen {
                 horizonLevelIndicator
-                    .rotationEffect(.degrees(camera.isLandscapeMode ? 90 : 0))
+                    .rotationEffect(.degrees(rotate90 ? 90 : 0))
                     .allowsHitTesting(false)
             }
 
@@ -320,14 +338,28 @@ struct CameraStudioNativeView: View {
 
     @ViewBuilder
     private func aiTrackingOverlay(size: CGSize) -> some View {
-        if let lockedPt = camera.customObjectLockedPoint {
+        let rotate90 = camera.isLandscapeMode && !(size.width > size.height)
+        if let tracked = camera.trackedObjectRect {
+            let boxW = max(110, tracked.width * size.width)
+            let boxH = max(136, tracked.height * size.height)
+            trackingReticleBox(
+                center: CGPoint(x: tracked.midX * size.width, y: tracked.midY * size.height),
+                size: CGSize(width: boxW, height: boxH),
+                badgeText: "Đang bám • \(camera.customObjectLabel)",
+                iconName: targetIconName(camera.aiTargetMode),
+                rotate90: rotate90
+            ) {
+                camera.clearLockedObject()
+            }
+        } else if let lockedPt = camera.customObjectLockedPoint {
             let boxW: CGFloat = camera.aiTargetMode == .object ? 148 : 172
             let boxH: CGFloat = camera.aiTargetMode == .object ? 148 : 206
             trackingReticleBox(
                 center: CGPoint(x: lockedPt.x * size.width, y: lockedPt.y * size.height),
                 size: CGSize(width: boxW, height: boxH),
                 badgeText: "Đang bám • \(camera.customObjectLabel)",
-                iconName: targetIconName(camera.aiTargetMode)
+                iconName: targetIconName(camera.aiTargetMode),
+                rotate90: rotate90
             ) {
                 camera.clearLockedObject()
             }
@@ -338,7 +370,8 @@ struct CameraStudioNativeView: View {
                 center: CGPoint(x: face.midX * size.width, y: face.midY * size.height),
                 size: CGSize(width: boxW, height: boxH),
                 badgeText: "Đang bám • AI 60fps",
-                iconName: "person.crop.viewfinder"
+                iconName: "person.crop.viewfinder",
+                rotate90: rotate90
             ) {
                 camera.aiTrackingEnabled = false
             }
@@ -350,7 +383,7 @@ struct CameraStudioNativeView: View {
                 .padding(.vertical, 6)
                 .background(glassPillBackground(cornerRadius: 14))
                 .position(x: size.width * 0.5, y: size.height * 0.42)
-                .rotationEffect(.degrees(camera.isLandscapeMode ? 90 : 0))
+                .rotationEffect(.degrees(rotate90 ? 90 : 0))
                 .allowsHitTesting(false)
         }
     }
@@ -360,6 +393,7 @@ struct CameraStudioNativeView: View {
         size boxSize: CGSize,
         badgeText: String,
         iconName: String,
+        rotate90: Bool,
         onClear: @escaping () -> Void
     ) -> some View {
         ZStack {
@@ -409,10 +443,10 @@ struct CameraStudioNativeView: View {
                 }
                 .buttonStyle(.plain)
             }
-            .rotationEffect(.degrees(camera.isLandscapeMode ? 90 : 0))
+            .rotationEffect(.degrees(rotate90 ? 90 : 0))
             .offset(
-                x: camera.isLandscapeMode ? (boxSize.width * 0.5 + 24) : 0,
-                y: camera.isLandscapeMode ? 0 : -(boxSize.height * 0.5 + 22)
+                x: rotate90 ? (boxSize.width * 0.5 + 24) : 0,
+                y: rotate90 ? 0 : -(boxSize.height * 0.5 + 22)
             )
         }
         .position(center)
@@ -421,6 +455,7 @@ struct CameraStudioNativeView: View {
     private func motionlapsePathOverlay(size: CGSize) -> some View {
         let ptA = CGPoint(x: camera.motionlapsePointA.x * size.width, y: camera.motionlapsePointA.y * size.height)
         let ptB = CGPoint(x: camera.motionlapsePointB.x * size.width, y: camera.motionlapsePointB.y * size.height)
+        let rotate90 = camera.isLandscapeMode && !(size.width > size.height)
 
         return ZStack {
             if camera.motionlapseHasPointB {
@@ -432,7 +467,7 @@ struct CameraStudioNativeView: View {
                 .allowsHitTesting(false)
             }
 
-            motionlapseHandle(letter: "A", point: ptA)
+            motionlapseHandle(letter: "A", point: ptA, rotate90: rotate90)
                 .gesture(
                     DragGesture(minimumDistance: 0)
                         .onChanged { value in
@@ -441,7 +476,7 @@ struct CameraStudioNativeView: View {
                 )
 
             if camera.motionlapseHasPointB {
-                motionlapseHandle(letter: "B", point: ptB)
+                motionlapseHandle(letter: "B", point: ptB, rotate90: rotate90)
                     .gesture(
                         DragGesture(minimumDistance: 0)
                             .onChanged { value in
@@ -452,14 +487,14 @@ struct CameraStudioNativeView: View {
         }
     }
 
-    private func motionlapseHandle(letter: String, point: CGPoint) -> some View {
+    private func motionlapseHandle(letter: String, point: CGPoint, rotate90: Bool) -> some View {
         Text(letter)
             .font(.system(size: 11, weight: .heavy))
             .foregroundColor(goldAccent)
             .frame(width: 24, height: 24)
             .background(Circle().fill(Color.black.opacity(0.55)))
             .overlay(Circle().stroke(goldAccent, lineWidth: 1.6))
-            .rotationEffect(.degrees(camera.isLandscapeMode ? 90 : 0))
+            .rotationEffect(.degrees(rotate90 ? 90 : 0))
             .position(point)
     }
 
@@ -1000,7 +1035,7 @@ struct CameraStudioNativeView: View {
 
     @ViewBuilder
     private func transientPanelSlot(isLandscape: Bool, maxHeight: CGFloat) -> some View {
-        if showAspectBar {
+        if showAspectBar && !camera.isRecording {
             ScrollView(.horizontal, showsIndicators: false) {
                 AspectRatioPickerBar(
                     selectedRatio: camera.selectedAspectRatio,
@@ -1052,40 +1087,48 @@ struct CameraStudioNativeView: View {
     private var utilityPillRow: some View {
         HStack(spacing: 8) {
             // Instant Aspect Ratio chip (Works directly in BOTH Basic & Pro)
-            Button {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                withAnimation(.easeInOut(duration: 0.2)) {
-                    let next = !showAspectBar
-                    closeTransientOverlays()
-                    showAspectBar = next
-                }
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "aspectratio")
-                        .font(.system(size: 10.5, weight: .bold))
-                    Text(camera.selectedAspectRatio)
-                        .font(.system(size: 11, weight: .bold, design: .monospaced))
-                }
-                .foregroundColor(camera.selectedAspectRatio != "9:16" ? .black : hudPrimaryInk)
-                .padding(.horizontal, 10)
-                .frame(height: 26)
-                .background(
-                    Group {
-                        if camera.selectedAspectRatio != "9:16" {
-                            Capsule().fill(goldAccent)
-                        } else {
-                            glassPillBackground(cornerRadius: 13)
+                Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    guard !camera.isRecording else {
+                        ble.showToast("Không thể đổi tỉ lệ khung hình khi đang ghi")
+                        return
+                    }
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        let next = !showAspectBar
+                        closeTransientOverlays()
+                        showAspectBar = next
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "aspectratio")
+                            .font(.system(size: 10.5, weight: .bold))
+                        Text(camera.selectedAspectRatio)
+                            .font(.system(size: 11, weight: .bold, design: .monospaced))
+                    }
+                    .foregroundColor(camera.selectedAspectRatio != "9:16" ? .black : hudPrimaryInk)
+                    .padding(.horizontal, 10)
+                    .frame(height: 26)
+                    .background(
+                        Group {
+                            if camera.selectedAspectRatio != "9:16" {
+                                Capsule().fill(goldAccent)
+                            } else {
+                                glassPillBackground(cornerRadius: 13)
+                            }
                         }
-                    }
+                    )
+                    .opacity(camera.isRecording ? 0.45 : 1.0)
+                }
+                .buttonStyle(.plain)
+                .disabled(camera.isRecording)
+                .simultaneousGesture(
+                    LongPressGesture(minimumDuration: 0.45)
+                        .onEnded { _ in
+                            if !camera.isRecording {
+                                camera.setAspectRatio("9:16")
+                            }
+                        }
                 )
-            }
-            .buttonStyle(.plain)
-            .simultaneousGesture(
-                LongPressGesture(minimumDuration: 0.45)
-                    .onEnded { _ in
-                        camera.setAspectRatio("9:16")
-                    }
-            )
 
             // Compact AI Target Selector pill
             Button {
@@ -1719,7 +1762,7 @@ struct CameraStudioNativeView: View {
 
     // MARK: - Top Banners (Touch Lock + BLE Toast)
 
-    private var floatingTopBanners: some View {
+    private func floatingTopBanners(isLandscape: Bool) -> some View {
         VStack(spacing: 8) {
             if camera.touchLockEnabled {
                 Button {
@@ -1738,7 +1781,7 @@ struct CameraStudioNativeView: View {
                     .background(Capsule().fill(goldAccent))
                     .shadow(color: Color.black.opacity(0.25), radius: 6, y: 2)
                 }
-                .padding(.top, camera.isLandscapeMode ? 14 : 62)
+                .padding(.top, isLandscape ? 14 : 62)
             }
 
             if let toast = ble.hudToastMessage {
@@ -1749,7 +1792,7 @@ struct CameraStudioNativeView: View {
                     .padding(.vertical, 7)
                     .background(glassPillBackground(cornerRadius: 16))
                     .overlay(Capsule().stroke(goldAccent.opacity(0.65), lineWidth: 0.8))
-                    .padding(.top, camera.touchLockEnabled ? 0 : (camera.isLandscapeMode ? 12 : 44))
+                    .padding(.top, camera.touchLockEnabled ? 0 : (isLandscape ? 12 : 44))
                     .transition(.opacity.combined(with: .move(edge: .top)))
             }
 

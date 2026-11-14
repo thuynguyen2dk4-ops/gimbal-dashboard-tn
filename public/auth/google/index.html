@@ -1,345 +1,370 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đăng nhập – Tài khoản Google</title>
-  <link rel="icon" href="https://www.google.com/favicon.ico">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&subset=vietnamese&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng nhập bằng Google — T-FLOW Account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="/shared/catalog_store.js"></script>
   <style>
-    :root {
-      --font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    }
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: var(--font);
-      font-kerning: normal;
-      text-rendering: optimizeLegibility;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      letter-spacing: 0;
-      line-height: 1.55;
-      background: #F8F9FA;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #F0F4F9;
       color: #1F1F1F;
+      min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 16px;
+      padding: 24px 16px;
     }
-    .google-card {
+    .oauth-card {
       background: #FFFFFF;
-      border: 1px solid #DADCE0;
-      border-radius: 28px;
       width: 100%;
-      max-width: 440px;
-      padding: 40px 36px 36px 36px;
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+      max-width: 460px;
+      border-radius: 24px;
+      padding: 40px 36px 32px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+      border: 1px solid #E3E7ED;
+      text-align: center;
     }
-    .google-logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 20px;
-    }
-    h1 {
-      font-size: 24px;
-      font-weight: 700;
-      line-height: 1.3;
-      letter-spacing: 0;
-      margin-bottom: 8px;
-      color: #1F1F1F;
-    }
-    .sub-text {
-      font-size: 14px;
-      color: #444746;
-      line-height: 1.4;
-      margin-bottom: 28px;
-    }
-    .sub-text strong {
-      color: #1F1F1F;
-    }
-    .input-group {
-      margin-bottom: 18px;
-      position: relative;
-    }
-    .input-label {
-      font-size: 12px;
-      color: #444746;
-      font-weight: 500;
-      margin-bottom: 6px;
-      display: block;
-    }
-    .google-input {
-      width: 100%;
-      padding: 14px 16px;
-      border: 1px solid #747775;
-      border-radius: 4px;
-      font-size: 15px;
-      color: #1F1F1F;
-      background: transparent;
-      outline: none;
-      transition: all 0.2s ease;
-      font-family: inherit;
-    }
-    .google-input:focus {
-      border-color: #0B57D0;
-      border-width: 2px;
-      padding: 13px 15px;
-    }
-    .input-error-msg {
-      font-size: 12px;
-      color: #B3261E;
-      margin-top: 5px;
-      display: none;
-      align-items: center;
-      gap: 4px;
-    }
-    .toggle-pass-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin: 10px 0 24px 0;
-      font-size: 13.5px;
-      color: #444746;
-      cursor: pointer;
-    }
-    .toggle-pass-row input {
-      width: 16px;
-      height: 16px;
-      accent-color: #0B57D0;
-      cursor: pointer;
-    }
-    .disclaimer {
-      font-size: 12.5px;
-      color: #444746;
-      line-height: 1.5;
-      margin-bottom: 28px;
-    }
-    .disclaimer a {
-      color: #0B57D0;
-      text-decoration: none;
-    }
-    .btn-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
-    .btn-create-acc {
-      background: none;
-      border: none;
-      color: #0B57D0;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      padding: 8px 12px;
-      border-radius: 99px;
-      font-family: inherit;
-    }
-    .btn-create-acc:hover {
-      background: rgba(11, 87, 208, 0.08);
-    }
-    .btn-next {
-      background: #0B57D0;
-      color: #FFFFFF;
-      border: none;
-      padding: 10px 24px;
-      border-radius: 99px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      font-family: inherit;
+    .brand-row {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
-      transition: background 0.2s ease;
+      gap: 10px;
+      margin-bottom: 18px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #1D1D1F;
     }
-    .btn-next:hover {
-      background: #0842A0;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: #1D1D1F;
+      color: #FFFFFF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
     }
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255,255,255,0.4);
-      border-top-color: #FFF;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
+    h1 {
+      font-size: 23px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #1F1F1F;
+      margin-bottom: 8px;
+    }
+    .subtitle {
+      font-size: 14px;
+      color: #444746;
+      line-height: 1.5;
+      margin-bottom: 26px;
+    }
+    .gis-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 20px 16px;
+      border-radius: 16px;
+      background: #F8FAFD;
+      border: 1px solid #E1E5EB;
+      margin-bottom: 16px;
+    }
+    .btn-oauth-fallback {
+      width: 100%;
+      min-height: 44px;
+      border-radius: 999px;
+      border: 1px solid #D2D5DB;
+      background: #FFFFFF;
+      color: #1F1F1F;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px 18px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-oauth-fallback:hover { background: #F3F6FA; border-color: #B4BCC8; }
+    .status-box {
       display: none;
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: left;
     }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    .status-box.error {
+      display: block;
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      color: #991B1B;
+    }
+    .status-box.success {
+      display: block;
+      background: #ECFDF5;
+      border: 1px solid #A7F3D0;
+      color: #065F46;
+    }
+    .status-box.info {
+      display: block;
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      color: #1E40AF;
+    }
+    .meta-note {
+      font-size: 12px;
+      color: #6E6E73;
+      line-height: 1.5;
+      margin-top: 16px;
     }
     .footer-links {
+      margin-top: 20px;
       display: flex;
-      justify-content: space-between;
-      max-width: 440px;
-      width: 100%;
-      margin: 16px auto 0 auto;
+      justify-content: center;
+      gap: 18px;
       font-size: 12px;
-      color: #444746;
-      padding: 0 12px;
+      color: #5F6368;
     }
     .footer-links a {
       color: #444746;
       text-decoration: none;
-      margin-left: 14px;
+      font-weight: 500;
     }
-    .footer-links a:hover {
-      color: #1F1F1F;
+    .footer-links a:hover { text-decoration: underline; }
+    .back-link {
+      display: inline-block;
+      margin-top: 14px;
+      font-size: 13px;
+      color: #0B57D0;
+      font-weight: 600;
+      text-decoration: none;
     }
+    .back-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
-
-  <div>
-    <div class="google-card">
-      <!-- GOOGLE SVG LOGO -->
-      <div class="google-logo">
-        <svg width="40" height="40" viewBox="0 0 48 48">
-          <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-          <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-          <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-          <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-          <path fill="none" d="M0 0h48v48H0z"/>
-        </svg>
-      </div>
-
-      <h1>Đăng nhập</h1>
-      <div class="sub-text">Tiếp tục tới <strong>T-Flow ID</strong></div>
-
-      <form id="googleAuthForm" onsubmit="handleGoogleSubmit(event)">
-        <!-- EMAIL FIELD -->
-        <div class="input-group">
-          <label class="input-label" for="googleEmail">Email Google</label>
-          <input type="email" id="googleEmail" class="google-input" placeholder="name@gmail.com" autofocus autocomplete="username" required>
-          <div class="input-error-msg" id="emailError">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#B3261E"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-            <span id="emailErrorText">Vui lòng nhập email Google hợp lệ.</span>
-          </div>
-        </div>
-
-        <!-- PASSWORD FIELD -->
-        <div class="input-group" id="passGroup">
-          <label class="input-label" for="googlePassword">Mật khẩu</label>
-          <input type="password" id="googlePassword" class="google-input" placeholder="Mật khẩu" autocomplete="current-password" required>
-          <div class="input-error-msg" id="passError">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#B3261E"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-            <span>Vui lòng nhập mật khẩu (tối thiểu 6 ký tự).</span>
-          </div>
-        </div>
-
-        <label class="toggle-pass-row">
-          <input type="checkbox" id="showPassCheckbox" onchange="togglePasswordVisibility()">
-          <span>Hiện mật khẩu</span>
-        </label>
-
-        <div class="disclaimer">
-          Google xác thực email &amp; ảnh đại diện để đăng nhập <strong>T-Flow</strong>.
-        </div>
-
-        <div class="btn-row">
-          <button type="button" class="btn-create-acc" onclick="alert('Vui lòng tạo tài khoản tại accounts.google.com')">Tạo tài khoản</button>
-          <button type="submit" class="btn-next" id="btnNext">
-            <span class="spinner" id="btnSpinner"></span>
-            <span id="btnText">Tiếp theo</span>
-          </button>
-        </div>
-      </form>
+  <main class="oauth-card">
+    <div class="brand-row">
+      <span class="brand-mark">T</span>
+      <span>T-FLOW Ecosystem</span>
     </div>
+    <h1>Đăng nhập bằng Google</h1>
+    <p class="subtitle">
+      Xác thực trực tiếp qua <strong>Google Identity Services (OAuth 2.0)</strong>.<br />
+      Dữ liệu tài khoản đồng bộ thời gian thực giữa Web và iOS App.
+    </p>
+
+    <div class="gis-box">
+      <div id="googleButtonContainer" style="min-height:44px;display:flex;align-items:center;justify-content:center;"></div>
+      <button type="button" class="btn-oauth-fallback" id="googleTokenBtn" onclick="startGoogleOAuthPopup()">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.37 24 12 24Z"/>
+          <path fill="#FBBC05" d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14Z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96Z"/>
+        </svg>
+        Tiếp tục với tài khoản Google của bạn
+      </button>
+    </div>
+
+    <div id="oauthStatus" class="status-box" role="status"></div>
+
+    <p class="meta-note">
+      T-FLOW không bao giờ yêu cầu nhập mật khẩu Google trực tiếp trên trang web này.
+      Mọi phiên đăng nhập đều xác thực qua Google Cloud OAuth 2.0 chính thức.
+    </p>
+
+    <a href="/account/" id="returnLink" class="back-link">&larr; Quay lại Cổng Khách Hàng</a>
 
     <div class="footer-links">
-      <div>Tiếng Việt</div>
-      <div>
-        <a href="#">Trợ giúp</a>
-        <a href="#">Bảo mật</a>
-        <a href="#">Điều khoản</a>
-      </div>
+      <a href="/account/#privacy">Quyền riêng tư</a>
+      <a href="/account/#terms">Điều khoản dịch vụ</a>
+      <a href="/">Trang chủ T-FLOW</a>
     </div>
-  </div>
+  </main>
 
   <script>
-    function togglePasswordVisibility() {
-      const chk = document.getElementById('showPassCheckbox');
-      const pass = document.getElementById('googlePassword');
-      pass.type = chk.checked ? 'text' : 'password';
+    var FALLBACK_CLIENT_ID = '725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com';
+
+    function getClientId() {
+      if (window.SmartGimbalCatalog && typeof window.SmartGimbalCatalog.getGoogleOAuthClientId === 'function') {
+        return window.SmartGimbalCatalog.getGoogleOAuthClientId() || FALLBACK_CLIENT_ID;
+      }
+      return FALLBACK_CLIENT_ID;
     }
 
-    function handleGoogleSubmit(e) {
-      e.preventDefault();
-      const emailInput = document.getElementById('googleEmail');
-      const passInput = document.getElementById('googlePassword');
-      const emailErr = document.getElementById('emailError');
-      const emailErrText = document.getElementById('emailErrorText');
-      const passErr = document.getElementById('passError');
+    function getSafeRedirectUrl() {
+      var params = new URLSearchParams(window.location.search);
+      var raw = params.get('redirect') || '/account/';
+      if (raw.charAt(0) === '/' && raw.indexOf('//') !== 0) {
+        return raw;
+      }
+      return '/account/';
+    }
 
-      emailErr.style.display = 'none';
-      passErr.style.display = 'none';
+    document.getElementById('returnLink').href = getSafeRedirectUrl();
 
-      const email = emailInput.value.trim();
-      const pass = passInput.value;
+    function showStatus(type, msg) {
+      var box = document.getElementById('oauthStatus');
+      box.className = 'status-box ' + type;
+      box.textContent = msg;
+    }
 
-      if (!email || !email.includes('@')) {
-        emailErrText.textContent = 'Vui lòng nhập địa chỉ email Google hợp lệ.';
-        emailErr.style.display = 'flex';
-        emailInput.focus();
+    function decodeJwtPayload(jwtToken) {
+      var parts = String(jwtToken || '').split('.');
+      if (parts.length < 2) throw new Error('Token Google không hợp lệ.');
+      var b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+      while (b64.length % 4) b64 += '=';
+      var binStr = atob(b64);
+      var bytes = new Uint8Array(binStr.length);
+      for (var i = 0; i < binStr.length; i++) {
+        bytes[i] = binStr.charCodeAt(i);
+      }
+      var jsonStr = typeof TextDecoder !== 'undefined'
+        ? new TextDecoder('utf-8').decode(bytes)
+        : decodeURIComponent(escape(binStr));
+      return JSON.parse(jsonStr);
+    }
+
+    function finishVerifiedGoogleSignIn(email, displayName, pictureUrl) {
+      if (!email) {
+        showStatus('error', 'Không nhận được địa chỉ Email từ Google OAuth.');
         return;
       }
+      showStatus('info', 'Đang đồng bộ tài khoản ' + email + ' với T-FLOW Cloud...');
+      var catalog = window.SmartGimbalCatalog;
+      var syncPromise = (catalog && typeof catalog.loginWithGmailAsync === 'function')
+        ? catalog.loginWithGmailAsync(email, displayName, { authProvider: 'google', avatarUrl: pictureUrl || '' })
+        : Promise.resolve(catalog ? catalog.loginWithGmail(email, displayName, { authProvider: 'google', avatarUrl: pictureUrl || '' }) : { success: true });
 
-      if (!pass || pass.length < 6) {
-        passErr.style.display = 'flex';
-        passInput.focus();
-        return;
-      }
-
-      // Show Google loading spinner
-      const btn = document.getElementById('btnNext');
-      const spinner = document.getElementById('btnSpinner');
-      const btnText = document.getElementById('btnText');
-      btn.disabled = true;
-      spinner.style.display = 'inline-block';
-      btnText.textContent = 'Đang xác thực...';
-
-      setTimeout(() => {
-        // Derive display name from email (e.g. "thuynguyen2dk4" -> "Thuy Nguyen")
-        let displayName = email.split('@')[0];
-        if (email.toLowerCase().includes('thuynguyen')) {
-          displayName = 'Thuy Nguyen';
-        } else {
-          displayName = displayName.replace(/[._0-9]/g, ' ').trim();
-          displayName = displayName.charAt(0).toUpperCase() + displayName.slice(1);
-        }
-
-        const authPayload = {
-          type: 'GOOGLE_OAUTH_SUCCESS',
-          user: {
-            email: email,
-            name: displayName,
-            avatar: email.charAt(0).toUpperCase(),
-            provider: 'google'
-          }
+      syncPromise.then(function (res) {
+        var payload = {
+          type: 'TFLOW_GOOGLE_AUTH_SUCCESS',
+          verified: true,
+          email: email,
+          name: (res && res.user && res.user.name) || displayName || email.split('@')[0],
+          picture: pictureUrl || '',
+          user: (res && res.user) || null
         };
-
-        // Post message to opener window
         if (window.opener && !window.opener.closed) {
-          window.opener.postMessage(authPayload, '*');
-          window.close();
-        } else {
-          // If opened directly without opener, save to localStorage and redirect
           try {
-            localStorage.setItem('tflow_google_auth_redirect_user', JSON.stringify(authPayload.user));
-          } catch(err) {}
-          window.location.href = '/';
+            window.opener.postMessage(payload, window.location.origin);
+          } catch (e) {}
+          showStatus('success', 'Đăng nhập Google thành công! Đang chuyển về trang gốc...');
+          setTimeout(function () { window.close(); }, 350);
+        } else {
+          showStatus('success', 'Đăng nhập thành công! Đang chuyển hướng...');
+          setTimeout(function () {
+            window.location.href = getSafeRedirectUrl();
+          }, 350);
         }
-      }, 750);
+      });
     }
+
+    function handleGoogleCredential(response) {
+      try {
+        var claims = decodeJwtPayload(response && response.credential);
+        if (!claims || !claims.email) {
+          showStatus('error', 'Google không trả về thông tin email hợp lệ.');
+          return;
+        }
+        finishVerifiedGoogleSignIn(claims.email, claims.name || '', claims.picture || '');
+      } catch (err) {
+        showStatus('error', 'Lỗi giải mã Google ID Token: ' + (err && err.message ? err.message : String(err)));
+      }
+    }
+
+    function startGoogleOAuthPopup() {
+      if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) {
+        showStatus('error', 'Thư viện Google Identity Services chưa tải xong hoặc bị chặn mạng. Vui lòng thử lại hoặc kiểm tra nguồn: ' + window.location.origin);
+        return;
+      }
+      try {
+        var tokenClient = window.google.accounts.oauth2.initTokenClient({
+          client_id: getClientId(),
+          scope: 'openid email profile',
+          callback: function (tokenResponse) {
+            if (tokenResponse && tokenResponse.error) {
+              showStatus('error', 'Google OAuth trả về lỗi: ' + tokenResponse.error + '. Đảm bảo origin "' + window.location.origin + '" đã được thêm vào Authorized JavaScript Origins trên Google Cloud Console.');
+              return;
+            }
+            if (!tokenResponse || !tokenResponse.access_token) {
+              showStatus('error', 'Không nhận được Access Token từ Google.');
+              return;
+            }
+            fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { 'Authorization': 'Bearer ' + tokenResponse.access_token }
+            })
+              .then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+              })
+              .then(function (profile) {
+                finishVerifiedGoogleSignIn(profile.email, profile.name || '', profile.picture || '');
+              })
+              .catch(function (err) {
+                showStatus('error', 'Không thể lấy hồ sơ từ Google UserInfo: ' + (err && err.message ? err.message : String(err)));
+              });
+          }
+        });
+        tokenClient.requestAccessToken({ prompt: 'select_account' });
+      } catch (e) {
+        showStatus('error', 'Không thể khởi tạo Google OAuth cho origin ' + window.location.origin + ': ' + (e && e.message ? e.message : String(e)));
+      }
+    }
+
+    function initGoogleSdk() {
+      if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+        return false;
+      }
+      try {
+        window.google.accounts.id.initialize({
+          client_id: getClientId(),
+          callback: handleGoogleCredential,
+          auto_select: false
+        });
+        var btnEl = document.getElementById('googleButtonContainer');
+        if (btnEl) {
+          window.google.accounts.id.renderButton(btnEl, {
+            theme: 'outline',
+            size: 'large',
+            shape: 'pill',
+            text: 'signin_with',
+            locale: 'vi',
+            width: 340
+          });
+        }
+        return true;
+      } catch (err) {
+        showStatus('error', 'Không thể cấu hình Google Sign-In tại ' + window.location.origin + '. Hãy kiểm tra Authorized JavaScript Origins trong Google Cloud Console.');
+        return false;
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+      var attempts = 0;
+      var timer = setInterval(function () {
+        attempts++;
+        if (initGoogleSdk() || attempts >= 25) {
+          clearInterval(timer);
+          if (attempts >= 25 && (!window.google || !window.google.accounts)) {
+            showStatus('info', 'Nếu nút Google chính thức chưa xuất hiện, bạn có thể nhấn "Tiếp tục với tài khoản Google của bạn" bên trên hoặc kiểm tra kết nối Google Accounts.');
+          }
+        }
+      }, 200);
+    });
   </script>
 </body>
 </html>

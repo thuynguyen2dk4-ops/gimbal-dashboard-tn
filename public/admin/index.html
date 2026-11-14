@@ -435,6 +435,11 @@
       gap: 14px;
       margin-bottom: 14px;
     }
+    @media (max-width: 600px) {
+      .form-row-2, .form-row-3 {
+        grid-template-columns: 1fr;
+      }
+    }
     .form-group {
       margin-bottom: 14px;
     }
@@ -958,6 +963,7 @@
     .admin-nav-item.active {
       background: #1D1D1F;
       color: #FFFFFF;
+      font-weight: 700;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
@@ -1198,24 +1204,25 @@
       <div style="font-size:24px; font-weight:700; letter-spacing:0; line-height:1.3; color:#1D1D1F; margin-bottom:6px;">t-flow console</div>
       <div style="font-size:12px; font-weight:600; color:#6B7280; margin-bottom:24px;">Trung tâm quản trị T-Flow</div>
 
-      <div style="background:#F5F5F7; border-radius:14px; padding:16px 18px; margin-bottom:22px; text-align:left;">
-        <div style="font-size:11.5px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:4px;">Phân Quyền Gmail</div>
-        <div style="font-size:13.5px; color:#1D1D1F; line-height:1.5;">Chỉ tài khoản Master Admin <strong>thuynguyen2dk4@gmail.com</strong> được phép truy cập.</div>
+      <div style="background:#F5F5F7; border-radius:14px; padding:14px 16px; margin-bottom:18px; text-align:left;">
+        <div style="font-size:11.5px; font-weight:700; color:#0071E3; text-transform:uppercase; margin-bottom:4px;">Xác Thực Quản Trị Viên</div>
+        <div style="font-size:13px; color:#1D1D1F; line-height:1.5;">Chỉ tài khoản quản trị được cấp quyền (<strong>thuynguyen2dk4@gmail.com</strong>) mới có thể đăng nhập thông qua Google OAuth 2.0 hoặc mật khẩu đã xác thực.</div>
       </div>
 
-      <!-- 1-Click Google Admin Button -->
-      <button onclick="adminLoginWithOneClick('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; display:flex; align-items:center; justify-content:center; gap:12px; padding:14px 20px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14.5px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.15); transition:transform 0.2s, background 0.2s; margin-bottom:14px;">
+      <!-- Real Google OAuth Button -->
+      <button type="button" onclick="startAdminGoogleOAuth()" style="width:100%; display:flex; align-items:center; justify-content:center; gap:12px; padding:13px 20px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14.5px; font-weight:700; cursor:pointer; box-shadow:0 4px 16px rgba(0,0,0,0.15); margin-bottom:16px;">
         <svg width="20" height="20" viewBox="0 0 24 24" style="background:#FFF; border-radius:50%; padding:2px;"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/></svg>
-        Đăng nhập với thuynguyen2dk4@gmail.com
+        Đăng nhập với Google (OAuth 2.0)
       </button>
 
-      <!-- Custom Gmail input toggle -->
-      <div style="font-size:12.5px; color:#86868B; margin-bottom:14px;">- hoặc đăng nhập bằng tài khoản khác -</div>
-      
-      <div style="display:flex; gap:8px; margin-bottom:20px;">
-        <input type="email" id="customGmailInput" placeholder="nhap.email@gmail.com" style="flex:1; padding:10px 14px; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-family:inherit; outline:none;">
-        <button onclick="adminLoginWithCustomGmail()" style="padding:10px 16px; background:#F5F5F7; border:1px solid #D2D2D7; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;">Xác nhận</button>
-      </div>
+      <div style="font-size:12px; color:#86868B; margin-bottom:12px;">- hoặc đăng nhập bằng Email &amp; Mật khẩu Admin -</div>
+
+      <form onsubmit="handleAdminPasswordLogin(event)" style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px; text-align:left;">
+        <input type="email" id="adminLoginEmail" required placeholder="Email quản trị viên" autocomplete="email" style="width:100%; padding:10px 14px; border:1px solid #D2D2D7; border-radius:10px; font-size:13.5px; font-family:inherit; outline:none;">
+        <input type="password" id="adminLoginPassword" required placeholder="Mật khẩu tài khoản" autocomplete="current-password" style="width:100%; padding:10px 14px; border:1px solid #D2D2D7; border-radius:10px; font-size:13.5px; font-family:inherit; outline:none;">
+        <div id="adminAuthError" style="display:none; font-size:12.5px; color:#DC2626; font-weight:600; line-height:1.4;"></div>
+        <button type="submit" style="width:100%; padding:11px 16px; background:#F5F5F7; border:1px solid #D2D2D7; border-radius:10px; font-size:13.5px; font-weight:700; color:#1D1D1F; cursor:pointer;">Xác thực &amp; Đăng nhập</button>
+      </form>
 
       <a href="/" style="font-size:13px; color:#6E6E73; text-decoration:none;">&larr; Quay lại Website Cửa Hàng</a>
     </div>
@@ -2647,12 +2654,13 @@
           </button>
         </div>`;
 
+        const canDelete = (p.id !== 'tf-g31-pro') && (catalog.products.length > 1);
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>
             <div style="display:flex; align-items:center; gap:12px;">
               <div class="prod-thumb-sm">
-                <img src="${p.img || '/shared/img/tflow_pro_main.png'}" alt="${p.name}">
+                <img src="${escAttr(p.img || '/shared/img/tflow_pro_main.png')}" alt="${escAttr(p.name)}">
               </div>
               <div>
                 <div style="font-size:14.5px; font-weight:700;">${sanitizeHtml(p.name)}</div>
@@ -2666,15 +2674,17 @@
           <td>
             <div>
               <b style="font-family:var(--font-mono); font-size:15px;">${(p.totalOrders || 0).toLocaleString('vi-VN')}</b> đơn
-              <div style="font-size:11.5px; color:var(--green); font-weight:600;">${p.orderGrowth || '+15%'}</div>
+              <div style="font-size:11.5px; color:var(--green); font-weight:600;">${sanitizeHtml(p.orderGrowth || 'Dữ liệu thực')}</div>
             </div>
           </td>
           <td>${tiersListHtml}</td>
           <td style="text-align:right;">
             <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-end;">
-              ${!isMvp ? `<button class="btn btn-outline" style="padding:4px 10px; font-size:11.5px;" onclick="pinMvpProduct('${p.id}')">Ghim MVP</button>` : ''}
-              <button class="btn btn-outline" style="padding:4px 10px; font-size:11.5px;" onclick="editProduct('${p.id}')">Sửa Bài</button>
-              <button class="btn btn-outline" style="padding:4px 10px; font-size:11.5px; color:#DC3545;" onclick="deleteProduct('${p.id}')">Xóa</button>
+              ${!isMvp ? `<button class="btn btn-outline" style="padding:4px 10px; font-size:11.5px;" data-pid="${escAttr(p.id)}" onclick="pinMvpProduct(this.dataset.pid)">Ghim MVP</button>` : ''}
+              <button class="btn btn-outline" style="padding:4px 10px; font-size:11.5px;" data-pid="${escAttr(p.id)}" onclick="editProduct(this.dataset.pid)">Sửa Bài</button>
+              ${canDelete
+                ? `<button class="btn btn-outline" style="padding:4px 10px; font-size:11.5px; color:#DC3545;" data-pid="${escAttr(p.id)}" onclick="deleteProduct(this.dataset.pid)">Xóa</button>`
+                : `<button class="btn btn-outline" style="padding:4px 10px; font-size:11.5px; color:#9CA3AF; cursor:not-allowed;" disabled title="Sản phẩm chủ lực duy nhất không thể xóa">Cố định</button>`}
             </div>
           </td>
         `;
@@ -2691,9 +2701,17 @@
     }
 
     function deleteProduct(productId) {
+      if (productId === 'tf-g31-pro' || (catalog.products && catalog.products.length <= 1)) {
+        showToast('Không thể xóa sản phẩm chủ lực duy nhất (T-Flow Pro).');
+        return;
+      }
       const prod = SmartGimbalCatalog.getProduct(productId);
       if (confirm(`Bạn có chắc chắn muốn xóa bài đăng [${prod ? prod.name : productId}]?`)) {
-        SmartGimbalCatalog.deleteProduct(productId);
+        const deleted = SmartGimbalCatalog.deleteProduct(productId);
+        if (!deleted) {
+          showToast('Không thể xóa sản phẩm chủ lực (T-Flow Pro).');
+          return;
+        }
         loadCatalog();
         renderAll();
         showToast('Đã xóa bài đăng');
@@ -3280,25 +3298,26 @@
       const users = SmartGimbalCatalog.getUsers();
       users.forEach(u => {
         const activeCount = (u.modules || []).filter(Boolean).length;
-        const devTitle = u.device || u.registeredDevice || 'Smart Gimbal S1 Titanium';
+        const rawDev = u.device || u.registeredDevice || '';
+        const devTitle = (rawDev && rawDev !== 'Smart Gimbal S1 Titanium') ? rawDev : 'Chưa kết nối thiết bị';
         const serialText = u.serial || 'Chưa kích hoạt';
-        const batText = (typeof u.battery === 'number') ? `${u.battery}%` : '98%';
-        const fwText = u.firmware || 'v2.4.2';
+        const batText = (typeof u.battery === 'number' && u.battery > 0) ? `${u.battery}%` : '--';
+        const fwText = u.firmware || 'Chưa cập nhật';
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><b style="font-size:14px;">${u.name}</b></td>
+          <td><b style="font-size:14px;">${sanitizeHtml(u.name || 'T-FLOW User')}</b></td>
           <td>
-            <div>${u.email}</div>
-            <div style="font-size:11.5px; color:var(--text-muted);">${u.phone || ''}</div>
+            <div>${sanitizeHtml(u.email || '')}</div>
+            <div style="font-size:11.5px; color:var(--text-muted);">${sanitizeHtml(u.phone || '')}</div>
           </td>
           <td>
-            <div style="font-size:13px; font-weight:600;">${devTitle}</div>
-            <div style="font-size:11.5px; color:var(--text-muted); font-family:monospace;">S/N: ${serialText} • Pin ${batText} • ${fwText}</div>
+            <div style="font-size:13px; font-weight:600;">${sanitizeHtml(devTitle)}</div>
+            <div style="font-size:11.5px; color:var(--text-muted); font-family:monospace;">S/N: ${sanitizeHtml(serialText)} • Pin ${sanitizeHtml(batText)} • ${sanitizeHtml(fwText)}</div>
           </td>
-          <td><span class="badge-mvp" style="background:#555;">${u.tier || 'Basic Creator'}</span></td>
+          <td><span class="badge-mvp" style="background:#555;">${sanitizeHtml(u.tier || 'Basic Creator')}</span></td>
           <td><b>${activeCount}/7</b> module kích hoạt</td>
           <td style="text-align:right;">
-            <button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" onclick="openUserDrawer('${u.id}')">Phân Quyền Module</button>
+            <button class="btn btn-outline" style="padding:4px 10px; font-size:12px;" data-uid="${escAttr(u.id)}" onclick="openUserDrawer(this.dataset.uid)">Phân Quyền Module</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -3309,7 +3328,8 @@
       const user = SmartGimbalCatalog.getUsers().find(u => u.id === userId);
       if (!user) return;
 
-      const devDisplay = user.device || user.registeredDevice || user.deviceName || 'Smart Gimbal S1 Titanium';
+      const rawDev = user.device || user.registeredDevice || user.deviceName || '';
+      const devDisplay = (rawDev && rawDev !== 'Smart Gimbal S1 Titanium') ? rawDev : 'Chưa kết nối thiết bị';
       document.getElementById('drawerUserId').value = user.id;
       document.getElementById('drawerUserName').textContent = user.name;
       document.getElementById('drawerUserEmail').textContent = `${user.email} • ${devDisplay}`;
@@ -3485,7 +3505,7 @@
         const avaEl = document.getElementById('adminSidebarAvatar');
         if (avaEl) {
           if (user.avatar && (user.avatar.startsWith('data:image') || user.avatar.startsWith('http'))) {
-            avaEl.innerHTML = `<img src="${user.avatar}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block;">`;
+            avaEl.innerHTML = `<img src="${escAttr(user.avatar)}" alt="Avatar" style="width:100%; height:100%; object-fit:cover; display:block;">`;
           } else {
             avaEl.textContent = user.avatar || 'TN';
           }
@@ -3505,8 +3525,11 @@
                 Tài khoản <strong>${sanitizeHtml(user.email)}</strong> là tài khoản Khách Hàng, không có quyền truy cập Quản Trị Viên.<br><br>
                 Chỉ email <strong>thuynguyen2dk4@gmail.com</strong> mới có quyền quản trị T-Flow.
               </div>
-              <button onclick="adminLoginWithOneClick('thuynguyen2dk4@gmail.com', 'Thuy Nguyen')" style="width:100%; padding:14px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:12px;">
-                Chuyển sang tài khoản thuynguyen2dk4@gmail.com
+              <button type="button" onclick="startAdminGoogleOAuth()" style="width:100%; padding:14px; background:#1D1D1F; color:#FFF; border:none; border-radius:12px; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:10px;">
+                Đăng nhập Google bằng tài khoản Quản trị
+              </button>
+              <button type="button" onclick="handleAdminLogout()" style="width:100%; padding:11px; background:#F5F5F7; color:#1D1D1F; border:1px solid #D2D2D7; border-radius:12px; font-size:13px; font-weight:600; cursor:pointer; margin-bottom:12px;">
+                Đăng xuất tài khoản hiện tại
               </button>
               <a href="/" style="font-size:13px; color:#0071E3; text-decoration:none;">&larr; Về trang chủ mua hàng</a>
             </div>
@@ -3518,21 +3541,52 @@
       }
     }
 
-    function adminLoginWithOneClick(email, name) {
-      if (typeof SmartGimbalCatalog !== 'undefined') {
-        SmartGimbalCatalog.loginWithGmail(email, name);
-      }
-      checkAdminAccess();
+    function startAdminGoogleOAuth() {
+      const w = 480, h = 620;
+      const left = Math.max(0, (window.screen.width - w) / 2);
+      const top = Math.max(0, (window.screen.height - h) / 2);
+      window.open('/auth/google/?redirect=' + encodeURIComponent('/admin'), 'tflow_admin_google_oauth', `width=${w},height=${h},top=${top},left=${left},resizable=yes,scrollbars=yes`);
     }
 
-    function adminLoginWithCustomGmail() {
-      const email = (document.getElementById('customGmailInput').value || '').trim();
-      if (!email || !email.includes('@')) {
-        alert('Vui lòng nhập địa chỉ email hợp lệ!');
+    function handleAdminPasswordLogin(e) {
+      if (e) e.preventDefault();
+      const email = (document.getElementById('adminLoginEmail')?.value || '').trim();
+      const pw = (document.getElementById('adminLoginPassword')?.value || '');
+      const errBox = document.getElementById('adminAuthError');
+      if (errBox) { errBox.style.display = 'none'; errBox.textContent = ''; }
+      if (!email || !pw) {
+        if (errBox) { errBox.style.display = 'block'; errBox.textContent = 'Vui lòng nhập đầy đủ Email và Mật khẩu.'; }
         return;
       }
-      adminLoginWithOneClick(email);
+      const p = (typeof SmartGimbalCatalog.loginUserAsync === 'function')
+        ? SmartGimbalCatalog.loginUserAsync(email, pw)
+        : Promise.resolve(SmartGimbalCatalog.loginUser(email, pw));
+      p.then(res => {
+        if (!res || !res.success) {
+          if (errBox) { errBox.style.display = 'block'; errBox.textContent = (res && res.message) || 'Đăng nhập thất bại.'; }
+          return;
+        }
+        if (!res.isAdmin) {
+          if (errBox) { errBox.style.display = 'block'; errBox.textContent = 'Tài khoản này không có quyền Quản trị viên.'; }
+        }
+        checkAdminAccess();
+      });
     }
+
+    window.addEventListener('message', function(event) {
+      if (event.origin !== window.location.origin) return;
+      if (event.data && event.data.type === 'TFLOW_GOOGLE_AUTH_SUCCESS' && event.data.verified && event.data.email) {
+        if (typeof SmartGimbalCatalog !== 'undefined' && typeof SmartGimbalCatalog.loginWithGmailAsync === 'function') {
+          SmartGimbalCatalog.loginWithGmailAsync(event.data.email, event.data.name, {
+            authProvider: 'google',
+            avatarUrl: event.data.picture || ''
+          }).then(() => { checkAdminAccess(); renderAll(); });
+        } else {
+          checkAdminAccess();
+          renderAll();
+        }
+      }
+    });
 
     function handleAdminLogout() {
       if (typeof SmartGimbalCatalog !== 'undefined') {
@@ -3962,33 +4016,34 @@
 
         let adminCommentSnippet = '';
         if (c.adminComment) {
+          const safeComment = sanitizeHtml((c.adminComment || '').replace(/\n/g, ' ').substring(0, 85));
           adminCommentSnippet = `
             <div style="margin-top:5px; padding:4px 8px; background:rgba(0,113,227,0.08); border-left:3px solid #0071E3; border-radius:4px; font-size:11px; color:#0071E3; font-weight:600; line-height:1.35;">
-              💡 <strong>Góp ý của Admin:</strong> "${(c.adminComment || '').replace(/\n/g, ' ').substring(0, 85)}..."
+              💡 <strong>Góp ý của Admin:</strong> "${safeComment}..."
             </div>
           `;
         }
 
         html += `
           <tr>
-            <td style="font-size:12px; font-family:monospace; color:var(--text-secondary);">${timeStr}</td>
+            <td style="font-size:12px; font-family:monospace; color:var(--text-secondary);">${sanitizeHtml(timeStr)}</td>
             <td>${sourceBadge}</td>
             <td>
-              <div style="font-weight:700; font-size:12.5px;">${c.userName || 'Khách hàng'}</div>
-              <div style="font-size:11px; color:var(--text-secondary);">${c.userEmail || ''}</div>
+              <div style="font-weight:700; font-size:12.5px;">${sanitizeHtml(c.userName || 'Khách hàng')}</div>
+              <div style="font-size:11px; color:var(--text-secondary);">${sanitizeHtml(c.userEmail || '')}</div>
             </td>
             <td>
-              <div style="font-weight:600; font-size:13px; color:var(--text-main); line-height:1.4;">${c.query || ''}</div>
+              <div style="font-weight:600; font-size:13px; color:var(--text-main); line-height:1.4;">${sanitizeHtml(c.query || '')}</div>
             </td>
             <td>
               <div style="font-size:12.5px; color:var(--text-secondary); line-height:1.4; max-height:75px; overflow:hidden; text-overflow:ellipsis;">
-                ${(c.reply || '').replace(/\n/g, ' ')}
+                ${sanitizeHtml((c.reply || '').replace(/\n/g, ' '))}
               </div>
               ${adminCommentSnippet}
             </td>
             <td style="text-align:right;">
               <div>${statusBadge}</div>
-              <button class="btn btn-dark" onclick="openAdminCommentModal('${c.id}')" style="margin-top:6px; padding:4px 10px; font-size:11.5px; font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; background:#0071E3; border-color:#0071E3; color:#FFF; cursor:pointer; box-shadow:0 2px 6px rgba(0,113,227,0.25);">
+              <button class="btn btn-dark" data-cid="${escAttr(c.id)}" onclick="openAdminCommentModal(this.dataset.cid)" style="margin-top:6px; padding:4px 10px; font-size:11.5px; font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:5px; white-space:nowrap; background:#0071E3; border-color:#0071E3; color:#FFF; cursor:pointer; box-shadow:0 2px 6px rgba(0,113,227,0.25);">
                 <span>💡</span> ${c.adminComment ? 'Sửa Góp Ý AI' : 'Góp Ý Định Hướng AI'}
               </button>
             </td>

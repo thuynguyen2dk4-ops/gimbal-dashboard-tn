@@ -76,6 +76,10 @@
       "destination": "/index.html"
     },
     {
+      "source": "/auth/google",
+      "destination": "/auth/google/index.html"
+    },
+    {
       "source": "/auth/apple",
       "destination": "/auth/apple/index.html"
     },

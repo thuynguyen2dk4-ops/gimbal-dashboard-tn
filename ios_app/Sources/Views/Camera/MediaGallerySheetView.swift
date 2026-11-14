@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import AVFoundation
+import AVKit
 import UIKit
 
 struct MediaGallerySheetView: View {
@@ -220,9 +222,11 @@ struct MediaGallerySheetView: View {
     private var batchSelectionBar: some View {
         HStack {
             Button {
-                let imgs = filteredMedia.filter { selectedIds.contains($0.id) }.map { $0.image }
-                guard !imgs.isEmpty else { return }
-                batchShareItems = imgs
+                let shareTargets: [Any] = filteredMedia
+                    .filter { selectedIds.contains($0.id) }
+                    .map { ($0.isVideo ? ($0.videoURL as Any?) : nil) ?? $0.image }
+                guard !shareTargets.isEmpty else { return }
+                batchShareItems = shareTargets
                 showBatchShareSheet = true
             } label: {
                 Label("Chia sẻ (\(selectedIds.count))", systemImage: "square.and.arrow.up")
@@ -261,8 +265,7 @@ struct MediaDetailPreviewSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
 
-    @State private var playbackProgress: Double = 0.34
-    @State private var isPlaying: Bool = false
+    @State private var avPlayer: AVPlayer? = nil
     @State private var isFavorite: Bool = false
     @State private var showShareSheet: Bool = false
     @State private var showClipEditor: Bool = false
@@ -285,33 +288,42 @@ struct MediaDetailPreviewSheet: View {
                     Spacer(minLength: 10)
 
                     ZStack {
-                        Image(uiImage: item.image)
-                            .resizable()
-                            .scaledToFit()
-                            .cornerRadius(12)
-                            .padding(.horizontal, 8)
-
-                        if item.isVideo {
-                            Button {
-                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                isPlaying.toggle()
-                            } label: {
-                                Image(systemName: isPlaying ? "pause.circle.fill" : "play.circle.fill")
-                                    .font(.system(size: 56))
-                                    .foregroundColor(.white.opacity(0.92))
-                                    .shadow(color: .black.opacity(0.45), radius: 8)
-                            }
+                        if item.isVideo, let player = avPlayer {
+                            VideoPlayer(player: player)
+                                .aspectRatio(16.0 / 9.0, contentMode: .fit)
+                                .cornerRadius(12)
+                                .padding(.horizontal, 8)
+                        } else {
+                            Image(uiImage: item.image)
+                                .resizable()
+                                .scaledToFit()
+                                .cornerRadius(12)
+                                .padding(.horizontal, 8)
                         }
                     }
 
                     Spacer(minLength: 10)
 
-                    if item.isVideo {
-                        scrubberPanel
+                    if item.isVideo && item.videoURL == nil {
+                        Text("Video bản xem trước tĩnh (chưa có tệp .mov trên thiết bị)")
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+                            .padding(.bottom, 8)
                     }
 
                     bottomActionToolbar
                 }
+            }
+            .onAppear {
+                if item.isVideo, let url = item.videoURL, avPlayer == nil {
+                    let player = AVPlayer(url: url)
+                    avPlayer = player
+                    player.play()
+                }
+            }
+            .onDisappear {
+                avPlayer?.pause()
+                avPlayer = nil
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -327,14 +339,14 @@ struct MediaDetailPreviewSheet: View {
                         Text(timestampLabel)
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(.primary)
-                        Text("4K 60fps • ProRes 422HQ")
+                        Text("\(item.resolution) • \(item.profile)")
                             .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.secondary)
                     }
                 }
             }
             .sheet(isPresented: $showShareSheet) {
-                ActivityShareSheet(items: [item.image])
+                ActivityShareSheet(items: [(item.isVideo ? (item.videoURL as Any?) : nil) ?? item.image])
             }
             .sheet(isPresented: $showClipEditor) {
                 ClipEditorSheetView(item: item) { editedCopy in
@@ -342,49 +354,6 @@ struct MediaDetailPreviewSheet: View {
                 }
             }
         }
-    }
-
-    private var scrubberPanel: some View {
-        VStack(spacing: 8) {
-            // Filmstrip preview bar with active yellow indicator
-            ZStack(alignment: .leading) {
-                HStack(spacing: 2) {
-                    ForEach(0..<10, id: \.self) { _ in
-                        Image(uiImage: item.image)
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 36)
-                            .clipped()
-                            .opacity(0.75)
-                    }
-                }
-                .cornerRadius(8)
-
-                GeometryReader { geo in
-                    Rectangle()
-                        .fill(accentYellow)
-                        .frame(width: 3, height: 42)
-                        .offset(x: max(0, min(geo.size.width - 3, geo.size.width * CGFloat(playbackProgress))), y: -3)
-                }
-                .frame(height: 36)
-            }
-            .padding(.horizontal, 18)
-
-            HStack(spacing: 10) {
-                Text(formattedSeconds(playbackProgress * 42.0))
-                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                    .foregroundColor(.secondary)
-
-                Slider(value: $playbackProgress, in: 0...1)
-                    .tint(accentYellow)
-
-                Text(item.duration ?? "00:42")
-                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                    .foregroundColor(.secondary)
-            }
-            .padding(.horizontal, 18)
-        }
-        .padding(.vertical, 10)
     }
 
     private var bottomActionToolbar: some View {
@@ -478,8 +447,19 @@ struct ClipEditorSheetView: View {
     private let soundtrackPresets = ["Không có", "Cinematic Epic", "Lo-fi Travel", "Action Beat"]
 
     private var selectedDurationText: String {
-        let totalClipSeconds = 24.2
-        let selected = max(1.0, (trimEnd - trimStart) * totalClipSeconds / playbackSpeed)
+        let baseSeconds: Double = {
+            if let videoURL = item.videoURL {
+                let assetSecs = AVURLAsset(url: videoURL).duration.seconds
+                if assetSecs.isFinite && assetSecs > 0 { return assetSecs }
+            }
+            if let dur = item.duration {
+                let parts = dur.split(separator: ":").compactMap { Double($0) }
+                if parts.count == 2 { return parts[0] * 60 + parts[1] }
+                if parts.count == 3 { return parts[0] * 3600 + parts[1] * 60 + parts[2] }
+            }
+            return 10.0
+        }()
+        let selected = max(0.5, (trimEnd - trimStart) * baseSeconds / playbackSpeed)
         return String(format: "00:%04.1f", selected)
     }
 
@@ -520,12 +500,27 @@ struct ClipEditorSheetView: View {
 
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button("Lưu bản sao") {
+                        let newId = UUID()
+                        var copiedVideoURL: URL? = nil
+                        var copiedFileName = ""
+                        if item.isVideo, let srcURL = item.videoURL {
+                            let tmpCopy = FileManager.default.temporaryDirectory
+                                .appendingPathComponent("\(newId.uuidString).mov")
+                            try? FileManager.default.removeItem(at: tmpCopy)
+                            if (try? FileManager.default.copyItem(at: srcURL, to: tmpCopy)) != nil {
+                                copiedVideoURL = tmpCopy
+                                copiedFileName = "\(newId.uuidString).mov"
+                            }
+                        }
                         let copied = CapturedMediaItem(
+                            id: newId,
                             image: item.image,
                             isVideo: item.isVideo,
-                            duration: String(selectedDurationText.prefix(5)),
-                            resolution: "\(selectedRatio) • 4K",
-                            profile: "LUT \(selectedLut)"
+                            duration: item.isVideo ? String(selectedDurationText.prefix(5)) : nil,
+                            resolution: "\(selectedRatio) • \(item.resolution)",
+                            profile: "LUT \(selectedLut)",
+                            fileName: copiedFileName,
+                            videoURL: copiedVideoURL
                         )
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                         onSaveCopy?(copied)

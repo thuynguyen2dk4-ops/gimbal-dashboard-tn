@@ -107,6 +107,7 @@
     .v-tab.active {
       background: #238636;
       color: #fff;
+      font-weight: 700;
     }
 
     /* Right Actions */
@@ -402,6 +403,34 @@
       font-family: ui-monospace, SFMono-Regular, monospace;
       font-size: 12px;
       color: #3fb950;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+      }
+      .topbar {
+        height: auto;
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 14px;
+      }
+      .workspace {
+        flex-direction: column;
+        overflow: visible;
+      }
+      .code-pane {
+        width: 100%;
+        min-width: 0;
+        height: 45vh;
+        border-right: none;
+        border-bottom: 1px solid #30363d;
+      }
+      .qr-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
