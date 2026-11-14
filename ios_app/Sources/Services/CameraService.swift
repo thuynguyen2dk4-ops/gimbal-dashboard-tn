@@ -22,7 +22,7 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     @Published var recordingDuration: String = "00:00:00"
     @Published var isFrontCamera: Bool = false
     @Published var selectedResolution: String = "4K • 60"
-    @Published var selectedAspectRatio: String = "16:9"
+    @Published var selectedAspectRatio: String = "9:16"
     @Published var shutterFlash: Bool = false
     @Published var latestThumbnail: UIImage? = nil
     @Published var capturedMedia: [CapturedMediaItem] = []
@@ -33,9 +33,14 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
     @Published var zoomFactor: String = "1x"
     @Published var isFlashEnabled: Bool = false
 
-    // Customizable Figma UI States (05_Settings_UI_Customizer_Modal)
+    // Customizable Figma UI States (Node 96:3)
     @Published var isProMode: Bool = false {
-        didSet { persistUiPreferences() }
+        didSet {
+            if oldValue && !isProMode {
+                selectedAspectRatio = "9:16"
+            }
+            persistUiPreferences()
+        }
     }
     @Published var uiThemeMode: String = "dark" {
         didSet { persistUiPreferences() }
@@ -56,6 +61,31 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
         didSet { persistUiPreferences() }
     }
     @Published var isLandscapeMode: Bool = false
+
+    // AI Multi-Target, Gesture & Timelapse State
+    @Published var aiTrackingEnabled: Bool = true
+    @Published var aiTargetMode: AITargetMode = .human
+    @Published var customObjectLockedPoint: CGPoint? = nil
+    @Published var customObjectLabel: String = "Vật thể đã chọn"
+    @Published var autoGroupFraming05x: Bool = false
+    @Published var gestureControlEnabled: Bool = true
+    @Published var selfTimerSeconds: Int = 0
+    @Published var micMode: String = "Stereo"
+    @Published var isManualExposure: Bool = false
+
+    // Motionlapse 2-Point State
+    @Published var motionlapsePointA: CGPoint = CGPoint(x: 0.22, y: 0.45)
+    @Published var motionlapsePointB: CGPoint = CGPoint(x: 0.78, y: 0.35)
+    @Published var motionlapseHasPointB: Bool = true
+    @Published var motionlapseDurationSec: Int = 15
+    @Published var motionlapseIntervalSec: Double = 2.0
+
+    var motionlapseTotalFrames: Int {
+        if motionlapseDurationSec == 15 && abs(motionlapseIntervalSec - 2.0) < 0.01 {
+            return 450
+        }
+        return max(30, motionlapseDurationSec * 30)
+    }
 
     // Pro Exposure & Audio HUD State
     @Published var iso: Int = 100
@@ -133,11 +163,16 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
         loadUiPreferences()
         setupMockThumbnails()
         startAudioVUAnimation()
+        setupOrientationObserver()
     }
 
     deinit {
         vuTimer?.invalidate()
         recordingTimer?.invalidate()
+        NotificationCenter.default.removeObserver(self, name: UIDevice.orientationDidChangeNotification, object: nil)
+        DispatchQueue.main.async {
+            UIDevice.current.endGeneratingDeviceOrientationNotifications()
+        }
         let session = captureSession
         sessionQueue.async {
             if session.isRunning {
@@ -145,6 +180,106 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
             }
         }
     }
+
+    private func setupOrientationObserver() {
+        DispatchQueue.main.async {
+            UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+        }
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDeviceOrientationChanged),
+            name: UIDevice.orientationDidChangeNotification,
+            object: nil
+        )
+    }
+
+    @objc private func handleDeviceOrientationChanged() {
+        let orientation = UIDevice.current.orientation
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            switch orientation {
+            case .landscapeLeft, .landscapeRight:
+                if !self.isLandscapeMode {
+                    self.isLandscapeMode = true
+                }
+            case .portrait:
+                if self.isLandscapeMode {
+                    self.isLandscapeMode = false
+                }
+            default:
+                break
+            }
+        }
+    }
+
+    // MARK: - Figma Customizer & AI Target Controls
+
+    func setAspectRatio(_ ratio: String) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        selectedAspectRatio = ratio
+    }
+
+    func setCameraInterfaceMode(pro: Bool) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        isProMode = pro
+    }
+
+    func lockObjectAtNormalizedPoint(_ point: CGPoint, label: String = "Vật thể đã chọn") {
+        let clampedX = min(0.95, max(0.05, point.x))
+        let clampedY = min(0.95, max(0.05, point.y))
+        customObjectLockedPoint = CGPoint(x: clampedX, y: clampedY)
+        customObjectLabel = label
+        aiTargetMode = .object
+        aiTrackingEnabled = true
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+
+    func clearLockedObject() {
+        customObjectLockedPoint = nil
+        customObjectLabel = "Vật thể đã chọn"
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+
+    func setAutoGroupFraming(_ enabled: Bool) {
+        autoGroupFraming05x = enabled
+        if enabled {
+            setZoom(".5")
+        }
+    }
+
+    func toggleLandscapeHud() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        isLandscapeMode.toggle()
+    }
+
+    func cycleSelfTimer() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        switch selfTimerSeconds {
+        case 0: selfTimerSeconds = 3
+        case 3: selfTimerSeconds = 10
+        default: selfTimerSeconds = 0
+        }
+    }
+
+    func cycleMicMode() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        switch micMode {
+        case "Stereo": micMode = "Lọc gió AI"
+        case "Lọc gió AI": micMode = "Tắt"
+        default: micMode = "Stereo"
+        }
+    }
+
+    func cycleResolution() {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        switch selectedResolution {
+        case "4K • 60": selectedResolution = "4K • 30"
+        case "4K • 30": selectedResolution = "1080 • 60"
+        default: selectedResolution = "4K • 60"
+        }
+    }
+
+    // MARK: - Preference Persistence
 
     private func loadUiPreferences() {
         isRestoringPreferences = true
@@ -234,6 +369,8 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
             self.audioLevelR = min(1.0, max(0.08, self.audioLevelR + Double.random(in: -0.15...0.15)))
         }
     }
+
+    // MARK: - AVCaptureSession Pipeline (Preserved IOS-BUG-01)
 
     func setupSession() {
         let wantFront = isFrontCamera

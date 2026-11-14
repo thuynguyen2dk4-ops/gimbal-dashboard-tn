@@ -2,8 +2,8 @@
 //  TelemetryMetersView.swift
 //  SmartGimbalPro
 //
-//  Các thanh đo kỹ thuật chuyên nghiệp: Biểu đồ ánh sáng RGB Histogram,
-//  thước âm thanh Stereo Audio VU và các thẻ đo góc Roll/Pitch/Pan.
+//  Các thanh đo kỹ thuật Apple HIG (Figma Node 96:3): Biểu đồ ánh sáng Histogram gọn,
+//  thước âm thanh Stereo Audio VU và thẻ đo góc Roll/Pitch/Pan.
 //
 
 import SwiftUI
@@ -11,55 +11,112 @@ import SwiftUI
 struct MiniRGBHistogramView: View {
     @Environment(\.colorScheme) private var colorScheme
 
-    private let bins: [Double] = [
-        0.24, 0.38, 0.56, 0.72, 0.85, 0.92, 0.88, 0.76, 0.62,
-        0.54, 0.68, 0.82, 0.78, 0.64, 0.48, 0.36, 0.25, 0.18
+    private let curvePoints: [CGFloat] = [
+        0.05, 0.14, 0.28, 0.44, 0.56, 0.42, 0.72, 0.88, 0.64, 0.78, 0.92, 0.54, 0.28, 0.08
     ]
 
     var body: some View {
         let isLight = colorScheme == .light
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
-                Text("HISTO")
-                    .font(.system(size: 8, weight: .bold, design: .monospaced))
-                    .foregroundColor(isLight ? Color(red: 0.15, green: 0.23, blue: 0.34) : .white.opacity(0.75))
-                Spacer(minLength: 4)
-                HStack(spacing: 2) {
-                    Circle().fill(Color.red.opacity(0.9)).frame(width: 4, height: 4)
-                    Circle().fill(Color.green.opacity(0.9)).frame(width: 4, height: 4)
-                    Circle().fill(Color.blue.opacity(0.9)).frame(width: 4, height: 4)
-                }
-            }
+        let strokeGold = isLight
+            ? Color(red: 0.73, green: 0.53, blue: 0.0)
+            : Color(red: 1.0, green: 0.84, blue: 0.04)
 
-            HStack(alignment: .bottom, spacing: 2) {
-                ForEach(Array(bins.enumerated()), id: \.offset) { idx, ratio in
-                    let h = max(4.0, ratio * 24.0)
-                    let topColor: Color = idx < 6
-                        ? Color(red: 0.94, green: 0.27, blue: 0.27)
-                        : (idx < 12 ? Color(red: 0.20, green: 0.83, blue: 0.60) : Color(red: 0.38, green: 0.65, blue: 0.98))
-                    RoundedRectangle(cornerRadius: 1)
-                        .fill(
-                            LinearGradient(
-                                colors: [topColor.opacity(0.92), Color.white.opacity(isLight ? 0.35 : 0.45)],
-                                startPoint: .top,
-                                endPoint: .bottom
+        ZStack {
+            GeometryReader { geo in
+                let w = geo.size.width
+                let h = geo.size.height
+
+                // Filled luminance curve
+                Path { path in
+                    guard curvePoints.count > 1 else { return }
+                    let stepX = w / CGFloat(curvePoints.count - 1)
+                    path.move(to: CGPoint(x: 0, y: h))
+                    for (idx, val) in curvePoints.enumerated() {
+                        let x = CGFloat(idx) * stepX
+                        let y = h - (val * (h - 4)) - 2
+                        if idx == 0 {
+                            path.addLine(to: CGPoint(x: x, y: y))
+                        } else {
+                            let prevX = CGFloat(idx - 1) * stepX
+                            let prevY = h - (curvePoints[idx - 1] * (h - 4)) - 2
+                            let midX = (prevX + x) * 0.5
+                            path.addCurve(
+                                to: CGPoint(x: x, y: y),
+                                control1: CGPoint(x: midX, y: prevY),
+                                control2: CGPoint(x: midX, y: y)
                             )
-                        )
-                        .frame(width: 3, height: CGFloat(h))
+                        }
+                    }
+                    path.addLine(to: CGPoint(x: w, y: h))
+                    path.closeSubpath()
                 }
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            (isLight ? Color.black : Color.white).opacity(0.32),
+                            (isLight ? Color.black : Color.white).opacity(0.06)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+
+                // Accent highlight waveform line
+                Path { path in
+                    guard curvePoints.count > 1 else { return }
+                    let stepX = w / CGFloat(curvePoints.count - 1)
+                    for (idx, val) in curvePoints.enumerated() {
+                        let x = CGFloat(idx) * stepX
+                        let y = h - (val * (h - 4)) - 2
+                        if idx == 0 {
+                            path.move(to: CGPoint(x: x, y: y))
+                        } else {
+                            let prevX = CGFloat(idx - 1) * stepX
+                            let prevY = h - (curvePoints[idx - 1] * (h - 4)) - 2
+                            let midX = (prevX + x) * 0.5
+                            path.addCurve(
+                                to: CGPoint(x: x, y: y),
+                                control1: CGPoint(x: midX, y: prevY),
+                                control2: CGPoint(x: midX, y: y)
+                            )
+                        }
+                    }
+                }
+                .stroke(strokeGold, style: StrokeStyle(lineWidth: 1.5, lineCap: .round, lineJoin: .round))
             }
-            .frame(height: 26, alignment: .bottom)
+            .padding(.horizontal, 5)
+            .padding(.vertical, 4)
+
+            // Discreet corner label + RGB dots
+            VStack {
+                HStack(spacing: 3) {
+                    Text("HISTO")
+                        .font(.system(size: 7.5, weight: .bold, design: .monospaced))
+                        .foregroundColor(isLight ? Color.black.opacity(0.55) : Color.white.opacity(0.65))
+                    Spacer()
+                    HStack(spacing: 2) {
+                        Circle().fill(Color.red.opacity(0.85)).frame(width: 3, height: 3)
+                        Circle().fill(Color.green.opacity(0.85)).frame(width: 3, height: 3)
+                        Circle().fill(Color.blue.opacity(0.85)).frame(width: 3, height: 3)
+                    }
+                }
+                .padding(.horizontal, 5)
+                .padding(.top, 3)
+                Spacer()
+            }
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .frame(width: 108)
+        .frame(width: 82, height: 42)
         .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(isLight ? Color.white.opacity(0.84) : Color.black.opacity(0.55))
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(isLight ? Color.white.opacity(0.45) : Color.black.opacity(0.28))
+                )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(isLight ? Color.black.opacity(0.10) : Color.white.opacity(0.16), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                .stroke(isLight ? Color.black.opacity(0.10) : Color.white.opacity(0.14), lineWidth: 0.6)
         )
     }
 }
@@ -84,12 +141,16 @@ struct MiniStereoAudioMeterView: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
         .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(isLight ? Color.white.opacity(0.84) : Color.black.opacity(0.55))
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(isLight ? Color.white.opacity(0.50) : Color.black.opacity(0.32))
+                )
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(isLight ? Color.black.opacity(0.10) : Color.white.opacity(0.16), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 10, style: .continuous)
+                .stroke(isLight ? Color.black.opacity(0.10) : Color.white.opacity(0.16), lineWidth: 0.6)
         )
     }
 
@@ -135,11 +196,11 @@ struct AxisAngleCard: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 14)
         .background(
-            RoundedRectangle(cornerRadius: 14)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .fill(isLight ? Color.white : Color.white.opacity(0.06))
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 14)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(isLight ? Color.black.opacity(0.07) : Color.white.opacity(0.08), lineWidth: 1)
         )
     }
@@ -158,10 +219,10 @@ struct TorqueSliderRow: View {
                 Spacer()
                 Text("\(Int(value * 100))%")
                     .font(.system(size: 12, weight: .bold, design: .monospaced))
-                    .foregroundColor(Color(red: 0.98, green: 0.72, blue: 0.10))
+                    .foregroundColor(Color(red: 1.0, green: 0.84, blue: 0.04))
             }
             Slider(value: $value, in: 0.3...1.0)
-                .tint(Color(red: 0.98, green: 0.72, blue: 0.10))
+                .tint(Color(red: 1.0, green: 0.84, blue: 0.04))
         }
     }
 }

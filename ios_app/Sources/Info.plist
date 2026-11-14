@@ -16,14 +16,18 @@
     <dict/>
     <key>UIStatusBarHidden</key>
     <true/>
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+    </array>
     <key>NSCameraUsageDescription</key>
     <string>Ứng dụng cần quyền Camera để quay phim 4K và bám nét AI Vision.</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Ứng dụng cần quyền Micro để thu âm video.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Ứng dụng cần quyền truy cập Thư viện ảnh để lưu trữ và hiển thị ảnh, video 4K đã quay từ Gimbal.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Ứng dụng cần quyền lưu video và ảnh chụp vào Thư viện của bạn.</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Ứng dụng cần quyền truy cập Thư viện ảnh để lưu trữ và hiển thị ảnh, video 4K đã quay từ Gimbal.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Ứng dụng cần quyền lưu video và ảnh chụp vào Thư viện của bạn.</string>
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>Ứng dụng cần quyền Bluetooth BLE 5.3 để điều khiển động cơ Gimbal.</string>
 </dict>
