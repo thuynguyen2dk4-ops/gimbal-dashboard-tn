@@ -538,22 +538,24 @@ struct GimbalDeviceHubView: View {
             }
             .buttonStyle(.plain)
 
-            Button {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                showFeatureFlagsSheet = true
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "flag.fill")
-                        .foregroundColor(iosBlue)
-                    Text("Cờ tính năng")
-                        .font(.system(size: 13.5, weight: .bold))
-                        .foregroundColor(.primary)
+            if store.isAdmin {
+                Button {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    showFeatureFlagsSheet = true
+                } label: {
+                    HStack(spacing: 10) {
+                        Image(systemName: "flag.fill")
+                            .foregroundColor(iosBlue)
+                        Text("Cờ tính năng")
+                            .font(.system(size: 13.5, weight: .bold))
+                            .foregroundColor(.primary)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.tertiarySystemGroupedBackground)))
                 }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(RoundedRectangle(cornerRadius: 12).fill(Color(UIColor.tertiarySystemGroupedBackground)))
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
     }
 }
