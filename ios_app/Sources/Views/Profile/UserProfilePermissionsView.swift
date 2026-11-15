@@ -2910,7 +2910,7 @@ struct EngineerTelemetryDashboardView: View {
             VStack(spacing: 0) {
                 Button {
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                    ble.setGimbalMode("PF")
+                    ble.setGimbalModeWithHaptic("PF")
                     ble.sendManualJoystick(x: 0, y: 0)
                     actionBanner = "Đã gửi lệnh Soft Reboot đến bộ điều khiển STM32G474."
                 } label: {
