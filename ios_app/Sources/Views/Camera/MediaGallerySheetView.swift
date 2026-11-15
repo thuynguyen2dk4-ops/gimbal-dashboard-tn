@@ -556,46 +556,11 @@ struct ClipEditorSheetView: View {
     var body: some View {
         NavigationStack {
             GeometryReader { geo in
-                let isLandscape = geo.size.width > geo.size.height
-
-                Group {
-                    if isLandscape {
-                        HStack(spacing: 14) {
-                            previewStage
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-
-                            VStack(spacing: 10) {
-                                trimTimelineSection
-                                toolContentSection
-                                Spacer(minLength: 4)
-                                bottomToolTabs
-                            }
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .fill(Color(UIColor.secondarySystemGroupedBackground))
-                            )
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                    } else {
-                        VStack(spacing: 12) {
-                            previewStage
-
-                            VStack(spacing: 10) {
-                                trimTimelineSection
-                                toolContentSection
-                                bottomToolTabs
-                            }
-                            .padding(.top, 10)
-                            .background(Color(UIColor.secondarySystemGroupedBackground))
-                        }
-                    }
-                }
+                editorLayout(isLandscape: geo.size.width > geo.size.height)
             }
             .background(
-                (colorScheme == .light ? Color(red: 0.96, green: 0.96, blue: 0.98) : Color.black)
-                    .ignoresSafeArea()
+                colorScheme == .light ? Color(red: 0.96, green: 0.96, blue: 0.98) : Color.black,
+                ignoresSafeAreaEdges: .all
             )
             .navigationTitle("Chỉnh sửa clip")
             .navigationBarTitleDisplayMode(.inline)
@@ -638,6 +603,42 @@ struct ClipEditorSheetView: View {
                     .fontWeight(.bold)
                     .foregroundColor(accentYellow)
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func editorLayout(isLandscape: Bool) -> some View {
+        if isLandscape {
+            HStack(spacing: 14) {
+                previewStage
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                VStack(spacing: 10) {
+                    trimTimelineSection
+                    toolContentSection
+                    Spacer(minLength: 4)
+                    bottomToolTabs
+                }
+                .frame(maxWidth: .infinity)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color(UIColor.secondarySystemGroupedBackground))
+                )
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+        } else {
+            VStack(spacing: 12) {
+                previewStage
+
+                VStack(spacing: 10) {
+                    trimTimelineSection
+                    toolContentSection
+                    bottomToolTabs
+                }
+                .padding(.top, 10)
+                .background(Color(UIColor.secondarySystemGroupedBackground))
             }
         }
     }
