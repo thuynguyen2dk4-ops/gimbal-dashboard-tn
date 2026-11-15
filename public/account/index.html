@@ -471,6 +471,13 @@
     .slider-box input[type="range"] {
       flex: 1;
       accent-color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+    }
+    .slider-box input[type="range"]:focus,
+    .slider-box input[type="range"]:focus-visible {
+      outline: none;
+      box-shadow: none;
     }
     .slider-box span.val {
       font-size: 13px;
@@ -965,7 +972,7 @@
         <div class="card">
           <div class="card-title-row">
             <div class="card-title">Động Cơ FOC &amp; Độ Mượt</div>
-            <span style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono);">BLE 4ms</span>
+            <span id="focBleStatusBadge" style="font-size:11.5px; color:var(--text-muted); font-family:var(--font-mono);">T-Flow Pro • BLE</span>
           </div>
 
           <div class="setting-row">
@@ -974,8 +981,8 @@
               <p>Độ nhạy xoay ngang</p>
             </div>
             <div class="slider-box">
-              <input type="range" min="1" max="100" value="65" oninput="this.nextElementSibling.innerText = this.value + '%'">
-              <span class="val">65%</span>
+              <input type="range" id="focPanSlider" min="1" max="100" value="65" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="val" id="focPanVal">65%</span>
             </div>
           </div>
 
@@ -985,8 +992,8 @@
               <p>Độ nhạy ngẩng / cúi</p>
             </div>
             <div class="slider-box">
-              <input type="range" min="1" max="100" value="45" oninput="this.nextElementSibling.innerText = this.value + '%'">
-              <span class="val">45%</span>
+              <input type="range" id="focTiltSlider" min="1" max="100" value="45" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="val" id="focTiltVal">45%</span>
             </div>
           </div>
 
@@ -996,8 +1003,8 @@
               <p>Triệt tiêu giật khựng</p>
             </div>
             <div class="slider-box">
-              <input type="range" min="1" max="100" value="80" oninput="this.nextElementSibling.innerText = this.value + '%'">
-              <span class="val">80%</span>
+              <input type="range" id="focDampingSlider" min="1" max="100" value="80" oninput="this.nextElementSibling.innerText = this.value + '%'">
+              <span class="val" id="focDampingVal">80%</span>
             </div>
           </div>
 
@@ -1007,14 +1014,16 @@
               <p>Chống trôi khi chạm nhẹ</p>
             </div>
             <div class="slider-box">
-              <input type="range" min="0" max="20" value="4" oninput="this.nextElementSibling.innerText = this.value + '°'">
-              <span class="val">4°</span>
+              <input type="range" id="focDeadzoneSlider" min="0" max="20" value="4" oninput="this.nextElementSibling.innerText = this.value + '°'">
+              <span class="val" id="focDeadzoneVal">4°</span>
             </div>
           </div>
 
+          <div id="focConfigStatus" style="display:none; margin-top:14px; font-size:12.5px; font-weight:600; color:#248A3D;"></div>
+
           <div style="margin-top:24px; display:flex; justify-content:flex-end; gap:10px;">
-            <button class="btn btn-outline" onclick="alert('Đã khôi phục thông số động cơ mặc định!')">Mặc Định</button>
-            <button class="btn btn-dark" onclick="alert('Đã gửi thông số tới T-Flow S1 qua BLE thành công!')">Lưu Cấu Hình</button>
+            <button type="button" class="btn btn-outline" onclick="resetFocDefaults()">Mặc Định</button>
+            <button type="button" class="btn btn-dark" onclick="saveFocConfig()">Lưu Cấu Hình</button>
           </div>
         </div>
 
@@ -1025,12 +1034,13 @@
             Xem trước màu điện ảnh trên viewfinder.
           </p>
 
-          <div style="border:2px dashed var(--border); border-radius:var(--radius-md); padding:28px 20px; text-align:center; cursor:pointer;" onclick="alert('Mở hộp thoại tải file .cube...')">
+          <input type="file" id="lutCubeFileInput" accept=".cube" style="display:none;" onchange="handleCubeLutSelected(this)" />
+          <div style="border:2px dashed var(--border); border-radius:var(--radius-md); padding:28px 20px; text-align:center; cursor:pointer;" onclick="document.getElementById('lutCubeFileInput').click()">
             <div style="display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:12px; background:var(--bg); margin-bottom:10px;">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             </div>
             <div style="font-size:13.5px; font-weight:700;">Tải file .cube lên</div>
-            <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">17x17x17 hoặc 33x33x33</div>
+            <div id="lutSelectedStatus" style="font-size:12px; color:var(--text-muted); margin-top:4px;">17x17x17 hoặc 33x33x33</div>
           </div>
 
           <div style="margin-top:20px; font-size:12.5px; color:var(--text-secondary);">
@@ -1790,6 +1800,79 @@
         }
       }
     });
+
+    const FOC_DEFAULT_CONFIG = { pan: 65, tilt: 45, damping: 80, deadzone: 4 };
+    const FOC_STORAGE_KEY = 'tflow_foc_config_v1';
+
+    function applyFocSliders(cfg) {
+      const pan = document.getElementById('focPanSlider');
+      const tilt = document.getElementById('focTiltSlider');
+      const damping = document.getElementById('focDampingSlider');
+      const deadzone = document.getElementById('focDeadzoneSlider');
+      if (!pan || !tilt || !damping || !deadzone) return;
+      pan.value = cfg.pan;
+      tilt.value = cfg.tilt;
+      damping.value = cfg.damping;
+      deadzone.value = cfg.deadzone;
+      document.getElementById('focPanVal').innerText = cfg.pan + '%';
+      document.getElementById('focTiltVal').innerText = cfg.tilt + '%';
+      document.getElementById('focDampingVal').innerText = cfg.damping + '%';
+      document.getElementById('focDeadzoneVal').innerText = cfg.deadzone + '°';
+    }
+
+    function showFocStatus(msg) {
+      const el = document.getElementById('focConfigStatus');
+      if (!el) return;
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    function loadFocConfig() {
+      try {
+        const raw = localStorage.getItem(FOC_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          applyFocSliders({
+            pan: Number(parsed.pan) || FOC_DEFAULT_CONFIG.pan,
+            tilt: Number(parsed.tilt) || FOC_DEFAULT_CONFIG.tilt,
+            damping: Number(parsed.damping) || FOC_DEFAULT_CONFIG.damping,
+            deadzone: parsed.deadzone !== undefined ? Number(parsed.deadzone) : FOC_DEFAULT_CONFIG.deadzone
+          });
+          return;
+        }
+      } catch (e) {}
+      applyFocSliders(FOC_DEFAULT_CONFIG);
+    }
+
+    function resetFocDefaults() {
+      applyFocSliders(FOC_DEFAULT_CONFIG);
+      try { localStorage.setItem(FOC_STORAGE_KEY, JSON.stringify(FOC_DEFAULT_CONFIG)); } catch (e) {}
+      showFocStatus('Đã khôi phục thông số động cơ mặc định (Pan 65%, Tilt 45%, Damping 80%, Deadzone 4°).');
+    }
+
+    function saveFocConfig() {
+      const cfg = {
+        pan: Number(document.getElementById('focPanSlider').value),
+        tilt: Number(document.getElementById('focTiltSlider').value),
+        damping: Number(document.getElementById('focDampingSlider').value),
+        deadzone: Number(document.getElementById('focDeadzoneSlider').value)
+      };
+      try { localStorage.setItem(FOC_STORAGE_KEY, JSON.stringify(cfg)); } catch (e) {}
+      showFocStatus('Đã lưu cấu hình thông số động cơ FOC cho T-Flow Pro!');
+    }
+
+    function handleCubeLutSelected(input) {
+      const file = input && input.files && input.files[0];
+      if (!file) return;
+      const status = document.getElementById('lutSelectedStatus');
+      if (status) {
+        status.style.color = '#248A3D';
+        status.style.fontWeight = '600';
+        status.textContent = 'Đã chọn LUT: ' + file.name + ' (' + Math.max(1, Math.round(file.size / 1024)) + ' KB)';
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', loadFocConfig);
 
 </script>
 
