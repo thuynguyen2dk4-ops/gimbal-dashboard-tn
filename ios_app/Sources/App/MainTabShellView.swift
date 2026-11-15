@@ -23,6 +23,11 @@ struct MainTabShellView: View {
 
     @State private var showSplash: Bool = true
     @State private var showCameraStudio: Bool = false
+    @State private var focPushWorkItem: DispatchWorkItem? = nil
+    @State private var isApplyingCloudFoc: Bool = false
+
+    private let focPollTimer = Timer.publish(every: 8, on: .main, in: .common).autoconnect()
+    private let openCameraNotification = NotificationCenter.default.publisher(for: Notification.Name("TFlowOpenCameraStudio"))
 
     init() {
         let appearance = UITabBarAppearance()
@@ -44,88 +49,10 @@ struct MainTabShellView: View {
 
     var body: some View {
         ZStack {
-            Group {
-                if !store.isLoggedIn {
-                    AuthSignInGateView()
-                } else {
-                    TabView(selection: $store.activeMainTab) {
-                        HomeControlHubView(
-                            onOpenCamera: {
-                                showCameraStudio = true
-                            }
-                        )
-                        .tabItem {
-                            Label("Quay", systemImage: "camera.fill")
-                        }
-                        .tag(0)
-
-                        MediaGallerySheetView(camera: camera, isEmbeddedTab: true)
-                            .tabItem {
-                                Label("Thư viện", systemImage: "photo.on.rectangle")
-                            }
-                            .tag(1)
-
-                        GimbalDeviceHubView()
-                            .tabItem {
-                                Label("Thiết bị", systemImage: "gyroscope")
-                            }
-                            .tag(2)
-
-                        TFlowAIChatAssistantView(
-                            isEmbeddedTab: true,
-                            onOpenCamera: {
-                                showCameraStudio = true
-                            }
-                        )
-                        .tabItem {
-                            Label("T-Flow Bot", systemImage: "sparkles")
-                        }
-                        .tag(3)
-
-                        UserProfilePermissionsView()
-                            .tabItem {
-                                Label("Hồ sơ", systemImage: "person.crop.circle.fill")
-                            }
-                            .tag(4)
-                    }
-                    .tint(Color(red: 0.98, green: 0.72, blue: 0.10))
-                    .toolbarBackground(
-                        colorScheme == .light
-                            ? Color(red: 0.97, green: 0.98, blue: 0.99).opacity(0.96)
-                            : Color(red: 0.05, green: 0.05, blue: 0.07).opacity(0.98),
-                        for: .tabBar
-                    )
-                    .toolbarBackground(.visible, for: .tabBar)
-                    .fullScreenCover(isPresented: $showCameraStudio) {
-                        CameraStudioNativeView(onBackToHomeHub: {
-                            showCameraStudio = false
-                        })
-                        .environmentObject(store)
-                        .environmentObject(ble)
-                        .environmentObject(camera)
-                    }
-                    .sheet(isPresented: $store.showPairingModal) {
-                        BLEPairingScanSheetView()
-                    }
-                    .sheet(isPresented: $store.showPermissionsModal) {
-                        SystemPermissionsSheetView()
-                    }
-                    .sheet(isPresented: $store.showSignInSheet) {
-                        AuthSignInGateView()
-                    }
-                    .sheet(isPresented: $store.showAiCopilotSheet) {
-                        TFlowAIChatAssistantView(
-                            isEmbeddedTab: false,
-                            onOpenCamera: {
-                                store.showAiCopilotSheet = false
-                                showCameraStudio = true
-                            }
-                        )
-                    }
-                    .sheet(isPresented: $ble.showCalibrationModal) {
-                        AutoCalibrationModalView(ble: ble)
-                    }
-                }
+            if !store.isLoggedIn {
+                AuthSignInGateView()
+            } else {
+                authenticatedTabShell
             }
 
             if showSplash {
@@ -134,21 +61,8 @@ struct MainTabShellView: View {
                     .zIndex(999)
             }
         }
-        .onAppear {
-            camera.switchMediaAccount(email: store.isLoggedIn ? store.currentUser.email : "")
-            store.fetchGimbalSettings()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.05) {
-                withAnimation(.easeOut(duration: 0.35)) {
-                    showSplash = false
-                }
-            }
-        }
-        // Tách thư viện ảnh/video theo tài khoản + nạp lại cấu hình FOC khi đổi tài khoản
-        .onChange(of: store.currentUser.email) { _ in
-            camera.switchMediaAccount(email: store.isLoggedIn ? store.currentUser.email : "")
-            store.resetGimbalSettingsSession()
-            store.fetchGimbalSettings()
-        }
+        .onAppear(perform: handleOnAppear)
+        .onChange(of: store.currentUser.email) { _ in handleAccountSwitch() }
         .onChange(of: store.isLoggedIn) { loggedIn in
             camera.switchMediaAccount(email: loggedIn ? store.currentUser.email : "")
             store.resetGimbalSettingsSession()
@@ -157,35 +71,119 @@ struct MainTabShellView: View {
         .onChange(of: scenePhase) { phase in
             if phase == .active { store.fetchGimbalSettings() }
         }
-        // Poll Cloud mỗi 8 giây để nhận thông số vừa chỉnh trên web
-        .onReceive(Timer.publish(every: 8, on: .main, in: .common).autoconnect()) { _ in
+        .onReceive(focPollTimer) { _ in
             store.fetchGimbalSettings()
         }
-        // Web -> App: áp thông số FOC từ Supabase xuống BLE
-        .onReceive(store.$cloudGimbalSettings.compactMap { $0 }) { cfg in
-            ble.smoothPan = max(0.01, min(1.0, Double(cfg.pan_speed) / 100.0))
-            ble.smoothTilt = max(0.01, min(1.0, Double(cfg.tilt_speed) / 100.0))
-            ble.smoothRoll = max(0.01, min(1.0, Double(cfg.damping) / 100.0))
-            ble.joystickDeadzone = Double(cfg.deadzone)
+        .onChange(of: store.cloudGimbalSettings) { cfg in
+            if let cfg = cfg { applyCloudFocSettings(cfg) }
         }
-        // App -> Web: chỉnh slider trên app thì đẩy ngược lên Supabase (debounce 1.2s)
-        .onReceive(
-            ble.$smoothPan.combineLatest(ble.$smoothTilt, ble.$smoothRoll, ble.$joystickDeadzone)
-                .dropFirst()
-                .debounce(for: .seconds(1.2), scheduler: RunLoop.main)
-        ) { pan, tilt, roll, dz in
-            store.pushGimbalSettings(
-                panSpeed: Int((pan * 100).rounded()),
-                tiltSpeed: Int((tilt * 100).rounded()),
-                damping: Int((roll * 100).rounded()),
-                deadzone: Int(dz.rounded())
+        .onChange(of: ble.smoothPan) { _ in scheduleFocPush() }
+        .onChange(of: ble.smoothTilt) { _ in scheduleFocPush() }
+        .onChange(of: ble.smoothRoll) { _ in scheduleFocPush() }
+        .onChange(of: ble.joystickDeadzone) { _ in scheduleFocPush() }
+        .onReceive(openCameraNotification) { _ in
+            if store.isLoggedIn { showCameraStudio = true }
+        }
+    }
+
+    private var authenticatedTabShell: some View {
+        TabView(selection: $store.activeMainTab) {
+            HomeControlHubView(
+                onOpenCamera: { showCameraStudio = true }
+            )
+            .tabItem { Label("Quay", systemImage: "camera.fill") }
+            .tag(0)
+
+            MediaGallerySheetView(camera: camera, isEmbeddedTab: true)
+                .tabItem { Label("Thư viện", systemImage: "photo.on.rectangle") }
+                .tag(1)
+
+            GimbalDeviceHubView()
+                .tabItem { Label("Thiết bị", systemImage: "gyroscope") }
+                .tag(2)
+
+            TFlowAIChatAssistantView(
+                isEmbeddedTab: true,
+                onOpenCamera: { showCameraStudio = true }
+            )
+            .tabItem { Label("T-Flow Bot", systemImage: "sparkles") }
+            .tag(3)
+
+            UserProfilePermissionsView()
+                .tabItem { Label("Hồ sơ", systemImage: "person.crop.circle.fill") }
+                .tag(4)
+        }
+        .tint(Color(red: 0.98, green: 0.72, blue: 0.10))
+        .toolbarBackground(
+            colorScheme == .light
+                ? Color(red: 0.97, green: 0.98, blue: 0.99).opacity(0.96)
+                : Color(red: 0.05, green: 0.05, blue: 0.07).opacity(0.98),
+            for: .tabBar
+        )
+        .toolbarBackground(.visible, for: .tabBar)
+        .fullScreenCover(isPresented: $showCameraStudio) {
+            CameraStudioNativeView(onBackToHomeHub: { showCameraStudio = false })
+                .environmentObject(store)
+                .environmentObject(ble)
+                .environmentObject(camera)
+        }
+        .sheet(isPresented: $store.showPairingModal) { BLEPairingScanSheetView() }
+        .sheet(isPresented: $store.showPermissionsModal) { SystemPermissionsSheetView() }
+        .sheet(isPresented: $store.showSignInSheet) { AuthSignInGateView() }
+        .sheet(isPresented: $store.showAiCopilotSheet) {
+            TFlowAIChatAssistantView(
+                isEmbeddedTab: false,
+                onOpenCamera: {
+                    store.showAiCopilotSheet = false
+                    showCameraStudio = true
+                }
             )
         }
-        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("TFlowOpenCameraStudio"))) { _ in
-            if store.isLoggedIn {
-                showCameraStudio = true
+        .sheet(isPresented: $ble.showCalibrationModal) {
+            AutoCalibrationModalView(ble: ble)
+        }
+    }
+
+    private func handleOnAppear() {
+        camera.switchMediaAccount(email: store.isLoggedIn ? store.currentUser.email : "")
+        store.fetchGimbalSettings()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.05) {
+            withAnimation(.easeOut(duration: 0.35)) {
+                showSplash = false
             }
         }
+    }
+
+    private func handleAccountSwitch() {
+        camera.switchMediaAccount(email: store.isLoggedIn ? store.currentUser.email : "")
+        store.resetGimbalSettingsSession()
+        store.fetchGimbalSettings()
+    }
+
+    private func applyCloudFocSettings(_ cfg: SupabaseModuleStore.CloudGimbalSettings) {
+        isApplyingCloudFoc = true
+        ble.smoothPan = max(0.01, min(1.0, Double(cfg.pan_speed) / 100.0))
+        ble.smoothTilt = max(0.01, min(1.0, Double(cfg.tilt_speed) / 100.0))
+        ble.smoothRoll = max(0.01, min(1.0, Double(cfg.damping) / 100.0))
+        ble.joystickDeadzone = Double(cfg.deadzone)
+        DispatchQueue.main.async {
+            isApplyingCloudFoc = false
+        }
+    }
+
+    private func scheduleFocPush() {
+        guard !isApplyingCloudFoc, store.isLoggedIn else { return }
+        focPushWorkItem?.cancel()
+        let work = DispatchWorkItem {
+            store.pushGimbalSettings(
+                panSpeed: Int((ble.smoothPan * 100).rounded()),
+                tiltSpeed: Int((ble.smoothTilt * 100).rounded()),
+                damping: Int((ble.smoothRoll * 100).rounded()),
+                deadzone: Int(ble.joystickDeadzone.rounded())
+            )
+        }
+        focPushWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2, execute: work)
     }
 }
 
