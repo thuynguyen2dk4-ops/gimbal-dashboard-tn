@@ -148,6 +148,91 @@ final class SupabaseModuleStore: ObservableObject {
     private let supabaseRestURL = "https://dlgkrwodxdsbbliwdnkg.supabase.co/rest/v1"
     private let supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZ2tyd29keGRzYmJsaXdkbmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxMjIwNjQsImV4cCI6MjEwOTY5ODA2NH0.Lg6C6MpLhX_CoKgWtl_nhWLGNw5NuYE9FZJoTxXnu6I"
     private let supabaseWriteQueue = DispatchQueue(label: "com.tflow.supabase.write.serial", qos: .utility)
+
+    // MARK: - Role (Admin) & Cloud Gimbal Settings (web <-> app)
+
+    static let adminEmails: Set<String> = ["thuynguyen2dk4@gmail.com", "thuy.nguyen@tflow.tech"]
+
+    /// Chỉ tài khoản quản trị mới thấy Bảng điều khiển Kỹ sư / Cờ tính năng.
+    var isAdmin: Bool {
+        guard isLoggedIn else { return false }
+        let lower = currentUser.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return Self.adminEmails.contains(lower)
+    }
+
+    struct CloudGimbalSettings: Codable, Equatable {
+        var pan_speed: Int
+        var tilt_speed: Int
+        var damping: Int
+        var deadzone: Int
+        var updated_at: String?
+    }
+
+    /// Thông số FOC mới nhất nhận từ Supabase (`gimbal_settings`), áp xuống BLE ở MainTabShellView.
+    @Published var cloudGimbalSettings: CloudGimbalSettings? = nil
+    private var lastPushedGimbalSettings: CloudGimbalSettings? = nil
+
+    func fetchGimbalSettings() {
+        let email = currentUser.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard isLoggedIn, !email.isEmpty,
+              let req = makeSupabaseRequest(
+                endpoint: "/gimbal_settings",
+                queryItems: [
+                    URLQueryItem(name: "email", value: "eq.\(email)"),
+                    URLQueryItem(name: "select", value: "pan_speed,tilt_speed,damping,deadzone,updated_at")
+                ]
+              ) else { return }
+        URLSession.shared.dataTask(with: req) { [weak self] data, _, _ in
+            guard let data = data,
+                  let rows = try? JSONDecoder().decode([CloudGimbalSettings].self, from: data),
+                  let row = rows.first else { return }
+            DispatchQueue.main.async {
+                guard let self = self,
+                      self.currentUser.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == email else { return }
+                if self.cloudGimbalSettings?.updated_at != row.updated_at {
+                    self.lastPushedGimbalSettings = row
+                    self.cloudGimbalSettings = row
+                }
+            }
+        }.resume()
+    }
+
+    func pushGimbalSettings(panSpeed: Int, tiltSpeed: Int, damping: Int, deadzone: Int) {
+        let email = currentUser.email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard isLoggedIn, !email.isEmpty else { return }
+        let nowIso = ISO8601DateFormatter().string(from: Date())
+        let candidate = CloudGimbalSettings(pan_speed: panSpeed, tilt_speed: tiltSpeed, damping: damping, deadzone: deadzone, updated_at: nil)
+        if let last = lastPushedGimbalSettings,
+           last.pan_speed == panSpeed, last.tilt_speed == tiltSpeed, last.damping == damping, last.deadzone == deadzone {
+            return
+        }
+        let body: [String: Any] = [
+            "email": email,
+            "pan_speed": panSpeed,
+            "tilt_speed": tiltSpeed,
+            "damping": damping,
+            "deadzone": deadzone,
+            "updated_at": nowIso,
+            "updated_from": "ios"
+        ]
+        guard let bodyData = try? JSONSerialization.data(withJSONObject: body),
+              let req = makeSupabaseRequest(
+                endpoint: "/gimbal_settings",
+                queryItems: [URLQueryItem(name: "on_conflict", value: "email")],
+                method: "POST",
+                prefer: "resolution=merge-duplicates,return=minimal",
+                bodyData: bodyData
+              ) else { return }
+        var pushed = candidate
+        pushed.updated_at = nowIso
+        lastPushedGimbalSettings = pushed
+        URLSession.shared.dataTask(with: req).resume()
+    }
+
+    func resetGimbalSettingsSession() {
+        cloudGimbalSettings = nil
+        lastPushedGimbalSettings = nil
+    }
     private var activePushCount: Int = 0
 
     private enum SyncPayloadMode {

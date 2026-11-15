@@ -34,6 +34,8 @@ final class BLEGimbalManager: NSObject, ObservableObject, CBCentralManagerDelega
     @Published var smoothPan: Double = 0.70
     @Published var smoothTilt: Double = 0.60
     @Published var smoothRoll: Double = 0.50
+    /// Vùng chết joystick (độ), đồng bộ với web "Vùng chết Joystick".
+    @Published var joystickDeadzone: Double = 4
     @Published var firmwareVersion: String = ""
     @Published var latestFirmwareVersion: String = "v2.4.2"
     @Published var isUpdatingFirmware: Bool = false

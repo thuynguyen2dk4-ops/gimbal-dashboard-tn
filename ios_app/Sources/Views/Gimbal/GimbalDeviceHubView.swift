@@ -271,6 +271,7 @@ struct GimbalDeviceHubView: View {
                 }
                 Divider().padding(.leading, 56)
 
+                if store.isAdmin {
                 quickActionRow(
                     icon: "waveform.path.ecg",
                     iconBg: Color(UIColor.systemPurple),
@@ -280,6 +281,7 @@ struct GimbalDeviceHubView: View {
                     showEngineerDashboardSheet = true
                 }
                 Divider().padding(.leading, 56)
+                }
 
                 quickActionRow(
                     icon: "gearshape.fill",

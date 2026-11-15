@@ -1827,27 +1827,77 @@
       el.style.display = 'block';
     }
 
-    function loadFocConfig() {
+    function focCurrentEmail() {
       try {
-        const raw = localStorage.getItem(FOC_STORAGE_KEY);
+        const u = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.getCurrentUser) ? SmartGimbalCatalog.getCurrentUser() : currentUser;
+        return u && u.email ? String(u.email).trim().toLowerCase() : '';
+      } catch (e) { return ''; }
+    }
+
+    const FOC_SB_URL = 'https://dlgkrwodxdsbbliwdnkg.supabase.co/rest/v1/gimbal_settings';
+    const FOC_SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRsZ2tyd29keGRzYmJsaXdkbmtnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxMjIwNjQsImV4cCI6MjEwOTY5ODA2NH0.Lg6C6MpLhX_CoKgWtl_nhWLGNw5NuYE9FZJoTxXnu6I';
+
+    function focHeaders(extra) {
+      const key = (typeof SmartGimbalCatalog !== 'undefined' && SmartGimbalCatalog.SUPABASE_ANON_KEY) ? SmartGimbalCatalog.SUPABASE_ANON_KEY : FOC_SB_KEY;
+      return Object.assign({ 'apikey': key, 'Authorization': 'Bearer ' + key, 'Content-Type': 'application/json' }, extra || {});
+    }
+
+    function loadFocConfig() {
+      let localCfg = null;
+      try {
+        const raw = localStorage.getItem(FOC_STORAGE_KEY + ':' + focCurrentEmail());
         if (raw) {
           const parsed = JSON.parse(raw);
-          applyFocSliders({
+          localCfg = {
             pan: Number(parsed.pan) || FOC_DEFAULT_CONFIG.pan,
             tilt: Number(parsed.tilt) || FOC_DEFAULT_CONFIG.tilt,
             damping: Number(parsed.damping) || FOC_DEFAULT_CONFIG.damping,
             deadzone: parsed.deadzone !== undefined ? Number(parsed.deadzone) : FOC_DEFAULT_CONFIG.deadzone
-          });
-          return;
+          };
         }
       } catch (e) {}
-      applyFocSliders(FOC_DEFAULT_CONFIG);
+      applyFocSliders(localCfg || FOC_DEFAULT_CONFIG);
+
+      const email = focCurrentEmail();
+      if (!email || typeof fetch !== 'function') return;
+      fetch(FOC_SB_URL + '?email=eq.' + encodeURIComponent(email) + '&select=*', { headers: focHeaders() })
+        .then(r => r.ok ? r.json() : [])
+        .then(rows => {
+          if (Array.isArray(rows) && rows[0]) {
+            const row = rows[0];
+            applyFocSliders({ pan: row.pan_speed, tilt: row.tilt_speed, damping: row.damping, deadzone: row.deadzone });
+          }
+        })
+        .catch(() => {});
+    }
+
+    function pushFocToCloud(cfg, okMsg) {
+      const email = focCurrentEmail();
+      try { localStorage.setItem(FOC_STORAGE_KEY + ':' + email, JSON.stringify(cfg)); } catch (e) {}
+      if (!email) {
+        showFocStatus('Vui lòng đăng nhập để đồng bộ thông số xuống App iOS.');
+        return;
+      }
+      fetch(FOC_SB_URL + '?on_conflict=email', {
+        method: 'POST',
+        headers: focHeaders({ 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+        body: JSON.stringify({
+          email: email,
+          pan_speed: cfg.pan,
+          tilt_speed: cfg.tilt,
+          damping: cfg.damping,
+          deadzone: cfg.deadzone,
+          updated_at: new Date().toISOString(),
+          updated_from: 'web'
+        })
+      })
+        .then(r => showFocStatus(r.ok ? okMsg + ' Đã đồng bộ lên Cloud — App iOS sẽ tự cập nhật.' : 'Lưu Cloud thất bại (HTTP ' + r.status + '). Đã lưu tạm trên trình duyệt.'))
+        .catch(() => showFocStatus('Mất kết nối mạng. Đã lưu tạm trên trình duyệt.'));
     }
 
     function resetFocDefaults() {
       applyFocSliders(FOC_DEFAULT_CONFIG);
-      try { localStorage.setItem(FOC_STORAGE_KEY, JSON.stringify(FOC_DEFAULT_CONFIG)); } catch (e) {}
-      showFocStatus('Đã khôi phục thông số động cơ mặc định (Pan 65%, Tilt 45%, Damping 80%, Deadzone 4°).');
+      pushFocToCloud(FOC_DEFAULT_CONFIG, 'Đã khôi phục thông số mặc định (Pan 65%, Tilt 45%, Damping 80%, Deadzone 4°).');
     }
 
     function saveFocConfig() {
@@ -1857,8 +1907,7 @@
         damping: Number(document.getElementById('focDampingSlider').value),
         deadzone: Number(document.getElementById('focDeadzoneSlider').value)
       };
-      try { localStorage.setItem(FOC_STORAGE_KEY, JSON.stringify(cfg)); } catch (e) {}
-      showFocStatus('Đã lưu cấu hình thông số động cơ FOC cho T-Flow Pro!');
+      pushFocToCloud(cfg, 'Đã lưu cấu hình FOC.');
     }
 
     function handleCubeLutSelected(input) {

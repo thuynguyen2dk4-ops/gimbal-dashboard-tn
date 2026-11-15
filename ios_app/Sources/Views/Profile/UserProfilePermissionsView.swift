@@ -360,6 +360,7 @@ struct UserProfilePermissionsView: View {
                 showSettingsSheet = true
             }
 
+            if store.isAdmin {
             Divider().padding(.leading, 56)
 
             profileActionRow(
@@ -382,6 +383,7 @@ struct UserProfilePermissionsView: View {
                 subtitle: "Bật/tắt module AI & đồng bộ BLE"
             ) {
                 showFeatureFlagsSheet = true
+            }
             }
 
             Divider().padding(.leading, 56)
@@ -473,6 +475,7 @@ struct UserProfilePermissionsView: View {
                                 ))
                                 .labelsHidden()
                                 .tint(Color(UIColor.systemBlue))
+                                .disabled(!store.isAdmin)
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 9)
@@ -2495,6 +2498,14 @@ struct EngineerTelemetryDashboardView: View {
     ]
 
     var body: some View {
+        if !store.isAdmin {
+            AdminAccessDeniedView()
+        } else {
+            engineerBody
+        }
+    }
+
+    private var engineerBody: some View {
         NavigationStack {
             GeometryReader { geo in
                 if geo.size.width > geo.size.height {
@@ -3054,12 +3065,46 @@ struct EngineerTelemetryDashboardView: View {
 
 // MARK: - 8. FEATURE FLAGS ADMIN SCREEN (42_feature_flags_dark)
 
+struct AdminAccessDeniedView: View {
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        VStack(spacing: 14) {
+            Spacer()
+            Image(systemName: "lock.shield.fill")
+                .font(.system(size: 52, weight: .semibold))
+                .foregroundColor(Color(UIColor.systemOrange))
+            Text("Chỉ dành cho Quản trị viên")
+                .font(.system(size: 22, weight: .bold))
+            Text("Tài khoản của bạn không có quyền truy cập công cụ kỹ thuật này.")
+                .font(.system(size: 14))
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+            Button("Đóng") { dismiss() }
+                .font(.system(size: 16, weight: .semibold))
+                .padding(.top, 8)
+            Spacer()
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
+    }
+}
+
 struct FeatureFlagsAdminView: View {
     @EnvironmentObject var store: SupabaseModuleStore
     @Environment(\.dismiss) var dismiss
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
+        if !store.isAdmin {
+            AdminAccessDeniedView()
+        } else {
+            flagsBody
+        }
+    }
+
+    private var flagsBody: some View {
         NavigationStack {
             VStack(spacing: 0) {
                 HStack(alignment: .center) {

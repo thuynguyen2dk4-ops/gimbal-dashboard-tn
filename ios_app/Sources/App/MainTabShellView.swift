@@ -8,6 +8,7 @@
 
 import SwiftUI
 import UIKit
+import Combine
 
 // MARK: - =====================================================================
 // 7. MAIN TAB NAVIGATION SHELL (FIGMA NODE 96:3 — 5 TABS + SPLASH + AUTH GATE)
@@ -18,6 +19,7 @@ struct MainTabShellView: View {
     @EnvironmentObject var ble: BLEGimbalManager
     @EnvironmentObject var camera: CameraService
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.scenePhase) private var scenePhase
 
     @State private var showSplash: Bool = true
     @State private var showCameraStudio: Bool = false
@@ -133,11 +135,51 @@ struct MainTabShellView: View {
             }
         }
         .onAppear {
+            camera.switchMediaAccount(email: store.isLoggedIn ? store.currentUser.email : "")
+            store.fetchGimbalSettings()
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.05) {
                 withAnimation(.easeOut(duration: 0.35)) {
                     showSplash = false
                 }
             }
+        }
+        // Tách thư viện ảnh/video theo tài khoản + nạp lại cấu hình FOC khi đổi tài khoản
+        .onChange(of: store.currentUser.email) { _ in
+            camera.switchMediaAccount(email: store.isLoggedIn ? store.currentUser.email : "")
+            store.resetGimbalSettingsSession()
+            store.fetchGimbalSettings()
+        }
+        .onChange(of: store.isLoggedIn) { loggedIn in
+            camera.switchMediaAccount(email: loggedIn ? store.currentUser.email : "")
+            store.resetGimbalSettingsSession()
+            if loggedIn { store.fetchGimbalSettings() }
+        }
+        .onChange(of: scenePhase) { phase in
+            if phase == .active { store.fetchGimbalSettings() }
+        }
+        // Poll Cloud mỗi 8 giây để nhận thông số vừa chỉnh trên web
+        .onReceive(Timer.publish(every: 8, on: .main, in: .common).autoconnect()) { _ in
+            store.fetchGimbalSettings()
+        }
+        // Web -> App: áp thông số FOC từ Supabase xuống BLE
+        .onReceive(store.$cloudGimbalSettings.compactMap { $0 }) { cfg in
+            ble.smoothPan = max(0.01, min(1.0, Double(cfg.pan_speed) / 100.0))
+            ble.smoothTilt = max(0.01, min(1.0, Double(cfg.tilt_speed) / 100.0))
+            ble.smoothRoll = max(0.01, min(1.0, Double(cfg.damping) / 100.0))
+            ble.joystickDeadzone = Double(cfg.deadzone)
+        }
+        // App -> Web: chỉnh slider trên app thì đẩy ngược lên Supabase (debounce 1.2s)
+        .onReceive(
+            ble.$smoothPan.combineLatest(ble.$smoothTilt, ble.$smoothRoll, ble.$joystickDeadzone)
+                .dropFirst()
+                .debounce(for: .seconds(1.2), scheduler: RunLoop.main)
+        ) { pan, tilt, roll, dz in
+            store.pushGimbalSettings(
+                panSpeed: Int((pan * 100).rounded()),
+                tiltSpeed: Int((tilt * 100).rounded()),
+                damping: Int((roll * 100).rounded()),
+                deadzone: Int(dz.rounded())
+            )
         }
         .onReceive(NotificationCenter.default.publisher(for: Notification.Name("TFlowOpenCameraStudio"))) { _ in
             if store.isLoggedIn {

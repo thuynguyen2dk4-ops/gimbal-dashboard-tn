@@ -370,9 +370,50 @@ final class CameraService: NSObject, ObservableObject, AVCaptureVideoDataOutputS
         let fileSizeBytes: Int64
     }
 
+    /// Thư mục media tách riêng theo từng tài khoản (email). Khách = "guest".
+    private(set) var activeMediaAccountKey: String = "guest"
+
+    func switchMediaAccount(email: String) {
+        let lower = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        let key: String
+        if lower.isEmpty {
+            key = "guest"
+        } else {
+            key = String(lower.unicodeScalars.map { CharacterSet.alphanumerics.contains($0) ? Character($0) : "_" })
+        }
+        guard key != activeMediaAccountKey else { return }
+        activeMediaAccountKey = key
+        migrateLegacySharedMediaIfNeeded(toKey: key)
+        loadPersistedMediaFromDisk()
+    }
+
+    /// Bản cũ lưu chung toàn bộ media ở TFlowMedia/ (mọi tài khoản thấy nhau).
+    /// Chuyển một lần duy nhất về tài khoản chủ sở hữu (Master Admin).
+    private func migrateLegacySharedMediaIfNeeded(toKey key: String) {
+        guard key == "thuynguyen2dk4_gmail_com" else { return }
+        let fm = FileManager.default
+        let root = fm.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("TFlowMedia", isDirectory: true)
+        let legacyManifest = root.appendingPathComponent("manifest.json")
+        guard fm.fileExists(atPath: legacyManifest.path) else { return }
+        ensureMediaDirectoryExists()
+        let items = (try? fm.contentsOfDirectory(at: root, includingPropertiesForKeys: [.isDirectoryKey])) ?? []
+        for item in items {
+            let isDir = (try? item.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) ?? false
+            if isDir { continue }
+            let target = mediaDirectoryURL.appendingPathComponent(item.lastPathComponent)
+            if !fm.fileExists(atPath: target.path) {
+                try? fm.moveItem(at: item, to: target)
+            } else {
+                try? fm.removeItem(at: item)
+            }
+        }
+    }
+
     private var mediaDirectoryURL: URL {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        return docs.appendingPathComponent("TFlowMedia", isDirectory: true)
+        return docs
+            .appendingPathComponent("TFlowMedia", isDirectory: true)
+            .appendingPathComponent(activeMediaAccountKey, isDirectory: true)
     }
 
     private var manifestFileURL: URL {
