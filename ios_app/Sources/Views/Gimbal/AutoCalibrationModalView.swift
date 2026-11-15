@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct AutoCalibrationModalView: View {
     @ObservedObject var ble: BLEGimbalManager
@@ -19,15 +20,32 @@ struct AutoCalibrationModalView: View {
     }
 
     private var surfaceBackground: Color {
-        colorScheme == .light ? Color(red: 0.95, green: 0.95, blue: 0.97) : Color.black
+        Color(UIColor.systemGroupedBackground)
     }
 
     private var cardBackground: Color {
-        colorScheme == .light ? Color.white : Color(red: 0.11, green: 0.11, blue: 0.12)
+        Color(UIColor.secondarySystemGroupedBackground)
     }
 
     private var borderStroke: Color {
-        colorScheme == .light ? Color.black.opacity(0.08) : Color.white.opacity(0.10)
+        Color(UIColor.separator).opacity(0.35)
+    }
+
+    private var headlineText: String {
+        if clampedProgress >= 1.0 {
+            return "Hiệu chỉnh hoàn tất!"
+        } else if ble.isCalibrating {
+            return "Đang cân bằng trục Tilt..."
+        } else {
+            return "Sẵn sàng hiệu chuẩn 6 mặt"
+        }
+    }
+
+    private var subtitleText: String {
+        if !ble.calibrationStepText.isEmpty {
+            return ble.calibrationStepText
+        }
+        return "Vui lòng không di chuyển hoặc chạm vào thiết bị"
     }
 
     var body: some View {
@@ -36,13 +54,13 @@ struct AutoCalibrationModalView: View {
                 surfaceBackground.ignoresSafeArea()
 
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 22) {
+                    VStack(spacing: 20) {
                         gaugeSection
                         checklistSection
                         actionFooter
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 18)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 16)
                     .padding(.bottom, 28)
                 }
             }
@@ -55,112 +73,103 @@ struct AutoCalibrationModalView: View {
                         ble.showCalibrationModal = false
                         dismiss()
                     }
-                    .foregroundColor(accentYellow)
+                    .foregroundColor(Color(UIColor.systemBlue))
                 }
             }
         }
     }
 
     private var gaugeSection: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 10) {
             ZStack {
                 Circle()
-                    .stroke(
-                        colorScheme == .light ? Color.black.opacity(0.08) : Color.white.opacity(0.12),
-                        lineWidth: 11
-                    )
+                    .stroke(Color(UIColor.tertiarySystemFill), lineWidth: 9)
 
                 Circle()
                     .trim(from: 0, to: clampedProgress)
                     .stroke(
-                        AngularGradient(
-                            colors: [
-                                accentYellow,
-                                clampedProgress >= 1.0 ? Color.green : Color.orange
-                            ],
-                            center: .center
-                        ),
-                        style: StrokeStyle(lineWidth: 11, lineCap: .round)
+                        clampedProgress >= 1.0 ? Color(UIColor.systemGreen) : accentYellow,
+                        style: StrokeStyle(lineWidth: 9, lineCap: .round)
                     )
                     .rotationEffect(.degrees(-90))
                     .animation(.easeOut(duration: 0.2), value: clampedProgress)
 
-                VStack(spacing: 4) {
+                VStack(spacing: 2) {
                     Text("\(Int(clampedProgress * 100))%")
-                        .font(.system(size: 36, weight: .bold, design: .rounded))
+                        .font(.system(size: 30, weight: .heavy, design: .monospaced))
                         .foregroundColor(.primary)
 
-                    Text("Tiến độ")
-                        .font(.system(size: 12, weight: .semibold))
+                    Text("TIẾN ĐỘ")
+                        .font(.system(size: 11, weight: .semibold))
                         .foregroundColor(.secondary)
                 }
             }
-            .frame(width: 148, height: 148)
-            .padding(.top, 4)
+            .frame(width: 140, height: 140)
+            .padding(.top, 6)
 
-            Text(
-                ble.calibrationStepText.isEmpty
-                    ? "Đặt Smart Gimbal S1 trên mặt phẳng ổn định trước khi bắt đầu."
-                    : ble.calibrationStepText
-            )
-            .font(.system(size: 13, weight: .medium))
-            .foregroundColor(clampedProgress >= 1.0 ? .green : .secondary)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, 8)
-            .frame(minHeight: 36)
+            Text(headlineText)
+                .font(.system(size: 20, weight: .bold))
+                .foregroundColor(clampedProgress >= 1.0 ? Color(UIColor.systemGreen) : .primary)
+                .multilineTextAlignment(.center)
+                .padding(.top, 4)
+
+            Text(subtitleText)
+                .font(.system(size: 13))
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 12)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 20)
-        .padding(.horizontal, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 20)
-                .fill(cardBackground)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(borderStroke, lineWidth: 1)
-        )
+        .padding(.vertical, 12)
     }
 
     private var checklistSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("QUY TRÌNH HIỆU CHỈNH 6 MẶT")
-                .font(.system(size: 12, weight: .semibold))
-                .tracking(0.5)
+                .font(.system(size: 12.5, weight: .semibold))
                 .foregroundColor(.secondary)
-                .padding(.horizontal, 4)
+                .padding(.horizontal, 8)
 
             VStack(spacing: 0) {
                 calibrationStepRow(
-                    number: "1",
+                    icon: "checkmark",
+                    iconBg: Color(UIColor.systemGreen),
                     title: "Bước 1: Đặt trên mặt phẳng cố định",
-                    subtitle: "Giữ máy đứng yên, không chạm vào trục Roll/Tilt",
+                    subtitle: stepState(minActive: 0.01, minDone: 0.34) == .completed
+                        ? "Đã xác nhận độ nghiêng 0.0°"
+                        : "Giữ máy đứng yên trên mặt bàn phẳng",
                     state: stepState(minActive: 0.01, minDone: 0.34)
                 )
-                Divider().padding(.leading, 48)
+                Divider().padding(.leading, 56)
 
                 calibrationStepRow(
-                    number: "2",
+                    icon: "arrow.triangle.2.circlepath",
+                    iconBg: Color(UIColor.systemOrange),
                     title: "Bước 2: Căn chỉnh IMU 3 trục",
-                    subtitle: "Đo bù lệch trọng tâm & triệt rung Notch 245Hz",
+                    subtitle: stepState(minActive: 0.34, minDone: 0.78) == .completed
+                        ? "Đã cân bằng con quay hồi chuyển 20kHz"
+                        : "Đang hiệu chuẩn con quay hồi chuyển",
                     state: stepState(minActive: 0.34, minDone: 0.78)
                 )
-                Divider().padding(.leading, 48)
+                Divider().padding(.leading, 56)
 
                 calibrationStepRow(
-                    number: "3",
+                    icon: "info.circle",
+                    iconBg: Color(UIColor.systemGray),
                     title: "Bước 3: Lưu thông số vào bộ nhớ Gimbal",
-                    subtitle: "Khóa điểm Zero góc Roll ±0.01° qua BLE 5.3",
+                    subtitle: stepState(minActive: 0.78, minDone: 1.0) == .completed
+                        ? "Đã lưu góc Zero Roll ±0.01° qua BLE 5.3"
+                        : "Đang chờ bước 2 hoàn thành",
                     state: stepState(minActive: 0.78, minDone: 1.0)
                 )
             }
             .background(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .fill(cardBackground)
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
-                    .stroke(borderStroke, lineWidth: 1)
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(borderStroke, lineWidth: 0.5)
             )
         }
     }
@@ -178,39 +187,38 @@ struct AutoCalibrationModalView: View {
     }
 
     private func calibrationStepRow(
-        number: String,
+        icon: String,
+        iconBg: Color,
         title: String,
         subtitle: String,
         state: StepState
     ) -> some View {
-        HStack(spacing: 12) {
+        let resolvedBg: Color = {
+            switch state {
+            case .completed: return Color(UIColor.systemGreen)
+            case .active: return Color(UIColor.systemOrange)
+            case .pending: return iconBg == Color(UIColor.systemGreen) ? iconBg.opacity(0.65) : Color(UIColor.systemGray)
+            }
+        }()
+
+        return HStack(spacing: 12) {
             ZStack {
-                Circle()
-                    .fill(
-                        state == .completed
-                            ? Color.green.opacity(0.18)
-                            : (state == .active ? accentYellow.opacity(0.22) : Color.secondary.opacity(0.14))
-                    )
+                RoundedRectangle(cornerRadius: 7, style: .continuous)
+                    .fill(resolvedBg)
                     .frame(width: 28, height: 28)
 
-                if state == .completed {
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.green)
-                } else {
-                    Text(number)
-                        .font(.system(size: 12, weight: .bold, design: .rounded))
-                        .foregroundColor(state == .active ? accentYellow : .secondary)
-                }
+                Image(systemName: state == .completed ? "checkmark" : icon)
+                    .font(.system(size: 13.5, weight: .bold))
+                    .foregroundColor(.white)
             }
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 15, weight: .medium))
                     .foregroundColor(.primary)
 
                 Text(subtitle)
-                    .font(.system(size: 12))
+                    .font(.system(size: 12.5))
                     .foregroundColor(.secondary)
             }
 
@@ -220,10 +228,6 @@ struct AutoCalibrationModalView: View {
                 ProgressView()
                     .scaleEffect(0.85)
                     .tint(accentYellow)
-            } else if state == .completed {
-                Text("Xong")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(.green)
             }
         }
         .padding(.horizontal, 14)
@@ -241,26 +245,35 @@ struct AutoCalibrationModalView: View {
                         Image(systemName: "checkmark.circle.fill")
                         Text("Hoàn Tất")
                     }
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Capsule().fill(Color.green))
+                    .frame(height: 50)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(Color(UIColor.systemGreen))
+                    )
                 }
+                .buttonStyle(.plain)
             } else {
                 Button {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     ble.startCoGCalibration()
                 } label: {
                     HStack(spacing: 8) {
                         Image(systemName: ble.isCalibrating ? "gyroscope" : "scope")
-                        Text(ble.isCalibrating ? "Đang hiệu chuẩn IMU..." : "Bắt đầu hiệu chuẩn")
+                        Text(ble.isCalibrating ? "Đang hiệu chuẩn IMU..." : "Bắt đầu hiệu chuẩn 6 mặt")
                     }
-                    .font(.system(size: 15, weight: .bold))
+                    .font(.system(size: 16, weight: .bold))
                     .foregroundColor(.black)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Capsule().fill(ble.isCalibrating ? accentYellow.opacity(0.6) : accentYellow))
+                    .frame(height: 50)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(ble.isCalibrating ? accentYellow.opacity(0.6) : accentYellow)
+                    )
                 }
+                .buttonStyle(.plain)
                 .disabled(ble.isCalibrating)
             }
         }

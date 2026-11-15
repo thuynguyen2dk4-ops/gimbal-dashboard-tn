@@ -36,9 +36,7 @@ targets:
               - tflow
     entitlements:
       path: Sources/SmartGimbalPro.entitlements
-      properties:
-        com.apple.developer.applesignin:
-          - Default
+      properties: {}
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.smartgimbal.s1pro

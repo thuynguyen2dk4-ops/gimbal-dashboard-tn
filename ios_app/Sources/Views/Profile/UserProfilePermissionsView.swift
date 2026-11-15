@@ -28,6 +28,9 @@ struct UserProfilePermissionsView: View {
     @State private var showPersonalInfoSheet: Bool = false
     @State private var showPairingSheet: Bool = false
     @State private var showPermissionsSheet: Bool = false
+    @State private var showSettingsSheet: Bool = false
+    @State private var showEngineerDashboardSheet: Bool = false
+    @State private var showFeatureFlagsSheet: Bool = false
     @State private var showModuleMatrix: Bool = false
     @State private var showDeleteAccountConfirm: Bool = false
     @State private var isDeletingAccount: Bool = false
@@ -77,6 +80,15 @@ struct UserProfilePermissionsView: View {
             }
             .sheet(isPresented: $showPermissionsSheet) {
                 SystemPermissionsSheetView()
+            }
+            .sheet(isPresented: $showSettingsSheet) {
+                DeviceSettingsSheetView(camera: camera, store: store, ble: ble)
+            }
+            .sheet(isPresented: $showEngineerDashboardSheet) {
+                EngineerTelemetryDashboardView()
+            }
+            .sheet(isPresented: $showFeatureFlagsSheet) {
+                FeatureFlagsAdminView()
             }
             .sheet(item: $selectedModule) { item in
                 ModuleDetailInspectorSheet(detail: item, store: store)
@@ -338,6 +350,42 @@ struct UserProfilePermissionsView: View {
 
             Divider().padding(.leading, 56)
 
+            profileActionRow(
+                icon: "gearshape.fill",
+                iconBg: Color(UIColor.systemGray),
+                iconFg: .white,
+                title: "Cài đặt & Giao diện",
+                subtitle: "Chống rung, Camera, Giao diện Sáng/Tối"
+            ) {
+                showSettingsSheet = true
+            }
+
+            Divider().padding(.leading, 56)
+
+            profileActionRow(
+                icon: "waveform.path.ecg",
+                iconBg: accentGold,
+                iconFg: .black,
+                title: "Bảng điều khiển Kỹ sư FOC",
+                subtitle: "Telemetry 20kHz, Pin Li-Po & Chẩn đoán"
+            ) {
+                showEngineerDashboardSheet = true
+            }
+
+            Divider().padding(.leading, 56)
+
+            profileActionRow(
+                icon: "switch.2",
+                iconBg: Color(UIColor.systemTeal),
+                iconFg: .white,
+                title: "Cờ tính năng (Feature Flags)",
+                subtitle: "Bật/tắt module AI & đồng bộ BLE"
+            ) {
+                showFeatureFlagsSheet = true
+            }
+
+            Divider().padding(.leading, 56)
+
             Button {
                 withAnimation(.easeInOut(duration: 0.2)) {
                     showModuleMatrix.toggle()
@@ -558,7 +606,6 @@ struct UserProfilePermissionsView: View {
 
 // MARK: - 2. AUTH SIGN-IN & ONBOARDING GATE (21_onboarding + 22_signin)
 
-@MainActor
 private final class NativeOAuthCoordinator: NSObject, ObservableObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, ASWebAuthenticationPresentationContextProviding {
     static let googleClientId = "725853259455-ibugei8btrjeq9um14bc71ajbfna8218.apps.googleusercontent.com"
     static let googleCallbackScheme = "com.googleusercontent.apps.725853259455-ibugei8btrjeq9um14bc71ajbfna8218"
@@ -596,34 +643,50 @@ private final class NativeOAuthCoordinator: NSObject, ObservableObject, ASAuthor
         controller.performRequests()
     }
 
-    nonisolated func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        Task { @MainActor in
-            guard let cred = authorization.credential as? ASAuthorizationAppleIDCredential else {
-                self.appleCompletion?(.failure(NSError(domain: "TFlowOAuth", code: -1, userInfo: [NSLocalizedDescriptionKey: "Không nhận được thông tin Apple ID."])))
-                self.appleCompletion = nil
-                return
-            }
-            var resolvedEmail = cred.email ?? ""
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        var resolvedEmail = ""
+        var assembledName = ""
+        var failureError: Error? = nil
+
+        if let cred = authorization.credential as? ASAuthorizationAppleIDCredential {
+            resolvedEmail = cred.email ?? ""
             if resolvedEmail.isEmpty, let tokenData = cred.identityToken, let jwt = Self.decodeJWTPayload(tokenData) {
                 resolvedEmail = (jwt["email"] as? String) ?? ""
             }
-            var assembledName = ""
             if let nameComponents = cred.fullName {
                 assembledName = PersonNameComponentsFormatter().string(from: nameComponents).trimmingCharacters(in: .whitespacesAndNewlines)
             }
             if resolvedEmail.isEmpty {
-                self.appleCompletion?(.failure(NSError(domain: "TFlowOAuth", code: -2, userInfo: [NSLocalizedDescriptionKey: "Apple ID chưa chia sẻ email. Hãy bật quyền chia sẻ Email trong cài đặt Apple ID hoặc dùng đăng nhập Email."])))
-            } else {
-                self.appleCompletion?(.success((resolvedEmail.lowercased(), assembledName)))
+                failureError = NSError(
+                    domain: "TFlowOAuth",
+                    code: -2,
+                    userInfo: [NSLocalizedDescriptionKey: "Apple ID chưa chia sẻ email. Hãy bật quyền chia sẻ Email trong cài đặt Apple ID hoặc dùng đăng nhập Google / Email."]
+                )
             }
-            self.appleCompletion = nil
+        } else {
+            failureError = NSError(
+                domain: "TFlowOAuth",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Không nhận được thông tin Apple ID."]
+            )
+        }
+
+        let capturedEmail = resolvedEmail.lowercased()
+        let capturedName = assembledName
+        DispatchQueue.main.async { [weak self] in
+            if let failureError = failureError {
+                self?.appleCompletion?(.failure(failureError))
+            } else {
+                self?.appleCompletion?(.success((capturedEmail, capturedName)))
+            }
+            self?.appleCompletion = nil
         }
     }
 
-    nonisolated func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        Task { @MainActor in
-            self.appleCompletion?(.failure(error))
-            self.appleCompletion = nil
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        DispatchQueue.main.async { [weak self] in
+            self?.appleCompletion?(.failure(error))
+            self?.appleCompletion = nil
         }
     }
 
@@ -646,12 +709,14 @@ private final class NativeOAuthCoordinator: NSObject, ObservableObject, ASAuthor
             URLQueryItem(name: "prompt", value: "select_account")
         ]
         guard let authURL = components.url else {
-            completion(.failure(NSError(domain: "TFlowOAuth", code: -3, userInfo: [NSLocalizedDescriptionKey: "URL Google OAuth không hợp lệ."])))
+            DispatchQueue.main.async {
+                completion(.failure(NSError(domain: "TFlowOAuth", code: -3, userInfo: [NSLocalizedDescriptionKey: "URL Google OAuth không hợp lệ."])))
+            }
             return
         }
 
         let session = ASWebAuthenticationSession(url: authURL, callbackURLScheme: Self.googleCallbackScheme) { [weak self] callbackURL, error in
-            Task { @MainActor in
+            DispatchQueue.main.async {
                 self?.webAuthSession = nil
                 if let error = error {
                     completion(.failure(error))
@@ -847,6 +912,8 @@ struct AuthSignInGateView: View {
     @State private var showOnboarding: Bool = false
     @State private var onboardingPage: Int = 0
     @State private var selectedTab: Int = 0 // 0 = Đăng nhập, 1 = Đăng ký
+    @State private var showEmailAuthForm: Bool = false
+    @State private var showPermissionsSheet: Bool = false
     @StateObject private var oauthCoordinator = NativeOAuthCoordinator()
     @State private var isAuthBusy: Bool = false
 
@@ -910,6 +977,9 @@ struct AuthSignInGateView: View {
             }
             .onAppear {
                 showOnboarding = !store.hasCompletedOnboarding && !store.isLoggedIn
+            }
+            .sheet(isPresented: $showPermissionsSheet) {
+                SystemPermissionsSheetView()
             }
         }
     }
@@ -1033,7 +1103,7 @@ struct AuthSignInGateView: View {
                             .foregroundColor(.black)
                     }
 
-                    Text(selectedTab == 0 ? "Đăng nhập tài khoản" : "Đăng ký tài khoản T-Flow")
+                    Text(showEmailAuthForm && selectedTab == 1 ? "Đăng ký tài khoản T-Flow" : "Đăng nhập tài khoản")
                         .font(.system(size: 26, weight: .bold))
                         .foregroundColor(.primary)
                         .multilineTextAlignment(.center)
@@ -1043,16 +1113,7 @@ struct AuthSignInGateView: View {
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
                 }
-                .padding(.top, 14)
-
-                Picker("Chế độ tài khoản", selection: $selectedTab) {
-                    Text("Đăng nhập").tag(0)
-                    Text("Đăng ký tài khoản").tag(1)
-                }
-                .pickerStyle(.segmented)
-                .onChange(of: selectedTab) { _ in
-                    authError = ""
-                }
+                .padding(.top, 20)
 
                 if !authError.isEmpty {
                     HStack(spacing: 8) {
@@ -1070,33 +1131,219 @@ struct AuthSignInGateView: View {
                     )
                 }
 
-                if selectedTab == 0 {
-                    loginTabContent
-                } else {
-                    registerTabContent
+                // Figma 22_signin: Primary OAuth buttons at top
+                VStack(spacing: 12) {
+                    appleSignInButton
+                    googleSignInButton
                 }
+                .padding(.top, 4)
+
+                HStack(spacing: 12) {
+                    Rectangle().fill(Color(UIColor.separator)).frame(height: 0.5)
+                    Text("HOẶC")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.secondary)
+                    Rectangle().fill(Color(UIColor.separator)).frame(height: 0.5)
+                }
+                .padding(.vertical, 2)
 
                 Button {
-                    withAnimation {
-                        onboardingPage = 0
-                        showOnboarding = true
+                    withAnimation(.easeInOut(duration: 0.22)) {
+                        showEmailAuthForm.toggle()
+                        authError = ""
                     }
                 } label: {
-                    Text("Xem giới thiệu Chống Rung 3 Trục")
-                        .font(.system(size: 12.5, weight: .medium))
-                        .foregroundColor(Color(UIColor.systemBlue))
+                    HStack(spacing: 8) {
+                        Image(systemName: "envelope.fill")
+                            .font(.system(size: 15, weight: .semibold))
+                        Text(showEmailAuthForm ? "Thu gọn biểu mẫu Email" : "Tiếp tục bằng Email")
+                            .font(.system(size: 16.5, weight: .semibold))
+                        Spacer()
+                        Image(systemName: showEmailAuthForm ? "chevron.up" : "chevron.down")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.secondary)
+                    }
+                    .foregroundColor(.primary)
+                    .padding(.horizontal, 18)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(Color(UIColor.secondarySystemGroupedBackground))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(Color(UIColor.separator).opacity(0.45), lineWidth: 0.7)
+                    )
                 }
-                .padding(.top, 2)
+                .buttonStyle(.plain)
 
-                Text("Bằng việc tiếp tục, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật.")
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 24)
+                if showEmailAuthForm {
+                    VStack(spacing: 14) {
+                        Picker("Chế độ tài khoản", selection: $selectedTab) {
+                            Text("Đăng nhập").tag(0)
+                            Text("Đăng ký tài khoản").tag(1)
+                        }
+                        .pickerStyle(.segmented)
+                        .onChange(of: selectedTab) { _ in
+                            authError = ""
+                        }
+
+                        if selectedTab == 0 {
+                            loginTabContent
+                        } else {
+                            registerTabContent
+                        }
+                    }
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+
+                VStack(spacing: 10) {
+                    HStack(spacing: 16) {
+                        Button {
+                            withAnimation {
+                                onboardingPage = 0
+                                showOnboarding = true
+                            }
+                        } label: {
+                            Text("Giới thiệu 3 Trục")
+                                .font(.system(size: 12.5, weight: .medium))
+                                .foregroundColor(Color(UIColor.systemBlue))
+                        }
+
+                        Text("•")
+                            .font(.system(size: 12))
+                            .foregroundColor(.secondary)
+
+                        Button {
+                            showPermissionsSheet = true
+                        } label: {
+                            Text("Quyền truy cập hệ thống")
+                                .font(.system(size: 12.5, weight: .medium))
+                                .foregroundColor(Color(UIColor.systemBlue))
+                        }
+                    }
+
+                    Text("Bằng việc tiếp tục, bạn đồng ý với Điều khoản dịch vụ và Chính sách bảo mật.")
+                        .font(.system(size: 12))
+                        .foregroundColor(.secondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 16)
+                }
+                .padding(.top, 4)
+                .padding(.bottom, 24)
             }
             .padding(.horizontal, 20)
         }
+    }
+
+    private var appleSignInButton: some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            authError = ""
+            isAuthBusy = true
+            oauthCoordinator.signInWithApple { result in
+                switch result {
+                case .success(let info):
+                    store.signInWithOAuthAccount(email: info.email, fullName: info.fullName, provider: "Apple") { ok, msg in
+                        isAuthBusy = false
+                        if ok {
+                            authError = ""
+                            store.hasCompletedOnboarding = true
+                            store.showSignInSheet = false
+                            dismiss()
+                        } else {
+                            authError = msg
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        }
+                    }
+                case .failure(let error):
+                    isAuthBusy = false
+                    let nsErr = error as NSError
+                    if nsErr.domain == ASAuthorizationError.errorDomain && nsErr.code == ASAuthorizationError.canceled.rawValue {
+                        return
+                    }
+                    if nsErr.domain == ASAuthorizationError.errorDomain && nsErr.code == ASAuthorizationError.unknown.rawValue {
+                        authError = "Sign in with Apple yêu cầu chứng chỉ Apple Developer trả phí. Bạn có thể đăng nhập ngay bằng Google hoặc Email."
+                    } else {
+                        authError = "Apple Sign-In: \(error.localizedDescription)"
+                    }
+                    UINotificationFeedbackGenerator().notificationOccurred(.error)
+                }
+            }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "applelogo")
+                    .font(.system(size: 18, weight: .semibold))
+                Text("Đăng nhập bằng Apple")
+                    .font(.system(size: 17, weight: .semibold))
+            }
+            .foregroundColor(colorScheme == .dark ? .black : .white)
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(colorScheme == .dark ? Color.white : Color.black)
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(isAuthBusy)
+    }
+
+    private var googleSignInButton: some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            authError = ""
+            isAuthBusy = true
+            oauthCoordinator.signInWithGoogle { result in
+                switch result {
+                case .success(let info):
+                    store.signInWithOAuthAccount(
+                        email: info.email,
+                        fullName: info.fullName,
+                        provider: "Google",
+                        avatarUrl: info.avatarUrl
+                    ) { ok, msg in
+                        isAuthBusy = false
+                        if ok {
+                            authError = ""
+                            store.hasCompletedOnboarding = true
+                            store.showSignInSheet = false
+                            dismiss()
+                        } else {
+                            authError = msg
+                            UINotificationFeedbackGenerator().notificationOccurred(.error)
+                        }
+                    }
+                case .failure(let error):
+                    isAuthBusy = false
+                    let nsErr = error as NSError
+                    if nsErr.domain != ASWebAuthenticationSessionError.errorDomain || nsErr.code != ASWebAuthenticationSessionError.canceledLogin.rawValue {
+                        authError = "Google OAuth: \(error.localizedDescription)"
+                        UINotificationFeedbackGenerator().notificationOccurred(.error)
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 10) {
+                GoogleGLogoView(size: 20)
+                Text("Đăng nhập bằng Google")
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundColor(.primary)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(Color(UIColor.separator), lineWidth: 0.8)
+            )
+        }
+        .buttonStyle(.plain)
+        .disabled(isAuthBusy)
     }
 
     private var loginTabContent: some View {
@@ -1173,115 +1420,6 @@ struct AuthSignInGateView: View {
                 .background(
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .fill(accentGold)
-                )
-            }
-            .buttonStyle(.plain)
-            .disabled(isAuthBusy)
-
-            HStack(spacing: 12) {
-                Rectangle().fill(Color(UIColor.separator)).frame(height: 0.5)
-                Text("HOẶC")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundColor(.secondary)
-                Rectangle().fill(Color(UIColor.separator)).frame(height: 0.5)
-            }
-            .padding(.vertical, 4)
-
-            Button {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                authError = ""
-                isAuthBusy = true
-                oauthCoordinator.signInWithApple { result in
-                    switch result {
-                    case .success(let info):
-                        store.signInWithOAuthAccount(email: info.email, fullName: info.fullName, provider: "Apple") { ok, msg in
-                            isAuthBusy = false
-                            if ok {
-                                authError = ""
-                                store.hasCompletedOnboarding = true
-                                store.showSignInSheet = false
-                                dismiss()
-                            } else {
-                                authError = msg
-                                UINotificationFeedbackGenerator().notificationOccurred(.error)
-                            }
-                        }
-                    case .failure(let error):
-                        isAuthBusy = false
-                        let nsErr = error as NSError
-                        if nsErr.domain != ASAuthorizationError.errorDomain || nsErr.code != ASAuthorizationError.canceled.rawValue {
-                            authError = "Apple Sign-In: \(error.localizedDescription)"
-                            UINotificationFeedbackGenerator().notificationOccurred(.error)
-                        }
-                    }
-                }
-            } label: {
-                HStack(spacing: 10) {
-                    Image(systemName: "applelogo")
-                        .font(.system(size: 18, weight: .semibold))
-                    Text("Đăng nhập bằng Apple")
-                        .font(.system(size: 17, weight: .semibold))
-                }
-                .foregroundColor(colorScheme == .dark ? .black : .white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(colorScheme == .dark ? Color.white : Color.black)
-                )
-            }
-            .buttonStyle(.plain)
-            .disabled(isAuthBusy)
-
-            Button {
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                authError = ""
-                isAuthBusy = true
-                oauthCoordinator.signInWithGoogle { result in
-                    switch result {
-                    case .success(let info):
-                        store.signInWithOAuthAccount(
-                            email: info.email,
-                            fullName: info.fullName,
-                            provider: "Google",
-                            avatarUrl: info.avatarUrl
-                        ) { ok, msg in
-                            isAuthBusy = false
-                            if ok {
-                                authError = ""
-                                store.hasCompletedOnboarding = true
-                                store.showSignInSheet = false
-                                dismiss()
-                            } else {
-                                authError = msg
-                                UINotificationFeedbackGenerator().notificationOccurred(.error)
-                            }
-                        }
-                    case .failure(let error):
-                        isAuthBusy = false
-                        let nsErr = error as NSError
-                        if nsErr.domain != ASWebAuthenticationSessionError.errorDomain || nsErr.code != ASWebAuthenticationSessionError.canceledLogin.rawValue {
-                            authError = "Google OAuth: \(error.localizedDescription)"
-                            UINotificationFeedbackGenerator().notificationOccurred(.error)
-                        }
-                    }
-                }
-            } label: {
-                HStack(spacing: 10) {
-                    GoogleGLogoView(size: 20)
-                    Text("Đăng nhập bằng Google")
-                        .font(.system(size: 17, weight: .medium))
-                        .foregroundColor(.primary)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .fill(Color(UIColor.secondarySystemGroupedBackground))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
-                        .stroke(Color(UIColor.separator), lineWidth: 0.8)
                 )
             }
             .buttonStyle(.plain)
@@ -1930,6 +2068,9 @@ struct BLEPairingScanSheetView: View {
                     UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                     store.activeMainTab = 0
                     dismiss()
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        NotificationCenter.default.post(name: Notification.Name("TFlowOpenCameraStudio"), object: nil)
+                    }
                 } label: {
                     Text("Bắt đầu quay phim")
                         .font(.system(size: 17, weight: .bold))
@@ -2319,6 +2460,828 @@ private struct OnboardingGimbalVectorIllustration: View {
                         }
                         .offset(y: -10)
                     )
+            }
+        }
+    }
+}
+
+// MARK: - 7. ENGINEER TELEMETRY DASHBOARD (41_admin_dashboard & 41_admin_dashboard_land)
+
+struct EngineerTelemetryDashboardView: View {
+    @EnvironmentObject var store: SupabaseModuleStore
+    @EnvironmentObject var ble: BLEGimbalManager
+    @EnvironmentObject var camera: CameraService
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+
+    @State private var selectedSection: Int = 0
+    @State private var showFeatureFlagsSheet: Bool = false
+    @State private var activeInlineTool: Int = 0 // 0=none, 1=PID, 2=IMU, 3=BLE Console, 4=Analytics
+    @State private var actionBanner: String? = nil
+
+    private var accentYellow: Color {
+        colorScheme == .light
+            ? Color(red: 0.90, green: 0.65, blue: 0.00)
+            : Color(red: 1.00, green: 0.84, blue: 0.04)
+    }
+
+    private let navItems: [(id: Int, icon: String, label: String)] = [
+        (0, "chart.bar.fill", "Tổng quan"),
+        (1, "switch.2", "Cờ tính năng"),
+        (2, "slider.horizontal.3", "Hiệu chỉnh PID"),
+        (3, "gyroscope", "Giám sát IMU"),
+        (4, "terminal.fill", "Nhật ký BLE"),
+        (5, "chart.pie.fill", "Phân tích số liệu")
+    ]
+
+    var body: some View {
+        NavigationStack {
+            GeometryReader { geo in
+                if geo.size.width > geo.size.height {
+                    landscapeSplitDashboard
+                } else {
+                    portraitDashboard
+                }
+            }
+            .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
+            .toolbar(.hidden, for: .navigationBar)
+            .sheet(isPresented: $showFeatureFlagsSheet) {
+                FeatureFlagsAdminView()
+            }
+        }
+    }
+
+    // MARK: Landscape Split View (41_admin_dashboard_dark_land)
+
+    private var landscapeSplitDashboard: some View {
+        HStack(spacing: 0) {
+            VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Quản trị Kỹ thuật")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.primary)
+                    Text("SmartGimbal Engineering")
+                        .font(.system(size: 11.5))
+                        .foregroundColor(.secondary)
+                }
+                .padding(.top, 10)
+                .padding(.horizontal, 6)
+
+                VStack(spacing: 4) {
+                    ForEach(navItems, id: \.id) { item in
+                        let isSelected = selectedSection == item.id
+                        Button {
+                            selectedSection = item.id
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        } label: {
+                            HStack(spacing: 10) {
+                                Image(systemName: item.icon)
+                                    .font(.system(size: 13.5, weight: .semibold))
+                                    .foregroundColor(isSelected ? .black : .secondary)
+                                    .frame(width: 20)
+                                Text(item.label)
+                                    .font(.system(size: 13.5, weight: isSelected ? .bold : .medium))
+                                    .foregroundColor(isSelected ? .black : .primary)
+                                Spacer()
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 9)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(isSelected ? accentYellow : Color.clear)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+
+                Spacer()
+
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(ble.isConnected ? Color(UIColor.systemGreen) : accentYellow)
+                        .frame(width: 8, height: 8)
+                    Text("\(ble.isConnected ? "BLE Đã kết nối" : "Sẵn sàng BLE") • Pin \(ble.isConnected ? ble.batteryLevel : 84)%")
+                        .font(.system(size: 11.5, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+                .padding(10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                        .fill(Color(UIColor.secondarySystemGroupedBackground))
+                )
+            }
+            .padding(14)
+            .frame(width: 238)
+            .background(Color(UIColor.systemBackground))
+
+            Divider()
+
+            ScrollView(showsIndicators: false) {
+                VStack(alignment: .leading, spacing: 16) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Bảng điều khiển Kỹ sư")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(.primary)
+                            Text("\(ble.isConnected ? store.deviceName : "SmartGimbal-Pro_4A9F") • FW \(ble.firmwareVersion.isEmpty ? "v2.4.1" : ble.firmwareVersion) • Bootloader v1.2")
+                                .font(.system(size: 12))
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        Button("Đóng") {
+                            dismiss()
+                        }
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundColor(accentYellow)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule().fill(accentYellow.opacity(0.16))
+                        )
+                    }
+
+                    if let banner = actionBanner {
+                        bannerView(text: banner)
+                    }
+
+                    switch selectedSection {
+                    case 1:
+                        FeatureFlagsContentView()
+                    case 2:
+                        pidTuningInlineCard
+                    case 3:
+                        imuMonitorInlineCard
+                    case 4:
+                        bleConsoleInlineCard
+                    case 5:
+                        analyticsInlineCard
+                    default:
+                        kpiGrid(columnsCount: 4)
+                        HStack(alignment: .top, spacing: 14) {
+                            diagnosticToolsCard(inLandscape: true)
+                                .frame(maxWidth: .infinity)
+                            VStack(spacing: 14) {
+                                hardwareSpecsCard
+                                systemOperationsCard
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
+                    }
+                }
+                .padding(18)
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    // MARK: Portrait Dashboard (41_admin_dashboard_dark)
+
+    private var portraitDashboard: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .top) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Bảng điều khiển")
+                            .font(.system(size: 30, weight: .bold))
+                            .foregroundColor(.primary)
+                        Text("\(ble.isConnected ? "Đã kết nối" : "Sẵn sàng") • SmartGimbal Pro (BLE 5.3) • FW \(ble.firmwareVersion.isEmpty ? "v2.4.1" : ble.firmwareVersion)")
+                            .font(.system(size: 12.5))
+                            .foregroundColor(.secondary)
+                    }
+                    Spacer()
+                    Button("Đóng") {
+                        dismiss()
+                    }
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(Color(UIColor.systemBlue))
+                }
+
+                if let banner = actionBanner {
+                    bannerView(text: banner)
+                }
+
+                kpiGrid(columnsCount: 2)
+
+                if activeInlineTool == 1 {
+                    pidTuningInlineCard
+                } else if activeInlineTool == 2 {
+                    imuMonitorInlineCard
+                } else if activeInlineTool == 3 {
+                    bleConsoleInlineCard
+                } else if activeInlineTool == 4 {
+                    analyticsInlineCard
+                }
+
+                diagnosticToolsCard(inLandscape: false)
+                hardwareSpecsCard
+                systemOperationsCard
+            }
+            .padding(16)
+            .padding(.bottom, 24)
+        }
+    }
+
+    // MARK: Shared Components
+
+    private func kpiGrid(columnsCount: Int) -> some View {
+        let cols = Array(repeating: GridItem(.flexible(), spacing: 10), count: columnsCount)
+        let battPct = ble.isConnected ? ble.batteryLevel : 84
+        return LazyVGrid(columns: cols, spacing: 10) {
+            kpiCard(
+                label: "PIN LI-PO 3S",
+                value: ble.isConnected ? String(format: "%.2f V", 10.2 + Double(battPct) * 0.015) : "11.42 V",
+                valueColor: accentYellow,
+                sub: "● \(battPct)% • 420 mA",
+                subColor: Color(UIColor.systemGreen)
+            )
+            kpiCard(
+                label: "NHIỆT ĐỘ MOTOR",
+                value: "38.5 °C",
+                valueColor: .primary,
+                sub: "Tối ưu • P:38° T:41° R:36°",
+                subColor: .secondary
+            )
+            kpiCard(
+                label: "VÒNG LẶP FOC",
+                value: "20.0 kHz",
+                valueColor: .primary,
+                sub: "Ổn định • Jitter 1.2 µs",
+                subColor: .secondary
+            )
+            kpiCard(
+                label: "NHẬT KÝ LỖI",
+                value: "0 Lỗi",
+                valueColor: Color(UIColor.systemGreen),
+                sub: "Bình thường • 1 Cảnh báo tải",
+                subColor: .secondary
+            )
+        }
+    }
+
+    private func kpiCard(label: String, value: String, valueColor: Color, sub: String, subColor: Color) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(label)
+                .font(.system(size: 11, weight: .bold))
+                .tracking(0.3)
+                .foregroundColor(.secondary)
+            Text(value)
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .foregroundColor(valueColor)
+            Text(sub)
+                .font(.system(size: 11.5))
+                .foregroundColor(subColor)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color(UIColor.secondarySystemGroupedBackground))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(Color(UIColor.separator).opacity(0.35), lineWidth: 0.5)
+        )
+    }
+
+    private func diagnosticToolsCard(inLandscape: Bool) -> some View {
+        let activeCount = store.modules.filter { $0 }.count
+        return VStack(alignment: .leading, spacing: 8) {
+            Text("CÔNG CỤ KỸ THUẬT & CHẨN ĐOÁN")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 4)
+
+            VStack(spacing: 0) {
+                toolRow(
+                    icon: "switch.2",
+                    bg: accentYellow,
+                    fg: .black,
+                    title: "Cờ tính năng (Feature Flags)",
+                    badge: "\(activeCount)/7 Bật"
+                ) {
+                    if inLandscape {
+                        selectedSection = 1
+                    } else {
+                        showFeatureFlagsSheet = true
+                    }
+                }
+                Divider().padding(.leading, 56)
+                toolRow(
+                    icon: "slider.horizontal.3",
+                    bg: Color(UIColor.systemBlue),
+                    fg: .white,
+                    title: "Hiệu chỉnh PID (PID Tuning)",
+                    badge: "P/T/R"
+                ) {
+                    if inLandscape { selectedSection = 2 } else {
+                        withAnimation { activeInlineTool = (activeInlineTool == 1 ? 0 : 1) }
+                    }
+                }
+                Divider().padding(.leading, 56)
+                toolRow(
+                    icon: "gyroscope",
+                    bg: Color(UIColor.systemGreen),
+                    fg: .white,
+                    title: "Giám sát IMU (IMU Monitor)",
+                    badge: "500 Hz"
+                ) {
+                    if inLandscape { selectedSection = 3 } else {
+                        withAnimation { activeInlineTool = (activeInlineTool == 2 ? 0 : 2) }
+                    }
+                }
+                Divider().padding(.leading, 56)
+                toolRow(
+                    icon: "terminal.fill",
+                    bg: Color(UIColor.systemIndigo),
+                    fg: .white,
+                    title: "Nhật ký BLE (BLE Console)",
+                    badge: ble.isConnected ? "Live" : "Idle"
+                ) {
+                    if inLandscape { selectedSection = 4 } else {
+                        withAnimation { activeInlineTool = (activeInlineTool == 3 ? 0 : 3) }
+                    }
+                }
+                Divider().padding(.leading, 56)
+                toolRow(
+                    icon: "chart.pie.fill",
+                    bg: Color(UIColor.systemPink),
+                    fg: .white,
+                    title: "Phân tích & Thống kê (Analytics)",
+                    badge: nil
+                ) {
+                    if inLandscape { selectedSection = 5 } else {
+                        withAnimation { activeInlineTool = (activeInlineTool == 4 ? 0 : 4) }
+                    }
+                }
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+            )
+        }
+    }
+
+    private func toolRow(icon: String, bg: Color, fg: Color, title: String, badge: String?, action: @escaping () -> Void) -> some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            action()
+        } label: {
+            HStack(spacing: 12) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 7, style: .continuous)
+                        .fill(bg)
+                        .frame(width: 28, height: 28)
+                    Image(systemName: icon)
+                        .font(.system(size: 13.5, weight: .semibold))
+                        .foregroundColor(fg)
+                }
+                Text(title)
+                    .font(.system(size: 15))
+                    .foregroundColor(.primary)
+                Spacer()
+                if let badge = badge {
+                    Text(badge)
+                        .font(.system(size: 11.5, weight: .semibold))
+                        .foregroundColor(.secondary)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(
+                            Capsule().fill(Color(UIColor.tertiarySystemFill))
+                        )
+                }
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(Color(UIColor.tertiaryLabel))
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 11)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var hardwareSpecsCard: some View {
+        let serial = store.currentUser.gimbalSerial.isEmpty ? "SGM-PRO-2026-A821" : store.currentUser.gimbalSerial
+        return VStack(alignment: .leading, spacing: 8) {
+            Text("THÔNG TIN PHẦN CỨNG & FIRMWARE")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 4)
+
+            VStack(spacing: 0) {
+                specRow(label: "Số sê-ri (S/N)", value: serial)
+                Divider().padding(.leading, 14)
+                specRow(label: "Vi điều khiển (MCU)", value: "STM32G474 (170MHz)")
+                Divider().padding(.leading, 14)
+                specRow(label: "Module RF", value: "nRF52840 (BLE 5.3)")
+                Divider().padding(.leading, 14)
+                specRow(label: "Thời gian hoạt động", value: "14h 28m 32s")
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+            )
+        }
+    }
+
+    private func specRow(label: String, value: String) -> some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 14.5))
+                .foregroundColor(.primary)
+            Spacer()
+            Text(value)
+                .font(.system(size: 13.5, design: .monospaced))
+                .foregroundColor(.secondary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+    }
+
+    private var systemOperationsCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("THAO TÁC HỆ THỐNG")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 4)
+
+            VStack(spacing: 0) {
+                Button {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    ble.setGimbalMode("PF")
+                    ble.sendManualJoystick(x: 0, y: 0)
+                    actionBanner = "Đã gửi lệnh Soft Reboot đến bộ điều khiển STM32G474."
+                } label: {
+                    HStack {
+                        Text("Khởi động lại Gimbal (Soft Reboot)")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(Color(UIColor.systemBlue))
+                        Spacer()
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                }
+                .buttonStyle(.plain)
+
+                Divider().padding(.leading, 14)
+
+                Button {
+                    UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                    ble.joystickSensitivity = 0.45
+                    ble.smoothPan = 0.70
+                    ble.smoothTilt = 0.60
+                    ble.smoothRoll = 0.50
+                    ble.panTorque = 1.0
+                    ble.tiltTorque = 0.85
+                    ble.rollTorque = 0.90
+                    actionBanner = "Đã khôi phục thông số PID & NVRAM về cấu hình gốc."
+                } label: {
+                    HStack {
+                        Text("Khôi phục cấu hình NVRAM mặc định")
+                            .font(.system(size: 15, weight: .medium))
+                            .foregroundColor(Color(UIColor.systemRed))
+                        Spacer()
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 12)
+                }
+                .buttonStyle(.plain)
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+            )
+        }
+    }
+
+    private var pidTuningInlineCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("HIỆU CHỈNH PID & MÔ-MEN FOC 3 TRỤC")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.secondary)
+
+            VStack(spacing: 10) {
+                pidSliderRow(title: "Pan Torque Gain", value: $ble.panTorque, color: accentYellow)
+                pidSliderRow(title: "Tilt Torque Gain", value: $ble.tiltTorque, color: Color(UIColor.systemBlue))
+                pidSliderRow(title: "Roll Torque Gain", value: $ble.rollTorque, color: Color(UIColor.systemGreen))
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+            )
+        }
+    }
+
+    private func pidSliderRow(title: String, value: Binding<Double>, color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(title).font(.system(size: 13.5, weight: .medium))
+                Spacer()
+                Text("\(Int(value.wrappedValue * 100))%")
+                    .font(.system(size: 12.5, weight: .bold, design: .monospaced))
+                    .foregroundColor(color)
+            }
+            Slider(value: value, in: 0.2...1.5).tint(color)
+        }
+    }
+
+    private var imuMonitorInlineCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("GIÁM SÁT EULER IMU 500HZ")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.secondary)
+            HStack(spacing: 10) {
+                kpiCard(label: "PAN (YAW)", value: String(format: "%.1f°", ble.panAngle), valueColor: accentYellow, sub: "Smooth \(Int(ble.smoothPan * 100))%", subColor: .secondary)
+                kpiCard(label: "TILT (PITCH)", value: String(format: "%.1f°", ble.pitchAngle), valueColor: Color(UIColor.systemBlue), sub: "Smooth \(Int(ble.smoothTilt * 100))%", subColor: .secondary)
+                kpiCard(label: "ROLL", value: String(format: "%.2f°", ble.rollAngle), valueColor: Color(UIColor.systemGreen), sub: "Drift ±0.01°", subColor: .secondary)
+            }
+        }
+    }
+
+    private var bleConsoleInlineCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("NHẬT KÝ GÓI TIN BLE GATT")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.secondary)
+            VStack(alignment: .leading, spacing: 5) {
+                Text("[GATT] Service: 0xFF00 • Characteristic: 0xFF01 (Notify)")
+                Text("[FOC ] Loop: 20.0kHz • Mode: \(ble.gimbalMode) • Connected: \(ble.isConnected ? "YES" : "NO")")
+                Text("[IMU ] Pan \(String(format: "%.1f", ble.panAngle))° • Pitch \(String(format: "%.1f", ble.pitchAngle))° • Roll \(String(format: "%.2f", ble.rollAngle))°")
+                Text("[SYNC] Supabase Cloud Queue: \(store.isSyncing ? "Syncing..." : "Idle") • Account: \(store.currentUser.email)")
+            }
+            .font(.system(size: 11.5, design: .monospaced))
+            .foregroundColor(.secondary)
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+            )
+        }
+    }
+
+    private var analyticsInlineCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("PHÂN TÍCH DUNG LƯỢNG & MODULE CLOUD")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundColor(.secondary)
+            HStack(spacing: 10) {
+                kpiCard(label: "TỆP THƯ VIỆN", value: "\(camera.capturedMedia.count)", valueColor: .primary, sub: camera.totalLibraryStorageBytesFormatted, subColor: .secondary)
+                kpiCard(label: "MODULE HOẠT ĐỘNG", value: "\(store.modules.filter { $0 }.count)/7", valueColor: accentYellow, sub: "Tier: \(store.userTier)", subColor: .secondary)
+            }
+        }
+    }
+
+    private func bannerView(text: String) -> some View {
+        HStack(spacing: 8) {
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundColor(Color(UIColor.systemGreen))
+            Text(text)
+                .font(.system(size: 13, weight: .medium))
+                .foregroundColor(.primary)
+            Spacer()
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color(UIColor.systemGreen).opacity(0.14))
+        )
+    }
+}
+
+// MARK: - 8. FEATURE FLAGS ADMIN SCREEN (42_feature_flags_dark)
+
+struct FeatureFlagsAdminView: View {
+    @EnvironmentObject var store: SupabaseModuleStore
+    @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                HStack(alignment: .center) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(Color(UIColor.systemBlue))
+                            .frame(width: 34, height: 34)
+                    }
+
+                    VStack(alignment: .leading, spacing: 1) {
+                        Text("Cờ tính năng")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.primary)
+                        Text("Bật/tắt module chức năng trên thiết bị & tài khoản")
+                            .font(.system(size: 11.5))
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
+
+                    Spacer()
+
+                    Button("Khôi phục") {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        for idx in 0..<store.modules.count {
+                            if !store.modules[idx] {
+                                store.toggleModule(at: idx)
+                            }
+                        }
+                    }
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundColor(colorScheme == .light ? Color(red: 0.90, green: 0.65, blue: 0.00) : Color(red: 1.00, green: 0.84, blue: 0.04))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
+
+                ScrollView(showsIndicators: false) {
+                    FeatureFlagsContentView()
+                        .padding(16)
+                }
+            }
+            .background(Color(UIColor.systemGroupedBackground).ignoresSafeArea())
+            .toolbar(.hidden, for: .navigationBar)
+        }
+    }
+}
+
+private struct FeatureFlagRowMeta: Identifiable {
+    let id: Int
+    let section: Int
+    let title: String
+    let subtitle: String
+    let icon: String
+    let iconBg: Color
+}
+
+private struct FeatureFlagsContentView: View {
+    @EnvironmentObject var store: SupabaseModuleStore
+    @State private var searchQuery: String = ""
+
+    private let catalog: [FeatureFlagRowMeta] = [
+        FeatureFlagRowMeta(
+            id: 0,
+            section: 0,
+            title: "AI Vision Tracking",
+            subtitle: "Nhận diện khuôn mặt 60fps & tự động đóng khung",
+            icon: "viewfinder",
+            iconBg: Color(UIColor.systemBlue)
+        ),
+        FeatureFlagRowMeta(
+            id: 5,
+            section: 0,
+            title: "FOC Micro-Tuning",
+            subtitle: "Thuật toán FOC 20kHz & tinh chỉnh mô-men 3 trục",
+            icon: "slider.horizontal.3",
+            iconBg: Color(UIColor.systemOrange)
+        ),
+        FeatureFlagRowMeta(
+            id: 6,
+            section: 0,
+            title: "Raw Sensor Telemetry",
+            subtitle: "Truy xuất IMU Gyro/Accel & nhật ký chẩn đoán",
+            icon: "waveform.path.ecg",
+            iconBg: Color(UIColor.systemIndigo)
+        ),
+        FeatureFlagRowMeta(
+            id: 2,
+            section: 1,
+            title: "Motionlapse Waypoint",
+            subtitle: "Lập trình tối đa 8 điểm di chuyển đa trục mượt mà",
+            icon: "timelapse",
+            iconBg: Color(UIColor.systemGreen)
+        ),
+        FeatureFlagRowMeta(
+            id: 1,
+            section: 1,
+            title: "4K 60fps Apple Log",
+            subtitle: "Quay dải tương phản rộng 10-bit ProRes / Log",
+            icon: "film.fill",
+            iconBg: Color(UIColor.systemPurple)
+        ),
+        FeatureFlagRowMeta(
+            id: 4,
+            section: 1,
+            title: "Cinema 3D LUTs",
+            subtitle: "Áp dụng bộ lọc màu LUT điện ảnh trực tiếp (.cube)",
+            icon: "camera.filters",
+            iconBg: Color(UIColor.systemPink)
+        ),
+        FeatureFlagRowMeta(
+            id: 3,
+            section: 2,
+            title: "Multi-Cam Studio",
+            subtitle: "Kết nối và điều khiển đồng bộ tới 4 máy ảnh Wi-Fi",
+            icon: "rectangle.grid.2x2.fill",
+            iconBg: Color(UIColor.systemTeal)
+        )
+    ]
+
+    private var filteredCatalog: [FeatureFlagRowMeta] {
+        let q = searchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !q.isEmpty else { return catalog }
+        return catalog.filter {
+            $0.title.lowercased().contains(q) || $0.subtitle.lowercased().contains(q)
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(spacing: 8) {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.secondary)
+                TextField("Tìm kiếm module tính năng...", text: $searchQuery)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                if !searchQuery.isEmpty {
+                    Button {
+                        searchQuery = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundColor(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+            )
+
+            flagSection(title: "THUẬT TOÁN AI & THEO DÕI ĐỐI TƯỢNG", sectionIndex: 0)
+            flagSection(title: "CHẾ ĐỘ QUAY PHIM & CHUYỂN ĐỘNG", sectionIndex: 1)
+            flagSection(title: "HỆ THỐNG & DỊCH VỤ THƯƠNG MẠI", sectionIndex: 2)
+
+            Text("Thay đổi cờ tính năng sẽ có hiệu lực ngay lập tức trên phiên làm việc hiện tại và tự động đồng bộ xuống firmware qua BLE.")
+                .font(.system(size: 12))
+                .foregroundColor(.secondary)
+                .padding(.horizontal, 4)
+        }
+    }
+
+    @ViewBuilder
+    private func flagSection(title: String, sectionIndex: Int) -> some View {
+        let items = filteredCatalog.filter { $0.section == sectionIndex }
+        if !items.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(title)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal, 4)
+
+                VStack(spacing: 0) {
+                    ForEach(Array(items.enumerated()), id: \.element.id) { offset, item in
+                        if offset > 0 {
+                            Divider().padding(.leading, 56)
+                        }
+                        HStack(spacing: 12) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .fill(item.iconBg)
+                                    .frame(width: 30, height: 30)
+                                Image(systemName: item.icon)
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.white)
+                            }
+
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(item.title)
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundColor(.primary)
+                                Text(item.subtitle)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.secondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+
+                            Spacer()
+
+                            Toggle("", isOn: Binding(
+                                get: { store.modules.indices.contains(item.id) ? store.modules[item.id] : false },
+                                set: { newVal in
+                                    let current = store.modules.indices.contains(item.id) ? store.modules[item.id] : false
+                                    if current != newVal {
+                                        store.toggleModule(at: item.id)
+                                    }
+                                }
+                            ))
+                            .labelsHidden()
+                            .tint(Color(UIColor.systemGreen))
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
+                    }
+                }
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color(UIColor.secondarySystemGroupedBackground))
+                )
             }
         }
     }

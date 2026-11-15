@@ -266,6 +266,8 @@ struct MediaDetailPreviewSheet: View {
     @Environment(\.colorScheme) private var colorScheme
 
     @State private var avPlayer: AVPlayer? = nil
+    @State private var isPlaying: Bool = false
+    @State private var scrubProgress: Double = 0.32
     @State private var isFavorite: Bool = false
     @State private var showShareSheet: Bool = false
     @State private var showClipEditor: Bool = false
@@ -294,22 +296,38 @@ struct MediaDetailPreviewSheet: View {
                                 .cornerRadius(12)
                                 .padding(.horizontal, 8)
                         } else {
-                            Image(uiImage: item.image)
-                                .resizable()
-                                .scaledToFit()
-                                .cornerRadius(12)
-                                .padding(.horizontal, 8)
+                            ZStack {
+                                Image(uiImage: item.image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .cornerRadius(12)
+                                    .padding(.horizontal, 8)
+
+                                if item.isVideo {
+                                    Button {
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        isPlaying.toggle()
+                                    } label: {
+                                        ZStack {
+                                            Circle()
+                                                .fill(Color.black.opacity(0.55))
+                                                .frame(width: 64, height: 64)
+                                                .overlay(Circle().stroke(Color.white.opacity(0.22), lineWidth: 1))
+                                            Image(systemName: isPlaying ? "pause.fill" : "play.fill")
+                                                .font(.system(size: 22, weight: .bold))
+                                                .foregroundColor(.white)
+                                                .offset(x: isPlaying ? 0 : 2)
+                                        }
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
                         }
                     }
 
                     Spacer(minLength: 10)
 
-                    if item.isVideo && item.videoURL == nil {
-                        Text("Video bản xem trước tĩnh (chưa có tệp .mov trên thiết bị)")
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondary)
-                            .padding(.bottom, 8)
-                    }
+                    filmstripScrubberCard
 
                     bottomActionToolbar
                 }
@@ -354,6 +372,69 @@ struct MediaDetailPreviewSheet: View {
                 }
             }
         }
+    }
+
+    private var filmstripScrubberCard: some View {
+        let totalSecs: Double = {
+            if let dur = item.duration {
+                let parts = dur.split(separator: ":").compactMap { Double($0) }
+                if parts.count == 2 { return max(1, parts[0] * 60 + parts[1]) }
+            }
+            return 45.0
+        }()
+        let currentSecs = totalSecs * scrubProgress
+
+        return VStack(spacing: 6) {
+            HStack {
+                Text(formattedSeconds(currentSecs))
+                Spacer()
+                Text(item.duration ?? "00:45")
+            }
+            .font(.system(size: 12, weight: .medium, design: .monospaced))
+            .foregroundColor(.white.opacity(0.85))
+
+            GeometryReader { geo in
+                let totalW = max(1, geo.size.width)
+                ZStack(alignment: .leading) {
+                    HStack(spacing: 2) {
+                        ForEach(0..<5, id: \.self) { _ in
+                            Image(uiImage: item.image)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 32, maxHeight: 32)
+                                .clipped()
+                        }
+                    }
+                    .cornerRadius(6)
+
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(accentYellow)
+                        .frame(width: 4, height: 34)
+                        .shadow(color: accentYellow.opacity(0.8), radius: 6)
+                        .offset(x: max(0, min(totalW - 4, totalW * CGFloat(scrubProgress))))
+                }
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            scrubProgress = min(1.0, max(0.0, Double(value.location.x / totalW)))
+                            if let player = avPlayer {
+                                let target = CMTime(seconds: totalSecs * scrubProgress, preferredTimescale: 600)
+                                player.seek(to: target)
+                            }
+                        }
+                )
+            }
+            .frame(height: 34)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(.ultraThinMaterial)
+        )
+        .padding(.horizontal, 16)
+        .padding(.bottom, 10)
     }
 
     private var bottomActionToolbar: some View {
@@ -474,16 +555,44 @@ struct ClipEditorSheetView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 14) {
-                previewStage
+            GeometryReader { geo in
+                let isLandscape = geo.size.width > geo.size.height
 
-                trimTimelineSection
+                Group {
+                    if isLandscape {
+                        HStack(spacing: 14) {
+                            previewStage
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                toolContentSection
+                            VStack(spacing: 10) {
+                                trimTimelineSection
+                                toolContentSection
+                                Spacer(minLength: 4)
+                                bottomToolTabs
+                            }
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+                            )
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                    } else {
+                        VStack(spacing: 12) {
+                            previewStage
 
-                bottomToolTabs
+                            VStack(spacing: 10) {
+                                trimTimelineSection
+                                toolContentSection
+                                bottomToolTabs
+                            }
+                            .padding(.top, 10)
+                            .background(Color(UIColor.secondarySystemGroupedBackground))
+                        }
+                    }
+                }
             }
-            .padding(.top, 8)
             .background(
                 (colorScheme == .light ? Color(red: 0.96, green: 0.96, blue: 0.98) : Color.black)
                     .ignoresSafeArea()
@@ -575,20 +684,24 @@ struct ClipEditorSheetView: View {
     private var trimTimelineSection: some View {
         VStack(spacing: 8) {
             HStack {
+                Text("00:00")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundColor(.secondary)
+                Spacer()
                 Text("Đoạn chọn: \(selectedDurationText)")
-                    .font(.system(size: 12, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 11.5, weight: .bold, design: .monospaced))
                     .foregroundColor(accentYellow)
                 Spacer()
-                Text("Điểm vào \(Int(trimStart * 100))% - Ra \(Int(trimEnd * 100))%")
-                    .font(.system(size: 11))
+                Text(item.duration ?? "00:45")
+                    .font(.system(size: 11, design: .monospaced))
                     .foregroundColor(.secondary)
             }
 
-            // Trim strip with #FFD60A highlighted frame border
+            // Trim strip with #FFD60A highlighted frame border + Left/Right grip handles
             GeometryReader { geo in
                 let width = max(1, geo.size.width)
                 let startX = width * CGFloat(trimStart)
-                let selectionW = max(24, width * CGFloat(max(0.08, trimEnd - trimStart)))
+                let selectionW = max(36, width * CGFloat(max(0.08, trimEnd - trimStart)))
 
                 ZStack(alignment: .leading) {
                     HStack(spacing: 1) {
@@ -596,24 +709,41 @@ struct ClipEditorSheetView: View {
                             Image(uiImage: item.image)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 48, maxHeight: 48)
+                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 44, maxHeight: 44)
                                 .clipped()
-                                .opacity(0.42)
+                                .opacity(0.45)
                         }
                     }
                     .cornerRadius(8)
 
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(accentYellow, lineWidth: 3)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(accentYellow.opacity(0.12))
-                        )
-                        .frame(width: min(width - startX, selectionW), height: 48)
-                        .offset(x: startX)
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(accentYellow, lineWidth: 3)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(accentYellow.opacity(0.10))
+                            )
+
+                        HStack {
+                            Text("||")
+                                .font(.system(size: 9, weight: .black))
+                                .foregroundColor(.black)
+                                .frame(width: 14, height: 44)
+                                .background(accentYellow)
+                            Spacer()
+                            Text("||")
+                                .font(.system(size: 9, weight: .black))
+                                .foregroundColor(.black)
+                                .frame(width: 14, height: 44)
+                                .background(accentYellow)
+                        }
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                    }
+                    .frame(width: min(width - startX, selectionW), height: 44)
+                    .offset(x: startX)
                 }
             }
-            .frame(height: 48)
+            .frame(height: 44)
 
             HStack(spacing: 12) {
                 VStack(alignment: .leading, spacing: 2) {

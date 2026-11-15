@@ -13,6 +13,8 @@ import UIKit
 import AVFoundation
 
 struct CameraStudioNativeView: View {
+    var onBackToHomeHub: (() -> Void)? = nil
+
     @EnvironmentObject var store: SupabaseModuleStore
     @EnvironmentObject var ble: BLEGimbalManager
     @EnvironmentObject var camera: CameraService
@@ -636,6 +638,20 @@ struct CameraStudioNativeView: View {
             VStack(spacing: 8) {
                 // Top Row: Flash + Portrait Return + Pro Readout / Gimbal Pill + Menu
                 HStack(spacing: 8) {
+                    if let backToHub = onBackToHomeHub {
+                        Button {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            backToHub()
+                        } label: {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(hudPrimaryInk)
+                                .frame(width: 36, height: 36)
+                                .background(glassPillBackground(cornerRadius: 18))
+                        }
+                        .buttonStyle(.plain)
+                    }
+
                     flashCircleButton(size: 36)
 
                     // Quick Exit Landscape pill so portrait users can return 1-tap
@@ -727,6 +743,19 @@ struct CameraStudioNativeView: View {
     private var portraitBasicTopBar: some View {
         HStack {
             HStack(spacing: 8) {
+                if let backToHub = onBackToHomeHub {
+                    Button {
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        backToHub()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(hudPrimaryInk)
+                            .frame(width: 38, height: 38)
+                            .background(glassPillBackground(cornerRadius: 19))
+                    }
+                    .buttonStyle(.plain)
+                }
                 flashCircleButton(size: 38)
                 if camera.isRecording {
                     gimbalCompactBatteryPill
@@ -749,9 +778,24 @@ struct CameraStudioNativeView: View {
 
     private var portraitProTopSection: some View {
         VStack(spacing: 8) {
-            // Row 1: Flash, REC badge (if recording), Menu Chevron
+            // Row 1: Flash (and optional Hub Back), REC badge (if recording), Menu Chevron
             HStack {
-                flashCircleButton(size: 38)
+                HStack(spacing: 8) {
+                    if let backToHub = onBackToHomeHub {
+                        Button {
+                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            backToHub()
+                        } label: {
+                            Image(systemName: "chevron.left")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(hudPrimaryInk)
+                                .frame(width: 38, height: 38)
+                                .background(glassPillBackground(cornerRadius: 19))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    flashCircleButton(size: 38)
+                }
                 Spacer()
                 if camera.isRecording {
                     recordingTimecodePill

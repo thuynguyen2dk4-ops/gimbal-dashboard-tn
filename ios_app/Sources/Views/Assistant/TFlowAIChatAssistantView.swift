@@ -15,6 +15,9 @@ struct TFlowAIChatAssistantView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
 
+    var isEmbeddedTab: Bool = false
+    var onOpenCamera: (() -> Void)? = nil
+
     private let chatEndpoint = "https://t-flow-tech.vercel.app/api/chat"
     private let accentYellow = Color(red: 1.0, green: 0.84, blue: 0.04) // #FFD60A
 
@@ -106,11 +109,25 @@ struct TFlowAIChatAssistantView: View {
                     }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Đóng") {
-                        dismiss()
+                    if isEmbeddedTab {
+                        Button {
+                            onOpenCamera?()
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "camera.fill")
+                                    .font(.system(size: 12, weight: .bold))
+                                Text("Mở Camera")
+                                    .font(.system(size: 13, weight: .semibold))
+                            }
+                            .foregroundColor(accentYellow)
+                        }
+                    } else {
+                        Button("Đóng") {
+                            dismiss()
+                        }
+                        .fontWeight(.semibold)
+                        .foregroundColor(accentYellow)
                     }
-                    .fontWeight(.semibold)
-                    .foregroundColor(accentYellow)
                 }
             }
         }
