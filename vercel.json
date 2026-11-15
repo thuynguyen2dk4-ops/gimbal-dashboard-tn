@@ -84,6 +84,14 @@
       "destination": "/auth/apple/index.html"
     },
     {
+      "source": "/privacy",
+      "destination": "/privacy/index.html"
+    },
+    {
+      "source": "/terms",
+      "destination": "/terms/index.html"
+    },
+    {
       "source": "/san-pham",
       "destination": "/index.html"
     },
