@@ -596,7 +596,7 @@ struct ClipEditorSheetView: View {
                             Image(uiImage: item.image)
                                 .resizable()
                                 .scaledToFill()
-                                .frame(maxWidth: .infinity, height: 48)
+                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 48, maxHeight: 48)
                                 .clipped()
                                 .opacity(0.42)
                         }
