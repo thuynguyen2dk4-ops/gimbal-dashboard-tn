@@ -30,9 +30,9 @@ targets:
         NSBluetoothAlwaysUsageDescription: "Ứng dụng cần quyền Bluetooth BLE 5.3 để kết nối và điều khiển động cơ Gimbal 3 trục FOC."
         CFBundleURLTypes:
           - CFBundleTypeRole: Editor
-            CFBundleURLName: com.googleusercontent.apps.725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac
+            CFBundleURLName: com.googleusercontent.apps.725853259455-ibugei8btrjeq9um14bc71ajbfna8218
             CFBundleURLSchemes:
-              - com.googleusercontent.apps.725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac
+              - com.googleusercontent.apps.725853259455-ibugei8btrjeq9um14bc71ajbfna8218
               - tflow
     entitlements:
       path: Sources/SmartGimbalPro.entitlements

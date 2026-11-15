@@ -28,10 +28,10 @@
             <key>CFBundleTypeRole</key>
             <string>Editor</string>
             <key>CFBundleURLName</key>
-            <string>com.googleusercontent.apps.725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac</string>
+            <string>com.googleusercontent.apps.725853259455-ibugei8btrjeq9um14bc71ajbfna8218</string>
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>com.googleusercontent.apps.725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac</string>
+                <string>com.googleusercontent.apps.725853259455-ibugei8btrjeq9um14bc71ajbfna8218</string>
                 <string>tflow</string>
             </array>
         </dict>

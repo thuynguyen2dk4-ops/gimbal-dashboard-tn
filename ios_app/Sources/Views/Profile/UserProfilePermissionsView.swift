@@ -560,9 +560,9 @@ struct UserProfilePermissionsView: View {
 
 @MainActor
 private final class NativeOAuthCoordinator: NSObject, ObservableObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, ASWebAuthenticationPresentationContextProviding {
-    static let googleClientId = "725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac.apps.googleusercontent.com"
-    static let googleCallbackScheme = "com.googleusercontent.apps.725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac"
-    static let googleRedirectUri = "com.googleusercontent.apps.725853259455-83tapd22sn2en4cht3jdiaa0ehn734ac:/oauth2redirect"
+    static let googleClientId = "725853259455-ibugei8btrjeq9um14bc71ajbfna8218.apps.googleusercontent.com"
+    static let googleCallbackScheme = "com.googleusercontent.apps.725853259455-ibugei8btrjeq9um14bc71ajbfna8218"
+    static let googleRedirectUri = "com.googleusercontent.apps.725853259455-ibugei8btrjeq9um14bc71ajbfna8218:/oauth2redirect"
 
     private var appleCompletion: ((Result<(email: String, fullName: String), Error>) -> Void)?
     private var webAuthSession: ASWebAuthenticationSession?
